@@ -1117,28 +1117,44 @@ useEffect(() => {
   };
 
   // --- CAMBIO MANUAL DE ESTADO DE FIRMAS FC-10 (solo administrador) ---
-  // Llama al endpoint protegido del backend Express:
-  //   PATCH /api/fc10/:id/firma-estado  (middleware exigirAdmin -> solo admin/dev)
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-
+  // Escribe directo en Supabase (tabla fc10, columna JSONB data). No usa backend.
   const actualizarEstadoFirma = async (id, { estadoFirma, registradoPor }) => {
     if (!isAdmin) throw new Error('Solo el administrador puede cambiar el estado de firmas.');
     try {
       setIsProcessing({ active: true, text: 'Actualizando estado de firma...' });
-      const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${API_URL}/api/fc10/${encodeURIComponent(id)}/firma-estado`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {})
-        },
-        body: JSON.stringify({ estadoFirma, registradoPor: registradoPor || (currentUser?.username || 'admin') })
-      });
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        throw new Error(errBody.error || `Error ${res.status}`);
+
+      // Leer el acta actual
+      const { data: fila, error: errLeer } = await supabase
+        .from('fc10')
+        .select('data')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (errLeer || !fila) {
+        throw new Error('Acta FC-10 no encontrada');
       }
-      const data = await res.json();
+
+      const data = typeof fila.data === 'string' ? JSON.parse(fila.data) : (fila.data || {});
+      const ahora = new Date().toISOString();
+
+      const actualizado = {
+        ...data,
+        estadoFirma,
+        firmaEstadoManual: true,
+        firmaEstadoActualizadoPor: registradoPor || (currentUser?.username || 'admin'),
+        firmaEstadoActualizadoEn: ahora
+      };
+
+      if (estadoFirma === 'CERRADO') {
+        actualizado.fechaCierreFirmaManual = ahora;
+      }
+
+      const { error: errEscribir } = await supabase
+        .from('fc10')
+        .update({ data: actualizado })
+        .eq('id', id);
+
+      if (errEscribir) throw errEscribir;
 
       // Refrescar lista local para UI inmediata
       setFc10List(prev => prev.map(fc => (fc.id === id ? { ...fc, estadoFirma, firmaEstadoManual: true } : fc)));

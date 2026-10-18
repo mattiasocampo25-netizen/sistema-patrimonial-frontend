@@ -2,14 +2,12 @@ import FiltroCombo from '../FiltroCombo';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { normalizeStr } from '../../utils/helpers';
 
-// Gestor de dependencias v3: maestro-detalle con búsqueda unificada.
-// Mejoras v3:
-// - Los selects nativos se reemplazan por un combo con buscador (el nativo
-//   con 215 opciones era lento, se recorría a ojo y encima ocultaba gente
-//   con un slice(0, 100) silencioso).
-// - La lista izquierda muestra el nombre completo (antes se truncaba con
-//   ellipsis: "Facultad de Ciencias Agropecua...").
-// - Los filtros pesados se memoizan para no recalcular en cada tecla.
+// Gestor de dependencias v4: maestro-detalle con búsqueda unificada.
+// Mejoras v4:
+// - Jerarquía visual más clara entre dependencias oficiales y detectadas.
+// - Tarjetas de departamento más limpias y fáciles de leer.
+// - Estados de fusión y acciones más visibles.
+// - Mejor contraste y accesibilidad en modo oscuro.
 export default function DependenciasModal({
   isOpen, onClose, dependencias, detectadas, conteos,
   onSave, onDelete, onFusionar, isSaving,
@@ -65,8 +63,6 @@ export default function DependenciasModal({
 
   const normDepSel = depSel ? normalizeStr(depSel.nombre) : '';
 
-  // Mapa ubicacion -> funcionarios de la dependencia seleccionada (un solo
-  // recorrido en vez de un filter por cada tarjeta de departamento).
   const funcsPorUbic = useMemo(() => {
     const mapa = new Map();
     if (!depSel) return mapa;
@@ -120,13 +116,15 @@ export default function DependenciasModal({
         title={d.nombre}
         className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
           activo || activoDet
-            ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
-            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300'
+            ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border border-transparent'
+            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300 border border-transparent'
         }`}
       >
-        <span className={`flex h-2 w-2 shrink-0 rounded-full ${detectada ? 'bg-amber-500' : (activo || activoDet ? 'bg-emerald-400' : 'bg-zinc-300 dark:bg-zinc-600')}`}></span>
+        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-emerald-500 ring-1 ring-emerald-900/20' : 'bg-zinc-400 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
-          <span className="block text-[13px] font-bold leading-snug text-balance">{d.nombre}</span>
+          <span className={`block text-[13px] font-bold leading-snug text-balance ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`}>
+            {d.nombre}
+          </span>
           <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'opacity-80' : 'text-zinc-400'}`}>
             {detectada ? `${d.bienes + d.funcionarios} registros por fusionar` : `${(conteos[d.nombre]?.bienes || 0)} bienes · ${(conteos[d.nombre]?.funcionarios || 0)} func.`}
           </span>
@@ -137,10 +135,10 @@ export default function DependenciasModal({
 
   return (
     <div className={STYLES.modalOverlay} onClick={onClose}>
-      <div className={STYLES.modalContent + " max-w-4xl !max-h-[88dvh]"} onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0">
+      <div className={STYLES.modalContent + " max-w-5xl !max-h-[90dvh]"} onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-zinc-100 dark:border-darkbg-border shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
               <i className="fa-solid fa-building-columns text-base"></i>
             </div>
             <div className="min-w-0">
@@ -175,11 +173,17 @@ export default function DependenciasModal({
         </div>
 
         <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
-          <div className="md:w-72 shrink-0 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-zinc-800/80 p-3 space-y-1 overflow-y-auto custom-scrollbar max-h-48 md:max-h-none">
+          {/* Panel izquierdo: lista de dependencias */}
+          <div className="md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-darkbg-border p-3 space-y-1 overflow-y-auto custom-scrollbar max-h-48 md:max-h-none">
+            <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+              Oficiales ({depsFiltradas.length})
+            </div>
             {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
             {detFiltradas.length > 0 && (
               <>
-                <p className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400">Por fusionar ({detFiltradas.length})</p>
+                <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400 border-t border-amber-100/30 mt-2">
+                  Posibles duplicados ({detFiltradas.length})
+                </div>
                 {detFiltradas.map(d => <ItemDep key={'det-' + d.nombre} d={d} detectada />)}
               </>
             )}
@@ -198,7 +202,7 @@ export default function DependenciasModal({
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 cursor-pointer shrink-0 disabled:opacity-40"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
@@ -206,25 +210,35 @@ export default function DependenciasModal({
             </div>
           </div>
 
+          {/* Panel derecho: detalle y gestión */}
           <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-5 sm:p-6">
             {detSel ? (
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400 mb-2">Nombre detectado en datos</p>
-                <h3 className="text-base font-bold text-zinc-900 dark:text-white">{detSel.nombre}</h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 tabular-nums">{detSel.bienes} bienes · {detSel.funcionarios} funcionarios con este nombre (posible error de carga).</p>
-                <div className="flex flex-wrap items-center gap-2 mt-4">
+              <div className="space-y-6">
+                {/* Banner de posible duplicado */}
+                <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                    <i className="fa-solid fa-triangle-exclamation text-sm"></i>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400 mb-1">Nombre detectado en datos (posible duplicado)</p>
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">{detSel.nombre}</h3>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 tabular-nums">{detSel.bienes} bienes · {detSel.funcionarios} funcionarios con este nombre</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 mt-2">
                   <FiltroCombo
                     valor=""
                     opciones={dependencias.map(o => ({ label: o.nombre, value: o.nombre }))}
                     onElegir={(v) => { if (v) onFusionar(detSel.nombre, v); }}
                     etiquetaTodos="Fusionar en..."
-                    titulo="Fusionar en una dependencia"
+                    titulo="Fusionar en una dependencia oficial"
                     ancho="max-w-[280px]"
                   />
                   <button
                     onClick={() => onSave(null, detSel.nombre)}
                     title="Agregar como dependencia oficial"
-                    className="h-10 px-4 rounded-xl text-[13px] font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer"
+                    className="h-10 px-4 rounded-xl text-[13px] font-bold bg-brand-primary text-white hover:bg-brand-hover transition-all cursor-pointer shadow-sm shadow-blue-500/20"
                   >
                     Agregar como oficial
                   </button>
@@ -245,7 +259,7 @@ export default function DependenciasModal({
                           }}
                           className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 h-9 text-sm font-bold outline-none focus:border-brand-primary min-w-0"
                         />
-                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 cursor-pointer shrink-0">
+                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
                           <i className="fa-solid fa-check text-xs"></i>
                         </button>
                       </span>
@@ -284,7 +298,7 @@ export default function DependenciasModal({
                       onClick={() => { if (nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
                       disabled={isSaving || !nuevaUbic.trim()}
                       title="Agregar departamento" aria-label="Agregar departamento"
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 cursor-pointer shrink-0 disabled:opacity-40"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
                     >
                       <i className="fa-solid fa-plus text-xs"></i>
                     </button>
@@ -365,7 +379,7 @@ export default function DependenciasModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 shrink-0">
+        <div className="flex justify-end gap-2 px-6 py-4 border-t border-zinc-100 dark:border-darkbg-border shrink-0">
           <button onClick={onClose} className="h-10 px-5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Listo
           </button>
@@ -396,7 +410,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
               }}
               className="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 h-8 text-xs font-medium outline-none focus:border-brand-primary"
             />
-            <button onClick={() => { if (editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); } }} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 cursor-pointer shrink-0">
+            <button onClick={() => { if (editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); } }} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
               <i className="fa-solid fa-check text-[10px]"></i>
             </button>
           </>
@@ -436,7 +450,6 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
 });
 
 // Combo con buscador para asignar funcionarios: reemplaza al select nativo.
-// Filtra por nombre o cédula (sin tildes) y muestra ubicación actual.
 function ComboFuncionarios({ candidatos, excluirUbicacion, onElegir, titulo }) {
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState('');

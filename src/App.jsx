@@ -1870,8 +1870,13 @@ if (publicBienId) {
       );
   }
 
+  // Sincronizar clase 'dark' en <html> para que el CSS de contraste alto (.dark.contrast-more) funcione globalmente.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
+
   return (
-    <div className={`${darkMode ? 'dark' : ''} flex h-dvh overflow-hidden bg-zinc-50 dark:bg-darkbg-main transition-colors duration-300 text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>
+    <div className={`flex h-dvh overflow-hidden bg-zinc-50 ${darkMode ? 'dark bg-darkbg-main' : 'bg-zinc-50'} transition-colors duration-300 text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>
       <a href="#contenido" className="skip-link px-4 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[13px] font-bold shadow-xl">{ti('app.saltar')}</a>
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileUpload} />
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputFuncionariosRef} onChange={handleFileUploadFuncionarios} />

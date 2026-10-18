@@ -367,22 +367,31 @@ html.font-lg { font-size: 18px; }
 /* Bordes: más visibles */
 .dark.contrast-more .dark\:border-white\/10,
 .dark.contrast-more .dark\:border-zinc-800,
-.dark.contrast-more .dark\:border-darkbg-border {
-  border-color: rgba(255, 255, 255, 0.35) !important;
+.dark.contrast-more .dark\:border-darkbg-border,
+.dark.contrast-more .dark\:border-zinc-200\/70,
+.dark.contrast-more .dark\:border-zinc-200\/80 {
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* Fondos de tarjetas y superficies */
+/* Fondos de tarjetas y superficies - más oscuros para contraste */
 .dark.contrast-more .dark\:bg-white\/5,
 .dark.contrast-more .dark\:bg-darkbg-card,
 .dark.contrast-more .dark\:bg-darkbg-main,
 .dark.contrast-more .dark\:bg-darkbg-surface {
+  background-color: #0f172a !important;
+}
+
+/* Superficies elevadas (tarjetas) */
+.dark.contrast-more .dark\:bg-white\/\[0\.04\],
+.dark.contrast-more .dark\:bg-zinc-50\/30,
+.dark.contrast-more .dark\:bg-zinc-50 {
   background-color: #111827 !important;
 }
 
 /* Sidebar y navbar específicas */
 .dark.contrast-more .dark\:bg-darkbg-card {
   background-color: #0f172a !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* Modales: fondo y bordes */
@@ -393,10 +402,19 @@ html.font-lg { font-size: 18px; }
 /* Inputs en contraste alto */
 .dark.contrast-more .dark\:bg-darkbg-main input,
 .dark.contrast-more .dark\:bg-darkbg-main textarea,
-.dark.contrast-more .dark\:bg-darkbg-main select {
+.dark.contrast-more .dark\:bg-darkbg-main select,
+.dark.contrast-more input,
+.dark.contrast-more textarea,
+.dark.contrast-more select {
   background-color: #111827 !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Botones secundarios en contraste alto */
+.dark.contrast-more .dark\:hover\:bg-zinc-100:hover,
+.dark.contrast-more .dark\:hover\:bg-white\/10:hover {
+  background-color: #1f2937 !important;
 }
 
 /* Footer */
@@ -409,10 +427,35 @@ html.font-lg { font-size: 18px; }
 
 /* Toasts y notificaciones */
 .dark.contrast-more .dark\:bg-zinc-900,
-.dark.contrast-more .dark\:bg-zinc-950 {
+.dark.contrast-more .dark\:bg-zinc-950,
+.dark.contrast-more .dark\:bg-darkbg-card {
   background-color: #111827 !important;
   color: #ffffff !important;
   border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Tarjetas de departamentos y items en DependenciasModal */
+.dark.contrast-more .dark\:bg-white\/\[0\.03\],
+.dark.contrast-more .dark\:bg-zinc-50 {
+  background-color: #111827 !important;
+}
+
+/* Texto en blanco para legibilidad en contraste alto */
+.dark.contrast-more .dark\:text-zinc-700,
+.dark.contrast-more .dark\:text-zinc-600,
+.dark.contrast-more .dark\:text-zinc-500 {
+  color: #e5e7eb !important;
+}
+
+/* Pulido general del modo oscuro moderno */
+.dark body { background-color: #0b0f19; }
+.dark ::selection { background: rgba(96, 165, 250, 0.35); }
+::selection { background: rgba(29, 78, 216, 0.18); }
+
+/* Forzar color-scheme en todos los controles de formulario en modo oscuro */
+.dark input, .dark select, .dark textarea,
+.dark.contrast-more input, .dark.contrast-more select, .dark.contrast-more textarea {
+  color-scheme: dark;
 }
 
 /* Pulido general del modo oscuro moderno */

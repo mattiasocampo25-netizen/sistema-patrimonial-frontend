@@ -114,8 +114,8 @@ export default function AyudaView({ setTourPaso, STYLES }) {
       {/* Encabezado */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-            <i className="fa-solid fa-circle-question text-lg"></i>
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+            <i className="fa-solid fa-circle-question text-xl"></i>
           </div>
           <div>
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Centro de Ayuda y Normativa</h2>
@@ -125,7 +125,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
         <button
           onClick={() => setTourPaso(0)}
           title="Recorrer la guía interactiva"
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shrink-0"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
         >
           <i className="fa-solid fa-route"></i> Hacer tour guiado
         </button>
@@ -139,7 +139,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
             onClick={() => setSeccionActiva(s.id)}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-medium transition-all cursor-pointer ${
               seccionActiva === s.id
-                ? 'bg-brand-primary text-white shadow-sm'
+                ? 'bg-brand-primary text-white shadow-sm shadow-blue-500/30'
                 : 'bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'
             }`}
           >

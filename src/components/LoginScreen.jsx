@@ -74,7 +74,7 @@ export default function LoginScreen({
             </h1>
             <ul className="space-y-4">
               {BULLETS.map((b, i) => (
-                <li key={b.titulo} className="flex items-start gap-4">
+                <li key={b.titulo} className="flex items-start gap-4 login-rise login-rise-1">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/10 border border-white/15 text-brand-accent backdrop-blur-sm shadow-sm">
                     <i className={`fa-solid ${b.icon} text-[13px]`}></i>
                   </span>
@@ -87,7 +87,7 @@ export default function LoginScreen({
             </ul>
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-auto login-rise login-rise-4">
             <p className="text-[10px] font-medium text-slate-400">
               © {new Date().getFullYear()} Universidad Nacional de Pilar &nbsp;·&nbsp; v{APP_VERSION}
             </p>
@@ -101,7 +101,7 @@ export default function LoginScreen({
             alt=""
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover object-center opacity-60 dark:opacity-40"
+            className="h-full w-full object-cover object-center opacity-60 dark:opacity-40 login-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-[#0b0f19]/60 to-transparent dark:from-[#0b0f19] dark:via-[#0b0f19]/70"></div>
         </div>
@@ -125,7 +125,7 @@ export default function LoginScreen({
         {/* TOASTS FLOTANTES */}
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none">
           {toasts?.map(t => (
-            <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-xl text-xs font-bold bg-white text-zinc-900 dark:bg-darkbg-card dark:text-white border border-zinc-200 dark:border-darkbg-border transition-all animate-slide-up">
+            <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-xl text-xs font-bold bg-white text-zinc-900 dark:bg-darkbg-card dark:text-white border border-zinc-200 dark:border-darkbg-border transition-all animate-slide-up login-rise login-rise-2">
               <i className={`fa-solid ${t.type === 'success' ? 'fa-circle-check text-emerald-500' : t.type === 'error' ? 'fa-circle-exclamation text-rose-500' : t.type === 'warning' ? 'fa-triangle-exclamation text-amber-500' : 'fa-circle-info text-brand-primary'} text-base`}></i>
               <span className="flex-1">{t.message}</span>
               {t.action && (
@@ -141,7 +141,7 @@ export default function LoginScreen({
         </div>
 
         {/* Encabezado móvil + tema */}
-        <header className="relative z-10 flex items-center justify-between w-full px-6 sm:px-10 py-6 border-b border-zinc-100 dark:border-white/5 bg-white/50 dark:bg-darkbg-card/80 backdrop-blur-md">
+        <header className="relative z-10 flex items-center justify-between w-full px-6 sm:px-10 py-6 border-b border-zinc-100 dark:border-white/5 bg-white/50 dark:bg-darkbg-card/80 backdrop-blur-md login-rise login-rise-3">
           <div className="flex items-center gap-3 lg:invisible">
             <img
               src={appLogo || '/UNP-Site-Logo.webp'}
@@ -169,7 +169,7 @@ export default function LoginScreen({
 
         {/* Tarjeta de acceso */}
         <main className="relative z-10 flex-1 flex items-center justify-center px-6 pb-8">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md login-card-in">
             <div className={`bg-white dark:bg-darkbg-card rounded-3xl border border-zinc-200 dark:border-white/10 shadow-2xl p-8 sm:p-12 relative flex flex-col ${loginError ? 'animate-shake border-rose-500/50' : ''}`}>
               {/* Acento superior */}
               <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-primary via-brand-accent to-transparent"></div>

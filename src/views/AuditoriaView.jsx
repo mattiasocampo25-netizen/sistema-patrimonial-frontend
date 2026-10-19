@@ -44,16 +44,16 @@ export default function AuditoriaView({
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="aud-kpis">
         {[
-          { label: 'Eventos (30 días)', valor: kpisAud.total, icon: 'fa-bolt', box: 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900' },
-          { label: 'Altas registradas', valor: kpisAud.altas, icon: 'fa-plus', box: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' },
-          { label: 'Modificaciones', valor: kpisAud.mods, icon: 'fa-pen-to-square', box: 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 border border-zinc-500/20' },
-          { label: 'Bajas y eliminaciones', valor: kpisAud.bajas, icon: 'fa-flag', box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20' },
+          { label: 'Eventos (30 días)', valor: kpisAud.total, icon: 'fa-bolt', box: 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-sm shadow-zinc-900/20' },
+          { label: 'Altas registradas', valor: kpisAud.altas, icon: 'fa-plus', box: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/20' },
+          { label: 'Modificaciones', valor: kpisAud.mods, icon: 'fa-pen-to-square', box: 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 border border-zinc-500/20 shadow-sm shadow-zinc-500/20' },
+          { label: 'Bajas y eliminaciones', valor: kpisAud.bajas, icon: 'fa-flag', box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/20' },
         ].map(k => (
-          <div key={k.label} className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-5 shadow-sm">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-2xl mb-4 ${k.box}`}>
-              <i className={`fa-solid ${k.icon}`}></i>
+          <div key={k.label} className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div className={`flex h-11 w-11 items-center justify-center rounded-2xl mb-4 ${k.box}`}>
+              <i className={`fa-solid ${k.icon} text-lg`}></i>
             </div>
-            <p className="text-3xl font-bold tabular-nums text-zinc-900 dark:text-white tracking-tight">{k.valor}</p>
+            <p className="text-3xl sm:text-4xl font-black tabular-nums text-zinc-900 dark:text-white tracking-tight">{k.valor}</p>
             <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400 mt-1">{k.label}</p>
           </div>
         ))}
@@ -101,7 +101,7 @@ export default function AuditoriaView({
               del conteo de filas por tabla: sirve para saber cuanto margen queda
               antes de tener que archivar informacion vieja. */}
           {usoDb && (
-            <div className="mb-4 rounded-2xl border border-zinc-200/70 dark:border-white/10 bg-zinc-50/50 dark:bg-white/[0.02] p-3.5">
+            <div className="mb-4 rounded-2xl border border-zinc-200/70 dark:border-white/10 bg-zinc-50/50 dark:bg-white/[0.02] p-3.5 shadow-sm">
               <div className="flex items-center justify-between gap-3 mb-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                   <i className="fa-solid fa-database text-[10px]"></i> Consumo de base de datos
@@ -114,6 +114,8 @@ export default function AuditoriaView({
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${
                     alertaDb?.nivel === 'critico' ? 'bg-rose-500' : alertaDb?.nivel === 'aviso' ? 'bg-amber-500' : 'bg-emerald-500'
+                  } shadow-sm ${
+                    alertaDb?.nivel === 'critico' ? 'shadow-rose-500/40' : alertaDb?.nivel === 'aviso' ? 'shadow-amber-500/40' : 'shadow-emerald-500/40'
                   }`}
                   style={{ width: `${Math.min(100, Math.max(1.5, usoDb.pctUso))}%` }}
                 ></div>
@@ -126,8 +128,8 @@ export default function AuditoriaView({
           )}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-4">
               {saludDatos.map(s => (
-                  <div key={s.id} className="rounded-2xl border border-zinc-200/70 dark:border-white/10 px-3 py-3 text-center">
-                      <p className="text-xl font-bold tabular-nums text-zinc-900 dark:text-white">{s.count}</p>
+                  <div key={s.id} className="rounded-2xl border border-zinc-200/70 dark:border-white/10 px-3 py-3 text-center shadow-sm">
+                      <p className="text-xl sm:text-2xl font-black tabular-nums text-zinc-900 dark:text-white">{s.count}</p>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5 leading-tight">{s.label}</p>
                   </div>
               ))}

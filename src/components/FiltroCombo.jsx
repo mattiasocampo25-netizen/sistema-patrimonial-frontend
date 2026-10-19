@@ -76,7 +76,9 @@ export default function FiltroCombo({
         aria-required={required || undefined}
         className={`w-full ${alto} rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 font-medium text-zinc-700 dark:text-zinc-300 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-zinc-300 dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
       >
-        <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-zinc-400 dark:text-zinc-500' : ''}`}>{etiqueta}</span>
+        <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-zinc-400 dark:text-zinc-500' : ''}`} title={etiqueta}>
+          {etiqueta}
+        </span>
         <i className={`fa-solid fa-chevron-down text-[10px] text-zinc-400 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
       {abierto && (
@@ -116,6 +118,11 @@ export default function FiltroCombo({
                 <span className="block truncate" title={o.label}>{o.label}</span>
               </button>
             ))}
+            {lista.length > 0 && (
+              <div className="px-3.5 py-1 text-[10px] font-semibold text-zinc-400 text-center border-t border-zinc-100 dark:border-white/10">
+                Pulse sobre una opción para seleccionarla
+              </div>
+            )}
             {lista.length === 0 && (
               <p className="px-3.5 py-3 text-xs font-semibold text-zinc-400 text-center">Sin coincidencias.</p>
             )}

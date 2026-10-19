@@ -237,7 +237,7 @@ export default function DashboardView({
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold shadow-sm shadow-amber-500/25 transition-all active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-black shadow-sm shadow-amber-500/30 hover:shadow-amber-500/40 transition-all active:scale-95 cursor-pointer shrink-0"
             >
               Gestionar →
             </button>

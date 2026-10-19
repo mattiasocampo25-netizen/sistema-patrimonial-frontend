@@ -82,11 +82,12 @@ export default function Header({
                     <button
                         onClick={() => setActiveTab('fc10')}
                         title={`${actasPorFirmarCount} acta(s) esperando firma`}
-                        className="relative inline-flex items-center gap-2 h-10 px-3.5 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/25 hover:bg-amber-500/25 transition-all cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
+                        className="relative inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 text-amber-900 dark:text-amber-900 shadow-sm shadow-amber-500/30 hover:bg-amber-600 hover:shadow-amber-500/40 transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 outline-none"
                     >
                         <i className="fa-solid fa-file-signature text-xs"></i>
-                        <span className="hidden sm:inline text-[13px] font-bold tabular-nums">{actasPorFirmarCount}</span>
+                        <span className="hidden sm:inline text-[13px] font-black tabular-nums">{actasPorFirmarCount}</span>
                         <span className="hidden lg:inline text-[12px] font-bold">por firmar</span>
+                        <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-rose-600 ring-2 ring-white dark:ring-amber-900"></span>
                     </button>
                 )}
                 <button

@@ -28,18 +28,20 @@ export default function LoginScreen({
   const [capsLock, setCapsLock] = useState(false);
 
   const detectarCaps = (e) => {
-    try { setCapsLock(!!(e.getModifierState && e.getModifierState('CapsLock'))); } catch { /* navegador sin soporte */ }
+    try { setCapsLock(!!(e.getModifierState && e.getModifierState('CapsLock'))); } catch { /* noop */ }
   };
+
+  const bgColor = darkMode ? '#0b0f19' : '#f8fafc';
+  const textColor = darkMode ? '#f1f5f9' : '#0f172a';
 
   return (
     <div
       className={`${darkMode ? 'dark' : ''} min-h-dvh flex w-full font-sans antialiased selection:bg-brand-primary/20 relative overflow-hidden`}
       style={{
-        backgroundColor: darkMode ? '#0b0f19' : '#f8fafc',
-        color: darkMode ? '#f1f5f9' : '#0f172a'
+        backgroundColor: bgColor,
+        color: textColor
       }}
     >
-
       {/* ===== Orbe decorativo sutil ===== */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -160,7 +162,7 @@ export default function LoginScreen({
               setDarkMode(newMode);
               localStorage.setItem('theme', newMode ? 'dark' : 'light');
             }}
-            className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10 transition-all cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-white/10"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/10 hover:text-zinc-800 dark:hover:text-zinc-100 transition-all cursor-pointer border border-transparent hover:border-zinc-200 dark:hover:border-white/10"
             title="Alternar Tema" aria-label="Alternar Tema"
           >
             <i className={`fa-solid ${darkMode ? 'fa-sun text-amber-400' : 'fa-moon text-brand-primary'} text-sm transition-transform duration-500 ${darkMode ? 'rotate-0' : '-rotate-12'}`}></i>
@@ -331,7 +333,6 @@ export default function LoginScreen({
           </div>
         </div>
       )}
-
     </div>
   );
 }

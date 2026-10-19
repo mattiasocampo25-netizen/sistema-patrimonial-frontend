@@ -57,7 +57,7 @@ export default function AnunciosView({
       {/* Encabezado con métricas */}
       <div className="bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white shadow-sm">
             <i className="fa-solid fa-bullhorn text-lg"></i>
           </div>
           <div>
@@ -72,20 +72,20 @@ export default function AnunciosView({
         </div>
 
         <div className="flex gap-3 sm:gap-6">
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border ${
-            totalEnviados > 0 ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border'
+          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+            totalEnviados > 0 ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
           }`}>
             <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total enviados</div>
             <div className="text-xl font-black text-zinc-900 dark:text-white">{totalEnviados}</div>
           </div>
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border ${
-            totalDestinatarios > 0 ? 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/20 text-brand-primary' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border'
+          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+            totalDestinatarios > 0 ? 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/20 text-brand-primary shadow-brand-primary/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
           }`}>
             <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Destinatarios</div>
             <div className="text-xl font-black text-zinc-900 dark:text-white">{totalDestinatarios}</div>
           </div>
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border ${
-            totalLeidos > 0 ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-100 dark:border-sky-900/30' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border'
+          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+            totalLeidos > 0 ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-100 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
           }`}>
             <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Leídos</div>
             <div className="text-xl font-black text-zinc-900 dark:text-white">{totalLeidos}</div>
@@ -103,7 +103,7 @@ export default function AnunciosView({
           <input
             type="text" value={titulo} onChange={(e) => { setTitulo(e.target.value); try { localStorage.setItem('anuncio_borrador_titulo', e.target.value); } catch {} }} maxLength={120}
             placeholder="Ej: Mantenimiento programado este sábado"
-            className="w-full rounded-xl border border-zinc-200 dark:border-darkbg-border bg-white dark:bg-darkbg-main h-11 px-4 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all"
+            className="w-full rounded-xl border border-zinc-200 dark:border-darkbg-border bg-white dark:bg-darkbg-main h-11 px-4 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all shadow-sm"
           />
         </div>
         <div>
@@ -111,20 +111,20 @@ export default function AnunciosView({
           <textarea
             rows={3} value={mensaje} onChange={(e) => { setMensaje(e.target.value); try { localStorage.setItem('anuncio_borrador_mensaje', e.target.value); } catch {} }} maxLength={1000}
             placeholder="Detalle del aviso que verán en la campana de notificaciones..."
-            className="w-full rounded-xl border border-zinc-200 dark:border-darkbg-border bg-white dark:bg-darkbg-main px-4 py-3 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none"
+            className="w-full rounded-xl border border-zinc-200 dark:border-darkbg-border bg-white dark:bg-darkbg-main px-4 py-3 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none shadow-sm"
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="flex gap-2">
             <button
               type="button" onClick={() => setDestino('TODOS')}
-              className={`flex-1 h-11 rounded-xl text-[13px] font-bold border transition-all cursor-pointer ${destino === 'TODOS' ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white' : 'text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-darkbg-border hover:border-zinc-400'}`}
+              className={`flex-1 h-11 rounded-xl text-[13px] font-bold border transition-all cursor-pointer shadow-sm ${destino === 'TODOS' ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-zinc-100' : 'text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-darkbg-border hover:border-zinc-400 dark:hover:border-white/20'}`}
             >
               <i className="fa-solid fa-users mr-2 text-xs"></i>Todos ({usuariosList.length})
             </button>
             <button
               type="button" onClick={() => setDestino(usuariosOrdenados.find(u => u.username !== currentUser?.username)?.username || '')}
-              className={`flex-1 h-11 rounded-xl text-[13px] font-bold border transition-all cursor-pointer ${destino !== 'TODOS' ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white' : 'text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-darkbg-border hover:border-zinc-400'}`}
+              className={`flex-1 h-11 rounded-xl text-[13px] font-bold border transition-all cursor-pointer shadow-sm ${destino !== 'TODOS' ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-zinc-100' : 'text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-darkbg-border hover:border-zinc-400 dark:hover:border-white/20'}`}
             >
               <i className="fa-solid fa-user mr-2 text-xs"></i>Específico
             </button>
@@ -142,7 +142,7 @@ export default function AnunciosView({
         <div className="flex justify-end pt-1">
           <button
             type="button" onClick={handleEnviar} disabled={!puedeEnviar || enviando}
-            className="inline-flex items-center gap-2 px-5 h-11 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[13px] font-bold hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all active:scale-95 cursor-pointer disabled:opacity-50 shadow-md hover:shadow-lg"
+            className="inline-flex items-center gap-2 px-5 h-11 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[13px] font-black hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all active:scale-95 cursor-pointer disabled:opacity-50 shadow-lg shadow-zinc-900/25 dark:shadow-white/10 hover:shadow-xl"
           >
             <i className={`fa-solid ${enviando ? 'fa-circle-notch fa-spin' : 'fa-paper-plane'} text-xs`}></i>
             {enviando ? 'Enviando...' : `Enviar a ${cantDest} usuario${cantDest === 1 ? '' : 's'}`}
@@ -157,7 +157,7 @@ export default function AnunciosView({
         </div>
         {anunciosGrupos.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 dark:bg-darkbg-main text-zinc-400 mb-4 shadow-inner">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 dark:bg-darkbg-main text-zinc-400 mb-4 shadow-inner shadow-zinc-200/50 dark:shadow-darkbg-main/50">
               <i className="fa-solid fa-bullhorn text-2xl"></i>
             </div>
             <p className="text-sm font-semibold text-zinc-400">Aún no has enviado anuncios.</p>
@@ -165,24 +165,24 @@ export default function AnunciosView({
         ) : (
           <ul className="divide-y divide-zinc-100/50 dark:divide-darkbg-border/30">
             {anunciosGrupos.map(a => (
-              <li key={a.grupo} className="px-5 sm:px-6 py-5 flex items-start gap-4 group hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 flex-shrink-0">
+              <li key={a.grupo} className="px-5 sm:px-6 py-5 flex items-start gap-4 group hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors border-b border-zinc-50 dark:border-darkbg-border/30 last:border-0">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 flex-shrink-0 shadow-inner">
                   <i className="fa-solid fa-bullhorn text-sm"></i>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <p className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1">{a.titulo}</p>
-                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${
                       a.alcance === 'TODOS'
-                        ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20'
-                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                        ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 shadow-sky-500/20'
+                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20'
                     }`}>
                       {a.alcance === 'TODOS' ? 'Todos' : `@${a.alcance}`}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${
                       a.leidos >= (a.total || 1)
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-amber-500/20'
                     }`}>
                       {a.leidos}/{a.total} leídos
                     </span>
@@ -197,7 +197,7 @@ export default function AnunciosView({
                 <button
                   type="button" onClick={() => handleEliminar(a.grupo)} disabled={eliminando === a.grupo}
                   title="Eliminar anuncio para todos" aria-label="Eliminar anuncio"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-xl transition-all cursor-pointer disabled:opacity-50"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-xl transition-all cursor-pointer disabled:opacity-50 shadow-sm"
                 >
                   <i className={`fa-solid ${eliminando === a.grupo ? 'fa-circle-notch fa-spin' : 'fa-trash-can'} text-xs`}></i>
                 </button>

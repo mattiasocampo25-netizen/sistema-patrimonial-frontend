@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import rectoradoBg from '../assets/rectorado-pilar.webp';
 import { APP_VERSION } from '../utils/helpers';
-
-const BULLETS = [
-  { icon: 'fa-boxes-stacked', titulo: 'Inventario consolidado', texto: 'Bienes, traslados y asignaciones en un solo lugar.' },
-  { icon: 'fa-file-signature', titulo: 'Actas FC-04 · FC-10 · FC-11', texto: 'Documentos oficiales en tamaño oficio, listos para firmar.' },
-  { icon: 'fa-qrcode', titulo: 'Trazabilidad QR', texto: 'Cada activo identificado y verificable en campo.' },
-];
 
 export default function LoginScreen({
   handleLogin,
@@ -31,115 +24,63 @@ export default function LoginScreen({
     try { setCapsLock(!!(e.getModifierState && e.getModifierState('CapsLock'))); } catch { /* noop */ }
   };
 
+  const bgColor = darkMode ? '#0b0f19' : '#ffffff';
+  const cardColor = darkMode ? '#111827' : '#f8fafc';
+  const inputColor = darkMode ? '#1f2937' : '#ffffff';
+  const textMain = darkMode ? '#f3f4f6' : '#111827';
+  const textDim = darkMode ? '#9ca3af' : '#6b7280';
+  const borderColor = darkMode ? '#374151' : '#e5e7eb';
+
   return (
     <div
       className={`${darkMode ? 'dark' : ''} min-h-dvh flex w-full font-sans antialiased selection:bg-brand-primary/20 relative overflow-hidden`}
-      style={{
-        backgroundColor: darkMode ? '#0b0f19' : '#f8fafc',
-        color: darkMode ? '#f1f5f9' : '#0f172a'
-      }}
+      style={{ backgroundColor: bgColor, color: textMain }}
     >
 
-      {/* ===== Fondo institucional a pantalla completa ===== */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={rectoradoBg}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1c38]/20 via-[#0a1c38]/50 to-[#0a1c38]/90 dark:from-[#0a1c38]/40 dark:via-[#0a1c38]/70 dark:to-[#0a1c38]/95"></div>
-      </div>
+      {/* Fondo sutil en claro / oscuro */}
+      {!darkMode && (
+        <div className="absolute inset-0 z-0">
+          <div className="absolute -top-[10%] left-[10%] -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-blue-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
+          <div className="absolute -bottom-[10%] right-[10%] -translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-indigo-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
+        </div>
+      )}
 
-      {/* Orbe decorativo sutil */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-[10%] left-[10%] -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-blue-600/10 dark:bg-blue-900/20 blur-[120px] mix-blend-overlay"
-          style={{ filter: 'blur(100px)' }}
-        ></div>
-        <div
-          className="absolute -bottom-[10%] right-[10%] -translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-indigo-600/10 dark:bg-indigo-900/20 blur-[120px] mix-blend-overlay"
-          style={{ filter: 'blur(100px)' }}
-        ></div>
-      </div>
-
-      {/* ===== Contenido 50/50: izquierda = institución, derecha = acceso ===== */}
+      {/* Contenido centrado, estilo Google */}
       <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
+        <div className="w-full max-w-sm login-card-in">
+          <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-2xl p-8 sm:p-10 relative flex flex-col ${loginError ? 'animate-shake' : ''}" style={{ backgroundColor: cardColor, color: textMain }}>
 
-        {/* Mitad izquierda: presentación institucional (siempre visible) */}
-        <div className="hidden lg:flex w-1/2 h-full flex-col justify-center px-12 sm:px-16 text-white">
-          <div className="flex flex-col gap-8">
-            <div className="flex items-center gap-2">
+            {/* Logo institucional */}
+            <div className="flex items-center gap-2 mb-2">
               {appLogo ? (
-                <img src={appLogo} alt="Logo UNP" className="h-10 w-10 object-contain" />
+                <img src={appLogo} alt="Logo UNP" className="h-9 w-9 object-contain" />
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10">
-                  <i className="fa-solid fa-university text-sm"></i>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
+                  <i className="fa-solid fa-university text-base"></i>
                 </div>
               )}
-              <span className="text-[11px] font-black uppercase tracking-widest opacity-80">UNP · Bienes Patrimoniales</span>
+              <span className="text-sm font-bold tracking-tight text-brand-primary">UNP · Patrimonio</span>
             </div>
 
-            <div className="mt-4">
-              <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">Sistema de Gestión Patrimonial</h2>
-              <p className="text-lg sm:text-xl font-medium opacity-90 leading-relaxed">
-                Control, trazabilidad y administración de los bienes institucionales de la Universidad Nacional de Pilar.
-              </p>
-            </div>
-
-            <div className="mt-8 flex flex-col gap-4">
-              <p className="text-[11px] font-bold uppercase tracking-widest opacity-70 mb-3">Qué podés hacer</p>
-              <div className="flex flex-col gap-3">
-                {BULLETS.map((b) => (
-                  <div key={b.titulo} className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-accent">
-                      <i className={`fa-solid ${b.icon} text-[12px]`}></i>
-                    </span>
-                    <div>
-                      <span className="font-bold block">{b.titulo}</span>
-                      <span className="text-sm opacity-80">{b.texto}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mitad derecha: tarjeta de acceso */}
-        <div className="flex-1 max-w-md login-card-in">
-          <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-white/30 dark:border-zinc-800/50 shadow-2xl p-8 sm:p-12 relative flex flex-col ${loginError ? 'animate-shake border-rose-500/50' : ''}">
-            {/* Acento superior */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-primary via-brand-accent to-transparent"></div>
-
-            <div className="flex flex-col mb-8 border-b border-zinc-100 dark:border-zinc-800/30 pb-6 text-left">
-              <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand-primary mb-3">
-                <i className="fa-solid fa-shield-halved text-[10px]"></i>
-                Iniciar Sesión
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
-                Acceso al Sistema
-              </h2>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium mt-2">
-                Ingrese sus credenciales autorizadas del sistema UNP.
+            <div className="mt-6 mb-8">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: textMain }}>Iniciar sesión</h2>
+              <p className="text-sm text-[color:var(--login-subtitle, #6b7280)] mt-1" style={{ color: textDim }}>
+                Acceso al Sistema de Gestión Patrimonial
               </p>
             </div>
 
             <form onSubmit={handleLogin} className="w-full space-y-6">
               {loginError && (
-                <div id="login-error" role="alert" className="rounded-2xl bg-rose-50 dark:bg-rose-950/20 p-5 text-sm text-rose-700 dark:text-rose-300 font-medium flex items-center gap-3 border border-rose-200 dark:border-rose-900/50 animate-slide-up shadow-sm">
+                <div id="login-error" role="alert" className="rounded-xl bg-rose-50 dark:bg-rose-900/30 p-4 text-sm text-rose-700 dark:text-rose-300 font-medium flex items-center gap-3 border border-rose-100 dark:border-rose-800/50 animate-slide-up shadow-sm" style={{ color: loginError ? (darkMode ? '#fb7185' : '#dc2626') : 'inherit' }}>
                   <i className="fa-solid fa-circle-exclamation text-base text-rose-500 shrink-0" aria-hidden="true"></i>
                   <span>Credenciales inválidas. Verifique su usuario y contraseña.</span>
                 </div>
               )}
 
               <div className="space-y-2 text-left">
-                <label htmlFor="user" className="block text-[10px] font-black text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                  Usuario (ID)
-                </label>
+                <label htmlFor="user" className="block text-xs font-semibold text-[color:var(--login-label, #6b7280)] uppercase tracking-wider" style={{ color: textDim }}>Usuario (ID)</label>
                 <div className="relative group">
-                  <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-brand-primary group-focus-within:scale-110 text-xs transition-all"></i>
+                  <i className="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
                   <input
                     type="text"
                     id="user"
@@ -152,7 +93,13 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-2xl border border-zinc-200/90 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-4 py-4 text-sm font-bold text-zinc-900 dark:text-white focus:border-brand-primary focus:bg-white dark:focus:bg-zinc-800 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 dark:border-zinc-700 transition-all placeholder:text-zinc-400 placeholder:font-normal disabled:opacity-60"
+                    className="block w-full rounded-xl border pl-10 pr-4 py-3.5 text-sm font-medium placeholder:text-[color:var(--login-placeholder, #9ca3af)] focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    style={{
+                      backgroundColor: inputColor,
+                      borderColor: borderColor,
+                      color: textMain,
+                      caretColor: '#1d4ed8'
+                    }}
                     placeholder="ej. admin"
                   />
                 </div>
@@ -160,19 +107,17 @@ export default function LoginScreen({
 
               <div className="space-y-2 text-left">
                 <div className="flex justify-between items-center">
-                  <label htmlFor="pass" className="block text-[10px] font-black text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                    Contraseña
-                  </label>
+                  <label htmlFor="pass" className="block text-xs font-semibold text-[color:var(--login-label, #6b7280)] uppercase tracking-wider" style={{ color: textDim }}>Contraseña</label>
                   <button
                     type="button"
                     onClick={() => setShowRecoveryModal(true)}
-                    className="text-[10px] font-bold text-brand-primary dark:text-brand-accent hover:underline cursor-pointer"
+                    className="text-xs font-semibold text-brand-primary dark:text-brand-accent hover:underline cursor-pointer"
                   >
                     ¿Olvidó su clave?
                   </button>
                 </div>
                 <div className="relative group">
-                  <i className="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-brand-primary group-focus-within:scale-110 text-xs transition-all"></i>
+                  <i className="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
                   <input
                     type={showPassword ? "text" : "password"}
                     id="pass"
@@ -186,13 +131,19 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-2xl border border-zinc-200/90 bg-zinc-50 dark:bg-zinc-900/50 pl-11 pr-11 py-4 text-sm font-bold text-zinc-900 dark:text-white focus:border-brand-primary focus:bg-white dark:focus:bg-zinc-800 focus:outline-none focus:ring-4 focus:ring-brand-primary/10 dark:border-zinc-700 transition-all placeholder:text-zinc-400 placeholder:font-normal disabled:opacity-60"
+                    className="block w-full rounded-xl border pl-10 pr-10 py-3.5 text-sm font-medium placeholder:text-[color:var(--login-placeholder, #9ca3af)] focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    style={{
+                      backgroundColor: inputColor,
+                      borderColor: borderColor,
+                      color: textMain,
+                      caretColor: '#1d4ed8'
+                    }}
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-white hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] hover:text-brand-primary transition-colors cursor-pointer"
                     title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
                     <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
@@ -206,59 +157,28 @@ export default function LoginScreen({
                 )}
               </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={isProcessing}
-                  aria-busy={isProcessing || undefined}
-                  className="group w-full rounded-2xl bg-brand-primary px-6 py-4 text-sm font-black text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none transition-all cursor-pointer flex justify-center items-center gap-2 shadow-lg shadow-brand-primary/25 hover:shadow-xl hover:-translate-y-px active:translate-y-0 disabled:opacity-70 disabled:cursor-wait disabled:hover:translate-y-0"
-                >
-                  {isProcessing ? (
-                    <>
-                      <span className="login-spinner" aria-hidden="true"></span>
-                      <span>Verificando credenciales…</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Acceder a la Plataforma</span>
-                      <i className="fa-solid fa-arrow-right-to-bracket text-xs ml-1 transition-transform duration-300 group-hover:translate-x-1"></i>
-                    </>
-                  )}
-                </button>
-                <p className="mt-6 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  <i className="fa-solid fa-shield-halved text-[10px] text-emerald-500"></i>
-                  Acceso restringido · UNP
-                </p>
-              </div>
+              <button
+                type="submit"
+                disabled={isProcessing}
+                aria-busy={isProcessing || undefined}
+                className="w-full rounded-xl bg-brand-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none transition-all cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+              >
+                {isProcessing ? (
+                  <>
+                    <span className="login-spinner" aria-hidden="true"></span>
+                    <span>Verificando…</span>
+                  </>
+                ) : (
+                  <span>Acceder</span>
+                )}
+              </button>
             </form>
 
-            {/* Beneficios pequeños al final de la tarjeta */}
-            <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800/30">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-3 text-center">
-                Características del sistema
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {BULLETS.map((b) => (
-                  <div key={b.titulo} className="flex flex-col items-center gap-2 text-center">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10 border border-white/15 text-brand-accent backdrop-blur-sm">
-                      <i className={`fa-solid ${b.icon} text-[12px]`}></i>
-                    </span>
-                    <span className="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 leading-tight">
-                      {b.titulo}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <p className="text-[10px] font-medium text-white/50">
-                © {new Date().getFullYear()} Universidad Nacional de Pilar &nbsp;·&nbsp; v{APP_VERSION}
-              </p>
-            </div>
+            <p className="mt-8 text-center text-xs font-medium text-[color:var(--login-footer, #9ca3af)] tracking-tight uppercase" style={{ color: textDim }}>
+              © {new Date().getFullYear()} Universidad Nacional de Pilar · v{APP_VERSION}
+            </p>
           </div>
         </div>
-
       </div>
 
       {/* TOASTS FLOTANTES */}
@@ -282,13 +202,11 @@ export default function LoginScreen({
       {/* MODAL DE RECUPERACIÓN / SOPORTE */}
       {showRecoveryModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/70 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-darkbg-card p-7 shadow-2xl border border-zinc-200 dark:border-darkbg-border text-center animate-slide-up">
+          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-darkbg-card p-7 shadow-2xl border border-zinc-100 dark:border-darkbg-border text-center animate-slide-up">
             <div className="h-14 w-14 rounded-2xl bg-blue-500/10 text-brand-primary dark:text-brand-accent border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
               <i className="fa-solid fa-headset text-xl"></i>
             </div>
-            <h3 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">
-              Recuperación de Acceso
-            </h3>
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Recuperación de Acceso</h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-300 font-medium mt-2 leading-relaxed">
               Por políticas de seguridad patrimonial de la UNP, el restablecimiento de contraseñas es gestionado por el Desarrollador del sistema.
             </p>
@@ -298,7 +216,7 @@ export default function LoginScreen({
             </div>
             <button
               onClick={() => setShowRecoveryModal(false)}
-              className="mt-6 w-full py-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-sm font-black transition-all cursor-pointer shadow-md active:scale-[0.98]"
+              className="mt-6 w-full py-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-sm font-bold transition-all cursor-pointer shadow-md active:scale-[0.98]"
             >
               Entendido
             </button>

@@ -5,7 +5,7 @@ import CampoCatalogo from './CampoCatalogo';
 import SelectorPersona from './SelectorPersona';
 import { FC10_ORGANOS, FC10_UNIDADES, opcionesCatalogoFC10, organoDeUnidad } from '../constants/fc10Catalogo';
 
-export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Editing, saveFC10, STYLES, formatCurrency, funcionariosConDatos, dependenciaActual, estructurasDB }) {
+export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Editing, saveFC10, STYLES, formatCurrency, funcionariosConDatos, dependenciaActual, estructurasDB, dependenciasList }) {
     const esNuevoFC = !fc10Editing;
     const { borrador: borradorFC, hayBorrador: hayBorradorFC, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc10_nuevo', esNuevoFC);
     const [restauradoFC, setRestauradoFC] = useState(null);
@@ -39,7 +39,15 @@ export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Edit
     // Unidad jerárquica (órgano) → Repartición → Dependencia → Área. Cada nivel
     // sugiere solo lo que cuelga de lo elegido arriba; el código patrimonial se
     // completa al elegir del catálogo y se puede corregir a mano.
-    const memoriaOrg = useMemo(() => estructurasDB || [], [estructurasDB]);
+    const memoriaOrg = useMemo(() => {
+        const db = estructurasDB || [];
+        // Agregar dependencias creadas en el módulo de Dependencias y departamentos
+        // para que aparezcan también en el catálogo del FC-10.
+        const depModulo = (dependenciasList || [])
+            .filter(d => d.activa !== false)
+            .map(d => ({ nombre: d.nombre, tipoEstructura: 'dependencia', codigo: d.codigo || '' }));
+        return [...db, ...depModulo];
+    }, [estructurasDB, dependenciasList]);
 
     // "Rectorado" no figura textual en el organigrama (que dice
     // "Rectorado / Despacho del Rector"), así que también se acepta el prefijo.

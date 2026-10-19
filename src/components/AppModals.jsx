@@ -437,6 +437,7 @@ export default function AppModals({
                   funcionariosConDatos={funcionariosConDatos}
                   dependenciaActual={dependenciaActual}
                   estructurasDB={estructurasDB}
+                  dependenciasList={dependenciasList}
               />
           )}
           {isFC11ModalOpen && (

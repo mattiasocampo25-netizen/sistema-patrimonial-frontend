@@ -122,9 +122,16 @@ export default function DependenciasModal({
       >
         <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-emerald-500 ring-1 ring-emerald-900/20' : 'bg-zinc-400 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
-          <span className={`block text-[13px] font-bold leading-snug text-balance ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`}>
-            {d.nombre}
-          </span>
+          <div className="flex items-baseline gap-1.5">
+            <span className={`block text-[13px] font-bold leading-snug text-balance ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`}>
+              {d.nombre}
+            </span>
+            {d.codigo && (
+              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500">
+                {d.codigo}
+              </span>
+            )}
+          </div>
           <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'opacity-80' : 'text-zinc-400'}`}>
             {detectada ? `${d.bienes + d.funcionarios} registros por fusionar` : `${(conteos[d.nombre]?.bienes || 0)} bienes · ${(conteos[d.nombre]?.funcionarios || 0)} func.`}
           </span>
@@ -264,7 +271,14 @@ export default function DependenciasModal({
                         </button>
                       </span>
                     ) : (
-                      <h3 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight text-balance" title={depSel.nombre}>{depSel.nombre}</h3>
+                      <h3 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight text-balance" title={depSel.nombre}>
+                        {depSel.nombre}
+                        {depSel.codigo && (
+                          <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 ml-1.5">
+                            {depSel.codigo}
+                          </span>
+                        )}
+                      </h3>
                     )}
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 tabular-nums">
                       {(conteos[depSel.nombre]?.bienes || 0)} bienes · {(conteos[depSel.nombre]?.funcionarios || 0)} funcionarios · {ubicsDeSel.length} departamentos

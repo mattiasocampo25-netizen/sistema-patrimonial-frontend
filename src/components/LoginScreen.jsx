@@ -64,11 +64,51 @@ export default function LoginScreen({
         ></div>
       </div>
 
-      {/* ===== Contenido principal: sin cajas blancas, solo una tarjeta central ===== */}
+      {/* ===== Contenido 50/50: izquierda = institución, derecha = acceso ===== */}
       <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
 
-        {/* Tarjeta de acceso: pequeña, centrada, sin borde izquierdo ni divisiones */}
-        <div className="w-full max-w-md login-card-in">
+        {/* Mitad izquierda: presentación institucional (siempre visible) */}
+        <div className="hidden lg:flex w-1/2 h-full flex-col justify-center px-12 sm:px-16 text-white">
+          <div className="flex flex-col gap-8">
+            <div className="flex items-center gap-2">
+              {appLogo ? (
+                <img src={appLogo} alt="Logo UNP" className="h-10 w-10 object-contain" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10">
+                  <i className="fa-solid fa-university text-sm"></i>
+                </div>
+              )}
+              <span className="text-[11px] font-black uppercase tracking-widest opacity-80">UNP · Bienes Patrimoniales</span>
+            </div>
+
+            <div className="mt-4">
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">Sistema de Gestión Patrimonial</h2>
+              <p className="text-lg sm:text-xl font-medium opacity-90 leading-relaxed">
+                Control, trazabilidad y administración de los bienes institucionales de la Universidad Nacional de Pilar.
+              </p>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-4">
+              <p className="text-[11px] font-bold uppercase tracking-widest opacity-70 mb-3">Qué podés hacer</p>
+              <div className="flex flex-col gap-3">
+                {BULLETS.map((b) => (
+                  <div key={b.titulo} className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-accent">
+                      <i className={`fa-solid ${b.icon} text-[12px]`}></i>
+                    </span>
+                    <div>
+                      <span className="font-bold block">{b.titulo}</span>
+                      <span className="text-sm opacity-80">{b.texto}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mitad derecha: tarjeta de acceso */}
+        <div className="flex-1 max-w-md login-card-in">
           <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-white/30 dark:border-zinc-800/50 shadow-2xl p-8 sm:p-12 relative flex flex-col ${loginError ? 'animate-shake border-rose-500/50' : ''}">
             {/* Acento superior */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-brand-primary via-brand-accent to-transparent"></div>
@@ -76,10 +116,10 @@ export default function LoginScreen({
             <div className="flex flex-col mb-8 border-b border-zinc-100 dark:border-zinc-800/30 pb-6 text-left">
               <span className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-brand-primary mb-3">
                 <i className="fa-solid fa-shield-halved text-[10px]"></i>
-                Portal de Acceso
+                Iniciar Sesión
               </span>
               <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
-                Iniciar Sesión
+                Acceso al Sistema
               </h2>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium mt-2">
                 Ingrese sus credenciales autorizadas del sistema UNP.

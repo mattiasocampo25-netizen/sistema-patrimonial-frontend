@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import rectoradoBg from '../assets/rectorado-pilar.webp';
 import { APP_VERSION } from '../utils/helpers';
 
 export default function LoginScreen({
@@ -37,9 +38,21 @@ export default function LoginScreen({
       style={{ backgroundColor: bgColor, color: textMain }}
     >
 
-      {/* Fondo sutil en claro / oscuro */}
+      {/* Fondo institucional: imagen del Rectorado (siempre visible) */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src={rectoradoBg}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1c38]/20 via-[#0a1c38]/50 to-[#0a1c38]/90 dark:from-[#0a1c38]/40 dark:via-[#0a1c38]/70 dark:to-[#0a1c38]/95"></div>
+      </div>
+
+      {/* Orbes decorativos sutiles (solo modo claro) */}
       {!darkMode && (
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <div className="absolute -top-[10%] left-[10%] -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-blue-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
           <div className="absolute -bottom-[10%] right-[10%] -translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-indigo-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
         </div>

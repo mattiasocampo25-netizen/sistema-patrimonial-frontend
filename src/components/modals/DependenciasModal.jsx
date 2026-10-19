@@ -118,8 +118,8 @@ export default function DependenciasModal({
         title={d.nombre}
         className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
           activo || activoDet
-            ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 border border-transparent'
-            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-700 dark:text-zinc-300 border border-transparent'
+            ? 'bg-zinc-900 dark:bg-zinc-800 text-white dark:text-white border border-transparent shadow-sm shadow-brand-primary/20'
+            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-zinc-800 dark:text-zinc-100 border border-transparent'
         }`}
       >
         <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-emerald-500 ring-1 ring-emerald-900/20' : 'bg-zinc-400 ring-1 ring-zinc-900/10')}`}></span>
@@ -129,12 +129,12 @@ export default function DependenciasModal({
               {d.nombre}
             </span>
             {d.codigo && (
-              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500">
+              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-300">
                 {d.codigo}
               </span>
             )}
           </div>
-          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'opacity-80' : 'text-zinc-400'}`}>
+          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'opacity-90' : 'text-zinc-500 dark:text-zinc-400'}`}>
             {detectada ? `${d.bienes + d.funcionarios} registros por fusionar` : `${(conteos[d.nombre]?.bienes || 0)} bienes · ${(conteos[d.nombre]?.funcionarios || 0)} func.`}
           </span>
         </span>

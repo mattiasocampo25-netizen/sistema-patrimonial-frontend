@@ -35,7 +35,7 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                     <div className={STYLES.modalBody}>
                         <div className="space-y-5">
                             <div>
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Cédula de Identidad</label>
+                                <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400 mb-2 whitespace-normal">Cédula de Identidad</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
                                     <input type="text" name="cedula" required inputMode="numeric" onInput={(e) => { e.target.value = formatearMiles(e.target.value); validarCI(e.target.value); }} onBlur={(e) => validarCI(e.target.value)} className={`${STYLES.input} pl-11 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. 1.234.567" />
@@ -47,21 +47,21 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                                 )}
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Nombre Completo</label>
+                                <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400 mb-2 whitespace-normal">Nombre Completo</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
                                     <input type="text" name="nombre" required className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. Juan Pérez" />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Cargo Institucional</label>
+                                <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400 mb-2 whitespace-normal">Cargo Institucional</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm"></i>
                                     <input type="text" name="cargo" className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. Administrador" />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Ubicación asignada</label>
+                                <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-zinc-500 dark:text-zinc-400 mb-2 whitespace-normal">Ubicación asignada</label>
                                 <FiltroCombo
                                     name="ubicacion"
                                     valor=""

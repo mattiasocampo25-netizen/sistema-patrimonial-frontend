@@ -135,9 +135,11 @@ export default function CampoCatalogo({
                                     {o.aprendida && (
                                         <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">usada</span>
                                     )}
-                                    <span className="shrink-0 font-mono text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
-                                        {o.codigo || '—'}
-                                    </span>
+                                    {o.codigo && (
+                                        <span className="shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 whitespace-normal">
+                                            {o.codigo}
+                                        </span>
+                                    )}
                                 </button>
                             ))}
                         </div>

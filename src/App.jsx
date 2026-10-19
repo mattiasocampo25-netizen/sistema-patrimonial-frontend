@@ -436,11 +436,11 @@ export default function App() {
       setIsSavingUbicacion(false);
     }
   };
-  const guardarDependencia = async (id, nombre, activa = true) => {
+  const guardarDependencia = async (id, nombre, codigo = '', activa = true) => {
     setIsSavingDep(true);
     try {
       if (!id) {
-        const row = { id: generateId(), nombre: nombre.trim(), activa: true };
+        const row = { id: generateId(), nombre: nombre.trim(), codigo: codigo.trim(), activa: true };
         const { error } = await supabase.from('dependencias').insert([row]);
         if (error) throw error;
         setDependenciasList(prev => [...prev, row].sort((a, b) => String(a.nombre).localeCompare(String(b.nombre))));
@@ -448,7 +448,7 @@ export default function App() {
       } else {
         const anterior = dependenciasList.find(d => d.id === id);
         if (!anterior) return;
-        const { error } = await supabase.from('dependencias').update({ nombre: nombre.trim(), activa }).eq('id', id);
+        const { error } = await supabase.from('dependencias').update({ nombre: nombre.trim(), codigo: codigo.trim(), activa }).eq('id', id);
         if (error) throw error;
         // Cascada de renombre en todos los registros que usaban el nombre anterior
         if (normalizeStr(anterior.nombre) !== normalizeStr(nombre)) {

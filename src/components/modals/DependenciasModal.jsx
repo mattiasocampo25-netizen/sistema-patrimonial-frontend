@@ -20,8 +20,10 @@ export default function DependenciasModal({
   const [selId, setSelId] = useState(null);
   const [selDetectada, setSelDetectada] = useState(null);
   const [editDepNombre, setEditDepNombre] = useState('');
+  const [editDepCod, setEditDepCod] = useState('');
   const [editandoDep, setEditandoDep] = useState(false);
   const [nuevo, setNuevo] = useState('');
+  const [nuevoCod, setNuevoCod] = useState('');
   const [nuevaUbic, setNuevaUbicacion] = useState('');
   const [editUbicId, setEditUbicId] = useState(null);
   const [editUbicNombre, setEditUbicNombre] = useState('');
@@ -201,12 +203,17 @@ export default function DependenciasModal({
               <div className="flex items-center gap-1.5">
                 <input
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   placeholder="Nueva dependencia..."
                   className="flex-1 min-w-0 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-3 h-9 text-xs font-medium outline-none focus:border-brand-primary"
                 />
+                <input
+                  type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
+                  placeholder="Código"
+                  className="min-w-[56px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
+                />
                 <button
-                  onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
+                  onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
@@ -256,20 +263,30 @@ export default function DependenciasModal({
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     {editandoDep ? (
-                      <span className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <input
                           type="text" value={editDepNombre} autoFocus
                           onChange={(e) => setEditDepNombre(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim()); setEditandoDep(false); }
+                            if (e.key === 'Enter' && editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); }
                             if (e.key === 'Escape') setEditandoDep(false);
                           }}
                           className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 h-9 text-sm font-bold outline-none focus:border-brand-primary min-w-0"
                         />
-                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
+                        <input
+                          type="text" value={editDepCod}
+                          onChange={(e) => setEditDepCod(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); }
+                            if (e.key === 'Escape') setEditandoDep(false);
+                          }}
+                          placeholder="Cód."
+                          className="min-w-[56px] rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
+                        />
+                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
                           <i className="fa-solid fa-check text-xs"></i>
                         </button>
-                      </span>
+                      </div>
                     ) : (
                       <h3 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight text-balance" title={depSel.nombre}>
                         {depSel.nombre}
@@ -288,7 +305,7 @@ export default function DependenciasModal({
                     <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer">
                       <i className="fa-solid fa-users"></i><span className="hidden sm:inline">Padrón</span>
                     </button>
-                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-white dark:hover:bg-white/10 transition-all cursor-pointer">
+                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-white dark:hover:bg-white/10 transition-all cursor-pointer">
                       <i className="fa-solid fa-pen text-xs"></i>
                     </button>
                     <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer">

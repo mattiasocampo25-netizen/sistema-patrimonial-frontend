@@ -119,7 +119,7 @@ export default function CampoCatalogo({
                         className={`${STYLES.input} py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}
                     />
                     {abierto && listado.length > 0 && (
-                        <div ref={listaRef} className="absolute left-0 right-0 top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
+                        <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
                             {listado.map((o, i) => (
                                 <button
                                     key={`${o.nombre}-${i}`}
@@ -129,7 +129,7 @@ export default function CampoCatalogo({
                                     onClick={() => elegir(o)}
                                     className={`w-full flex items-center gap-3 px-3.5 py-2 text-left transition-colors cursor-pointer ${i === activo ? 'bg-zinc-100 dark:bg-white/10' : 'hover:bg-zinc-50 dark:hover:bg-white/5'}`}
                                 >
-                                    <span className={`min-w-0 flex-1 truncate text-[13px] ${o.aprendida ? 'font-medium normal-case text-zinc-500 dark:text-zinc-400' : 'font-semibold text-zinc-700 dark:text-zinc-200'}`} title={o.nombre}>
+                                    <span className={`min-w-0 flex-1 text-[13px] ${o.aprendida ? 'font-medium normal-case text-zinc-500 dark:text-zinc-400' : 'font-semibold text-zinc-700 dark:text-zinc-200'}`} title={o.nombre}>
                                         {o.nombre}
                                     </span>
                                     {o.aprendida && (
@@ -143,7 +143,7 @@ export default function CampoCatalogo({
                         </div>
                     )}
                     {abierto && listado.length === 0 && (
-                        <div className="absolute left-0 right-0 top-full z-40 mt-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl px-3.5 py-2.5 animate-pop">
+                        <div className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl px-3.5 py-2.5 animate-pop">
                             <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                                 Sin coincidencias — podés escribirlo y cargar el código.
                             </p>

@@ -78,18 +78,18 @@ export default function Fc10View({
         <div className="bg-white dark:bg-darkbg-card border border-zinc-200/70 dark:border-darkbg-border rounded-3xl shadow-sm p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 shadow-sm">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 shadow-sm shadow-blue-500/20">
                 <i className="fa-solid fa-clipboard-check text-lg"></i>
               </div>
               <div>
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Estado de las Firmas FC-10</h3>
+                <h3 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">Estado de las Firmas FC-10</h3>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                   Marque manualmente el estado cuando reciba el documento físico o digital devuelto. Solo administrador.
                 </p>
               </div>
             </div>
             {puedeGestionarFirmas ? (
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shadow-sm shadow-emerald-500/20`}>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shadow-sm shadow-emerald-500/20`}>
                 <i className="fa-solid fa-shield-halved text-[9px]"></i> Modo administrador activo
               </span>
             ) : (
@@ -104,7 +104,7 @@ export default function Fc10View({
               const estaCambiando = cambiandoEstado[fc.id];
               const estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
               return (
-                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-2xl border border-zinc-100 dark:border-darkbg-border/50 bg-zinc-50 dark:bg-darkbg-main/50 hover:border-brand-primary/50 hover:shadow-sm transition-all group">
+                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-2xl border border-zinc-100 dark:border-darkbg-border/50 bg-zinc-50 dark:bg-darkbg-main/50 hover:border-brand-primary/50 hover:shadow-md transition-all duration-200 group">
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-zinc-900 dark:text-white truncate" title={fc.funcionarioNombre || 'Sin responsable'}>
@@ -114,7 +114,7 @@ export default function Fc10View({
                         <i className="fa-solid fa-tag text-[9px]"></i>{bien.rotulo || 'S/R'}
                       </p>
                     </div>
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
                       estadoActual === 'CERRADO'
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                         : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2'
@@ -133,7 +133,7 @@ export default function Fc10View({
                           key={op.valor}
                           onClick={() => !estaCambiando && handleCambiarEstadoFirma(fc, op.valor)}
                           disabled={estaCambiando || !puedeGestionarFirmas}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-[11px] font-medium transition-all ${
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-200 ${
                             seleccionado
                               ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/30'
                               : 'bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 border border-transparent hover:border-zinc-200 dark:hover:border-white/10'

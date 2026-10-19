@@ -13,16 +13,12 @@ export default function DashboardView({
   setFc10Year, setFc10Month,
   fc10List, bienes, registrarAmbasFirmas, firmandoId
 }) {
-  // Actas que esperan una firma, con el dato de a quién le toca. Es la bandeja
-  // de trabajo del circuito: sin esto, saber que hay algo pendiente obligaba
-  // a entrar al módulo de FC-10 y buscarlo a mano.
   const actasPorFirmar = useMemo(() => (fc10List || [])
     .filter(fc => !fc.devolucionFecha && pendienteDeFirma(fc))
     .map(fc => ({ fc, bien: (bienes || []).find(b => b.id === fc.bienId) || null, pendiente: pendienteDeFirma(fc) }))
     .sort((a, b) => (a.pendiente.orden - b.pendiente.orden)
       || String(a.fc.entregadoFecha || '').localeCompare(String(b.fc.entregadoFecha || ''))), [fc10List, bienes]);
-  // Atajo del panel hacia Inventario: limpia filtros, aplica el nuevo y vuelve
-  // a la página 1. Sin el reset, si venías en la página 5 la tabla quedaba vacía.
+
   const irInventario = (aplicar) => {
     clearAllFilters();
     if (aplicar) aplicar();
@@ -30,7 +26,6 @@ export default function DashboardView({
     setActiveTab('inventario');
   };
 
-  // Widgets visibles del panel (preferencia por usuario).
   const [widgets, setWidgets] = useState(() => {
     try { return { metricas: true, pendientes: true, accesos: true, tendencias: true, ...JSON.parse(localStorage.getItem('dash_widgets') || '{}') }; }
     catch { return { metricas: true, pendientes: true, accesos: true, tendencias: true }; }
@@ -44,20 +39,91 @@ export default function DashboardView({
     });
   };
   const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias']];
-  return (
-    <div className="space-y-5 sm:space-y-6 animate-fade-in pb-12">
 
-      {/* 1. ENCABEZADO DE PÁGINA COMPACTO */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  // Tarjetas de métrica con diseño consistente y simétrico
+  const METRIC_CARDS = [
+    {
+      id: 'activos',
+      label: 'Bienes Activos',
+      valor: stats.totalItems,
+      sublabel: 'Total en ' + dependenciaActual,
+      icon: 'fa-boxes-stacked',
+      iconBg: 'bg-zinc-900 dark:bg-white',
+      iconColor: 'text-white dark:text-zinc-900',
+      border: 'border-zinc-200/70 dark:border-white/10',
+      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/20',
+      ring: 'focus-visible:ring-brand-primary',
+      numero: <AnimatedNumber value={stats.totalItems} />,
+      onClick: () => { clearAllFilters(); setActiveTab('inventario'); },
+      showProgress: false,
+    },
+    {
+      id: 'qr',
+      label: 'Bienes con QR',
+      valor: stats.withQR,
+      total: stats.totalItems,
+      sublabel: stats.withQR + ' de ' + Number(stats.totalItems || 0).toLocaleString('es-PY') + ' con código',
+      icon: 'fa-qrcode',
+      iconBg: 'bg-violet-500/10 backdrop-blur border border-violet-500/25',
+      iconColor: 'text-violet-600 dark:text-violet-300',
+      border: 'border-zinc-200/70 dark:border-white/10',
+      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/20',
+      ring: 'focus-visible:ring-brand-primary',
+      numero: <><AnimatedNumber value={stats.withQR} /><span className="text-base text-zinc-400 font-semibold"> / {Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>,
+      onClick: () => irInventario(() => setFiltroQR('YES')),
+      showProgress: true,
+      pct: stats.percQR || 0,
+      progressColor: 'bg-violet-500',
+    },
+    {
+      id: 'sin-fc10',
+      label: 'Sin FC-10',
+      valor: stats.withoutFc10,
+      sublabel: stats.fc10Pendientes > 0
+        ? stats.fc10Pendientes + ' en firma · ' + Math.max(0, stats.withoutFc10 - stats.fc10Pendientes) + ' sin acta'
+        : 'Pendientes de asignación',
+      subColor: stats.fc10Pendientes > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-amber-600 dark:text-amber-400',
+      icon: 'fa-file-signature',
+      iconBg: 'bg-amber-500 text-white',
+      iconColor: 'text-white',
+      border: 'border-amber-200/70 dark:border-amber-400/20',
+      hoverBorder: 'hover:border-amber-300 dark:hover:border-amber-400/30',
+      ring: 'focus-visible:ring-amber-500',
+      numero: <AnimatedNumber value={stats.withoutFc10} />,
+      onClick: () => irInventario(() => setFiltroFC10('NO')),
+      showProgress: false,
+    },
+    {
+      id: 'pendiente-qr',
+      label: 'Pendiente QR',
+      valor: stats.withoutQR,
+      sublabel: 'Sin etiqueta generada',
+      icon: 'fa-triangle-exclamation',
+      iconBg: 'bg-rose-500 text-white',
+      iconColor: 'text-white',
+      border: 'border-rose-200/70 dark:border-rose-400/20',
+      hoverBorder: 'hover:border-rose-300 dark:hover:border-rose-400/30',
+      ring: 'focus-visible:ring-rose-500',
+      numero: <AnimatedNumber value={stats.withoutQR} />,
+      onClick: () => irInventario(() => setFiltroQR('NO')),
+      showProgress: false,
+    },
+  ];
+
+  return (
+    <div className="space-y-6 sm:space-y-7 animate-fade-in pb-16">
+
+      {/* 1. ENCABEZADO DE PÁGINA */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-xl sm:text-2xl shadow-md dep-accent-ring">
+          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-xl sm:text-2xl shadow-md shadow-zinc-900/25 dep-accent-ring">
             {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 truncate">
               Panel General · {dependenciaActual}
             </p>
-            <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white tracking-tight truncate mt-0.5">
+            <h3 className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight truncate mt-0.5">
               {saludoBienvenida}, {currentUser?.nombre || 'Usuario'}!
             </h3>
           </div>
@@ -68,14 +134,14 @@ export default function DashboardView({
             <button
               onClick={() => setMenuWidgets(v => !v)}
               title="Personalizar panel" aria-label="Personalizar panel"
-              className="flex items-center gap-2 h-10 px-4 rounded-2xl bg-white dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-all cursor-pointer"
+              className="flex items-center gap-2 h-11 px-4 rounded-2xl bg-white dark:bg-white/5 border border-zinc-200/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-all cursor-pointer"
             >
               <i className="fa-solid fa-sliders text-xs"></i> <span className="hidden sm:inline">Personalizar</span>
             </button>
             {menuWidgets && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuWidgets(false)}></div>
-                <div className="absolute right-0 z-50 mt-1.5 w-52 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl p-1.5 animate-pop">
+                <div className="absolute right-0 z-50 mt-1.5 w-52 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl p-1.5 animate-pop">
                   <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400">Widgets visibles</p>
                   {WIDGETS.map(([k, label]) => (
                     <button
@@ -107,116 +173,45 @@ export default function DashboardView({
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
       {widgets.metricas && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5" data-tour="dash-stats">
-
-        {/* Bienes Activos */}
-        <button
-          onClick={() => { clearAllFilters(); setActiveTab('inventario'); }}
-          title="Ver inventario completo"
-          className="group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-5 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-brand-primary outline-none transition-all duration-200 cursor-pointer"
-        >
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900">
-              <i className="fa-solid fa-boxes-stacked text-lg"></i>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6" data-tour="dash-stats">
+        {METRIC_CARDS.map((card) => (
+          <button
+            key={card.id}
+            onClick={card.onClick}
+            title={card.label}
+            className={`group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border ${card.border} p-6 sm:p-7 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-300 cursor-pointer`}
+          >
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${card.iconBg} shadow-sm`}>
+                <i className={`fa-solid ${card.icon} text-lg ${card.iconColor}`}></i>
+              </div>
+              <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all"></i>
             </div>
-            <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all"></i>
-          </div>
-          <p className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white tracking-tight tabular-nums">
-            {isLoading ? '…' : <AnimatedNumber value={stats.totalItems} />}
-          </p>
-          <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-1.5 uppercase tracking-[0.14em]">
-            Bienes Activos
-          </p>
-          <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500 mt-2 truncate">
-            Total en {dependenciaActual}
-          </p>
-        </button>
-
-        {/* Bienes con QR */}
-        <button
-          onClick={() => { irInventario(() => setFiltroQR('YES')); }}
-          title="Ver bienes con QR"
-          className="group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-5 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-brand-primary outline-none transition-all duration-200 cursor-pointer"
-        >
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-500/10 backdrop-blur border border-violet-500/25 text-violet-600 dark:text-violet-300">
-              <i className="fa-solid fa-qrcode text-lg"></i>
-            </div>
-            <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all"></i>
-          </div>
-          <p className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white tracking-tight tabular-nums">
-            {isLoading ? '…' : <><AnimatedNumber value={stats.withQR} />
-            <span className="text-base text-zinc-400 font-semibold"> / {isLoading ? '…' : Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>}
-          </p>
-          <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-1.5 uppercase tracking-[0.14em]">
-            Bienes con QR
-          </p>
-          <div className="mt-2.5 h-1.5 w-full bg-zinc-100 dark:bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full bg-violet-500 rounded-full transition-all duration-700" style={{ width: `${stats.percQR || 0}%` }}></div>
-          </div>
-        </button>
-
-        {/* Sin FC-10 */}
-        <button
-          onClick={() => { irInventario(() => setFiltroFC10('NO')); }}
-          title="Ver bienes sin FC-10 cerrado"
-          className="group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border border-amber-200/70 dark:border-amber-400/20 p-5 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-amber-500 outline-none transition-all duration-200 cursor-pointer"
-        >
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white">
-              <i className="fa-solid fa-file-signature text-lg"></i>
-            </div>
-            <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all"></i>
-          </div>
-          <p className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white tracking-tight tabular-nums">
-            {isLoading ? '…' : <AnimatedNumber value={stats.withoutFc10} />}
-          </p>
-          <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-1.5 uppercase tracking-[0.14em]">
-            Sin FC-10
-          </p>
-          <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 mt-2">
-            {stats.fc10Pendientes > 0
-              ? `${stats.fc10Pendientes} en firma · ${Math.max(0, stats.withoutFc10 - stats.fc10Pendientes)} sin acta`
-              : 'Pendientes de asignación'}
-          </p>
-        </button>
-
-        {/* Pendiente QR */}
-        <button
-          onClick={() => { irInventario(() => setFiltroQR('NO')); }}
-          title="Ver bienes sin QR"
-          className="group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border border-rose-200/70 dark:border-rose-400/20 p-5 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition-all duration-200 cursor-pointer"
-        >
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-rose-500 text-white">
-              <i className="fa-solid fa-triangle-exclamation text-lg"></i>
-            </div>
-            <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-rose-500 group-hover:translate-x-0.5 transition-all"></i>
-          </div>
-          <p className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white tracking-tight tabular-nums">
-            {isLoading ? '…' : <AnimatedNumber value={stats.withoutQR} />}
-          </p>
-          <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-1.5 uppercase tracking-[0.14em]">
-            Pendiente QR
-          </p>
-          <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400 mt-2">
-            Sin etiqueta generada
-          </p>
-        </button>
-
+            <p className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white tracking-tight tabular-nums leading-tight">
+              {isLoading ? '…' : card.numero}
+            </p>
+            <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-2 uppercase tracking-[0.14em]">
+              {card.label}
+            </p>
+            <p className={`text-[11px] font-medium ${card.subColor} mt-3 truncate`}>
+              {card.sublabel}
+            </p>
+            {card.showProgress && (
+              <div className="mt-4 h-1.5 w-full bg-zinc-100 dark:bg-white/10 rounded-full overflow-hidden">
+                <div className={`h-full ${card.progressColor} rounded-full transition-all duration-1000 shadow-sm shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
+              </div>
+            )}
+          </button>
+        ))}
       </div>
       )}
 
-      {/* 2A. ACTAS POR FIRMAR
-          Bandeja de trabajo del circuito de firmas. Va arriba de todo porque es
-          la unica accion del sistema que depende de un tercero (que firme en
-          Acrobat) y sin recordatorio se pierde: hay que entrar al modulo de
-          FC-10 para saber que falta, y eso no va a pasar solo. */}
+      {/* 2A. ACTAS POR FIRMAR */}
       {actasPorFirmar.length > 0 && (
         <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-amber-200/70 dark:border-amber-400/25 shadow-sm overflow-hidden" data-tour="dash-firmas">
-          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-amber-500/[0.08] border-b border-amber-500/20">
+          <div className="flex items-center justify-between gap-4 px-6 sm:px-7 py-5 bg-amber-500/[0.06] border-b border-amber-500/20">
             <div className="flex items-center gap-3 min-w-0">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm shadow-amber-500/20">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm shadow-amber-500/25">
                 <i className="fa-solid fa-file-signature text-sm"></i>
               </span>
               <div className="min-w-0">
@@ -231,28 +226,26 @@ export default function DashboardView({
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {actasPorFirmar.length === 1
                     ? 'Un acta esperando que registres la firma que ya hiciste en Acrobat.'
-                    : `${actasPorFirmar.length} actas esperando que registres las firmas.`}
+                    : actasPorFirmar.length + ' actas esperando que registres las firmas.'}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-black shadow-sm shadow-amber-500/30 hover:shadow-amber-500/40 transition-all active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-black shadow-sm shadow-amber-500/30 hover:shadow-amber-500/40 transition-all active:scale-95 cursor-pointer shrink-0"
             >
               Gestionar →
             </button>
           </div>
 
-          {/* Lista compacta: qué falta en cada acta. Cada fila trae la acción directa
-              para no obligar a entrar al módulo a buscarla. */}
           <div className="divide-y divide-zinc-100 dark:divide-white/5">
             {actasPorFirmar.slice(0, 5).map(({ fc, bien, pendiente }) => (
-              <div key={fc.id} className="flex items-center gap-3 px-5 sm:px-6 py-3 hover:bg-amber-500/[0.04] transition-colors">
+              <div key={fc.id} className="flex items-center gap-3 px-6 sm:px-7 py-3.5 hover:bg-amber-500/[0.03] transition-colors">
                 <button
                   onClick={() => setActiveTab('fc10')}
                   className="flex items-center gap-3 min-w-0 flex-1 text-left cursor-pointer"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                     <i className="fa-solid fa-file-signature text-[10px]"></i>
                   </span>
                   <span className="min-w-0 flex-1">
@@ -270,7 +263,7 @@ export default function DashboardView({
                     onClick={() => registrarAmbasFirmas(fc)}
                     disabled={firmandoId === fc.id}
                     title="Registrar las dos firmas y cerrar el ciclo"
-                    className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+                    className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60"
                   >
                     {firmandoId === fc.id
                       ? <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
@@ -282,7 +275,7 @@ export default function DashboardView({
             {actasPorFirmar.length > 5 && (
               <button
                 onClick={() => setActiveTab('fc10')}
-                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.04] transition-colors cursor-pointer"
+                className="w-full px-6 sm:px-7 py-3 text-left text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.03] transition-colors cursor-pointer"
               >
                 Ver las {actasPorFirmar.length} actas en el módulo FC-10
               </button>
@@ -293,8 +286,8 @@ export default function DashboardView({
 
       {/* 2B. BANDEJA DE PENDIENTES */}
       {widgets.pendientes && (
-      <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-5 sm:p-6 shadow-sm" data-tour="dash-pendientes">
-          <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-6 sm:p-7 shadow-sm" data-tour="dash-pendientes">
+          <div className="flex items-center justify-between gap-3 mb-5">
               <h2 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-list-check text-zinc-400"></i> Atención requerida
               </h2>
@@ -304,19 +297,19 @@ export default function DashboardView({
                   </span>
               )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
               {pendientes.map(p => (
                   <button
                       key={p.id}
                       onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
                       title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-2xl border border-zinc-200/70 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-50 dark:hover:bg-white/[0.06] px-3.5 py-3 text-left transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                      className="group flex items-center gap-3 rounded-2xl border border-zinc-200/70 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 hover:bg-zinc-50 dark:hover:bg-white/[0.05] px-4 py-3.5 text-left transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ${p.box}`}>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ` + p.box}>
                           <i className={`fa-solid ${p.icon} text-sm`}></i>
                       </span>
                       <span className="min-w-0 flex-1">
-                          <span className="block text-lg font-bold tabular-nums text-zinc-900 dark:text-white leading-tight"><AnimatedNumber value={p.count} /></span>
+                          <span className="block text-xl font-black tabular-nums text-zinc-900 dark:text-white leading-tight"><AnimatedNumber value={p.count} /></span>
                           <span className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 truncate">{p.label}</span>
                       </span>
                       <i className="fa-solid fa-chevron-right text-[10px] text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 group-hover:translate-x-0.5 transition-all shrink-0"></i>
@@ -328,23 +321,23 @@ export default function DashboardView({
 
       {/* 3. ACCESOS DIRECTOS */}
       {widgets.accesos && (
-      <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 p-3 sm:p-4 shadow-sm">
-          <p className="px-2 pb-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">Accesos directos</p>
+      <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm p-5 sm:p-6">
+          <p className="px-2 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">Accesos directos</p>
           <div className="flex flex-wrap items-center gap-2">
-              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold text-[13px] transition-all shadow-sm active:scale-95 cursor-pointer">
+              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-black text-[13px] transition-all shadow-lg shadow-zinc-900/25 active:scale-95 cursor-pointer">
                   <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
               </button>
-              <span className="hidden sm:block h-6 w-px bg-zinc-200 dark:bg-white/10 mx-1"></span>
-              <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer">
+              <span className="hidden sm:block h-6 w-px bg-zinc-200 dark:bg-white/10 mx-1.5"></span>
+              <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-zinc-50 dark:hover:bg-white/5">
                   <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i> Importar
               </button>
-              <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer">
+              <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-zinc-50 dark:hover:bg-white/5">
                   <i className="fa-solid fa-file-export text-sky-600 dark:text-sky-400"></i> Exportar
               </button>
-              <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer">
+              <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-zinc-50 dark:hover:bg-white/5">
                   <i className="fa-solid fa-qrcode text-violet-600 dark:text-violet-400"></i> Lote QRs
               </button>
-              <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-2.5 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer">
+              <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-2xl border border-transparent hover:border-zinc-200 dark:hover:border-white/10 text-zinc-600 dark:text-zinc-300 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-zinc-50 dark:hover:bg-white/5">
                   <i className="fa-solid fa-print text-amber-600 dark:text-amber-400"></i> FC-03
               </button>
           </div>
@@ -353,7 +346,7 @@ export default function DashboardView({
 
       {/* 4. GRÁFICOS Y TENDENCIAS */}
       {widgets.tendencias && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Estado de Regularización */}
         <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
@@ -365,31 +358,29 @@ export default function DashboardView({
           </div>
 
           <div className="flex flex-1 flex-col gap-8 justify-center">
-            {/* Progreso FC-10 */}
             <div>
               <div className="flex justify-between items-end mb-3">
                 <div>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Cobertura FC-10</p>
                   <p className="text-[11px] text-zinc-500 font-medium mt-1">{stats.withFc10} de {stats.totalItems} activos asignados</p>
                 </div>
-                <span className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">{stats.percFC10.toFixed(1)}%</span>
+                <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">{stats.percFC10.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-zinc-200/50 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000 shadow-sm" style={{ width: `${stats.percFC10}%` }}></div>
+                <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000 shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
               </div>
             </div>
 
-            {/* Progreso QR */}
             <div>
               <div className="flex justify-between items-end mb-3">
                 <div>
                   <p className="text-xs font-bold text-zinc-900 dark:text-white uppercase tracking-wider">Etiquetado QR</p>
                   <p className="text-[11px] text-zinc-500 font-medium mt-1">{stats.withQR} de {stats.totalItems} activos con código</p>
                 </div>
-                <span className="text-2xl font-semibold text-zinc-900 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
+                <span className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-zinc-200/50 dark:bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-primary rounded-full transition-all duration-1000 shadow-sm" style={{ width: `${stats.percQR}%` }}></div>
+                <div className="h-full bg-brand-primary rounded-full transition-all duration-1000 shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
               </div>
             </div>
           </div>
@@ -420,7 +411,7 @@ export default function DashboardView({
 
             <div className="flex-1 flex flex-col">
               <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-6">Asignaciones (FC-10)</h3>
-              <div className="flex-1 flex flex-col justify-center gap-6">
+              <div className="flex-1 flex flex-col justify-center gap-7">
                 <SimpleBar label={`Actual (${timeStats.currentMonthName})`} value={timeStats.asigCurrentMonth} max={timeStats.asigMax} colorClass="bg-emerald-500" bgClass="bg-zinc-100 dark:bg-white/5" title="Ver asignaciones de este mes" onClick={() => { setFc10Year(timeStats.asigCurrent.year); setFc10Month(timeStats.asigCurrent.month); setActiveTab('fc10'); }} />
                 <SimpleBar label={`Anterior (${timeStats.prevMonthName})`} value={timeStats.asigPreviousMonth} max={timeStats.asigMax} colorClass="bg-zinc-300 dark:bg-zinc-600" bgClass="bg-zinc-100 dark:bg-white/5" title="Ver asignaciones del mes anterior" onClick={() => { setFc10Year(timeStats.asigPrev.year); setFc10Month(timeStats.asigPrev.month); setActiveTab('fc10'); }} />
               </div>

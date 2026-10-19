@@ -9,11 +9,12 @@ html {
   /* Open Sans es la única tipografía del sistema. */
   --font-sans: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Open Sans", ui-sans-serif, system-ui, sans-serif;
-  /* Paleta de marca */
+  /* Paleta de marca institucional UNP */
   --color-brand-primary: #1d4ed8;
   --color-brand-hover: #1e40af;
   --color-brand-accent: #60a5fa;
-  /* Modo oscuro moderno: grises muy oscuros con tono azuláceo para reducir fatiga visual */
+  --color-brand-light: #eff6ff;
+  /* Modo oscuro moderno: grises muy oscuros con tono azuláceo */
   --color-darkbg-main: #0b0f19;
   --color-darkbg-card: #111827;
   --color-darkbg-border: #1f2937;
@@ -21,6 +22,7 @@ html {
   /* Superficies elevadas en modo oscuro */
   --color-darkbg-surface: #0f172a;
 }
+
 body { 
   font-family: 'Open Sans', 'Inter', system-ui, sans-serif; 
   background-color: #f8f9fa; 
@@ -33,7 +35,7 @@ body {
   background-color: #0b0f19; 
 }
 
-/* Personalización de barra de desplazamiento */
+/* Barra de desplazamiento consistente */
 ::-webkit-scrollbar { 
   width: 8px; 
   height: 8px; 
@@ -59,7 +61,7 @@ body {
   background: #80868b; 
 }
 
-/* Clase personalizada para ocultar la barra de scroll */
+/* Ocultar scrollbar */
 .hide-scrollbar::-webkit-scrollbar { 
   display: none; 
 } 
@@ -68,24 +70,15 @@ body {
   -ms-overflow-style: none; 
   scrollbar-width: none; 
 }
-/* Soporte de esquema de color para inputs y datalists */
-:root {
-  color-scheme: light;
-}
 
-.dark {
-  color-scheme: dark;
-}
+/* Soporte de esquema de color */
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
 
-input, select, textarea {
-  color-scheme: light;
-}
+input, select, textarea { color-scheme: light; }
+.dark input, .dark select, .dark textarea { color-scheme: dark; }
 
-.dark input, .dark select, .dark textarea {
-  color-scheme: dark;
-}
-
-/* Evitar que el autofill de Chrome/Edge ponga fondo blanco y texto ilegible */
+/* Autofill de navegadores */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus,
@@ -106,7 +99,7 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px #18181b inset !important;
 }
 
-/* REGLA MAESTRA CONTRA TEXTO BLANCO EN INPUTS */
+/* Texto blanco en inputs focos */
 .dark input:focus,
 .dark textarea:focus,
 .dark select:focus {
@@ -122,11 +115,7 @@ select:focus {
 }
 
 /* ============================================================================
- * ANIMACIONES DEL SISTEMA (definición real de las clases animate-*)
- * ----------------------------------------------------------------------------
- * Estas clases se usan en todo el frontend (modales, vistas, toasts) pero no
- * tenían keyframes: eran no-ops. Se definen aquí de forma centralizada para
- * que el login animado y el resto del sistema compartan el mismo lenguaje.
+ * ANIMACIONES DEL SISTEMA (definición centralizada)
  * Todas respetan prefers-reduced-motion.
  * ========================================================================== */
 
@@ -197,101 +186,15 @@ select:focus {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Entrada de la tarjeta de login: un pelín más profunda y con rebote amortiguado. */
 @keyframes app-login-card {
   from { opacity: 0; transform: translateY(24px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.animate-fade-in { animation: app-fade-in 0.45s ease both; }
-.animate-slide-up { animation: app-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-fade-up { animation: app-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-scale-in { animation: app-scale-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.login-card-in { animation: app-login-card 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-shake { animation: app-shake 0.45s ease both; }
-.animate-pop { animation: app-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
-
-/* Pistas de compositor: evita parpadeos al arrancar las animaciones grandes. */
-.login-kenburns,
-.login-orb-a,
-.login-orb-b,
-.login-float {
-  will-change: transform;
-}
-
-/* Spinner del botón de login (usa currentColor) */
-.login-spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border-radius: 9999px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
-  animation: app-spin 0.7s linear infinite;
-  flex-shrink: 0;
-}
-
-/* Shimmer para skeletons de carga */
-.shimmer-wrap { position: relative; overflow: hidden; }
-.shimmer-wrap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-  animation: app-shimmer 1.6s ease-in-out infinite;
-}
-.dark .shimmer-wrap::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-}
-
-/* Entrada escalonada de filas de tablas (primeras 10: la página visible) */
-.anim-rows tbody tr { animation: app-row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-rows tbody tr:nth-child(1) { animation-delay: 0.02s; }
-.anim-rows tbody tr:nth-child(2) { animation-delay: 0.05s; }
-.anim-rows tbody tr:nth-child(3) { animation-delay: 0.08s; }
-.anim-rows tbody tr:nth-child(4) { animation-delay: 0.11s; }
-.anim-rows tbody tr:nth-child(5) { animation-delay: 0.14s; }
-.anim-rows tbody tr:nth-child(6) { animation-delay: 0.17s; }
-.anim-rows tbody tr:nth-child(7) { animation-delay: 0.20s; }
-.anim-rows tbody tr:nth-child(8) { animation-delay: 0.23s; }
-.anim-rows tbody tr:nth-child(9) { animation-delay: 0.26s; }
-.anim-rows tbody tr:nth-child(n+10) { animation-delay: 0.29s; }
-
-/* Bottom-sheet en móvil: los modales dejan de centrarse y suben desde abajo.
- * Solo <640px; en desktop no cambia nada. El CSS sin capas gana a las
- * utilidades de Tailwind, por eso no hace falta !important. */
-@media (max-width: 640px) {
-  .modalOverlay {
-    align-items: flex-end;
-    padding: 0;
-  }
-  .modalContent {
-    border-radius: 24px 24px 0 0;
-    max-height: 92dvh;
-    width: 100%;
-  }
-}
-
-/* Secciones ancladas: dejan espacio para el header fijo al saltar con #hash */
-[id] { scroll-margin-top: 72px; }
-
-/* Fondo del login: zoom lento institucional + orbes a la deriva */
-.login-kenburns { animation: app-kenburns 36s ease-in-out infinite alternate; }
-.login-orb-a { animation: app-drift-a 18s ease-in-out infinite; }
-.login-orb-b { animation: app-drift-b 22s ease-in-out infinite; }
-.login-float { animation: app-float-y 7s ease-in-out infinite; }
-
-/* Entrada escalonada de los campos del login */
 @keyframes app-rise {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.login-rise { opacity: 0; animation: app-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-.login-rise-1 { animation-delay: 0.08s; }
-.login-rise-2 { animation-delay: 0.16s; }
-.login-rise-3 { animation-delay: 0.24s; }
-.login-rise-4 { animation-delay: 0.32s; }
 
 @keyframes app-tab-in {
   from { opacity: 0; transform: translateY(10px); }
@@ -323,7 +226,97 @@ select:focus {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Transición entre pestañas (el contenedor se remonta con key=activeTab) */
+@keyframes app-login-card {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Utilidades de animación */
+.animate-fade-in { animation: app-fade-in 0.45s ease both; }
+.animate-slide-up { animation: app-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-up { animation: app-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-scale-in { animation: app-scale-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.login-card-in { animation: app-login-card 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-shake { animation: app-shake 0.45s ease both; }
+.animate-pop { animation: app-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Pistas de compositor para evitar parpadeos */
+.login-kenburns,
+.login-orb-a,
+.login-orb-b,
+.login-float {
+  will-change: transform;
+}
+
+/* Spinner del botón de login */
+.login-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: app-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Shimmer para skeletons */
+.shimmer-wrap { position: relative; overflow: hidden; }
+.shimmer-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: app-shimmer 1.6s ease-in-out infinite;
+}
+.dark .shimmer-wrap::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+/* Entrada escalonada de filas de tablas */
+.anim-rows tbody tr { animation: app-row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.anim-rows tbody tr:nth-child(1) { animation-delay: 0.02s; }
+.anim-rows tbody tr:nth-child(2) { animation-delay: 0.05s; }
+.anim-rows tbody tr:nth-child(3) { animation-delay: 0.08s; }
+.anim-rows tbody tr:nth-child(4) { animation-delay: 0.11s; }
+.anim-rows tbody tr:nth-child(5) { animation-delay: 0.14s; }
+.anim-rows tbody tr:nth-child(6) { animation-delay: 0.17s; }
+.anim-rows tbody tr:nth-child(7) { animation-delay: 0.20s; }
+.anim-rows tbody tr:nth-child(8) { animation-delay: 0.23s; }
+.anim-rows tbody tr:nth-child(9) { animation-delay: 0.26s; }
+.anim-rows tbody tr:nth-child(n+10) { animation-delay: 0.29s; }
+
+/* Bottom-sheet en móvil */
+@media (max-width: 640px) {
+  .modalOverlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modalContent {
+    border-radius: 24px 24px 0 0;
+    max-height: 92dvh;
+    width: 100%;
+  }
+}
+
+/* Secciones ancladas */
+[id] { scroll-margin-top: 72px; }
+
+/* Fondo del login */
+.login-kenburns { animation: app-kenburns 36s ease-in-out infinite alternate; }
+.login-orb-a { animation: app-drift-a 18s ease-in-out infinite; }
+.login-orb-b { animation: app-drift-b 22s ease-in-out infinite; }
+.login-float { animation: app-float-y 7s ease-in-out infinite; }
+
+/* Entrada escalonada de campos del login */
+.login-rise { opacity: 0; animation: app-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.login-rise-1 { animation-delay: 0.08s; }
+.login-rise-2 { animation-delay: 0.16s; }
+.login-rise-3 { animation-delay: 0.24s; }
+.login-rise-4 { animation-delay: 0.32s; }
+
+/* Transición entre pestañas */
 .tab-enter { animation: app-tab-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Micro-interacciones */
@@ -335,26 +328,23 @@ select:focus {
 .row-flash { animation: app-row-flash 2.4s ease-out both; }
 .check-pop { animation: app-check-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* Barra de progreso superior (procesos globales) */
+/* Barra de progreso superior */
 .proc-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 600; background: transparent; overflow: hidden; }
 .proc-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #1d4ed8, #60a5fa); transition: width 0.25s ease; }
 .proc-fill.indete { width: 30%; animation: app-proc-slide 1.1s ease-in-out infinite; }
 
-/* Enlace "saltar al contenido" (solo visible con teclado) */
+/* Enlace "saltar al contenido" */
 .skip-link { position: fixed; top: -60px; left: 16px; z-index: 700; transition: top 0.2s ease; }
 .skip-link:focus-visible { top: 12px; }
 
-/* Texto grande (preferencia de apariencia) */
+/* Texto grande */
 html.font-lg { font-size: 18px; }
 
 /* ============================================================================
- * CONTRASTE ALTO GLOBAL
- * Afecta a TODA la interfaz: sidebar, navbar, modales, footers, tablas,
- * inputs, botones, tarjetas y cualquier elemento con clases dark:*.
- * Se activa con la clase .contrast-more en <html> o <body>.
+ * CONTRASTE ALTO GUNCIONAL
+ * Afecta a TODA la interfaz. Se activa con .contrast-more en <html> o <body>.
  * ============================================================================ */
 
-/* Textos: reforzar grises apagados en modo oscuro */
 .dark.contrast-more .dark\:text-zinc-950 { color: #ffffff !important; }
 .dark.contrast-more .dark\:text-zinc-900 { color: #ffffff !important; }
 .dark.contrast-more .dark\:text-zinc-800 { color: #f3f4f6 !important; }
@@ -364,7 +354,6 @@ html.font-lg { font-size: 18px; }
 .dark.contrast-more .dark\:text-zinc-400 { color: #e5e7eb !important; }
 .dark.contrast-more .dark\:text-zinc-300 { color: #f3f4f6 !important; }
 
-/* Bordes: más visibles */
 .dark.contrast-more .dark\:border-white\/10,
 .dark.contrast-more .dark\:border-zinc-800,
 .dark.contrast-more .dark\:border-darkbg-border,
@@ -373,7 +362,6 @@ html.font-lg { font-size: 18px; }
   border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* Fondos de tarjetas y superficies - más oscuros para contraste */
 .dark.contrast-more .dark\:bg-white\/5,
 .dark.contrast-more .dark\:bg-darkbg-card,
 .dark.contrast-more .dark\:bg-darkbg-main,
@@ -381,25 +369,21 @@ html.font-lg { font-size: 18px; }
   background-color: #0f172a !important;
 }
 
-/* Superficies elevadas (tarjetas) */
 .dark.contrast-more .dark\:bg-white\/\[0\.04\],
 .dark.contrast-more .dark\:bg-zinc-50\/30,
 .dark.contrast-more .dark\:bg-zinc-50 {
   background-color: #111827 !important;
 }
 
-/* Sidebar y navbar específicas */
 .dark.contrast-more .dark\:bg-darkbg-card {
   background-color: #0f172a !important;
   border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* Modales: fondo y bordes */
 .dark.contrast-more .dark\:bg-darkbg-card {
   background-color: #0f172a !important;
 }
 
-/* Inputs en contraste alto */
 .dark.contrast-more .dark\:bg-darkbg-main input,
 .dark.contrast-more .dark\:bg-darkbg-main textarea,
 .dark.contrast-more .dark\:bg-darkbg-main select,
@@ -411,13 +395,11 @@ html.font-lg { font-size: 18px; }
   border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-/* Botones secundarios en contraste alto */
 .dark.contrast-more .dark\:hover\:bg-zinc-100:hover,
 .dark.contrast-more .dark\:hover\:bg-white\/10:hover {
   background-color: #1f2937 !important;
 }
 
-/* Footer */
 .dark.contrast-more footer,
 .dark.contrast-more .dark\:bg-darkbg-card footer {
   background-color: #0b0f19 !important;
@@ -425,7 +407,6 @@ html.font-lg { font-size: 18px; }
   border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Toasts y notificaciones */
 .dark.contrast-more .dark\:bg-zinc-900,
 .dark.contrast-more .dark\:bg-zinc-950,
 .dark.contrast-more .dark\:bg-darkbg-card {
@@ -434,13 +415,11 @@ html.font-lg { font-size: 18px; }
   border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-/* Tarjetas de departamentos y items en DependenciasModal */
 .dark.contrast-more .dark\:bg-white\/\[0\.03\],
 .dark.contrast-more .dark\:bg-zinc-50 {
   background-color: #111827 !important;
 }
 
-/* Texto en blanco para legibilidad en contraste alto */
 .dark.contrast-more .dark\:text-zinc-700,
 .dark.contrast-more .dark\:text-zinc-600,
 .dark.contrast-more .dark\:text-zinc-500 {
@@ -452,31 +431,19 @@ html.font-lg { font-size: 18px; }
 .dark ::selection { background: rgba(96, 165, 250, 0.35); }
 ::selection { background: rgba(29, 78, 216, 0.18); }
 
-/* Forzar color-scheme en todos los controles de formulario en modo oscuro */
 .dark input, .dark select, .dark textarea,
 .dark.contrast-more input, .dark.contrast-more select, .dark.contrast-more textarea {
   color-scheme: dark;
 }
 
-/* Pulido general del modo oscuro moderno */
-.dark body { background-color: #0b0f19; }
-.dark ::selection { background: rgba(96, 165, 250, 0.35); }
-::selection { background: rgba(29, 78, 216, 0.18); }
-
-/* Forzar color-scheme en todos los controles de formulario en modo oscuro */
-.dark input, .dark select, .dark textarea,
-.dark.contrast-more input, .dark.contrast-more select, .dark.contrast-more textarea {
-  color-scheme: dark;
-}
-
-/* Acento por dependencia (variable --dep-accent desde App) */
+/* Acento por dependencia */
 .dep-accent-bar { background: var(--dep-accent, #1d4ed8); }
 .dep-accent-ring { box-shadow: 0 0 0 2px var(--dep-accent, #1d4ed8); }
 
-/* Foco visible global (no pisa los rings de Tailwind, solo fallback) */
+/* Foco visible global */
 :focus:not(:focus-visible) { outline: none; }
 
-/* Reducir animaciones (preferencia manual + sistema) */
+/* Reducir animaciones */
 .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
   animation: none !important;
   transition: none !important;
@@ -511,8 +478,6 @@ html.font-lg { font-size: 18px; }
   .shimmer-wrap::after {
     display: none;
   }
-  /* Las transiciones también deben detenerse: la app usa `transition-all`
-     en casi todos los botones y tarjetas, y antes seguían animando. */
   *,
   *::before,
   *::after {

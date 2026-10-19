@@ -173,31 +173,31 @@ export default function DashboardView({
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
       {widgets.metricas && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3" data-tour="dash-stats">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2" data-tour="dash-stats">
         {METRIC_CARDS.map((card) => (
           <button
             key={card.id}
             onClick={card.onClick}
             title={card.label}
-            className={`group relative text-left bg-white dark:bg-darkbg-card/60 rounded-2xl border ${card.border} p-3 sm:p-4 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-200 cursor-pointer`}
+            className={`group relative text-left bg-white dark:bg-darkbg-card rounded-xl border ${card.border} p-2 sm:p-2.5 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-200 cursor-pointer`}
           >
-            <div className="flex items-center justify-between gap-1.5 mb-2">
-              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg} shadow-xs`}>
+            <div className="flex items-center justify-between gap-1 mb-1.5">
+              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${card.iconBg} shadow-xs`}>
                 <i className={`fa-solid ${card.icon} text-sm ${card.iconColor}`}></i>
               </div>
               <i className="fa-solid fa-chevron-right text-[10px] text-zinc-300 dark:text-zinc-500 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 group-hover:translate-x-0 transition-all"></i>
             </div>
-            <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight tabular-nums leading-snug">
+            <p className="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight tabular-nums leading-snug">
               {isLoading ? '…' : card.numero}
             </p>
             <p className="text-[10px] font-bold text-zinc-500 dark:text-zinc-300 mt-1 uppercase tracking-[0.12em]">
               {card.label}
             </p>
-            <p className={`text-[10px] font-medium ${card.subColor} mt-1.5 truncate`}>
+            <p className={`text-[10px] font-medium ${card.subColor} mt-1 truncate`}>
               {card.sublabel}
             </p>
             {card.showProgress && (
-              <div className="mt-2 h-1.5 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
+              <div className="mt-1.5 h-1 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
                 <div className={`h-full ${card.progressColor} rounded-full transition-all duration-1000 shadow-xs shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
               </div>
             )}

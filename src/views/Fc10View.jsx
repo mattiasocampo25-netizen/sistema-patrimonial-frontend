@@ -173,9 +173,6 @@ export default function Fc10View({
           <div>
             <div className="flex items-center gap-2.5">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Actas de Responsabilidad (FC-10)</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
-                {filteredFC10.length}
-              </span>
               {conteo.pendientes > 0 && (
                 <span
                   title={`${conteo.pendientes} actas esperando firma`}
@@ -197,7 +194,7 @@ export default function Fc10View({
               onClick={() => setFiltroEtapa(et.id)}
               className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
                 filtroEtapa === et.id
-                  ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-white shadow-sm shadow-zinc-900/20'
+                  ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/40'
                   : 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
@@ -207,14 +204,19 @@ export default function Fc10View({
           ))}
         </div>
 
-        <div className="flex flex-wrap gap-2 items-center">
-          <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
-          <button onClick={() => setIsConsolidatedFC10ModalOpen(true)} className={STYLES.btnPrimary + " flex items-center gap-2"}>
-              <i className="fa-solid fa-file-lines text-xs"></i> FC-10 Consolidado
-          </button>
-          <button onClick={handleExportFC10CSV} title={`Exportar actas del año ${fc10Year} a CSV`} className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
-              <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar año
-          </button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 p-1">
+            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider px-2">Periodo</span>
+            <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={() => setIsConsolidatedFC10ModalOpen(true)} className={STYLES.btnPrimary + " flex items-center gap-2 shrink-0"}>
+                <i className="fa-solid fa-file-lines text-xs"></i> FC-10 Consolidado
+            </button>
+            <button onClick={handleExportFC10CSV} title={`Exportar actas del año ${fc10Year} a CSV`} className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
+                <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar año
+            </button>
+          </div>
         </div>
       </div>
       <div className="bg-white dark:bg-darkbg-card p-6 sm:p-8 rounded-2xl border border-zinc-200/80 dark:border-darkbg-border shadow-2xs min-h-[400px]">

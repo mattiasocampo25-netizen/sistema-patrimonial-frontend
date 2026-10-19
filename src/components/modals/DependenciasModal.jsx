@@ -118,11 +118,11 @@ export default function DependenciasModal({
         title={d.nombre}
         className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
           activo || activoDet
-            ? 'bg-zinc-900 dark:bg-zinc-800 text-white dark:text-white border border-transparent shadow-sm shadow-brand-primary/20'
-            : 'hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-zinc-800 dark:text-zinc-100 border border-transparent'
+            ? 'bg-brand-light dark:bg-brand-primary/10 border border-brand-primary/30 border-l-4 border-brand-primary text-zinc-900 dark:text-white shadow-sm'
+            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-800 dark:text-zinc-100 border border-transparent'
         }`}
       >
-        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-emerald-500 ring-1 ring-emerald-900/20' : 'bg-zinc-400 ring-1 ring-zinc-900/10')}`}></span>
+        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-brand-primary ring-1 ring-brand-primary/50' : 'bg-zinc-400 dark:bg-zinc-600 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`} title={d.nombre}>
@@ -134,7 +134,7 @@ export default function DependenciasModal({
               </span>
             )}
           </div>
-          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'opacity-90' : 'text-zinc-500 dark:text-zinc-400'}`}>
+          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'text-zinc-600 dark:text-zinc-300 font-medium' : 'text-zinc-500 dark:text-zinc-400'}`}>
             {detectada ? `${d.bienes + d.funcionarios} registros por fusionar` : `${(conteos[d.nombre]?.bienes || 0)} bienes · ${(conteos[d.nombre]?.funcionarios || 0)} func.`}
           </span>
         </span>
@@ -199,28 +199,29 @@ export default function DependenciasModal({
             {(depsFiltradas.length + detFiltradas.length) === 0 && (
               <p className="p-4 text-center text-xs font-semibold text-zinc-400">Sin coincidencias.</p>
             )}
-            <div className="px-1 pt-2">
+            <div className="px-3 pb-6 pt-3 space-y-2">
               <div className="flex items-center gap-1.5">
                 <input
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   placeholder="Nueva dependencia..."
-                  className="flex-1 min-w-[100px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-3 h-9 text-xs font-medium outline-none focus:border-brand-primary"
+                  className="flex-1 min-w-[110px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 h-9 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-500 outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
                 />
                 <input
                   type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
                   placeholder="Código"
-                  className="min-w-[56px] max-w-[90px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
+                  className="min-w-[56px] max-w-[92px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold text-center text-zinc-900 dark:text-white outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
                 />
                 <button
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-none">Presiona Enter para guardar.</p>
             </div>
           </div>
 

@@ -17,7 +17,7 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
 
     return (
         <div className={STYLES.modalOverlay}>
-            <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
+            <div className={STYLES.modalContent + " max-w-lg overflow-hidden"}>
                 <div className="flex justify-between items-center px-6 py-5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 z-10">
                     <div className="flex items-center gap-3">
                         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
@@ -67,7 +67,8 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                                     valor=""
                                     opciones={ubicaciones}
                                     etiquetaTodos="Sin ubicación asignada"
-                                    titulo="Ubicación asignada"
+                                    titulo="Seleccionar ubicación"
+                                    className="w-full"
                                 />
                             </div>
                         </div>

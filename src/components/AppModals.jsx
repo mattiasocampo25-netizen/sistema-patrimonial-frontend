@@ -291,7 +291,8 @@ export default function AppModals({
                                 opciones={ubicacionesUnicas}
                                 onElegir={(v) => setFc03Config({ ...fc03Config, filtroValor: v })}
                                 etiquetaTodos="Seleccione una ubicación..."
-                                titulo="Ubicación"
+                                titulo="Seleccionar ubicación"
+                                className="w-full"
                             />
                         </div>
                     )}               
@@ -401,7 +402,7 @@ export default function AppModals({
                 {/* BOTONES DE ACCIÓN */}
                 <div className="flex justify-end gap-2 px-6 sm:px-8 py-5 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900 shrink-0 z-10 rounded-b-[24px]">
                   <button onClick={() => setIsFC03ModalOpen(false)} className="h-10 px-5 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">Cancelar</button>
-                  <button onClick={executeGenerateFC03} className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-zinc-900 dark:disabled:hover:bg-white" disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor}>
+                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-zinc-400 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed opacity-60' : 'text-white bg-brand-primary hover:bg-brand-hover shadow-md shadow-brand-primary/25 cursor-pointer'}`}>
                     <i className="fa-solid fa-file-pdf text-xs"></i> Generar Documento
                   </button>
                 </div>

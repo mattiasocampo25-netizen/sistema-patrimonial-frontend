@@ -101,8 +101,9 @@ export default function FiltroCombo({
               type="button"
               onClick={() => elegir('')}
               className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${!valorActual ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-zinc-500 dark:text-zinc-400'}`}
+              title={etiquetaTodos}
             >
-              {etiquetaTodos}
+              <span className="block truncate">{etiquetaTodos}</span>
             </button>
             {lista.map(o => (
               <button
@@ -112,7 +113,7 @@ export default function FiltroCombo({
                 title={o.label}
                 className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-zinc-700 dark:text-zinc-200'}`}
               >
-                <span className="block truncate">{o.label}</span>
+                <span className="block truncate" title={o.label}>{o.label}</span>
               </button>
             ))}
             {lista.length === 0 && (

@@ -106,6 +106,9 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   const handleBulkLabelPNGZip = async (lista) => {
     const objetivos = Array.isArray(lista) && lista.length > 0 ? lista : filteredBienes;
     if (objetivos.length === 0) return notify("No hay bienes filtrados.", "warning");
+    if (typeof window.JSZip === 'undefined') {
+      return notify("La librería de compresión no está disponible. Intenta recargar la página.", "error");
+    }
     return conCerrojo(async () => {
     setIsProcessing({ active: true, text: 'Iniciando generación masiva de etiquetas...', pct: 0 });
 
@@ -174,6 +177,9 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   const handleBulkSimpleQRZip = async (lista) => {
     const objetivos = Array.isArray(lista) && lista.length > 0 ? lista : filteredBienes;
     if (objetivos.length === 0) return notify("No hay bienes filtrados.", "warning");
+    if (typeof window.JSZip === 'undefined') {
+      return notify("La librería de compresión no está disponible. Intenta recargar la página.", "error");
+    }
     return conCerrojo(async () => {
     setIsProcessing({ active: true, text: 'Iniciando compresión de QRs simples...', pct: 0 });
 

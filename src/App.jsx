@@ -137,6 +137,11 @@ export default function App() {
   useEffect(() => {
     try { sessionStorage.removeItem('chunk_reintentado'); } catch (e) {}
   }, []);
+  // Sincronizar clase 'dark' en <html> para que el CSS de contraste alto
+  // (.dark.contrast-more) y los temas oscuro/claro funcionen globalmente.
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
   // FORMATO_PDF vive en constants/appConstants (se usa en usePdfHandlers).
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -1869,11 +1874,6 @@ if (publicBienId) {
           <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} setDarkMode={fijarTemaUsuario} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
       );
   }
-
-  // Sincronizar clase 'dark' en <html> para que el CSS de contraste alto (.dark.contrast-more) funcione globalmente.
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
-  }, [darkMode]);
 
   return (
     <div className={`flex h-dvh overflow-hidden bg-zinc-50 ${darkMode ? 'dark bg-darkbg-main' : 'bg-zinc-50'} transition-colors duration-300 text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>

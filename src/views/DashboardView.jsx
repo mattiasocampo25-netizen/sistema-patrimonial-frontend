@@ -214,18 +214,20 @@ export default function DashboardView({
           FC-10 para saber que falta, y eso no va a pasar solo. */}
       {actasPorFirmar.length > 0 && (
         <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-amber-200/70 dark:border-amber-400/25 shadow-sm overflow-hidden" data-tour="dash-firmas">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-5 sm:px-6 py-4 bg-amber-500/[0.07] border-b border-amber-500/20">
+          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-amber-500/[0.08] border-b border-amber-500/20">
             <div className="flex items-center gap-3 min-w-0">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm shadow-amber-500/20">
                 <i className="fa-solid fa-file-signature text-sm"></i>
               </span>
               <div className="min-w-0">
-                <h2 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                  Actas por firmar
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-amber-500 text-white">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
+                    Actas por firmar
+                  </h2>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-amber-500 text-white">
                     {actasPorFirmar.length}
                   </span>
-                </h2>
+                </div>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {actasPorFirmar.length === 1
                     ? 'Un acta esperando que registres la firma que ya hiciste en Acrobat.'
@@ -235,9 +237,9 @@ export default function DashboardView({
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold transition-all active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-bold shadow-sm shadow-amber-500/25 transition-all active:scale-95 cursor-pointer shrink-0"
             >
-              Gestionar <i className="fa-solid fa-arrow-right text-[10px]"></i>
+              Gestionar →
             </button>
           </div>
 

@@ -197,12 +197,12 @@ export default function Fc10View({
               onClick={() => setFiltroEtapa(et.id)}
               className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
                 filtroEtapa === et.id
-                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
-                  : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
+                  ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-white shadow-sm shadow-zinc-900/20'
+                  : 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
               {et.label}
-              <span className={`tabular-nums ${filtroEtapa === et.id ? 'opacity-80' : 'text-zinc-400 dark:text-zinc-500'}`}>{et.n}</span>
+              <span className={`tabular-nums ${filtroEtapa === et.id ? 'opacity-90' : 'text-zinc-400 dark:text-zinc-400'}`}>{et.n}</span>
             </button>
           ))}
         </div>

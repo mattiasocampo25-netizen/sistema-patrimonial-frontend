@@ -23,7 +23,7 @@ export const aniosDisponibles = () => {
  */
 export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth }) {
   return (
-    <div className="flex items-center gap-1.5 bg-white dark:bg-darkbg-card p-1.5 rounded-2xl border border-zinc-200/80 dark:border-darkbg-border shadow-sm">
+    <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-900/40 p-1.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/60 shadow-sm">
       <FiltroCombo
         ancho="w-[128px]"
         compacto
@@ -32,8 +32,9 @@ export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, s
         onElegir={setSelectedMonth}
         etiquetaTodos="Mes"
         titulo="Mes del periodo"
+        className="bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700"
       />
-      <div className="h-5 w-px bg-zinc-200 dark:bg-darkbg-border mx-1"></div>
+      <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-700 mx-1"></div>
       <FiltroCombo
         ancho="w-[104px]"
         compacto
@@ -42,6 +43,7 @@ export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, s
         onElegir={setSelectedYear}
         etiquetaTodos="Año"
         titulo="Año del periodo"
+        className="bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700"
       />
     </div>
   );

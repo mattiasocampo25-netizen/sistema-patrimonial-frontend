@@ -82,7 +82,7 @@ export default function FiltroCombo({
         <i className={`fa-solid fa-chevron-down text-[10px] text-zinc-400 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
       {abierto && (
-        <div className="absolute left-0 right-0 z-50 mt-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
+        <div className="absolute left-0 w-auto min-w-[260px] z-50 mt-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
           <div className="relative border-b border-zinc-100 dark:border-white/10">
             <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
             <input

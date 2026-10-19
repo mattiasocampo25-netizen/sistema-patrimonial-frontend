@@ -124,12 +124,12 @@ export default function DependenciasModal({
       >
         <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-emerald-500 ring-1 ring-emerald-900/20' : 'bg-zinc-400 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-1.5">
-            <span className={`block text-[13px] font-bold leading-snug text-balance ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`}>
+          <div className="flex items-center gap-2">
+            <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`} title={d.nombre}>
               {d.nombre}
             </span>
             {d.codigo && (
-              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-300">
+              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-300 whitespace-nowrap">
                 {d.codigo}
               </span>
             )}
@@ -205,12 +205,12 @@ export default function DependenciasModal({
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   placeholder="Nueva dependencia..."
-                  className="flex-1 min-w-0 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-3 h-9 text-xs font-medium outline-none focus:border-brand-primary"
+                  className="flex-1 min-w-[100px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-3 h-9 text-xs font-medium outline-none focus:border-brand-primary"
                 />
                 <input
                   type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
                   placeholder="Código"
-                  className="min-w-[56px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
+                  className="min-w-[56px] max-w-[90px] rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
                 />
                 <button
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}

@@ -107,7 +107,7 @@ export default function Header({
                         etiquetaTodos="Elegí dependencia"
                         titulo="Cambiar entorno de trabajo"
                         ancho="max-w-[220px]"
-                        className="font-semibold bg-zinc-100 dark:bg-white/5 border-transparent hover:border-zinc-200 dark:hover:border-white/10"
+                        className="font-semibold bg-zinc-100 dark:bg-zinc-900/50 border-transparent hover:border-zinc-200 dark:hover:border-white/10"
                       />
                     ) : (
                       <span

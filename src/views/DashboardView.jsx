@@ -50,8 +50,8 @@ export default function DashboardView({
       icon: 'fa-boxes-stacked',
       iconBg: 'bg-zinc-900 dark:bg-white',
       iconColor: 'text-white dark:text-zinc-900',
-      border: 'border-zinc-200/70 dark:border-white/10',
-      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/20',
+      border: 'border-zinc-200/80 dark:border-white/20',
+      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/30',
       ring: 'focus-visible:ring-brand-primary',
       numero: <AnimatedNumber value={stats.totalItems} />,
       onClick: () => { clearAllFilters(); setActiveTab('inventario'); },
@@ -66,8 +66,8 @@ export default function DashboardView({
       icon: 'fa-qrcode',
       iconBg: 'bg-violet-500/10 backdrop-blur border border-violet-500/25',
       iconColor: 'text-violet-600 dark:text-violet-300',
-      border: 'border-zinc-200/70 dark:border-white/10',
-      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/20',
+      border: 'border-zinc-200/80 dark:border-white/20',
+      hoverBorder: 'hover:border-zinc-300 dark:hover:border-white/30',
       ring: 'focus-visible:ring-brand-primary',
       numero: <><AnimatedNumber value={stats.withQR} /><span className="text-base text-zinc-400 font-semibold"> / {Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>,
       onClick: () => irInventario(() => setFiltroQR('YES')),
@@ -86,8 +86,8 @@ export default function DashboardView({
       icon: 'fa-file-signature',
       iconBg: 'bg-amber-500 text-white',
       iconColor: 'text-white',
-      border: 'border-amber-200/70 dark:border-amber-400/20',
-      hoverBorder: 'hover:border-amber-300 dark:hover:border-amber-400/30',
+      border: 'border-amber-200/80 dark:border-amber-500/35',
+      hoverBorder: 'hover:border-amber-300 dark:hover:border-amber-500/40',
       ring: 'focus-visible:ring-amber-500',
       numero: <AnimatedNumber value={stats.withoutFc10} />,
       onClick: () => irInventario(() => setFiltroFC10('NO')),
@@ -101,8 +101,8 @@ export default function DashboardView({
       icon: 'fa-triangle-exclamation',
       iconBg: 'bg-rose-500 text-white',
       iconColor: 'text-white',
-      border: 'border-rose-200/70 dark:border-rose-400/20',
-      hoverBorder: 'hover:border-rose-300 dark:hover:border-rose-400/30',
+      border: 'border-rose-200/80 dark:border-rose-500/35',
+      hoverBorder: 'hover:border-rose-300 dark:hover:border-rose-500/40',
       ring: 'focus-visible:ring-rose-500',
       numero: <AnimatedNumber value={stats.withoutQR} />,
       onClick: () => irInventario(() => setFiltroQR('NO')),
@@ -173,32 +173,32 @@ export default function DashboardView({
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
       {widgets.metricas && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6" data-tour="dash-stats">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3" data-tour="dash-stats">
         {METRIC_CARDS.map((card) => (
           <button
             key={card.id}
             onClick={card.onClick}
             title={card.label}
-            className={`group relative text-left bg-white dark:bg-white/[0.04] rounded-3xl border ${card.border} p-6 sm:p-7 shadow-sm hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-300 cursor-pointer`}
+            className={`group relative text-left bg-white dark:bg-darkbg-card/60 rounded-2xl border ${card.border} p-3 sm:p-4 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-200 cursor-pointer`}
           >
-            <div className="flex items-center justify-between gap-3 mb-6">
-              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${card.iconBg} shadow-sm`}>
-                <i className={`fa-solid ${card.icon} text-lg ${card.iconColor}`}></i>
+            <div className="flex items-center justify-between gap-1.5 mb-2">
+              <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg} shadow-xs`}>
+                <i className={`fa-solid ${card.icon} text-sm ${card.iconColor}`}></i>
               </div>
-              <i className="fa-solid fa-chevron-right text-xs text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-300 group-hover:translate-x-0.5 transition-all"></i>
+              <i className="fa-solid fa-chevron-right text-[10px] text-zinc-300 dark:text-zinc-500 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 group-hover:translate-x-0 transition-all"></i>
             </div>
-            <p className="text-4xl sm:text-5xl font-black text-zinc-900 dark:text-white tracking-tight tabular-nums leading-tight">
+            <p className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight tabular-nums leading-snug">
               {isLoading ? '…' : card.numero}
             </p>
-            <p className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 mt-2 uppercase tracking-[0.14em]">
+            <p className="text-[10px] font-bold text-zinc-500 dark:text-zinc-300 mt-1 uppercase tracking-[0.12em]">
               {card.label}
             </p>
-            <p className={`text-[11px] font-medium ${card.subColor} mt-3 truncate`}>
+            <p className={`text-[10px] font-medium ${card.subColor} mt-1.5 truncate`}>
               {card.sublabel}
             </p>
             {card.showProgress && (
-              <div className="mt-4 h-1.5 w-full bg-zinc-100 dark:bg-white/10 rounded-full overflow-hidden">
-                <div className={`h-full ${card.progressColor} rounded-full transition-all duration-1000 shadow-sm shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
+              <div className="mt-2 h-1.5 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className={`h-full ${card.progressColor} rounded-full transition-all duration-1000 shadow-xs shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
               </div>
             )}
           </button>
@@ -208,31 +208,31 @@ export default function DashboardView({
 
       {/* 2A. ACTAS POR FIRMAR */}
       {actasPorFirmar.length > 0 && (
-        <div className="bg-white dark:bg-white/[0.04] rounded-3xl border border-amber-200/70 dark:border-amber-400/25 shadow-sm overflow-hidden" data-tour="dash-firmas">
-          <div className="flex items-center justify-between gap-4 px-6 sm:px-7 py-5 bg-amber-500/[0.06] border-b border-amber-500/20">
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm shadow-amber-500/25">
-                <i className="fa-solid fa-file-signature text-sm"></i>
+        <div className="bg-white dark:bg-white/[0.03] rounded-2xl border border-amber-200/60 dark:border-amber-400/20 shadow-sm overflow-hidden" data-tour="dash-firmas">
+          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-amber-500/[0.05] border-b border-amber-500/20">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white shadow-xs shadow-amber-500/20">
+                <i className="fa-solid fa-file-signature text-[10px]"></i>
               </span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
                     Actas por firmar
                   </h2>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-amber-500 text-white">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-amber-500 text-white">
                     {actasPorFirmar.length}
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {actasPorFirmar.length === 1
-                    ? 'Un acta esperando que registres la firma que ya hiciste en Acrobat.'
-                    : actasPorFirmar.length + ' actas esperando que registres las firmas.'}
+                    ? 'Un acta esperando firma.'
+                    : actasPorFirmar.length + ' actas esperando firma.'}
                 </p>
               </div>
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[12px] font-black shadow-sm shadow-amber-500/30 hover:shadow-amber-500/40 transition-all active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 transition-all active:scale-95 cursor-pointer shrink-0"
             >
               Gestionar →
             </button>
@@ -240,21 +240,21 @@ export default function DashboardView({
 
           <div className="divide-y divide-zinc-100 dark:divide-white/5">
             {actasPorFirmar.slice(0, 5).map(({ fc, bien, pendiente }) => (
-              <div key={fc.id} className="flex items-center gap-3 px-6 sm:px-7 py-3.5 hover:bg-amber-500/[0.03] transition-colors">
+              <div key={fc.id} className="flex items-center gap-2.5 px-5 sm:px-6 py-3 hover:bg-amber-500/[0.02] transition-colors">
                 <button
                   onClick={() => setActiveTab('fc10')}
-                  className="flex items-center gap-3 min-w-0 flex-1 text-left cursor-pointer"
+                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                    <i className="fa-solid fa-file-signature text-[10px]"></i>
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <i className="fa-solid fa-file-signature text-[9px]"></i>
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-xs font-bold text-zinc-900 dark:text-white truncate">
                       {bien?.rotulo || 'S/R'}
                       <span className="font-semibold text-zinc-400 dark:text-zinc-500"> · {pendiente.nombre || pendiente.puesto}</span>
                     </span>
-                    <span className="block text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
-                      Falta la firma {pendiente.orden}: {pendiente.puesto}
+                    <span className="block text-[10px] text-zinc-500 dark:text-zinc-400 truncate">
+                      Falta firma {pendiente.orden}: {pendiente.puesto}
                     </span>
                   </span>
                 </button>
@@ -262,12 +262,12 @@ export default function DashboardView({
                   <button
                     onClick={() => registrarAmbasFirmas(fc)}
                     disabled={firmandoId === fc.id}
-                    title="Registrar las dos firmas y cerrar el ciclo"
-                    className="shrink-0 inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+                    title="Registrar las dos firmas"
+                    className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60"
                   >
                     {firmandoId === fc.id
-                      ? <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
-                      : <><i className="fa-solid fa-circle-check text-[10px]"></i> Firmaron ambos</>}
+                      ? <i className="fa-solid fa-circle-notch fa-spin text-[9px]"></i>
+                      : <><i className="fa-solid fa-circle-check text-[9px]"></i> Firmaron ambos</>}
                   </button>
                 )}
               </div>
@@ -275,9 +275,9 @@ export default function DashboardView({
             {actasPorFirmar.length > 5 && (
               <button
                 onClick={() => setActiveTab('fc10')}
-                className="w-full px-6 sm:px-7 py-3 text-left text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.03] transition-colors cursor-pointer"
+                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.02] transition-colors cursor-pointer"
               >
-                Ver las {actasPorFirmar.length} actas en el módulo FC-10
+                Ver las {actasPorFirmar.length} actas en FC-10
               </button>
             )}
           </div>

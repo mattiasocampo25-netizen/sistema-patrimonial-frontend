@@ -429,6 +429,12 @@ html.font-lg { font-size: 18px; }
 /* Pulido general del modo oscuro moderno */
 .dark body { background-color: #0b0f19; }
 .dark ::selection { background: rgba(96, 165, 250, 0.35); }
+
+/* Legibilidad de textos secundarios en modo oscuro (sin activar contraste alto) */
+.dark .text-zinc-500 { color: #d1d5db; }
+.dark .text-zinc-400 { color: #a1a1aa; }
+.dark .dark\:text-zinc-500 { color: #d1d5db; }
+.dark .dark\:text-zinc-400 { color: #a1a1aa; }
 ::selection { background: rgba(29, 78, 216, 0.18); }
 
 .dark input, .dark select, .dark textarea,

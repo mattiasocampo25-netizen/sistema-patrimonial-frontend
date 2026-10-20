@@ -77,7 +77,7 @@ export default function LoginScreen({
 
             <div className="mt-6 mb-8">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: textMain }}>Iniciar sesión</h2>
-              <p className="text-sm text-[color:var(--login-subtitle, #6b7280)] mt-1" style={{ color: textDim }}>
+              <p className="text-sm mt-1" style={{ color: textDim }}>
                 Acceso al Sistema de Gestión Patrimonial
               </p>
             </div>
@@ -91,9 +91,9 @@ export default function LoginScreen({
               )}
 
               <div className="space-y-2 text-left">
-                <label htmlFor="user" className="block text-xs font-semibold text-[color:var(--login-label, #6b7280)] uppercase tracking-wider" style={{ color: textDim }}>Usuario (ID)</label>
+                <label htmlFor="user" className="block text-xs font-semibold uppercase tracking-wider" style={{ color: textDim }}>Usuario (ID)</label>
                 <div className="relative group">
-                  <i className="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
+                  <i className="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
                   <input
                     type="text"
                     id="user"
@@ -106,7 +106,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border pl-10 pr-4 py-3.5 text-sm font-medium placeholder:text-[color:var(--login-placeholder, #9ca3af)] focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-xl border pl-10 pr-4 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -120,7 +120,7 @@ export default function LoginScreen({
 
               <div className="space-y-2 text-left">
                 <div className="flex justify-between items-center">
-                  <label htmlFor="pass" className="block text-xs font-semibold text-[color:var(--login-label, #6b7280)] uppercase tracking-wider" style={{ color: textDim }}>Contraseña</label>
+                  <label htmlFor="pass" className="block text-xs font-semibold uppercase tracking-wider" style={{ color: textDim }}>Contraseña</label>
                   <button
                     type="button"
                     onClick={() => setShowRecoveryModal(true)}
@@ -130,7 +130,7 @@ export default function LoginScreen({
                   </button>
                 </div>
                 <div className="relative group">
-                  <i className="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
+                  <i className="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-xs group-focus-within:text-brand-primary transition-colors" style={{ color: textDim }}></i>
                   <input
                     type={showPassword ? "text" : "password"}
                     id="pass"
@@ -144,7 +144,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border pl-10 pr-10 py-3.5 text-sm font-medium placeholder:text-[color:var(--login-placeholder, #9ca3af)] focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-xl border pl-10 pr-10 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -156,7 +156,7 @@ export default function LoginScreen({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[color:var(--login-icon, #9ca3af)] hover:text-brand-primary transition-colors cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:text-brand-primary transition-colors cursor-pointer"
                     title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
                     <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
@@ -187,7 +187,7 @@ export default function LoginScreen({
               </button>
             </form>
 
-            <p className="mt-8 text-center text-xs font-medium text-[color:var(--login-footer, #9ca3af)] tracking-tight uppercase" style={{ color: textDim }}>
+            <p className="mt-8 text-center text-xs font-medium tracking-tight uppercase" style={{ color: textDim }}>
               © {new Date().getFullYear()} Universidad Nacional de Pilar · v{APP_VERSION}
             </p>
           </div>

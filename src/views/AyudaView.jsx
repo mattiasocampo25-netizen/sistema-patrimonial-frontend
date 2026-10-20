@@ -132,7 +132,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
       </div>
 
       {/* Navegación de secciones */}
-      <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="flex gap-1 overflow-x-auto pb-2 hide-scrollbar">
         {SECCIONES.map(s => (
           <button
             key={s.id}

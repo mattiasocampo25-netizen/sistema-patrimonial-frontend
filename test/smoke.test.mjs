@@ -58,6 +58,9 @@ describe('smoke de render', () => {
     assert.doesNotThrow(() => {
       html = renderToString(React.createElement(App));
     }, 'el render no debe lanzar');
-    assert.ok(html.includes('Iniciar Sesi'), 'muestra el login (sin sesion)');
+    // El texto real es "Iniciar sesión": la 's' va en minúscula y la 'ó'
+    // lleva tilde, así que se busca un fragmento sin caracteres acentuados
+    // para que la aserción no dependa de mayúsculas ni de codificación.
+    assert.ok(html.includes('Iniciar sesi'), 'muestra el login (sin sesion)');
   });
 });

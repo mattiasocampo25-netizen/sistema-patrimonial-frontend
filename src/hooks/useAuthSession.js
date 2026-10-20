@@ -196,9 +196,12 @@ useEffect(() => {
 
 // El muro de mantenimiento solo lo salta una sesión con cargo desarrollador.
 // Un `?mant=off` público (o un leftover en sessionStorage) ya no abre la app.
-if (typeof window !== 'undefined') {
+// La limpieza va en un efecto (una vez al montar): en el cuerpo del hook
+// escribía en sessionStorage en CADA render.
+useEffect(() => {
+  if (typeof window === 'undefined') return;
   try { sessionStorage.removeItem('mant_bypass'); } catch (e) { /* ignore */ }
-}
+}, []);
 const mantBypass = false;
 
 // Auto-reparación de rol: si el mantenimiento está activo y la sesión local no

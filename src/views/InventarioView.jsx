@@ -4,6 +4,7 @@ import FiltroCombo from '../components/FiltroCombo';
 import CompararBienesModal from '../components/CompararBienesModal';
 import KanbanBienes from '../components/KanbanBienes';
 import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
@@ -85,7 +86,8 @@ export default function InventarioView({
   onMoverEstado,
   onCopiarLink,
   onExportarProgramado,
-  STYLES
+  STYLES,
+  isLoading
 }) {
   // Densidad y columnas visibles (preferencia local por usuario)
   const [densidad, setDensidad] = useState(() => {
@@ -164,7 +166,7 @@ export default function InventarioView({
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
   return (
-<div className="space-y-6 animate-fade-in pb-12 font-sans text-slate-900 dark:text-slate-100">
+<div className="space-y-6 pb-12 font-sans text-slate-900 dark:text-slate-100">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <div className="bg-white dark:bg-zinc-900/40 p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-zinc-700/30 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -584,6 +586,12 @@ export default function InventarioView({
                         </button>
                       </div>
                     )}
+                  {isLoading ? (
+                    /* Durante la carga inicial se muestra el esqueleto en vez del
+                       estado vacío: "Todavía no hay bienes cargados" era falso y
+                       alarmaba al usuario mientras los datos aún no llegaban. */
+                    <SkeletonLoader />
+                  ) : (
                   <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-700/30 rounded-3xl shadow-sm overflow-hidden" data-tour="inv-table">
                     {vistaInv === 'tarjetas' ? (
                     <div className="p-4 sm:p-5">
@@ -861,6 +869,7 @@ export default function InventarioView({
                     {/* Paginación Integrada */}
                     {renderPagination()}
                   </div>
+                  )}
 
       {comparando && (
         <CompararBienesModal

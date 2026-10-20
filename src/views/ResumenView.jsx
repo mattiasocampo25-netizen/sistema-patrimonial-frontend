@@ -4,7 +4,7 @@ import { formatCurrency, formatDateText } from '../utils/helpers';
 // Vista "Mi Dependencia" de solo lectura (extraída de App.jsx, Fase 4).
 export default function ResumenView({ dependenciaActual, stats, pendientes, fc10List }) {
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-6 pb-12">
       <div className="bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">

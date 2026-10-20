@@ -25,7 +25,8 @@ import { useState, useCallback, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import {
   analizarRespaldo, previsualizarRestauracion, armarLote,
-  dividirEnLotes, calcularPerdidas, TABLAS_RESTORABLES, ORDEN_RESTAURACION
+  dividirEnLotes, calcularPerdidas, TABLAS_RESTORABLES, ORDEN_RESTAURACION,
+  normalizarFilaActual
 } from '../services/restore';
 
 const TAMANO_LOTE = 500;
@@ -75,21 +76,33 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
         return;
       }
 
-      // Vista previa contra lo que hay HOY en la base. Solo se consulta lo
-      // necesario: el detalle de cada tabla y las claves existentes para
-      // calcular pérdidas, no el contenido completo.
+      // Vista previa contra lo que hay HOY en la base. Se trae la fila
+      // COMPLETA y se normaliza igual que las del archivo: si se trajera solo
+      // la clave, la comparación nunca coincidiría y el preview marcaría todas
+      // las filas como "actualizadas".
       const existentes = {};
       for (const t of TABLAS_RESTORABLES) {
         const entrantes = res.tablas[t.clave] || [];
         if (entrantes.length === 0) { existentes[t.clave] = []; continue; }
-        const pkTexto = entrantes.map(f => String(f[t.pk]));
-        const { data, error } = await supabase.from(t.tabla).select(t.pk).in(t.pk, pkTexto.slice(0, 1000));
-        if (error) {
-          notify(`No se pudo leer "${t.etiqueta}" para comparar: ${error.message}. La vista previa puede ser inexacta.`, 'warning');
+        const pkTexto = [...new Set(entrantes.map(f => String(f[t.pk])))];
+        // La consulta va en lotes: un .in() con miles de valores supera el
+        // límite de URL de PostgREST, y antes se truncaba en 1.000 (sin
+        // aviso), dejando fuera filas reales de la comparación.
+        const filasActuales = [];
+        let errorLectura = null;
+        for (const lote of dividirEnLotes(pkTexto, 200)) {
+          const { data, error } = await supabase.from(t.tabla).select('*').in(t.pk, lote);
+          if (error) { errorLectura = error; break; }
+          filasActuales.push(...(data || []));
+        }
+        if (errorLectura) {
+          notify(`No se pudo leer "${t.etiqueta}" para comparar: ${errorLectura.message}. La vista previa puede ser inexacta.`, 'warning');
           existentes[t.clave] = [];
           continue;
         }
-        existentes[t.clave] = (data || []).map(f => ({ [t.pk]: String(f[t.pk]) }));
+        existentes[t.clave] = filasActuales
+          .map(f => normalizarFilaActual(f, t))
+          .filter(Boolean);
       }
 
       const p = previsualizarRestauracion(res.tablas, existentes);

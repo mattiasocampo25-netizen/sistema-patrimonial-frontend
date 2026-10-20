@@ -111,7 +111,7 @@ export default function DashboardView({
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-7 animate-fade-in pb-16">
+    <div className="space-y-6 sm:space-y-7 pb-16">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

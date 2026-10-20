@@ -1,11 +1,12 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
 import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
-  esDesarrollador, currentUser, setItemToDelete, STYLES
+  esDesarrollador, currentUser, setItemToDelete, STYLES, isLoading
 }) {
   return (
-    <div className="animate-fade-in flex flex-col flex-1 space-y-6">
+    <div className="flex flex-col flex-1 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
@@ -27,6 +28,12 @@ export default function UsuariosView({
         </button>
       </div>
 
+      {isLoading ? (
+        /* Durante la carga inicial se muestra el esqueleto en vez del estado
+           vacío: "Sin usuarios registrados" era falso mientras los datos
+           aún no llegaban. */
+        <SkeletonLoader />
+      ) : (
       <div className="flex-1 bg-white dark:bg-white/[0.04] border border-zinc-200/70 dark:border-white/10 rounded-3xl flex flex-col overflow-hidden relative">
           <div className="flex-1 overflow-auto custom-scrollbar">
             <table className="min-w-full text-left">
@@ -96,6 +103,7 @@ export default function UsuariosView({
             </table>
           </div>
       </div>
+      )}
     </div>
   );
 }

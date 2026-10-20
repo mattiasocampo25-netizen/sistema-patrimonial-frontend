@@ -72,7 +72,7 @@ export default function Fc10View({
   };
 
   return (
-    <div className="animate-fade-in flex flex-col flex-1 space-y-6">
+    <div className="flex flex-col flex-1 space-y-6">
       {/* ===== PANEL DE ESTADO DE FIRMAS (solo admin) ===== */}
       {isAdmin && (
         <div className="bg-white dark:bg-darkbg-card border border-zinc-200/70 dark:border-darkbg-border rounded-3xl shadow-sm p-6 sm:p-8">

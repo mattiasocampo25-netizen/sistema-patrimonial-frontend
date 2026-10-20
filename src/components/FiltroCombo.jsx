@@ -15,12 +15,17 @@ import { puntuarOpcion } from '../utils/busqueda';
 
 export default function FiltroCombo({
   valor, opciones, onElegir, etiquetaTodos, titulo, ancho = 'w-full',
-  name, required, disabled, className = '', compacto = false
+  name, required, disabled, className = '', compacto = false, errorMsg,
+  validarNativo = true
 }) {
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState('');
   const [interno, setInterno] = useState(valor ?? '');
+  const [error, setError] = useState(false);
   const cajaRef = useRef(null);
+  const botonRef = useRef(null);
+  const inputRef = useRef(null);
+  const mensajeErrorId = name ? `${name}-filtro-error` : undefined;
 
   useEffect(() => {
     if (!abierto) return;
@@ -31,9 +36,18 @@ export default function FiltroCombo({
 
   const valorActual = valor !== undefined && valor !== null ? valor : interno;
 
+  // Si el valor llega desde afuera (componente controlado) y pasa a tener
+  // contenido, el error de validación deja de aplicar.
+  useEffect(() => {
+    if (valorActual !== undefined && valorActual !== null && String(valorActual) !== '') {
+      setError(false);
+    }
+  }, [valorActual]);
+
   const elegir = (v) => {
     setInterno(v);
     setAbierto(false);
+    setError(false);
     if (onElegir) onElegir(v);
   };
 
@@ -65,8 +79,49 @@ export default function FiltroCombo({
 
   return (
     <div ref={cajaRef} className={`relative ${ancho}`}>
-      {name && <input type="hidden" name={name} value={valorActual ?? ''} required={required} />}
+      {name && (
+        /*
+         * Input oculto pero VALIDABLE.
+         *
+         * Antes era type="hidden", y HTML ignora `required` en los inputs
+         * hidden: la validación nativa no lo tenía en cuenta y el formulario
+         * se enviaba con el campo vacío. Ahora es type="text" con tamaño 1px
+         * y opacidad 0 (nunca display:none, que sí lo saca de la validación):
+         * el navegador bloquea el envío si el valor está vacío.
+         *
+         * Al invalidarse se cancela el globo nativo (para no mostrar el
+         * mensaje del navegador en un idioma que no controlamos) y se lleva
+         * el foco al botón visible, que es el control real.
+         *
+         * `validarNativo={false}` desactiva este input: es para los campos
+         * que viven en un paso de un wizard que todavía no está visible al
+         * guardar. En ese caso el navegador no puede enfocar un control
+         * inválido dentro de un contenedor `display:none` y BLOQUEA el envío
+         * en silencio; esos campos se validan al avanzar de paso.
+         */
+        <input
+          ref={inputRef}
+          type="text"
+          name={name}
+          value={valorActual ?? ''}
+          required={required && validarNativo}
+          tabIndex={-1}
+          aria-label={titulo || 'Campo obligatorio'}
+          className="pointer-events-none absolute h-px w-px overflow-hidden border-0 p-0 opacity-0"
+          onInvalid={(e) => {
+            // Se cancela el globo nativo (para no mostrar el mensaje del
+            // navegador, en un idioma que no controlamos) y se lleva el foco
+            // al botón visible, que es el control real para el usuario.
+            // El foco se mueve en el siguiente frame porque el navegador
+            // enfoca el campo inválido DESPUÉS de disparar este evento.
+            e.preventDefault();
+            setError(true);
+            requestAnimationFrame(() => botonRef.current?.focus());
+          }}
+        />
+      )}
       <button
+        ref={botonRef}
         type="button"
         onClick={() => { if (disabled) return; setTexto(''); setAbierto(v => !v); }}
         title={titulo}
@@ -74,13 +129,20 @@ export default function FiltroCombo({
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-required={required || undefined}
-        className={`w-full ${alto} rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 font-medium text-zinc-700 dark:text-zinc-300 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-zinc-300 dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
+        aria-invalid={error || undefined}
+        aria-describedby={error && mensajeErrorId ? mensajeErrorId : undefined}
+        className={`w-full ${alto} rounded-xl border ${error ? 'border-rose-400 dark:border-rose-500' : 'border-zinc-200 dark:border-white/10'} bg-white dark:bg-white/5 px-4 font-medium text-zinc-700 dark:text-zinc-300 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-zinc-300 dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
       >
         <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-zinc-400 dark:text-zinc-500' : ''}`} title={etiqueta}>
           {etiqueta}
         </span>
         <i className={`fa-solid fa-chevron-down text-[10px] text-zinc-400 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
+      {error && (
+        <p id={mensajeErrorId} role="alert" className="mt-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+          {errorMsg || 'Este campo es obligatorio.'}
+        </p>
+      )}
       {abierto && (
         <div className="absolute left-0 w-auto min-w-[260px] z-50 mt-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
           <div className="relative border-b border-zinc-100 dark:border-white/10">

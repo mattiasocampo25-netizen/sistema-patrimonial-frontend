@@ -22,7 +22,8 @@ export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Edit
         setFormKeyFC(k => k + 1);
     };
     const [isReturning, setIsReturning] = useState(false);
-    const [step, setStep] = useState(1); 
+    const [step, setStep] = useState(1);
+    const [errorFirmantes, setErrorFirmantes] = useState(''); 
     // Lectura defensiva: un JSON corrupto en localStorage rompía el render del
     // modal entero (ErrorBoundary) y se re-parseaba en cada render.
     const savedOrg = (() => {
@@ -258,15 +259,35 @@ const valorOrgExplicito = (campo) => {
                 }
             }
         }
+        // Los nombres de los firmantes viven en estado de React, no en un input
+        // del formulario (el input oculto no admite `required`), así que se
+        // validan a mano: un FC-10 es un acta de custodia con dos firmantes y
+        // no puede guardarse sin ellos.
+        if (step === 2) {
+            const faltan = [];
+            if (!funcData.nombre.trim()) faltan.push('el nombre del funcionario');
+            if (!jefeData.nombre.trim()) faltan.push('el nombre del jefe inmediato');
+            if (faltan.length) {
+                setErrorFirmantes(`Falta completar: ${faltan.join(' y ')}.`);
+                return;
+            }
+        }
+        setErrorFirmantes('');
         bloqueoRef.current = Date.now();
         setStep(prev => Math.min(prev + 1, 3));
     };
 
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
+        if (e.key !== 'Enter') return;
+        if (step < 3) {
             e.preventDefault();
-            if (step < 3) nextStep();
+            nextStep();
+            return;
         }
+        // En el paso 3 NO se intercepta el Enter: antes el preventDefault lo
+        // bloqueaba siempre y el FC-10 no se podia guardar solo con teclado.
+        // El onSubmit ya tiene sus propios bloqueos (bloqueoRef / enviandoRef)
+        // contra el doble envío.
     };
 
     // Resolución tolerante contra el padrón (tildes, mayúsculas, espacios).
@@ -538,6 +559,7 @@ const valorOrgExplicito = (campo) => {
                                                     funcionarios={safeFuncionarios}
                                                     onElegir={(f) => setFuncData({ nombre: f.nombre, doc: f.doc || '', cargo: f.cargo || '' })}
                                                     placeholder="Buscar en el padron..."
+                                                    requerido
                                                 />
                                                 {funcData.nombre.trim() !== '' && (
                                                     <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${padronConDatos ? 'text-emerald-600 dark:text-emerald-400' : coincidePadron ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
@@ -554,6 +576,7 @@ const valorOrgExplicito = (campo) => {
                                                         value={funcData.doc}
                                                         onChange={(e) => setFuncData({...funcData, doc: e.target.value})}
                                                         className={STYLES.input}
+                                                        required
                                                     />
                                                 </div>
                                                 <div>
@@ -592,6 +615,7 @@ const valorOrgExplicito = (campo) => {
                                                     funcionarios={safeFuncionarios}
                                                     onElegir={(f) => setJefeData({ nombre: f.nombre, doc: f.doc || '', cargo: f.cargo || '' })}
                                                     placeholder="Buscar en el padron..."
+                                                    requerido
                                                 />
                                                 {jefeData.nombre.trim() !== '' && (
                                                     <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${jefeConDatos ? 'text-emerald-600 dark:text-emerald-400' : jefeEnPadron ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
@@ -608,6 +632,7 @@ const valorOrgExplicito = (campo) => {
                                                         value={jefeData.doc}
                                                         onChange={(e) => setJefeData({...jefeData, doc: e.target.value})}
                                                         className={STYLES.input}
+                                                        required
                                                     />
                                                 </div>
                                                 <div>
@@ -626,6 +651,14 @@ const valorOrgExplicito = (campo) => {
 
                                 {/* Que va a pasar al guardar: conviene que quede claro
                                     antes de confirmar, no despues. */}
+                                {errorFirmantes && (
+                                    <div role="alert" className="px-5 py-3 border-t border-rose-200 dark:border-rose-900/40 bg-rose-50 dark:bg-rose-950/20 flex items-start gap-2.5">
+                                        <i className="fa-solid fa-circle-exclamation text-rose-500 text-[11px] mt-0.5 shrink-0"></i>
+                                        <p className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 leading-relaxed">
+                                            {errorFirmantes}
+                                        </p>
+                                    </div>
+                                )}
                                 <div className="px-5 py-3 border-t border-zinc-100 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.02] flex items-start gap-2.5">
                                     <i className="fa-solid fa-circle-info text-zinc-400 text-[11px] mt-0.5 shrink-0"></i>
                                     <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">

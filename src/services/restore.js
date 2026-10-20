@@ -86,6 +86,24 @@ export const normalizarFila = (fila, defTabla) => {
 };
 
 /**
+ * Normaliza una fila que viene de la BASE para poder compararla con las del
+ * archivo: mismo formato (objeto plano de negocio) y misma clave primaria
+ * textual.
+ *
+ * Sin esto, `previsualizarRestauracion` comparaba una fila real completa
+ * contra un objeto con solo la clave: nunca coincidían, así que TODAS las
+ * filas existentes se reportaban como "actualizadas" y el preview no decía
+ * nada útil.
+ */
+export const normalizarFilaActual = (fila, defTabla) => {
+  const obj = normalizarFila(fila, defTabla);
+  if (!obj) return null;
+  const valorPk = obj[defTabla.pk];
+  if (valorPk === undefined || valorPk === null || String(valorPk).trim() === '') return null;
+  return { ...obj, [defTabla.pk]: String(valorPk) };
+};
+
+/**
  * Valida y normaliza un respaldo subido.
  *
  * @param {object} crudo  contenido parseado del JSON

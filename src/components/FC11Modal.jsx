@@ -134,6 +134,7 @@ export default function FC11Modal({
                                             opciones={todasDependencias}
                                             etiquetaTodos="Seleccione destino..."
                                             titulo="Dependencia destinataria"
+                                            errorMsg="Seleccione la dependencia destinataria."
                                         />
                                     </div>
                                     <div>

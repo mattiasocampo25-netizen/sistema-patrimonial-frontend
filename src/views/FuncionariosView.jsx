@@ -1,5 +1,6 @@
 import { formatCI } from '../utils/helpers';
 import EmptyState from '../components/EmptyState';
+import SkeletonLoader from '../components/SkeletonLoader';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -8,10 +9,11 @@ export default function FuncionariosView({
   fileInputFuncionariosRef, isAdmin, setIsUbicacionesModalOpen,
   setIsNewFuncionarioModalOpen, searchFuncionarioInput, setSearchFuncionarioInput,
   setCurrentPaginaFuncionarios, funcionariosPaginados,
-  handleEditFuncionario, handleDeleteFuncionario, renderPaginationFuncionarios
+  handleEditFuncionario, handleDeleteFuncionario, renderPaginationFuncionarios,
+  isLoading
 }) {
   return (
-    <div className="animate-fade-in flex flex-col flex-1 space-y-6 pb-12">
+    <div className="flex flex-col flex-1 space-y-6 pb-12">
 
       {/* CABECERA DE SECCIÓN */}
       <div className="bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
@@ -109,6 +111,12 @@ export default function FuncionariosView({
       </div>
 
       {/* TABLA DE FUNCIONARIOS */}
+      {isLoading ? (
+        /* Durante la carga inicial se muestra el esqueleto en vez del estado
+           vacío: "No hay funcionarios en esta dependencia" era falso mientras
+           los datos aún no llegaban. */
+        <SkeletonLoader />
+      ) : (
       <div className="flex-1 bg-white dark:bg-white/[0.04] shadow-sm border border-zinc-200/70 dark:border-white/10 rounded-3xl flex flex-col overflow-hidden relative min-h-[450px]">
           <div className="flex-1 overflow-auto custom-scrollbar">
             <table className="min-w-full text-left border-collapse">
@@ -194,6 +202,7 @@ export default function FuncionariosView({
 
           {renderPaginationFuncionarios()}
       </div>
+      )}
     </div>
   );
 }

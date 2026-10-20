@@ -8,7 +8,7 @@ export default function Fc11View({
   handleGenerateFC11PDF, openFC11Modal, bienes, isAdmin, setItemToDelete
 }) {
   return (
-    <div className="animate-fade-in flex flex-col flex-1 space-y-6">
+    <div className="flex flex-col flex-1 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
         <div className="flex items-center gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">

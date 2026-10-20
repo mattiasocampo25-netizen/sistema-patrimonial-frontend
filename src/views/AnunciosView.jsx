@@ -53,7 +53,7 @@ export default function AnunciosView({
   const totalDestinatarios = anunciosGrupos.reduce((s, a) => s + (a.total || 0), 0);
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12 font-sans">
+    <div className="space-y-6 pb-12 font-sans">
       {/* Encabezado con métricas */}
       <div className="bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">

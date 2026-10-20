@@ -39,7 +39,7 @@ import { numeroALetras } from './utils/numeroLetras';
 import { extraerCodigoQR } from './utils/qr';
 import { pendienteDeFirma } from './utils/fc10Firmas';
 import { detectarCambios, fusionarSobreFresco, detectarConflictos, describirCampos } from './services/escrituraSegura';
-import { normalizarBien, tieneValor } from './utils/bienPublico';
+import { normalizarBien } from './utils/bienPublico';
 import MaintenanceScreen from './components/MaintenanceScreen';
 import AyudaView from './views/AyudaView';
 import ResumenView from './views/ResumenView';
@@ -892,37 +892,25 @@ useEffect(() => {
       const idSanitizado = decodeURIComponent(publicBienId).trim();
       let bienEncontrado = null;
 
-      // 1. Consulta directa a 'bens' (datos completos, incluye valorUnitario).
-      //    El RPC público devuelve una proyección sin valor, por eso ya no va primero.
+      // 1. RPC público: proyección de los campos públicos de UN bien (por id o
+      //    por rótulo). Es el único camino de lectura para un visitante sin
+      //    sesión: el rol anónimo ya no tiene SELECT sobre la tabla 'bens'
+      //    (migración 004), así que no se puede volcar el inventario entero.
+      //    Antes se consultaba la tabla directamente y el RPC era solo el
+      //    respaldo; ahora el RPC trae todos los campos que muestra la vista
+      //    (incluido el valor).
       try {
-        const { data: directData } = await supabase
-          .from('bens')
-          .select('*')
-          .or(`id.eq.${idSanitizado},data->>rotulo.eq.${idSanitizado}`)
-          .limit(1);
-        if (directData && directData.length > 0) {
-          bienEncontrado = normalizarBien(directData[0]);
+        const { data: rpcData, error: rpcError } = await supabase.rpc('obtener_bien_publico', {
+          p_id: idSanitizado
+        });
+        if (!rpcError && rpcData) {
+          bienEncontrado = normalizarBien(rpcData);
         }
       } catch (e) {}
 
-      // 2. RPC público como respaldo (puede no traer valorUnitario).
-      if (!bienEncontrado || !tieneValor(bienEncontrado)) {
-        try {
-          const { data: rpcData, error: rpcError } = await supabase.rpc('obtener_bien_publico', {
-            p_id: idSanitizado
-          });
-          if (!rpcError && rpcData) {
-            const rpcBien = normalizarBien(rpcData);
-            if (!bienEncontrado) {
-              bienEncontrado = rpcBien;
-            } else if (!tieneValor(bienEncontrado) && tieneValor(rpcBien)) {
-              bienEncontrado = rpcBien;
-            }
-          }
-        } catch (e) {}
-      }
-
-      // 3. Fallback en caché IndexedDB local
+      // 2. Fallback en caché IndexedDB local (bienes ya vistos en este
+      //    dispositivo). No sirve para un visitante nuevo, pero evita el
+      //    "no encontrado" si la red falla.
       if (!bienEncontrado) {
         try {
           const allKeys = await localforage.keys();

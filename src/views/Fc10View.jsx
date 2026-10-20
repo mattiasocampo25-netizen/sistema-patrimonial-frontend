@@ -114,13 +114,13 @@ export default function Fc10View({
                         <i className="fa-solid fa-tag text-[9px]"></i>{bien.rotulo || 'S/R'}
                       </p>
                     </div>
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
                       estadoActual === 'CERRADO'
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                         : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2'
                           ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
                           : 'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300'
-                    }">
+                    }`}>
                       {estadoActual === 'CERRADO' ? '✓' : estadoActual === 'BORRADOR' ? 'B' : 'P'}
                     </div>
                   </div>

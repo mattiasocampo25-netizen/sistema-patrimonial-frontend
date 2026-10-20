@@ -61,7 +61,7 @@ export default function LoginScreen({
       {/* Contenido centrado, estilo Google */}
       <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
         <div className="w-full max-w-sm login-card-in">
-          <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-2xl p-8 sm:p-10 relative flex flex-col ${loginError ? 'animate-shake' : ''}" style={{ backgroundColor: cardColor, color: textMain }}>
+          <div className={`bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-2xl p-8 sm:p-10 relative flex flex-col ${loginError ? 'animate-shake' : ''}`} style={{ backgroundColor: cardColor, color: textMain }}>
 
             {/* Logo institucional */}
             <div className="flex items-center gap-2 mb-2">

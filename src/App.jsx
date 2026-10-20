@@ -133,10 +133,10 @@ export default function App() {
       else if (mq.removeListener) mq.removeListener(alCambiar);
     };
   }, []);
-  // Arranque limpio: permite un futuro auto-reintento de chunks ante deploys intermedios
-  useEffect(() => {
-    try { sessionStorage.removeItem('chunk_reintentado'); } catch (e) {}
-  }, []);
+  // Nota: la bandera 'chunk_reintentado' NO se limpia aquí a propósito.
+  // utils/lazyConReintento la usa para recargar UNA vez por sesión cuando un
+  // chunk falla (deploy intermedio). Si se borrara en cada montaje, el ciclo
+  // montar -> borrar -> fallar -> recargar -> montar se repetiría sin fin.
   // Sincronizar clase 'dark' en <html> para que el CSS de contraste alto
   // (.dark.contrast-more) y los temas oscuro/claro funcionen globalmente.
   useEffect(() => {

@@ -137,7 +137,7 @@ export default function AprobacionesView({
                     </td>
                     <td className="px-4 py-4 align-top">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${info.color}`}>
-                        <span className="h-2 w-2 rounded-full ${info.dot}"></span>
+                        <span className={`h-2 w-2 rounded-full ${info.dot}`}></span>
                         {info.label}
                       </span>
                     </td>

@@ -1,6 +1,8 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 // Smoke test de render: ejecuta el cuerpo de App (todos los hooks en orden)
 // vía SSR. Efectos no corren, pero los ReferenceError/TDZ de render sí
@@ -62,5 +64,42 @@ describe('smoke de render', () => {
     // lleva tilde, así que se busca un fragmento sin caracteres acentuados
     // para que la aserción no dependa de mayúsculas ni de codificación.
     assert.ok(html.includes('Iniciar sesi'), 'muestra el login (sin sesion)');
+  });
+
+  it('no borra la bandera de reintento de chunks', async () => {
+    // Regresión: App.jsx limpiaba 'chunk_reintentado' en cada montaje. Con eso,
+    // un chunk que fallaba (404 tras un deploy) entraba en bucle de recarga
+    // infinito: montar -> borrar flag -> fallar -> recargar -> montar -> ...
+    //
+    // No se puede comprobar con el render de SSR porque renderToString NO
+    // ejecuta los useEffect, así que el borrado nunca ocurría durante el test.
+    // Por eso se verifica sobre el código fuente: ningún archivo de src/ puede
+    // limpiar esa bandera, que debe durar toda la sesión de la pestaña.
+    const raiz = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+    const src = path.join(raiz, 'src');
+
+    const recorrer = (dir) => {
+      const out = [];
+      for (const entrada of readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, entrada.name);
+        if (entrada.isDirectory()) out.push(...recorrer(p));
+        else if (/\.(js|jsx)$/.test(entrada.name)) out.push(p);
+      }
+      return out;
+    };
+
+    const ofensores = [];
+    for (const archivo of recorrer(src)) {
+      const contenido = readFileSync(archivo, 'utf8');
+      if (/removeItem\(\s*['"`]chunk_reintentado/.test(contenido)) {
+        ofensores.push(path.relative(raiz, archivo));
+      }
+    }
+
+    assert.deepEqual(
+      ofensores,
+      [],
+      'ningún archivo puede borrar la bandera chunk_reintentado: eso reinicia el reintento y produce un bucle de recarga infinito'
+    );
   });
 });

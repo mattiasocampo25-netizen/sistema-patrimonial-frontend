@@ -70,6 +70,53 @@ body {
   scrollbar-width: none; 
 }
 
+/* ---------------------------------------------------------------------------
+ * Scrollbar con la estética del sistema para los contenedores con scroll
+ * propio (modales, tablas, dropdowns, paneles laterales).
+ *
+ * La clase se usa en 26 lugares pero NUNCA estuvo definida: en Chrome
+ * los contenedores caían en las reglas globales `::-webkit-scrollbar` (que sí
+ * existen) y se veían bien, pero en Firefox no aplicaba nada y quedaba el
+ * scrollbar por defecto del sistema. Esto lo unifica y cubre ambos motores.
+ * ------------------------------------------------------------------------ */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #dadce0 transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar { 
+  width: 8px; 
+  height: 8px; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-track { 
+  background: transparent; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb { 
+  background: #dadce0; 
+  border-radius: 10px; 
+  border: 2px solid transparent; 
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+  background: #b4b8bc; 
+}
+
+.dark .custom-scrollbar { 
+  scrollbar-color: #5f6368 transparent; 
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { 
+  background: #5f6368; 
+  border-color: transparent; 
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+  background: #80868b; 
+}
+
 /* Soporte de esquema de color */
 :root { color-scheme: light; }
 .dark { color-scheme: dark; }

@@ -25,6 +25,19 @@ describe('extraerCodigoQR', () => {
     assert.equal(extraerCodigoQR('  2803-01-02-4655 '), '2803-01-02-4655');
     assert.equal(extraerCodigoQR(''), '');
   });
+
+  it('extrae el codigo de las etiquetas CTA:/DIGO:', () => {
+    // El codigo va despues del ultimo "DIGO:". Antes se tomaba la parte
+    // izquierda del primer "CTA:" (siempre vacia) y el codigo se perdia.
+    assert.equal(extraerCodigoQR('CTA:UNP SIGEP DIGO:1045'), '1045');
+    assert.equal(extraerCodigoQR('CTA:SIGEP-UNP-DIGO:2803-01-02-4655'), '2803-01-02-4655');
+    assert.equal(extraerCodigoQR('DIGO:1045'), '1045');
+    assert.equal(extraerCodigoQR('digo:1045'), '1045');
+    // Solo "CTA:" -> se toma lo que sigue al ultimo CTA:
+    assert.equal(extraerCodigoQR('CTA:1045'), '1045');
+    // No debe devolver cadena vacia para ningun formato con prefijo
+    assert.notEqual(extraerCodigoQR('CTA:UNP SIGEP DIGO:1045'), '');
+  });
 });
 
 describe('bienPublico', () => {

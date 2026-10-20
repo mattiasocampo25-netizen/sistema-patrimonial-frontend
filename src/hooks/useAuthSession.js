@@ -91,6 +91,9 @@ export function useAuthSession({ notify }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    // Se limpia el error previo: si no, la clase 'animate-shake' ya estaba
+    // activa y la animacion no volvia a reproducirse en el siguiente intento.
+    setLoginError(false);
     setIsProcessing({ active: true, text: 'Verificando credenciales...' });
 
     // Validación y normalización antes de tocar la red: evita mandar basura a

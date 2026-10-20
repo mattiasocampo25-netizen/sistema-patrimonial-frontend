@@ -210,7 +210,7 @@ export default function Fc10View({
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsConsolidatedFC10ModalOpen(true)} className={STYLES.btnPrimary + " flex items-center gap-2 shrink-0"}>
+            <button onClick={() => setIsConsolidatedFC10ModalOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-800 dark:bg-zinc-700 px-5 h-10 shrink-0 text-[13px] font-bold text-white dark:text-white hover:bg-zinc-700 dark:hover:bg-zinc-600 focus-visible:ring-2 focus-visible:ring-brand-primary focus:outline-none transition-all active:scale-95 cursor-pointer">
                 <i className="fa-solid fa-file-lines text-xs"></i> FC-10 Consolidado
             </button>
             <button onClick={handleExportFC10CSV} title={`Exportar actas del año ${fc10Year} a CSV`} className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">

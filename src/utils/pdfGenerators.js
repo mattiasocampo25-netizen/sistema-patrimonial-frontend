@@ -59,7 +59,7 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
 
         const logoImg = localStorage.getItem('logoOficial');
         if (logoImg) {
-            try { doc.addImage(logoImg, 'PNG', 14, 13, 22, 22); } catch(e){}
+            try { doc.addImage(logoImg, 'PNG', 14, 13, 22, 22); } catch{}
         }
 
         doc.setFont("helvetica", "bold");
@@ -272,7 +272,7 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
     let finalY = 12;
 
     if (logoDataUrl) {
-        try { doc.addImage(logoDataUrl, 'PNG', 14, 10, 24, 24); } catch (e) {}
+        try { doc.addImage(logoDataUrl, 'PNG', 14, 10, 24, 24); } catch {}
     }
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);

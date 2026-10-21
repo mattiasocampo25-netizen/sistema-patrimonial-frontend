@@ -91,7 +91,7 @@ export function useRealtimeSync({
       }
       const set = new Set(ids);
       setNotificaciones(prev => prev.filter(n => !set.has(n.id)));
-    } catch (e) {}
+    } catch {}
   };
 
   const fetchData = useCallback(async (isSilent = false) => {
@@ -138,7 +138,7 @@ export function useRealtimeSync({
             dependencia: dbUser.dependencia || currentUser.dependencia
           };
           setCurrentUser(actualizado);
-          try { localStorage.setItem('current_user', JSON.stringify(actualizado)); } catch (e) { /* ignore */ }
+          try { localStorage.setItem('current_user', JSON.stringify(actualizado)); } catch { /* ignore */ }
         }
       }
     // --- FIN DE VALIDACIÓN DE ROL ---
@@ -155,7 +155,7 @@ export function useRealtimeSync({
     // "Esta carga tardo demasiado": se avisa, pero los datos que llegaron bien
     // se usan. Antes las dos cosas eran la misma y se perdian datos ya
     // descargados.
-    const sigueVigente = () => !vencido && turnoVigente();
+    const _sigueVigente = () => !vencido && turnoVigente();
 
       const fetchPromise = (async () => {
         // --- BIENES: descarga total solo si hace falta, si no delta por updated_at ---
@@ -163,8 +163,8 @@ export function useRealtimeSync({
         const META_BIENES = `bienes_meta_${dependenciaActual}`;
         let metaBienes = null;
         let cacheBienes = null;
-        try { metaBienes = await localforage.getItem(META_BIENES); } catch (e) {}
-        try { cacheBienes = await localforage.getItem(CACHE_BIENES); } catch (e) {}
+        try { metaBienes = await localforage.getItem(META_BIENES); } catch {}
+        try { cacheBienes = await localforage.getItem(CACHE_BIENES); } catch {}
         const descargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes);
 
         if (descargaTotal) {
@@ -280,7 +280,7 @@ export function useRealtimeSync({
             if (guardaGen.vigente(turno) && cachedBienes && cachedBienes.length > 0) {
                 setBienes(cachedBienes);
             }
-        } catch (e) {}
+        } catch {}
     } finally {
         if (timeoutId) clearTimeout(timeoutId);
         // Solo la carga vigente apaga el spinner: si una vieja termina después,
@@ -334,7 +334,7 @@ export function useRealtimeSync({
                       return copia;
                   });
                   setFichaBien(prev => (prev && prev.id === bien.id ? bien : prev));
-              } catch (e) {}
+              } catch {}
           }).subscribe() : null;
           return () => {
               clearInterval(notifInterval);
@@ -359,7 +359,7 @@ export function useRealtimeSync({
           setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
           try {
               await supabase.from('notificaciones').update({ data: updated }).eq('id', notif.id);
-          } catch(e) {}
+          } catch {}
           return;
       }
       if(notif.leido) return;
@@ -367,7 +367,7 @@ export function useRealtimeSync({
       setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
       try { 
           await supabase.from('notificaciones').update({ data: updated }).eq('id', notif.id);
-      } catch(e) {}
+      } catch {}
   };
 
   const markAllAsRead = async () => {
@@ -396,7 +396,7 @@ export function useRealtimeSync({
               }
               return payload ? supabase.from('notificaciones').update({ data: payload }).eq('id', n.id) : Promise.resolve();
           }));
-      } catch (e) {}
+      } catch {}
   };
 
   const misNotificaciones = useMemo(() => { 
@@ -474,7 +474,7 @@ export function useRealtimeSync({
               frescas.forEach(n => mapa.set(n.id, vistaPrevia.has(n.id) ? { ...n, leido: true } : n));
               return [...mapa.values()];
           });
-      } catch (e) {}
+      } catch {}
   };
 
   const fusionarNotificacion = (payload) => {
@@ -498,7 +498,7 @@ export function useRealtimeSync({
               copia[i] = parsed;
               return copia;
           });
-      } catch (e) {}
+      } catch {}
   };
 
   // xÓ Escuchador de estado de red (Offline / Online)

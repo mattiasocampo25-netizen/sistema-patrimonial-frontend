@@ -44,7 +44,7 @@ export function useAuthSession({ notify }) {
       try {
         const { data, error } = await supabase.from('app_config').select('*').eq('id', 'global').limit(1);
         if (!error && data && data[0] && alive) setMantenimiento(data[0]);
-      } catch (e) {}
+      } catch {}
     };
     cargar();
     const t = setInterval(cargar, 60000);
@@ -57,7 +57,7 @@ export function useAuthSession({ notify }) {
   });
 
   const handleLogout = useCallback(() => {
-    try { supabase.auth.signOut(); } catch (e) {}
+    try { supabase.auth.signOut(); } catch {}
     localStorage.removeItem('is_logged_in');
     localStorage.removeItem('current_user');
     setIsAuthenticated(false);
@@ -86,7 +86,7 @@ export function useAuthSession({ notify }) {
         setCurrentUser(null);
       }
     });
-    return () => { vivo = false; try { sub.subscription.unsubscribe(); } catch (e) {} };
+    return () => { vivo = false; try { sub.subscription.unsubscribe(); } catch {} };
   }, []);
 
   const handleLogin = async (e) => {
@@ -160,7 +160,7 @@ export function useAuthSession({ notify }) {
         setMostrarLoginDev(false); 
         
         notify(`Bienvenido, ${perfil.nombre} (${userSession.dependencia})`, "success"); 
-    } catch (error) {
+    } catch {
         setLoginError(true);
         notify("Error al conectar con la base de datos", "error");
     } finally {
@@ -203,7 +203,7 @@ useEffect(() => {
 // escribía en sessionStorage en CADA render.
 useEffect(() => {
   if (typeof window === 'undefined') return;
-  try { sessionStorage.removeItem('mant_bypass'); } catch (e) { /* ignore */ }
+  try { sessionStorage.removeItem('mant_bypass'); } catch { /* ignore */ }
 }, []);
 const mantBypass = false;
 
@@ -223,9 +223,9 @@ useEffect(() => {
         try {
           localStorage.setItem('is_logged_in', 'true');
           localStorage.setItem('current_user', JSON.stringify(actualizado));
-        } catch (e) {}
+        } catch {}
       }
-    } catch (e) {}
+    } catch {}
   })();
   return () => { vivo = false; };
 }, [mantenimiento?.en_mantenimiento]);
@@ -242,7 +242,7 @@ const saveMantenimiento = async (data) => {
       data.en_mantenimiento ? 'Modo mantenimiento activado para todos.' : 'Sistema habilitado nuevamente.',
       data.en_mantenimiento ? 'warning' : 'success'
     );
-  } catch (e) {
+  } catch {
     notify('No se pudo guardar. Crea la tabla app_config en Supabase (te pasé el SQL).', 'error');
   } finally {
     setIsSavingMant(false);

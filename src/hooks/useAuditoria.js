@@ -63,7 +63,7 @@ export function useAuditoria({
         if (errDel) break;
         if (data.length < 500) break;
       }
-    } catch (e) {}
+    } catch {}
   };
   const fetchAuditoria = async (pagina = 1) => {
     const pag = Number.isInteger(pagina) && pagina > 0 ? pagina : 1;
@@ -103,7 +103,7 @@ export function useAuditoria({
           contar(null), contar('%ALTA%'), contar('%MODIF%'), contar('%BAJA%')
         ]);
         setKpisAud({ total, altas, mods, bajas });
-      } catch (e) {
+      } catch {
         setKpisAud({ total: 0, altas: 0, mods: 0, bajas: 0 });
       }
       // Acciones distintas para el filtro. Acotado y del mismo alcance que el
@@ -115,8 +115,8 @@ export function useAuditoria({
         if (alcanceAud === 'dep') qAcc = qAcc.eq('dependencia', dependenciaActual);
         const { data: ad } = await qAcc;
         setAccionesUnicasAud([...new Set((ad || []).map(r => String(r.accion || 'OTROS')))].sort());
-      } catch (e) {}
-    } catch (e) {}
+      } catch {}
+    } catch {}
     finally { setIsLoadingAud(false); }
   };
   // dependenciaActual faltaba en las dependencias: al cambiar de dependencia la
@@ -136,7 +136,7 @@ export function useAuditoria({
     try {
       const m = typeof row.mensaje === 'string' ? JSON.parse(row.mensaje) : row.mensaje;
       if (m && typeof m === 'object' && m.solicitante) return m.solicitante;
-    } catch (e) {}
+    } catch {}
     return 'No registrado';
   };
   const detalleAudCorto = (row) => {
@@ -155,7 +155,7 @@ export function useAuditoria({
         return bits.join(' · ');
       }
       return String(row.mensaje || '').slice(0, 120);
-    } catch (e) { return String(row.mensaje || '').slice(0, 120); }
+    } catch { return String(row.mensaje || '').slice(0, 120); }
   };
   const tonoAccionAud = (accion) => {
     const a = String(accion || '').toUpperCase();
@@ -361,7 +361,7 @@ export function useAuditoria({
     try {
       const est = await estimarUsoDB(supabase);
       setUsoDb(est);
-    } catch (e) { setUsoDb(null); }
+    } catch { setUsoDb(null); }
   }, []);
   useEffect(() => {
     if (activeTab === 'auditoria' && isAdmin) cargarUso();

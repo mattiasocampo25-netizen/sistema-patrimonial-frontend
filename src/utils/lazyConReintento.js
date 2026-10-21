@@ -35,7 +35,7 @@ export const cargarConReintento = async (importador) => {
           e
         );
       }
-    } catch (err) {}
+    } catch {}
     throw e;
   }
 };

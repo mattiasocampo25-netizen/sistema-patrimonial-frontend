@@ -27,7 +27,6 @@ export default function EmptyState({
   className = ''
 }) {
   const esError = tipo === 'error';
-  const esFiltro = tipo === 'filtro' || tipo === 'busqueda';
 
   return (
     <div

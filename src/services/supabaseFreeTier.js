@@ -117,7 +117,7 @@ export const estimarUsoDB = async (supabase) => {
         porTabla[t] = count;
         totalFilas += count;
       }
-    } catch (e) { /* tabla que aun no existe */ }
+    } catch { /* tabla que aun no existe */ }
   }
   // 2 KB por fila es el orden de magnitud de un bien con su JSONB.
   const bytesEstimados = totalFilas * BYTES_POR_FILA_BIEN;

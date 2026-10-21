@@ -81,7 +81,11 @@ export const normalizarFila = (fila, defTabla) => {
   // Forma plana (usuarios). Se descartan claves de autenticación heredadas por
   // si el archivo viene de un export crudo: la contraseña vive en Supabase
   // Auth y escribirla acá no reinstate el acceso.
-  const { password, password_hash, encrypted_password, ...resto } = fila;
+  // OJO: `password`, `password_hash` y `encrypted_password` se listan aunque no
+  // se usen: están para SACARLAS del objeto. Si se quitan de la
+  // desestructuracion, el `...resto` las devuelve y el respaldo vuelve a
+  // escribir la contrasena.
+  const { password: _password, password_hash: _passwordHash, encrypted_password: _encryptedPassword, ...resto } = fila;
   return resto;
 };
 

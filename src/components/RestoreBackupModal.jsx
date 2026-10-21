@@ -37,7 +37,7 @@ export default function RestoreBackupModal({ restore }) {
     isRestoreOpen, cerrarRestore, analisis, previa, nombreArchivo,
     modo, setModo, tablasElegidas, alternarTabla,
     progreso, ejecutando, resultado, fileRef, manejarArchivo,
-    ejecutar, totalFilasElegidas, perdidasPorTabla
+    ejecutar, totalFilasElegidas, _perdidasPorTabla
   } = restore;
 
   if (!isRestoreOpen) return null;

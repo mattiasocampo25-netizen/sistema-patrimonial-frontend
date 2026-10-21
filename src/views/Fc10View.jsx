@@ -106,7 +106,7 @@ export default function Fc10View({
               const bien = bienes.find(b => b.id === fc.bienId) || {};
               const estadoActual = fc.estadoFirma || (esFC10Legado(fc) ? 'CERRADO' : 'BORRADOR');
               const estaCambiando = cambiandoEstado[fc.id];
-              const estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
+              const _estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
               return (
                 <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-card border border-line dark:border-line/50 bg-surface-2 dark:bg-surface-2/50 hover:border-brand/50 hover:shadow-md motion duration-[var(--dur-base)] group">
                   <div className="flex justify-between items-start">

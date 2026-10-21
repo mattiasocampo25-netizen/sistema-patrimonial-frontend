@@ -310,7 +310,7 @@ const valorOrgExplicito = (campo) => {
     };
 
     // Función que lee el padrón en tiempo real (rellena sin borrar lo manual)
-    const handleNameChange = (e) => {
+    const _handleNameChange = (e) => {
         const val = e.target.value;
         if (!val.trim()) {
             setFuncData({ nombre: val, doc: '', cargo: '' });
@@ -326,14 +326,14 @@ const valorOrgExplicito = (campo) => {
 
     // Red de seguridad: el autocompletado del navegador a veces no dispara
     // onChange; al salir del campo se resuelve con el valor real del input.
-    const handleNameBlur = (e) => {
+    const _handleNameBlur = (e) => {
         const match = resolverFuncionario(e.target.value);
         if (match && (match.doc || match.cargo)) {
             setFuncData({ nombre: e.target.value.trim(), doc: match.doc || '', cargo: match.cargo || '' });
         }
     };
     // Autocompletado del jefe inmediato, con la misma tolerancia del funcionario.
-    const handleJefeNameChange = (e) => {
+    const _handleJefeNameChange = (e) => {
         const val = e.target.value;
         if (!val.trim()) { setJefeData({ nombre: val, doc: '', cargo: '' }); return; }
         const match = resolverFuncionario(val);
@@ -343,7 +343,7 @@ const valorOrgExplicito = (campo) => {
             cargo: match?.cargo || jefeData.cargo
         });
     };
-    const handleJefeNameBlur = (e) => {
+    const _handleJefeNameBlur = (e) => {
         const match = resolverFuncionario(e.target.value);
         if (match && (match.doc || match.cargo)) {
             setJefeData({ nombre: e.target.value.trim(), doc: match.doc || '', cargo: match.cargo || '' });

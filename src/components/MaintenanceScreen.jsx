@@ -6,7 +6,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
     ? config.mejoras
     : String(config?.mejoras || '').split('\n').map(s => s.trim()).filter(Boolean);
 
-  const fechaInicio = config?.fechaInicio || new Date().toISOString();
+  const _fechaInicio = config?.fechaInicio || new Date().toISOString();
   const transcurrido = config?.transcurrido || '';
   const estimado = config?.estimado || '';
 

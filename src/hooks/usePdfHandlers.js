@@ -78,7 +78,7 @@ const handleDownloadLabelPNG = async (bien, returnOnly = false) => {
       setIsQRModalOpen(false);
     }
     return dataUrl;
-  } catch (e) {
+  } catch {
     notify("Error al generar la etiqueta", "error");
   } finally {
     if (!returnOnly) setIsProcessing({ active: false, text: '' });
@@ -96,7 +96,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       setIsQRModalOpen(false);
     }
     return dataUrl;
-  } catch (e) {
+  } catch {
     notify("Error al descargar el QR", "error");
   } finally {
     if (!returnOnly) setIsProcessing({ active: false, text: '' });
@@ -622,7 +622,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               window.XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
               window.XLSX.writeFile(wb, `Inventario_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
               notify("Excel generado exitosamente", "success");
-          } catch (e) {
+          } catch {
               notify("Error al generar el Excel.", "error");
           } finally {
               setIsProcessing({ active: false, text: '' });

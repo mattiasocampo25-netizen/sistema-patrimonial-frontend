@@ -1,27 +1,17 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react';
 import { lazyConReintento } from './utils/lazyConReintento';
-import SkeletonLoader from './components/SkeletonLoader';
-import { STYLES, DEPENDENCIAS_UNP, ESTADOS_CONSERVACION, ORIGENES_FC04, INACTIVITY_LIMIT_MS, PENDIENTE_LABELS, FORMATO_PDF } from './constants/appConstants';
-import SimpleBar from './components/SimpleBar';
+import { STYLES, DEPENDENCIAS_UNP, ESTADOS_CONSERVACION, ORIGENES_FC04 } from './constants/appConstants';
 import FiltroCombo from './components/FiltroCombo';
-import AnimatedNumber from './components/AnimatedNumber';
-import CommandPalette from './components/CommandPalette';
 import AtajosModal from './components/modals/AtajosModal';
-import TourGuiado from './components/TourGuiado';
 import AppShell from './components/shell/AppShell';
 // Modales de apertura bajo demanda: carga diferida para acelerar el arranque
 import localforage from 'localforage';
 import LoginScreen from './components/LoginScreen';
 import { supabase } from './supabaseClient';
 // Modales pesados: carga diferida para acelerar el arranque
-import { 
-    formatCurrency, formatCI, generateId, parseDateInfo, 
-    formatDateText, getEstadoAbbr, normalizeStr, matchSearchWords, matchBienSearch, getPlaceholderLogo,
-    convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia 
-} from './utils/helpers';
+import { formatCurrency, generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia } from './utils/helpers';
 import { useIdioma } from './utils/i18n';
-import { generateSimpleQR, generateProfessionalLabelPNG, buildFC10PDFDoc, buildActaAuditoriaPDF } from './utils/pdfGenerators';
-import { conSello, debeResyncTotal, fusionarBienes, ahoraISO } from './services/syncBienes';
+import { conSello } from './services/syncBienes';
 import { mapearFilasBienes } from './utils/csvBienes';
 import { useToasts } from './hooks/useToasts';
 import { useAuditoria } from './hooks/useAuditoria';
@@ -33,9 +23,7 @@ import { useFcModals } from './hooks/useFcModals';
 import { useRestoreBackup } from './hooks/useRestoreBackup';
 import AppModals from './components/AppModals';
 import RestoreBackupModal from './components/RestoreBackupModal';
-import { useInventarioFiltros, ITEMS_POR_PAGINA } from './hooks/useInventarioFiltros';
-import { numeroALetras } from './utils/numeroLetras';
-import { extraerCodigoQR } from './utils/qr';
+import { useInventarioFiltros } from './hooks/useInventarioFiltros';
 import { pendienteDeFirma } from './utils/fc10Firmas';
 import { detectarCambios, fusionarSobreFresco, detectarConflictos, describirCampos } from './services/escrituraSegura';
 import { normalizarBien } from './utils/bienPublico';
@@ -52,16 +40,11 @@ const AprobacionesView = lazyConReintento(() => import('./views/AprobacionesView
 const AuditoriaView = lazyConReintento(() => import('./views/AuditoriaView'));
 const DashboardView = lazyConReintento(() => import('./views/DashboardView'));
 const InventarioView = lazyConReintento(() => import('./views/InventarioView'));
-import { processOfflineQueue, enqueueOfflineAction } from './services/offlineSyncService';
 import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
 import ErrorView from './views/ErrorView';
 import KioskBar, { BotonPantallaCompleta, parseIdleSegundos } from './components/KioskBar';
-import {
-  obtenerProgramacion, guardarProgramacion, tocaEjecutar,
-  construirCSVInventario, nombreArchivoInventario,
-  descargarYArchivar, registrarPendiente, descargarBlob
-} from './services/exportSchedule';
+import { obtenerProgramacion, guardarProgramacion, tocaEjecutar, construirCSVInventario, nombreArchivoInventario, descargarYArchivar } from './services/exportSchedule';
 // Nota: papaparse y qrcode se importan dinámicamente donde se usan para no
 // inflar el bundle inicial (ver executeProcessBienesCSV y pdfGenerators).
 // Nota: STYLES y constantes globales viven en constants/appConstants
@@ -107,20 +90,8 @@ export default function App() {
   const [publicDescExpandida, setPublicDescExpandida] = useState(false);
   const { toasts, addToast, quitarToast } = useToasts();
   // Sesión y autenticación: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const {
-    isAuthenticated, setIsAuthenticated, currentUser, setCurrentUser,
-    isAdmin, esDesarrollador,
-    loginUser, setLoginUser, loginPass, setLoginPass,
-    showPassword, setShowPassword, loginError, setLoginError,
-    isProcessing, setIsProcessing,
-    dependenciaActual, setDependenciaActual,
-    showLogoutConfirm, setShowLogoutConfirm,
-    mantenimiento, setMantenimiento,
-    isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant,
-    mostrarLoginDev, setMostrarLoginDev, mantBypass,
-    handleLogin, handleLogout, saveMantenimiento
-  } = useAuthSession({ notify: addToast });
-  const [appLogo, setAppLogo] = useState(() => localStorage.getItem('logoOficial'));
+  const { isAuthenticated, currentUser, setCurrentUser, isAdmin, esDesarrollador, loginUser, setLoginUser, loginPass, setLoginPass, showPassword, setShowPassword, loginError, isProcessing, setIsProcessing, dependenciaActual, setDependenciaActual, showLogoutConfirm, setShowLogoutConfirm, mantenimiento, isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant, mostrarLoginDev, setMostrarLoginDev, mantBypass, handleLogin, handleLogout, saveMantenimiento } = useAuthSession({ notify: addToast });
+  const [appLogo, _setAppLogo] = useState(() => localStorage.getItem('logoOficial'));
   
   
   // Modo oscuro: 3 estados posibles. Sin elección guardada, sigue la preferencia
@@ -130,19 +101,19 @@ export default function App() {
     const saved = localStorage.getItem('theme');
     if (saved === 'dark') return true;
     if (saved === 'light') return false;
-    try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { return true; }
+    try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch { return true; }
   });
   // Solo persiste cuando el usuario elige tema. Si se escribiera en el primer
   // render, `theme` pasaría a dark/light y el sistema dejaría de gobernar.
   const fijarTemaUsuario = useCallback((valor) => {
     const next = typeof valor === 'function' ? valor(darkMode) : valor;
     setDarkMode(next);
-    try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch (e) { /* ignore */ }
+    try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch { /* ignore */ }
   }, [darkMode]);
   // Escuchar cambios del tema del sistema SOLO si el usuario no fijó uno manual.
   useEffect(() => {
     let mq;
-    try { mq = window.matchMedia('(prefers-color-scheme: dark)'); } catch (e) { return; }
+    try { mq = window.matchMedia('(prefers-color-scheme: dark)'); } catch { return; }
     const alCambiar = (e) => {
       const saved = localStorage.getItem('theme');
       if (saved !== 'dark' && saved !== 'light') setDarkMode(e.matches);
@@ -177,7 +148,7 @@ export default function App() {
       const vista = localStorage.getItem('unp_last_version');
       const v = mantenimiento?.ultima_version;
       if (v && v !== vista && isAuthenticated && !mantenimiento?.en_mantenimiento) setShowChangelog(true);
-    } catch (e) {}
+    } catch {}
   }, [mantenimiento, isAuthenticated]);
 
   const [showDependenciaConfirm, setShowDependenciaConfirm] = useState(false);
@@ -192,7 +163,7 @@ export default function App() {
     try {
       const { data, error } = await supabase.from('dependencias').select('*').order('nombre');
       if (!error && data) setDependenciasList(data);
-    } catch (e) {}
+    } catch {}
   };
   useEffect(() => { if (isAuthenticated) fetchDependencias(); }, [isAuthenticated]);
   const todasDependencias = useMemo(() => {
@@ -226,7 +197,7 @@ export default function App() {
   const eventosFicha = useMemo(() => {
     if (!fichaBien) return [];
     const ev = [];
-    const fmt = (f) => { try { return formatDateText(f) || f; } catch (e) { return f; } };
+    const fmt = (f) => { try { return formatDateText(f) || f; } catch { return f; } };
     if (fichaBien.fechaAdquisicion) {
       ev.push({ fecha: fichaBien.fechaAdquisicion, fechaFmt: fmt(fichaBien.fechaAdquisicion), tipo: 'alta', titulo: 'Alta en inventario', detalle: `Adquirido el ${fmt(fichaBien.fechaAdquisicion)}` });
     }
@@ -264,7 +235,7 @@ export default function App() {
             detalle = bits.join(' · ');
           }
         } else if (m) detalle = String(m);
-      } catch (e) { detalle = String(row.mensaje || ''); }
+      } catch { detalle = String(row.mensaje || ''); }
       ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle });
     });
     return ev.sort((x, y) => String(y.fecha || '').localeCompare(String(x.fecha || '')));
@@ -288,7 +259,7 @@ export default function App() {
       // Si se supera el tope, borrar la más vieja del storage
       const sobrantes = (fichaBien.fotos || []).filter(f => !fotos.includes(f));
       if (sobrantes.length > 0) {
-        try { await supabase.storage.from('fotos-bienes').remove(sobrantes.map(f => f.ruta).filter(Boolean)); } catch (e) {}
+        try { await supabase.storage.from('fotos-bienes').remove(sobrantes.map(f => f.ruta).filter(Boolean)); } catch {}
       }
       const actualizado = { ...fichaBien, fotos };
       const { error: dbErr } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
@@ -301,12 +272,12 @@ export default function App() {
           const d = typeof releido.data === 'string' ? JSON.parse(releido.data) : (releido.data || {});
           final = { id: releido.id, ...d };
         }
-      } catch (e) {}
+      } catch {}
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? final : b)));
       setFichaBien(final);
       const kb = Math.round(blob.size / 1024);
       addToast(`Foto agregada (${kb} KB).`, 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo subir la foto. Verifica el bucket fotos-bienes en Supabase.', 'error');
     } finally {
       setSubiendoFoto(false);
@@ -316,7 +287,7 @@ export default function App() {
     if (!fichaBien || !foto) return;
     try {
       if (foto.ruta) {
-        try { await supabase.storage.from('fotos-bienes').remove([foto.ruta]); } catch (e) {}
+        try { await supabase.storage.from('fotos-bienes').remove([foto.ruta]); } catch {}
       }
       const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => f.url !== foto.url) };
       const { error } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
@@ -324,31 +295,14 @@ export default function App() {
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? actualizado : b)));
       setFichaBien(actualizado);
       addToast('Foto eliminada.', 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo eliminar la foto.', 'error');
     }
   };
 
   // Filtros/búsqueda/paginación del inventario: hook extraído (Fase 3).
   // La UI usa los mismos nombres vía desestructuración.
-  const {
-    searchInput, setSearchInput, searchTerm, setSearchTerm, debouncedSearchTerm,
-    orden, setOrden, alternarOrden,
-    filtroFuncionario, setFiltroFuncionario, filtroUbicacion, setFiltroUbicacion,
-    filtroAnio, setFiltroAnio, filtroMes, setFiltroMes,
-    filtroSubcuenta, setFiltroSubcuenta, filtroAnalitico1, setFiltroAnalitico1,
-    filtroAnalitico2, setFiltroAnalitico2, filtroQR, setFiltroQR,
-    filtroFC10, setFiltroFC10, filtroEstado, setFiltroEstado,
-    filtroPendiente, setFiltroPendiente, currentPage, setCurrentPage,
-    clearAllFilters, hasFilters,
-    vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista,
-    guardarVistaActual, aplicarVista, eliminarVista,
-    funcionariosUnicos, ubicacionesUnicas, aniosUnicos,
-    subcuentasUnicas, analiticos1Unicos, analiticos2Unicos,
-    stats, pendientes, filteredBienes, paginatedBienes, itemsPaginados, totalPages,
-    itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion,
-    vistaInv, cambiarVistaInv, urlFiltrosActual
-  } = useInventarioFiltros({ bienes, dependenciaActual, fc10List, username: currentUser?.username, notify: addToast });
+  const { setSearchInput, searchTerm, setSearchTerm, orden, setOrden, filtroFuncionario, setFiltroFuncionario, filtroUbicacion, setFiltroUbicacion, filtroAnio, setFiltroAnio, setFiltroMes, filtroSubcuenta, setFiltroSubcuenta, filtroAnalitico1, setFiltroAnalitico1, filtroAnalitico2, setFiltroAnalitico2, setFiltroQR, filtroFC10, setFiltroFC10, filtroEstado, setFiltroEstado, filtroPendiente, setFiltroPendiente, currentPage, setCurrentPage, clearAllFilters, hasFilters, vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista, guardarVistaActual, aplicarVista, eliminarVista, funcionariosUnicos, ubicacionesUnicas, aniosUnicos, subcuentasUnicas, analiticos1Unicos, analiticos2Unicos, stats, pendientes, filteredBienes, itemsPaginados, totalPages, itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion, vistaInv, cambiarVistaInv, urlFiltrosActual } = useInventarioFiltros({ bienes, dependenciaActual, fc10List, username: currentUser?.username, notify: addToast });
   // Sugerencias para autocompletado (memoizado: evita refiltrar miles de bienes en cada render)
   const sugerenciasBienesDep = useMemo(
     () => bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
@@ -366,7 +320,7 @@ export default function App() {
     try {
       const { data, error } = await supabase.from('ubicaciones').select('*').order('nombre');
       if (!error && data) setUbicacionesList(data);
-    } catch (e) {}
+    } catch {}
   };
   useEffect(() => { if (isAuthenticated) fetchUbicaciones(); }, [isAuthenticated]);
   const ubicacionesDep = useMemo(
@@ -451,7 +405,7 @@ export default function App() {
         setUbicacionesList(prev => prev.map(u => (u.id === id ? { ...u, nombre } : u)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre))));
         addToast(`Ubicación actualizada en ${bienesAfectados.length} bienes y ${funcAfectados.length} funcionarios.`, 'success');
       }
-    } catch (e) {
+    } catch {
       addToast('No se pudo guardar. Verifica la tabla ubicaciones en Supabase.', 'error');
     } finally {
       setIsSavingUbicacion(false);
@@ -522,7 +476,7 @@ export default function App() {
         }
         setDependenciasList(prev => prev.map(d => (d.id === id ? { ...d, nombre: nombre.trim(), activa } : d)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre))));
       }
-    } catch (e) {
+    } catch {
       addToast('No se pudo guardar. Verifica la tabla dependencias en Supabase.', 'error');
     } finally {
       setIsSavingDep(false);
@@ -559,7 +513,7 @@ export default function App() {
         clearAllFilters();
       }
       addToast(`"${origenNombre}" fusionada en "${destinoNombre}" (${total} registros).`, 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo fusionar.', 'error');
     } finally {
       setIsSavingDep(false);
@@ -578,7 +532,7 @@ export default function App() {
       if (error) throw error;
       setDependenciasList(prev => prev.filter(d => d.id !== id));
       addToast('Dependencia eliminada.', 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo eliminar.', 'error');
     }
   };
@@ -621,7 +575,7 @@ export default function App() {
         }
       }
       addToast(ubicacionNombre ? (movidos > 0 ? `Funcionario asignado. ${movidos} bien(es) actualizados.` : 'Funcionario asignado a la ubicación.') : 'Funcionario sin ubicación.', 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo asignar.', 'error');
     }
   };
@@ -676,7 +630,7 @@ export default function App() {
         addToast(`${ids.length} solicitudes de baja enviadas.`, 'success');
       }
       limpiarSeleccion();
-    } catch (e) {
+    } catch {
       addToast('No se pudo completar la baja masiva.', 'error');
     } finally {
       setIsProcessing({ active: false, text: '' });
@@ -694,7 +648,7 @@ export default function App() {
       if (error) throw error;
       setUbicacionesList(prev => prev.filter(u => u.id !== id));
       addToast('Ubicación eliminada.', 'success');
-    } catch (e) {
+    } catch {
       addToast('No se pudo eliminar.', 'error');
     }
   };
@@ -818,24 +772,11 @@ export default function App() {
   }, [isAuthenticated]);
   const cerrarTour = (completado) => {
     setTourPaso(-1);
-    try { localStorage.setItem('tour_visto_v1', '1'); } catch (e) {}
+    try { localStorage.setItem('tour_visto_v1', '1'); } catch {}
   };
   // PENDIENTE_LABELS vive en constants/appConstants (se usa en InventarioView).
   // Dominio de auditoría: hook extraído (Fase 6). La vista recibe los mismos nombres.
-  const {
-    auditoriaList, isLoadingAud, searchAud, setSearchAud,
-    filtroAccionAud, setFiltroAccionAud,
-    conteoCodigos, setConteoCodigos, conteoInput, setConteoInput,
-    muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion,
-    conteoUbicacion, setConteoUbicacion, muestra, setMuestra,
-    verificadosMuestra, setVerificadosMuestra,
-    paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud,
-    fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud,
-    evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb,
-    resultadoConteo, agregarCodigoConteo,
-    descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV,
-    guardarActaConteo, generarMuestra, guardarActaMuestreo
-  } = useAuditoria({
+  const { auditoriaList, isLoadingAud, searchAud, setSearchAud, filtroAccionAud, setFiltroAccionAud, conteoCodigos, setConteoCodigos, conteoInput, setConteoInput, muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion, conteoUbicacion, setConteoUbicacion, muestra, verificadosMuestra, setVerificadosMuestra, paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud, fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud, evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, resultadoConteo, agregarCodigoConteo, descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV, guardarActaConteo, generarMuestra, guardarActaMuestreo } = useAuditoria({
     bienes, fc10List, fc11List, funcionariosPadron, dependenciaActual,
     currentUser, ubicacionesUnicas, activeTab, isAdmin,
     notify: addToast,
@@ -846,10 +787,10 @@ export default function App() {
   // currentPage, hasFilters y vistas viven en useInventarioFiltros (Fase 3).
   const [fc10Year, setFc10Year] = useState(new Date().getFullYear().toString()); 
   const [fc10Month, setFc10Month] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
-  const [searchConsolidadoModal, setSearchConsolidadoModal] = useState('');
+  const [_searchConsolidadoModal, _setSearchConsolidadoModal] = useState('');
   const [isConsolidatedFC10ModalOpen, setIsConsolidatedFC10ModalOpen] = useState(false);
 
-  const fc10Map = useMemo(() => {
+  const _fc10Map = useMemo(() => {
     const map = new Map();
     fc10List.forEach(fc => {
       if (fc.bienId && !fc.devolucionFecha) map.set(fc.bienId, fc);
@@ -875,23 +816,7 @@ export default function App() {
   const [motivoSolicitudBaja, setMotivoSolicitudBaja] = useState('');
   const [pendingCSVImport, setPendingCSVImport] = useState(null);
   // Dominio de funcionarios/padrón: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const {
-    currentPaginaFuncionarios, setCurrentPaginaFuncionarios,
-    isFuncionarioModalOpen, setIsFuncionarioModalOpen,
-    funcionarioToEdit, setFuncionarioToEdit,
-    isNewFuncionarioModalOpen, setIsNewFuncionarioModalOpen,
-    isCSVPreviewOpen, setIsCSVPreviewOpen,
-    csvPreviewData, setCsvPreviewData,
-    pendingFuncionariosToImport, setPendingFuncionariosToImport,
-    searchFuncionarioInput, setSearchFuncionarioInput,
-    funcionariosPurosDependencia, totalPagesFuncs, funcionariosPaginados,
-    funcionariosConDatos,
-    sincronizarBienesConPadron, handleFileUploadFuncionarios,
-    executeProcessFuncionariosCSV, handleSaveManualFuncionario,
-    confirmCSVImportFuncionarios, handleDeleteFuncionario,
-    handleEditFuncionario, saveFuncionarioEdit,
-    renderPaginationFuncionarios
-  } = useFuncionarios({
+  const { setCurrentPaginaFuncionarios, isFuncionarioModalOpen, setIsFuncionarioModalOpen, funcionarioToEdit, isNewFuncionarioModalOpen, setIsNewFuncionarioModalOpen, isCSVPreviewOpen, setIsCSVPreviewOpen, csvPreviewData, setCsvPreviewData, searchFuncionarioInput, setSearchFuncionarioInput, funcionariosPurosDependencia, funcionariosPaginados, funcionariosConDatos, sincronizarBienesConPadron, handleFileUploadFuncionarios, executeProcessFuncionariosCSV, handleSaveManualFuncionario, confirmCSVImportFuncionarios, handleDeleteFuncionario, handleEditFuncionario, saveFuncionarioEdit, renderPaginationFuncionarios } = useFuncionarios({
     funcionariosPadron, setFuncionariosPadron, dependenciaActual,
     bienes, setBienes, fc10List, currentUser, isAdmin,
     notify: addToast, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
@@ -927,7 +852,7 @@ useEffect(() => {
         if (!rpcError && rpcData) {
           bienEncontrado = normalizarBien(rpcData);
         }
-      } catch (e) {}
+      } catch {}
 
       // 2. Fallback en caché IndexedDB local (bienes ya vistos en este
       //    dispositivo). No sirve para un visitante nuevo, pero evita el
@@ -945,7 +870,7 @@ useEffect(() => {
               }
             }
           }
-        } catch (e) {}
+        } catch {}
       }
 
       if (bienEncontrado) {
@@ -976,45 +901,14 @@ useEffect(() => {
 
   // Ficha 360: la lee el realtime (H5) anterior a H8, vive en App.
   // Sincronización de datos: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const {
-    isOnline, colaOffline, notificaciones, setNotificaciones,
-    fetchData, cargarNotificaciones, sondearNotificaciones, fusionarNotificacion,
-    markAsRead, markAllAsRead, misNotificaciones, unreadCount
-  } = useRealtimeSync({
+  const { isOnline, colaOffline, notificaciones, setNotificaciones, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount } = useRealtimeSync({
     notify: addToast, currentUser, setCurrentUser, dependenciaActual, isAuthenticated, isAdmin,
     handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
     setEstructurasDB, setUsuariosList, setFuncionariosPadron,
     setDbError, setIsLoading, setFichaBien
   });
   // Modales de fichas y formularios: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const {
-    isBulkQR, setIsBulkQR, qrTargetBien, setQrTargetBien,
-    isQRModalOpen, setIsQRModalOpen,
-    isBienModalOpen, setIsBienModalOpen, bienEditing, setBienEditing, bienFormRef,
-    isFC10ModalOpen, setIsFC10ModalOpen, fc10TargetBien, setFc10TargetBien,
-    fc10Editing, setFc10Editing,
-    isFC11ModalOpen, setIsFC11ModalOpen, fc11TargetBien, setFc11TargetBien,
-    fc11Editing, setFc11Editing, fc11FormNumber, setFc11FormNumber,
-    isFC04ModalOpen, setIsFC04ModalOpen, fc04Editing, setFc04Editing,
-    fc04Items, setFc04Items, fc04SinMovimiento, setFc04SinMovimiento,
-    isFC03ModalOpen, setIsFC03ModalOpen, fc03Config, setFc03Config,
-    fc03FuncionarioTexto, setFc03FuncionarioTexto,
-    showFC03FuncDropdown, setShowFC03FuncDropdown,
-    isUsuarioModalOpen, setIsUsuarioModalOpen, usuarioEditing, setUsuarioEditing,
-    isSaving,
-    confirmBackupModal, setConfirmBackupModal,
-    resolucionBaja, setResolucionBaja, motivoResolucion, setMotivoResolucion,
-    fileInputRef, showUnsavedChangesModal, setShowUnsavedChangesModal,
-    scanParaConteo, setScanParaConteo,
-    modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo,
-    openFichaBien, openFC03Modal, executeGenerateFC03,
-    openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal,
-    handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange,
-    handleScanSuccess,
-    saveBien, saveUsuario, saveFC11, saveFC04, saveFC10,
-    registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite,
-    submitResolucionBaja, confirmDeleteAction
-  } = useFcModals({
+  const { isBulkQR, setIsBulkQR, qrTargetBien, setQrTargetBien, isQRModalOpen, setIsQRModalOpen, isBienModalOpen, setIsBienModalOpen, bienEditing, setBienEditing, bienFormRef, isFC10ModalOpen, setIsFC10ModalOpen, fc10TargetBien, fc10Editing, isFC11ModalOpen, setIsFC11ModalOpen, fc11TargetBien, fc11Editing, isFC04ModalOpen, setIsFC04ModalOpen, fc04Editing, fc04Items, fc04SinMovimiento, setFc04SinMovimiento, isFC03ModalOpen, setIsFC03ModalOpen, fc03Config, setFc03Config, fc03FuncionarioTexto, setFc03FuncionarioTexto, showFC03FuncDropdown, setShowFC03FuncDropdown, isUsuarioModalOpen, setIsUsuarioModalOpen, usuarioEditing, setUsuarioEditing, isSaving, confirmBackupModal, setConfirmBackupModal, resolucionBaja, setResolucionBaja, motivoResolucion, setMotivoResolucion, fileInputRef, showUnsavedChangesModal, setShowUnsavedChangesModal, scanParaConteo, setScanParaConteo, modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo, openFichaBien, openFC03Modal, executeGenerateFC03, openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal, handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange, handleScanSuccess, saveBien, saveUsuario, saveFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite, submitResolucionBaja, confirmDeleteAction } = useFcModals({
     notify: addToast, setIsProcessing, appLogo,
     bienes, setBienes, filteredBienes, fc10List, fc11List, fc04List,
     dependenciaActual, funcionariosConDatos,
@@ -1135,7 +1029,7 @@ useEffect(() => {
           });
           addToast(destino === 'TODOS' ? `Anuncio enviado a ${dests.length} usuarios.` : `Anuncio enviado a @${destino}.`, 'success');
           return true;
-      } catch (e) {
+      } catch {
           addToast('No se pudo enviar el anuncio.', 'error');
           return false;
       } finally {
@@ -1149,7 +1043,7 @@ useEffect(() => {
           await Promise.all(ids.map(id => supabase.from('notificaciones').delete().eq('id', id)));
           setNotificaciones(prev => prev.filter(n => (n.grupo || n.id) !== grupo));
           addToast('Anuncio eliminado.', 'success');
-      } catch (e) {
+      } catch {
           addToast('No se pudo eliminar el anuncio.', 'error');
       }
   };
@@ -1187,15 +1081,7 @@ useEffect(() => {
 
 
   // Handlers de PDFs/QR/CSV/Excel/backup: hook extraído (Fase 6).
-  const {
-    marcarBienConQR, handleDownloadLabelPNG, handleDownloadSimpleQR,
-    handleBulkLabelPNGZip, handleBulkSimpleQRZip,
-    handleGenerateFC04PDF, handleGenerateFC11PDF, handleGenerateFC10PDF,
-    handleGenerateConsolidatedFC10PDF, handleExportFC10CSV, handleExportFC11CSV,
-    handleDownloadTemplateCSV, handleExportBackupGeneral,
-    handleExportInventarioCSV, handleExportInventarioExcel,
-    handleDownloadTemplateFuncionarios
-  } = usePdfHandlers({
+  const { handleDownloadLabelPNG, handleDownloadSimpleQR, handleBulkLabelPNGZip, handleBulkSimpleQRZip, handleGenerateFC04PDF, handleGenerateFC11PDF, handleGenerateFC10PDF, handleGenerateConsolidatedFC10PDF, handleExportFC10CSV, handleExportFC11CSV, handleDownloadTemplateCSV, handleExportBackupGeneral, handleExportInventarioCSV, handleExportInventarioExcel, handleDownloadTemplateFuncionarios } = usePdfHandlers({
     notify: addToast, setIsProcessing, appLogo,
     bienes, filteredBienes, dependenciaActual, fc10List, fc11List,
     funcionariosPadron, currentUser, fc10Year, isAdmin,
@@ -1259,7 +1145,7 @@ useEffect(() => {
         detalles: { rotulo: bien.rotulo, estadoPrevio: previo, estadoNuevo, campos: Object.keys(cambios) }
       });
       addToast(`${bien.rotulo || 'Bien'} → ${estadoNuevo}.`, 'success');
-    } catch (e) {
+    } catch {
       setBienes(prev => prev.map(b => (b.id === bien.id ? bien : b)));
       addToast('No se pudo cambiar el estado.', 'error');
     }
@@ -1272,7 +1158,7 @@ useEffect(() => {
     try {
       await navigator.clipboard.writeText(url);
       addToast('Link copiado. Quien lo abra verá estos filtros.', 'success');
-    } catch (e) {
+    } catch {
       // clipboard puede estar bloqueado en http:// o sin permiso: cae al prompt.
       window.prompt('Copiá este link para compartir la vista filtrada:', url);
     }
@@ -1295,7 +1181,7 @@ useEffect(() => {
       descargarYArchivar({ nombre, tipo: 'inventario', formato, blob });
       guardarProgramacion({ ultimaEjecucion: Date.now() });
       if (!silencioso) addToast(`Reporte generado: ${nombre}`, 'success');
-    } catch (e) {
+    } catch {
       if (!silencioso) addToast('No se pudo generar el reporte programado.', 'error');
     } finally {
       setIsProcessing({ active: false, text: '' });
@@ -1328,7 +1214,7 @@ useEffect(() => {
     try {
       const b64 = await convertirImagenABase64(getLogoPorDependencia(dependencia));
       if (b64) return b64;
-    } catch (e) {}
+    } catch {}
     return getPlaceholderLogo();
   };
 
@@ -1337,7 +1223,7 @@ useEffect(() => {
 
 
 
-  const toggleQR = async (bien) => { 
+  const _toggleQR = async (bien) => { 
       const nuevoEstadoQR = !bien.hasQR;
       const updatedBien = { ...bien, hasQR: nuevoEstadoQR }; 
       
@@ -1358,7 +1244,7 @@ useEffect(() => {
           await localforage.setItem(claveCache, nuevoCache);
 
           addToast(`Estado QR actualizado`, "success");
-      } catch (error) { 
+      } catch { 
           // Si falla, revertimos el cambio en pantalla
           setBienes(prev => prev.map(b => b.id === bien.id ? bien : b));
           addToast("Error de red al guardar QR.", "error"); 
@@ -1389,7 +1275,7 @@ useEffect(() => {
       });
       setCsvPreviewData({ validos, duplicados, errores, tipo: 'bienes', file });
       setIsCSVPreviewOpen(true);
-    } catch (e) {
+    } catch {
       addToast("No se pudo leer el archivo CSV.", "error");
     } finally {
       setIsProcessing({ active: false, text: '' });
@@ -1426,7 +1312,7 @@ useEffect(() => {
             try {
               const cacheActual = await localforage.getItem(`bienes_cache_${dependenciaActual}`) || [];
               await localforage.setItem(`bienes_cache_${dependenciaActual}`, [...newBienes, ...cacheActual.filter(b => !newBienes.some(n => n.id === b.id))]);
-            } catch (e) {}
+            } catch {}
             addToast(`¡Éxito! Se guardaron ${newBienes.length} bienes nuevos.${duplicatesSkipped > 0 ? ` Se omitieron ${duplicatesSkipped} duplicados.` : ''}`, "success");
           } catch (error) {
             addToast(`No se pudieron guardar los bienes: ${error?.message || 'error de la base de datos'}.`, "error", { action: { label: 'Reintentar', onClick: () => { if (ultimoArchivoBienesRef.current) executeProcessBienesCSV(ultimoArchivoBienesRef.current); } } });
@@ -1490,13 +1376,13 @@ useEffect(() => {
           try {
               instancia = new window.Html5Qrcode("reader");
               window.html5QrCode = instancia;
-          } catch (e) {
+          } catch {
               // Quedó una instancia previa viva: se libera antes de reintentar.
-              try { window.html5QrCode?.clear(); } catch (e2) {}
+              try { window.html5QrCode?.clear(); } catch {}
               try {
                   instancia = new window.Html5Qrcode("reader");
                   window.html5QrCode = instancia;
-              } catch (e3) {
+              } catch {
                   addToast("No se pudo iniciar el lector de QR.", "error");
                   setIsScannerOpen(false);
                   return;
@@ -1522,8 +1408,8 @@ useEffect(() => {
           clearTimeout(timer);
           const inst = instancia || window.html5QrCode;
           if (inst) {
-              try { if (inst.isScanning) inst.stop(); } catch (e) {}
-              try { inst.clear(); } catch (e) {}
+              try { if (inst.isScanning) inst.stop(); } catch {}
+              try { inst.clear(); } catch {}
           }
           if (window.html5QrCode === inst) window.html5QrCode = null;
       };

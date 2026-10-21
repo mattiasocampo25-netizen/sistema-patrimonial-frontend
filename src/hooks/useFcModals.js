@@ -5,11 +5,7 @@ import { conSello } from '../services/syncBienes';
 import { normalizeStr, formatDateText, formatCurrency, getEstadoAbbr, generateId } from '../utils/helpers';
 import { numeroALetras } from '../utils/numeroLetras';
 import { extraerCodigoQR } from '../utils/qr';
-import {
-  ESTADOS_FC10, ESTADO_NUEVO_FC10, estadoInicialFC10, estaPendiente,
-  pendienteDeFirma, registrarFirma, registrarAmbasFirmas, habilitaFC10EnBien, ESTADO_INFO,
-  esFC10Legado, iniciarTramiteFC10
-} from '../utils/fc10Firmas';
+import { ESTADOS_FC10, ESTADO_NUEVO_FC10, estadoInicialFC10, pendienteDeFirma, registrarFirma, registrarAmbasFirmas, habilitaFC10EnBien, ESTADO_INFO, esFC10Legado, iniciarTramiteFC10 } from '../utils/fc10Firmas';
 import { registrarAuditoria } from '../services/auditService';
 import { enqueueOfflineAction } from '../services/offlineSyncService';
 import { FORMATO_PDF } from '../constants/appConstants';
@@ -88,7 +84,7 @@ export function useFcModals({
     try {
       const res = await plan.remoto();
       if (res && res.error) throw res.error;
-    } catch (e) {
+    } catch {
       plan.revertir();
       notify('No se pudo completar. Se restauró el registro.', 'error');
     }
@@ -121,7 +117,7 @@ export function useFcModals({
     try {
       const { data, error } = await supabase.from('auditoria').select('*').eq('bienid', bien.id).order('fecha', { ascending: false }).limit(100);
       if (!error && data) setEventosAuditFicha(data);
-    } catch (e) {}
+    } catch {}
   };
 
   const openFC03Modal = () => {
@@ -567,7 +563,7 @@ export function useFcModals({
         } else {
             notify("Error al guardar en el servidor.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         }
-    } catch (e) {
+    } catch {
         notify("Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         return false;
     } finally {
@@ -614,7 +610,7 @@ export function useFcModals({
         } else {
             notify(res.error.message || "Error al procesar la solicitud", "error");
         }
-    } catch (error) {
+    } catch {
         notify("Error de conexión.", "error");
     }
   };
@@ -752,7 +748,7 @@ export function useFcModals({
                         setEstructurasDB(prev => [...prev, newStruct]); 
                         await supabase.from('estructuras').insert([{ id: newStruct.id, data: newStruct }]); 
                     } 
-                } catch(err) {}
+                } catch {}
             } 
         }; 
         await checkAndAddStructure(orgDataToSave.unidad, orgDataToSave.unidadCod, 'unidad'); await checkAndAddStructure(orgDataToSave.reparticion, orgDataToSave.reparticionCod, 'reparticion'); await checkAndAddStructure(orgDataToSave.dependenciaOrg, orgDataToSave.dependenciaCod, 'dependencia'); await checkAndAddStructure(orgDataToSave.area, orgDataToSave.areaCod, 'area'); 
@@ -1210,7 +1206,7 @@ export function useFcModals({
               }
               if (plan) programarBorrado(plan);
           }
-      } catch (e) { 
+      } catch { 
         notify("Error de red.", "error"); 
       } finally { 
         setItemToDelete(null); 

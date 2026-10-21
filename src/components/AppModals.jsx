@@ -802,7 +802,7 @@ export default function AppModals({
                     <div className="flex px-6 sm:px-8 pb-6 sm:pb-8 bg-surface-1 dark:bg-surface-1">
                         <button
                             onClick={() => {
-                                try { localStorage.setItem('unp_last_version', mantenimiento?.ultima_version || ''); } catch (e) {}
+                                try { localStorage.setItem('unp_last_version', mantenimiento?.ultima_version || ''); } catch {}
                                 setShowChangelog(false);
                             }}
                             className="w-full inline-flex items-center justify-center gap-2 rounded-control bg-zinc-900 dark:bg-surface-1 px-6 h-11 text-[13px] font-bold text-white dark:text-content-1 motion hover:bg-zinc-700 dark:hover:bg-surface-3 active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"

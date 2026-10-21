@@ -133,7 +133,7 @@ useEffect(() => {
         if (v !== null && v !== '') salida[estado] = v;
       }
       return salida;
-    } catch (e) { return {}; }
+    } catch { return {}; }
   }, []);
 
   // Aplicar los filtros que vengan en la URL, una sola vez al entrar.
@@ -167,7 +167,7 @@ useEffect(() => {
       const qs = p.toString();
       const nueva = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
       window.history.replaceState(null, '', nueva);
-    } catch (e) { /* el navegador puede bloquear replaceState; no es crítico */ }
+    } catch { /* el navegador puede bloquear replaceState; no es crítico */ }
   }, [
     debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes,
     filtroSubcuenta, filtroAnalitico1, filtroAnalitico2,
@@ -176,12 +176,12 @@ useEffect(() => {
 
   // "Copiar link" de la vista actual.
   const urlFiltrosActual = useCallback(() => {
-    try { return window.location.href; } catch (e) { return ''; }
+    try { return window.location.href; } catch { return ''; }
   }, []);
 
   // Vistas guardadas por usuario (foto de filtros con nombre)
   const [vistasGuardadas, setVistasGuardadas] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(`vistas_${username || 'anon'}`) || '[]'); } catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem(`vistas_${username || 'anon'}`) || '[]'); } catch { return []; }
   });
   const [nombreVista, setNombreVista] = useState('');
   const [mostrarGuardarVista, setMostrarGuardarVista] = useState(false);
@@ -194,7 +194,7 @@ useEffect(() => {
     try {
       const raw = JSON.parse(localStorage.getItem(`vistas_${username || 'anon'}`) || '[]');
       if (vivo) setVistasGuardadas(Array.isArray(raw) ? raw : []);
-    } catch (e) {
+    } catch {
       if (vivo) setVistasGuardadas([]);
     }
     return () => { vivo = false; };
@@ -212,7 +212,7 @@ useEffect(() => {
     };
     setVistasGuardadas(prev => {
       const nuevas = [...prev.filter(v => v.nombre !== nombre), foto].slice(-8);
-      try { localStorage.setItem(`vistas_${username || 'anon'}`, JSON.stringify(nuevas)); } catch (e) {}
+      try { localStorage.setItem(`vistas_${username || 'anon'}`, JSON.stringify(nuevas)); } catch {}
       return nuevas;
     });
     setNombreVista('');
@@ -235,7 +235,7 @@ useEffect(() => {
   const eliminarVista = useCallback((nombre) => {
     setVistasGuardadas(prev => {
       const nuevas = prev.filter(v => v.nombre !== nombre);
-      try { localStorage.setItem(`vistas_${username || 'anon'}`, JSON.stringify(nuevas)); } catch (e) {}
+      try { localStorage.setItem(`vistas_${username || 'anon'}`, JSON.stringify(nuevas)); } catch {}
       return nuevas;
     });
   }, [username]);

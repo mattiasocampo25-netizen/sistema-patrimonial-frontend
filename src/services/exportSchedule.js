@@ -19,7 +19,6 @@
 import localforage from 'localforage';
 
 const CLAVE_CFG = 'export_programada';
-const CLAVE_PEND = 'export_pendientes';
 
 // Frecuencias expresadas en horas. 'manual' desactiva la programación.
 export const FRECUENCIAS = [

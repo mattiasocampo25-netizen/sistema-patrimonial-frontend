@@ -15,7 +15,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
       setRect(null);
       return;
     }
-    try { el.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (e) {}
+    try { el.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch {}
     requestAnimationFrame(() => {
       const r = el.getBoundingClientRect();
       if (r.width === 0 && r.height === 0) {

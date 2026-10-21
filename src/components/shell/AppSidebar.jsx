@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getLogoPorDependencia } from '../../utils/helpers';
 import { useIdioma } from '../../utils/i18n';
 
@@ -120,6 +120,29 @@ export default function AppSidebar({
   onOpenMantenimiento,
   onOpenDependencias
 }) {
+  // El menu se puede desplazar cuando la ventana es baja. Sin avisar, el
+  // elemento del borde queda cortado a la mitad y no se ve que hay mas: se
+  // difumina el borde (arriba y/o abajo) segun lo que haya fuera de vista.
+  const navRef = useRef(null);
+  const [desbordes, setDesbordes] = useState({ arriba: false, abajo: false });
+
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return undefined;
+    const medir = () => {
+      const arriba = el.scrollTop > 2;
+      const abajo = el.scrollTop + el.clientHeight < el.scrollHeight - 2;
+      setDesbordes((prev) => (prev.arriba === arriba && prev.abajo === abajo ? prev : { arriba, abajo }));
+    };
+    medir();
+    el.addEventListener('scroll', medir, { passive: true });
+    const observador = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(medir) : null;
+    observador?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', medir);
+      observador?.disconnect();
+    };
+  }, [isSidebarOpen]);
   const { t } = useIdioma();
   const LOGO_SISTEMA = '/UNP-Site-Logo.webp';
   const LOGO_SISTEMA_NEGRO = '/UNP-Site-Logo-negro.webp';
@@ -183,7 +206,10 @@ export default function AppSidebar({
         </div>
 
         {/* Navegación por grupos */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5 custom-scrollbar">
+        <nav
+          ref={navRef}
+          className={`flex-1 overflow-y-auto px-3 py-4 space-y-5 custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
+        >
           {GRUPOS.map((grupo) => {
             if (grupo.soloAdmin && !isAdmin) return null;
             if (grupo.soloDesarrollador && !esDesarrollador) return null;

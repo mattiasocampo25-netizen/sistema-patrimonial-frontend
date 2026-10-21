@@ -118,6 +118,39 @@ body {
   background: #80868b; 
 }
 
+/* El menu lateral es oscuro: la barra de scroll tiene que ser discreta.
+   Con el gris claro del tema claro, sobre el panel oscuro quedaba una linea
+   blanca cruzando el menu. */
+.bg-sidebar .custom-scrollbar {
+  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+}
+
+.bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.16);
+  border-color: transparent;
+}
+
+.bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.3);
+}
+
+/* Difuminado del borde cuando el menu se puede desplazar: sin esto, el
+   elemento del borde queda cortado a la mitad y no se ve que hay mas. */
+.nav-desborde-arriba {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
+}
+
+.nav-desborde-abajo {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent 100%);
+}
+
+.nav-desborde-arriba.nav-desborde-abajo {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+}
+
 /* Soporte de esquema de color */
 :root { color-scheme: light; }
 .dark { color-scheme: dark; }

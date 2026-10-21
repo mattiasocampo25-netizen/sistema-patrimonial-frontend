@@ -49,6 +49,7 @@
     "btoa": "readonly",
     "atob": "readonly",
     "CompressionStream": "readonly",
-    "DecompressionStream": "readonly"
+    "DecompressionStream": "readonly",
+    "ResizeObserver": "readonly"
   }
 }

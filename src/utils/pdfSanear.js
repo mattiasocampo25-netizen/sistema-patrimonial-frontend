@@ -79,11 +79,21 @@ async function cargarFuentes() {
 export async function prepararFuente(doc) {
   try {
     const { regular, bold } = await cargarFuentes();
+
+    // OJO con el quinto parametro de addFont:
+    //   addFont(archivo, familia, fontStyle, codificacion, style)
+    // El "style" es con el que despues se busca la variante con
+    // setFont(familia, estilo). Si no se pasa, jsPDF lo deja como
+    // "Identity-H" y la variante negrita queda registrada con otro nombre:
+    // setFont('OpenSans', 'bold') no la encuentra, avisa por consola y se
+    // queda con la normal. Todo lo que deberia ir en negrita (titulos,
+    // firmas, encabezados de tabla) se dibuja con el mismo peso que el
+    // resto del texto.
     doc.addFileToVFS('OpenSans-Regular.ttf', regular);
-    doc.addFont('OpenSans-Regular.ttf', FUENTE_PDF, 'normal');
+    doc.addFont('OpenSans-Regular.ttf', FUENTE_PDF, 'normal', 'Identity-H', 'normal');
     if (bold) {
       doc.addFileToVFS('OpenSans-Bold.ttf', bold);
-      doc.addFont('OpenSans-Bold.ttf', FUENTE_PDF, 'bold');
+      doc.addFont('OpenSans-Bold.ttf', FUENTE_PDF, 'bold', 'Identity-H', 'bold');
     }
     doc.setFont(FUENTE_PDF, 'normal');
     return true;

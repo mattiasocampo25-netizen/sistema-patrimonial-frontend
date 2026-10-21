@@ -68,13 +68,13 @@ export default function ErrorView({ variante = '404', onAccion }) {
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5">
           <button
             onClick={onAccion}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-bold shadow-sm hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-bold shadow-sm hover:bg-zinc-700 dark:hover:bg-surface-3 motion active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <i className="fa-solid fa-arrow-left text-xs"></i> {v.accion}
           </button>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 h-11 px-5 rounded-card text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-card text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion active:scale-95 cursor-pointer"
           >
             <i className="fa-solid fa-rotate-right text-xs"></i> Recargar
           </button>

@@ -1,6 +1,6 @@
 import { formatCI } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -115,50 +115,50 @@ export default function FuncionariosView({
       ) : (
       <div className="flex-1 bg-surface-1 dark:bg-surface-1/[0.04] shadow-sm border border-line/70 dark:border-white/10 rounded-panel flex flex-col overflow-hidden relative min-h-[450px]">
           <div className="flex-1 overflow-auto custom-scrollbar">
-            <table className="min-w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-surface-2/95 dark:bg-zinc-900/95 backdrop-blur-md z-10 border-b border-line/70 dark:border-white/10">
-                <tr className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-[0.14em]">
-                  <th className="py-4 pl-8 pr-4">Cédula de Identidad</th>
-                  <th className="px-4 py-4 w-1/3">Nombre Completo</th>
-                  <th className="px-4 py-4 w-1/3">Cargo Institucional</th>
-                  <th className="relative py-4 pl-4 pr-8 text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="bg-surface-1 dark:bg-surface-1 divide-y divide-zinc-100 dark:divide-zinc-800/60">
+            <Table sinContenedor minWidth={false} className="min-w-full text-left border-collapse">
+              <THead>
+                <TRow className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-[0.14em]">
+                  <TH className="py-4 pl-8 pr-4">Cédula de Identidad</TH>
+                  <TH className="px-4 py-4 w-1/3">Nombre Completo</TH>
+                  <TH className="px-4 py-4 w-1/3">Cargo Institucional</TH>
+                  <TH className="relative py-4 pl-4 pr-8 text-right">Acciones</TH>
+                </TRow>
+              </THead>
+              <TBody>
                 {funcionariosPaginados.map((f, idx) => {
                   if (f.esSeparador) {
                       return (
-                          <tr key={`sep-${f.letra}-${idx}`}>
-                              <td colSpan="4" className="py-2.5 pl-8 pr-4 bg-surface-2/70 dark:bg-surface-1/[0.02] border-y border-line dark:border-white/5">
+                          <TRow key={`sep-${f.letra}-${idx}`}>
+                              <TD colSpan="4" className="py-2.5 pl-8 pr-4 bg-surface-2/70 dark:bg-surface-1/[0.02] border-y border-line dark:border-white/5">
                                   <span className="inline-flex items-center justify-center h-6 w-6 rounded-lg bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[11px] font-bold">
                                       {f.letra}
                                   </span>
-                              </td>
-                          </tr>
+                              </TD>
+                          </TRow>
                       );
                   }
 
                   const inicial = f.nombre ? f.nombre.charAt(0).toUpperCase() : 'F';
 
                   return (
-                    <tr key={f.id} className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group">
-                        <td className="py-4 pl-8 pr-4 align-middle tabular-nums font-semibold text-content-1 dark:text-content-3 text-sm">
+                    <TRow key={f.id} className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group">
+                        <TD className="py-4 pl-8 pr-4 align-middle tabular-nums font-semibold text-content-1 dark:text-content-3 text-sm">
                             {formatCI(f.cedula)}
-                        </td>
-                        <td className="px-4 py-4 align-middle">
+                        </TD>
+                        <TD className="px-4 py-4 align-middle">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-zinc-200 font-bold text-xs">
                                     {inicial}
                                 </div>
                                 <span className="font-bold text-content-1 dark:text-white text-sm">{f.nombre}</span>
                             </div>
-                        </td>
-                        <td className="px-4 py-4 align-middle">
+                        </TD>
+                        <TD className="px-4 py-4 align-middle">
                             <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3">
                                 {f.cargo || 'Funcionario'}
                             </span>
-                        </td>
-                        <td className="relative py-4 pl-4 pr-8 align-middle text-right">
+                        </TD>
+                        <TD className="relative py-4 pl-4 pr-8 align-middle text-right">
                             <div className="flex items-center justify-end gap-1">
                                 <button
                                     onClick={() => handleEditFuncionario(f)}
@@ -175,13 +175,13 @@ export default function FuncionariosView({
                                     <i className={`fa-solid ${isAdmin ? 'fa-trash-can' : 'fa-paper-plane'} text-xs`}></i>
                                 </button>
                             </div>
-                        </td>
-                    </tr>
+                        </TD>
+                    </TRow>
                   );
                 })}
                 {funcionariosPurosDependencia.length === 0 && (
-                  <tr>
-                    <td colSpan="4">
+                  <TRow>
+                    <TD colSpan="4">
                         <EmptyState
                           icon="fa-users-slash"
                           titulo="No hay funcionarios en esta dependencia"
@@ -189,11 +189,11 @@ export default function FuncionariosView({
                           accionLabel="Registrar el primero"
                           onAccion={() => setIsNewFuncionarioModalOpen(true)}
                         />
-                    </td>
-                  </tr>
+                    </TD>
+                  </TRow>
                 )}
-              </tbody>
-            </table>
+              </TBody>
+            </Table>
           </div>
 
           {renderPaginationFuncionarios()}

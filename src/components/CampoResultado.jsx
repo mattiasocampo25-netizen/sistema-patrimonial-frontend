@@ -32,13 +32,13 @@ export default function CampoResultado({ escaneo, onVerFicha, onSeguir, onCerrar
         <div className="mt-6 grid grid-cols-2 gap-2">
           <button
             onClick={() => onVerFicha(bien)}
-            className="h-12 rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-sm font-black hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer active:scale-[0.98]"
+            className="h-12 rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-sm font-black hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer active:scale-[0.98]"
           >
             Ver ficha
           </button>
           <button
             onClick={onSeguir}
-            className="h-12 rounded-card border border-line dark:border-zinc-700 text-sm font-bold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer active:scale-[0.98]"
+            className="h-12 rounded-card border border-line dark:border-zinc-700 text-sm font-bold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer active:scale-[0.98]"
           >
             Seguir
           </button>

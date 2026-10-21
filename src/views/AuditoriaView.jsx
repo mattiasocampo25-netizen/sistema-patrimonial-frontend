@@ -1,6 +1,6 @@
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -334,40 +334,40 @@ export default function AuditoriaView({
           />
         </div>
         <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[720px]">
-            <thead className="bg-surface-2/70 dark:bg-surface-1/[0.02] border-b border-line/70 dark:border-white/10">
-              <tr className="text-[10px] sm:text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-[0.14em]">
-                <th className="py-3.5 pl-6 pr-4">Fecha</th>
-                <th className="px-4 py-3.5">Usuario</th>
-                <th className="px-4 py-3.5">Acción</th>
-                <th className="px-4 py-3.5">Evento</th>
-                <th className="py-3.5 pl-4 pr-6">Detalle</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-white/5">
+          <Table sinContenedor minWidth={false} className="w-full text-left border-collapse min-w-[720px]">
+            <THead>
+              <TRow className="text-[10px] sm:text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-[0.14em]">
+                <TH className="py-3.5 pl-6 pr-4">Fecha</TH>
+                <TH className="px-4 py-3.5">Usuario</TH>
+                <TH className="px-4 py-3.5">Acción</TH>
+                <TH className="px-4 py-3.5">Evento</TH>
+                <TH className="py-3.5 pl-4 pr-6">Detalle</TH>
+              </TRow>
+            </THead>
+            <TBody>
               {isLoadingAud ? (
-                <tr><td colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Cargando libro...</td></tr>
+                <TRow><TD colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Cargando libro...</TD></TRow>
               ) : auditoriaList.length === 0 ? (
-                <tr><td colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Sin eventos para los filtros aplicados.</td></tr>
+                <TRow><TD colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Sin eventos para los filtros aplicados.</TD></TRow>
               ) : (
                 auditoriaList.map(r => (
-                  <tr key={r.id} className="hover:bg-surface-2/70 dark:hover:bg-surface-1/[0.03] transition-colors">
-                    <td className="py-3 pl-6 pr-4 align-top text-xs tabular-nums text-content-3 dark:text-content-3 whitespace-nowrap">
+                  <TRow key={r.id} className="hover:bg-surface-2/70 dark:hover:bg-surface-1/[0.03] transition-colors">
+                    <TD className="py-3 pl-6 pr-4 align-top text-xs tabular-nums text-content-3 dark:text-content-3 whitespace-nowrap">
                       {r.fecha ? new Date(r.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
-                    </td>
-                    <td className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-content-3 whitespace-nowrap">{actorAud(r)}</td>
-                    <td className="px-4 py-3 align-top">
+                    </TD>
+                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-content-3 whitespace-nowrap">{actorAud(r)}</TD>
+                    <TD className="px-4 py-3 align-top">
                       <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${tonoAccionAud(r.accion)}`}>
                         {r.accion || 'OTROS'}
                       </span>
-                    </td>
-                    <td className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">{r.titulo || '-'}</td>
-                    <td className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px] truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</td>
-                  </tr>
+                    </TD>
+                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">{r.titulo || '-'}</TD>
+                    <TD className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px] truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</TD>
+                  </TRow>
                 ))
               )}
-            </tbody>
-          </table>
+            </TBody>
+          </Table>
         </div>
         <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-3.5 border-t border-line dark:border-white/10">
           <span className="text-xs text-content-3 font-medium">

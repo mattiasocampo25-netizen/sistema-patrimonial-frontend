@@ -75,7 +75,7 @@ export default function SelectorPersona({
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-required={requerido || undefined}
-        className={`w-full ${altura} rounded-control border bg-surface-1 dark:bg-zinc-900 px-4 text-left font-medium outline-none transition-all focus:ring-2 flex items-center gap-2 cursor-pointer ${
+        className={`w-full ${altura} rounded-control border bg-surface-1 dark:bg-zinc-900 px-4 text-left font-medium outline-none motion focus:ring-2 flex items-center gap-2 cursor-pointer ${
           requerido && !valor ? 'border-rose-300 dark:border-rose-800' : 'border-line dark:border-white/10'
         } focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-zinc-900/5 dark:focus:ring-white/10 hover:border-line-strong dark:hover:border-white/20`}
       >

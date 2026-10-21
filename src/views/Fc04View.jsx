@@ -49,7 +49,7 @@ export default function Fc04View({
               const origenObj = ORIGENES_FC04.find(o => o.id === fc.origenMovimiento);
               const isAlta = fc.origenMovimiento !== 'B';
               return (
-                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand-primary/50 transition-all group`}>
+                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand-primary/50 motion group`}>
                   <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-4">
                       <div className={`flex h-12 w-12 items-center justify-center rounded-card text-xl shadow-2xs ${isAlta ? 'bg-surface-3 text-content-1 dark:bg-surface-2 dark:text-content-3' : 'bg-brand-light text-brand-dark dark:bg-brand-primary/20 dark:text-brand-accent'}`}>

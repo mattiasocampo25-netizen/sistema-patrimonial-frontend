@@ -7,7 +7,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
-import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
 // Es la vista más grande del sistema; recibe todo por props.
@@ -648,30 +648,30 @@ export default function InventarioView({
                     </div>
                     ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                      <table className="anim-rows w-full text-left border-collapse min-w-[900px]">
+                      <Table sinContenedor minWidth={false} className="anim-rows w-full text-left border-collapse min-w-[900px]">
 
-                                                  <thead className="bg-surface-2/50 dark:bg-zinc-900/50 border-b border-line/50 dark:border-zinc-800/50">
-                          <tr className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
-                            <th className="py-4 pl-4 sm:pl-5 pr-1 w-[40px] align-middle">
+                                                  <THead>
+                          <TRow className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
+                            <TH className="py-4 pl-4 sm:pl-5 pr-1 w-[40px] align-middle">
                               <input
                                 type="checkbox" title="Seleccionar página" aria-label="Seleccionar página"
                                 checked={itemsPaginados.length > 0 && itemsPaginados.every(i => seleccionados.includes(i.id))}
                                 onChange={(e) => { if (e.target.checked) { itemsPaginados.forEach(i => { if (!seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } else { itemsPaginados.forEach(i => { if (seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } }}
                                 className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle"
                               />
-                            </th>
-                            <th className="py-4 pr-4 w-[38%]">
+                            </TH>
+                            <TH className="py-4 pr-4 w-[38%]">
                               <button onClick={() => ciclarOrden('rotulo')} title="Ordenar por rótulo" className="inline-flex items-center gap-1.5 uppercase tracking-widest hover:text-content-1 dark:hover:text-white transition-colors cursor-pointer">
                                 Identificación y Descripción <i className={`fa-solid ${flechaOrden('rotulo')} text-[9px]`}></i>
                               </button>
-                            </th>
-                            <th className="px-4 py-4 w-[28%]">Localización y Custodio</th>
-                            <th className="px-4 py-4 w-[18%]">Condición y Estado</th>
-                            <th className="py-4 pl-4 pr-6 sm:pr-8 text-right w-[16%]">Acciones</th>
-                          </tr>
-                        </thead>
+                            </TH>
+                            <TH className="px-4 py-4 w-[28%]">Localización y Custodio</TH>
+                            <TH className="px-4 py-4 w-[18%]">Condición y Estado</TH>
+                            <TH className="py-4 pl-4 pr-6 sm:pr-8 text-right w-[16%]">Acciones</TH>
+                          </TRow>
+                        </THead>
 
-                        <tbody className="divide-y divide-zinc-100/80 dark:divide-zinc-800/30">
+                        <TBody>
                           {itemsPaginados.map((item) => {
 
                             const getCondicionBadge = (cond) => {
@@ -684,14 +684,14 @@ export default function InventarioView({
                             };
 
                             return (
-                              <tr key={item.id} className={`hover:bg-surface-2/50 dark:hover:bg-zinc-800/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
+                              <TRow key={item.id} className={`hover:bg-surface-2/50 dark:hover:bg-zinc-800/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
 
                                 {/* Selección */}
-                                <td className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
+                                <TD className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
                                   <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle" />
-                                </td>
+                                </TD>
                                 {/* Columna 1: Identificación */}
-                                <td className={`pr-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
+                                <TD className={`pr-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex items-start gap-3.5">
                                     <div className={`shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-zinc-800/50 text-content-2 dark:text-content-3 text-xs ${compacto ? 'hidden' : 'mt-1 flex h-10 w-10'}`}>
                                       <i className="fa-solid fa-tag text-sm"></i>
@@ -718,10 +718,10 @@ export default function InventarioView({
                                       )}
                                     </div>
                                   </div>
-                                </td>
+                                </TD>
 
                                 {/* Columna 2: Localización y Custodio */}
-                                <td className={`px-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
+                                <TD className={`px-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-emerald-500 text-xs shrink-0"></i>
@@ -743,10 +743,10 @@ export default function InventarioView({
                                       );
                                     })()}
                                   </div>
-                                </td>
+                                </TD>
 
                                 {/* Columna 3: Condición y QR (Botón interactivo) */}
-                                <td className={`px-4 align-middle ${compacto ? 'py-2' : 'py-4'}`} >
+                                <TD className={`px-4 align-middle ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span className={`inline-flex items-center justify-center px-2.5 py-1 min-w-[76px] text-center rounded-control text-[11px] font-bold border uppercase tracking-wider ${getCondicionBadge(item.estadoConservacion)}`}>
                                       {item.estadoConservacion || 'Regular'}
@@ -766,10 +766,10 @@ export default function InventarioView({
                                       <span>{item.hasQR ? 'Con QR' : 'Sin QR'}</span>
                                     </button>)}
                                   </div>
-                                </td>
+                                </TD>
 
                                 {/* Columna 4: Matriz Completa de Acciones Restaurada */}
-                                <td className={`pl-4 pr-6 sm:pr-8 align-top text-right ${compacto ? 'py-2' : 'py-4'}`} >
+                                <TD className={`pl-4 pr-6 sm:pr-8 align-top text-right ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex items-center justify-end gap-1.5">
 
                                     {/* Ficha 360 y trazabilidad */}
@@ -833,15 +833,15 @@ export default function InventarioView({
                                     </button>
 
                                   </div>
-                                </td>
+                                </TD>
 
-                              </tr>
+                              </TRow>
                             );
                           })}
 
                           {itemsPaginados.length === 0 && (
-                            <tr>
-                              <td colSpan="5" className="p-0">
+                            <TRow>
+                              <TD colSpan="5" className="p-0">
                                 <EmptyState
                                   icon={hasFilters ? 'fa-filter-circle-xmark' : 'fa-boxes-packing'}
                                   titulo={hasFilters ? 'Ningún bien coincide con los filtros' : 'Todavía no hay bienes cargados'}
@@ -851,12 +851,12 @@ export default function InventarioView({
                                   accionLabel={hasFilters ? 'Restablecer filtros' : 'Añadir bien'}
                                   onAccion={hasFilters ? clearAllFilters : () => { setBienEditing(null); setIsBienModalOpen(true); }}
                                 />
-                              </td>
-                            </tr>
+                              </TD>
+                            </TRow>
                           )}
-                        </tbody>
+                        </TBody>
 
-                      </table>
+                      </Table>
                     </div>
                     )}
 

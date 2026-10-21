@@ -43,7 +43,7 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                                 name="nombre"
                                 defaultValue={funcionarioToEdit.nombre}
                                 required
-                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all"
+                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion"
                             />
                         </div>
 
@@ -70,7 +70,7 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                                 name="cargo"
                                 defaultValue={funcionarioToEdit.cargo || ''}
                                 placeholder="Ej: Asistente Administrativo"
-                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all"
+                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion"
                             />
                         </div>
                     </div>

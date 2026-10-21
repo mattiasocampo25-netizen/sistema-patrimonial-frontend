@@ -40,18 +40,18 @@ import { pendienteDeFirma } from './utils/fc10Firmas';
 import { detectarCambios, fusionarSobreFresco, detectarConflictos, describirCampos } from './services/escrituraSegura';
 import { normalizarBien } from './utils/bienPublico';
 import MaintenanceScreen from './components/MaintenanceScreen';
-import AyudaView from './views/AyudaView';
-import ResumenView from './views/ResumenView';
-import UsuariosView from './views/UsuariosView';
-import AnunciosView from './views/AnunciosView';
-import Fc04View from './views/Fc04View';
-import Fc10View from './views/Fc10View';
-import Fc11View from './views/Fc11View';
-import FuncionariosView from './views/FuncionariosView';
-import AprobacionesView from './views/AprobacionesView';
-import AuditoriaView from './views/AuditoriaView';
-import DashboardView from './views/DashboardView';
-import InventarioView from './views/InventarioView';
+const AyudaView = lazyConReintento(() => import('./views/AyudaView'));
+const ResumenView = lazyConReintento(() => import('./views/ResumenView'));
+const UsuariosView = lazyConReintento(() => import('./views/UsuariosView'));
+const AnunciosView = lazyConReintento(() => import('./views/AnunciosView'));
+const Fc04View = lazyConReintento(() => import('./views/Fc04View'));
+const Fc10View = lazyConReintento(() => import('./views/Fc10View'));
+const Fc11View = lazyConReintento(() => import('./views/Fc11View'));
+const FuncionariosView = lazyConReintento(() => import('./views/FuncionariosView'));
+const AprobacionesView = lazyConReintento(() => import('./views/AprobacionesView'));
+const AuditoriaView = lazyConReintento(() => import('./views/AuditoriaView'));
+const DashboardView = lazyConReintento(() => import('./views/DashboardView'));
+const InventarioView = lazyConReintento(() => import('./views/InventarioView'));
 import { processOfflineQueue, enqueueOfflineAction } from './services/offlineSyncService';
 import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
@@ -66,6 +66,28 @@ import {
 // inflar el bundle inicial (ver executeProcessBienesCSV y pdfGenerators).
 // Nota: STYLES y constantes globales viven en constants/appConstants
 // (Fase 0 del split de este monolito).
+
+/**
+ * Esqueleto de carga de un modulo.
+ *
+ * Las vistas se descargan cuando se abren por primera vez. Mientras llega,
+ * esto evita el salto de layout: misma altura, misma estructura.
+ */
+function CargaModulo() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 w-full" role="status" aria-label="Cargando modulo">
+      <div className="h-8 w-56 rounded-control bg-surface-2 motion" />
+      <div className="mt-3 h-4 w-80 max-w-full rounded-control bg-surface-2 motion" />
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-28 rounded-card bg-surface-2 motion" />
+        ))}
+      </div>
+      <div className="mt-6 h-72 rounded-card bg-surface-2 motion" />
+      <span className="sr-only">Cargando...</span>
+    </div>
+  );
+}
 
 export default function App() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -1532,8 +1554,8 @@ useEffect(() => {
           etiquetaTodos={ti('inv.por_pagina')}
           titulo={ti('inv.por_pagina')}
         />
-        <button disabled={currentPage <= 1} onClick={() => setCurrentPage(prev => prev - 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.anterior')}</button>
-        <button disabled={currentPage >= totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.siguiente')}</button>
+        <button disabled={currentPage <= 1} onClick={() => setCurrentPage(prev => prev - 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer">{ti('inv.anterior')}</button>
+        <button disabled={currentPage >= totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer">{ti('inv.siguiente')}</button>
       </div>
     </div>
   );
@@ -1740,7 +1762,7 @@ if (publicBienId) {
         <div className="pt-2">
           <button 
             onClick={() => window.location.href = window.location.origin} 
-            className="w-full py-3.5 px-4 rounded-card bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-98"
+            className="w-full py-3.5 px-4 rounded-card bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold motion cursor-pointer shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-98"
           >
             <i className="fa-solid fa-arrow-left text-xs"></i> Ir a la Plataforma Principal
           </button>
@@ -1755,7 +1777,7 @@ if (publicBienId) {
             <a
               href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`}
               title="Abrir en modo kiosco (pantalla completa con temporizador)"
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 motion cursor-pointer"
             >
               <i className="fa-solid fa-display text-[10px]"></i>
               <span className="hidden sm:inline">Kiosco</span>
@@ -1795,7 +1817,7 @@ if (publicBienId) {
   }
 
   return (
-    <div className={`flex h-dvh overflow-hidden bg-canvas ${darkMode ? 'dark' : ''} transition-colors duration-300 text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>
+    <div className={`flex h-dvh overflow-hidden bg-canvas ${darkMode ? 'dark' : ''} transition-colors duration-[var(--dur-base)] text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>
       <a href="#contenido" className="skip-link px-4 py-2 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-bold shadow-xl">{ti('app.saltar')}</a>
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileUpload} />
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputFuncionariosRef} onChange={handleFileUploadFuncionarios} />
@@ -1803,13 +1825,13 @@ if (publicBienId) {
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none">
         
         {!isOnline && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 transition-all animate-slide-up">
+          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 motion animate-slide-up">
             <i className="fa-solid fa-wifi-slash text-base"></i>
             <span className="flex-1">{ti('off.sin_conexion')}{colaOffline > 0 ? ` · ${colaOffline} ${colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}` : ''}</span>
           </div>
         )}
         {isOnline && colaOffline > 0 && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-sky-600/90 text-white backdrop-blur-md border border-sky-400/30 transition-all animate-slide-up">
+          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-sky-600/90 text-white backdrop-blur-md border border-sky-400/30 motion animate-slide-up">
             <i className="fa-solid fa-cloud-arrow-up text-base"></i>
             <span className="flex-1">{ti('off.sinc')} {colaOffline} {colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}...</span>
           </div>
@@ -1818,7 +1840,7 @@ if (publicBienId) {
         {toasts.map(t => (
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
-          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-surface-1/95 dark:bg-zinc-900/95 text-content-1 dark:text-zinc-100 backdrop-blur-xl border border-line/80 dark:border-zinc-800 transition-all animate-slide-up">
+          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-surface-1/95 dark:bg-zinc-900/95 text-content-1 dark:text-zinc-100 backdrop-blur-xl border border-line/80 dark:border-zinc-800 motion animate-slide-up">
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${
               t.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50' : 
               t.type === 'error' ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 
@@ -1836,7 +1858,7 @@ if (publicBienId) {
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-control text-[11px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-[11px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>
@@ -1894,6 +1916,7 @@ if (publicBienId) {
           </div>
         ) : null}
       >
+            <Suspense fallback={<CargaModulo />}>
             <div key={activeTab} className="tab-enter mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-full flex flex-col">
                 {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} />)}
 
@@ -1913,6 +1936,7 @@ if (publicBienId) {
                 {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
                 {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} />)}
             </div>
+            </Suspense>
       </AppShell>
 
       {/* Modales y componentes flotantes (carga diferida) */}

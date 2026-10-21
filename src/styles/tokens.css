@@ -214,6 +214,28 @@
 }
 
 /* ============================================================================
+ * Movimiento: una sola transicion para toda la app.
+ *
+ * La clase `motion` sustituye a `transition-all`. Antes cada archivo
+ * elegia su propia duracion (150 ms por defecto de Tailwind, o un
+ * `duration-300` pegado al lado) y la curva era siempre la misma: el mismo
+ * hover se sentia distinto en cada modulo. Aqui las tres cosas salen de los
+ * tokens: que propiedades se animan, cuanto y con que curva.
+ *
+ * Se queda en `components` a proposito: las utilidades de Tailwind van
+ * despues, asi que un `duration-*` explicito sigue mandando sobre el
+ * valor por defecto.
+ * ========================================================================== */
+@layer components {
+  .motion {
+    transition-property: color, background-color, border-color, text-decoration-color,
+      fill, stroke, box-shadow, transform, opacity;
+    transition-duration: var(--dur-base);
+    transition-timing-function: var(--ease-out);
+  }
+}
+
+/* ============================================================================
  * Foco visible, una sola vez para toda la app.
  * ========================================================================== */
 @layer base {

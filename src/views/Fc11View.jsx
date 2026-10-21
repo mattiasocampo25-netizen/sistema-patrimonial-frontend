@@ -48,7 +48,7 @@ export default function Fc11View({
               const depDestinataria = fc.dependenciaDestinataria || fc.destinatario || '';
               const esSalida = depRemitente === dependenciaActual;
               return (
-                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand-primary/50 transition-all group relative overflow-hidden`}>
+                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand-primary/50 motion group relative overflow-hidden`}>
                   <div className={`absolute top-0 left-0 w-full h-1 ${esSalida ? 'bg-zinc-500' : 'bg-brand-primary'}`}></div>
                   <div className="flex justify-between items-start mb-5">
                     <div className="flex items-center gap-3">

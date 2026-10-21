@@ -383,14 +383,14 @@ export function useFuncionarios({
           <button 
             disabled={currentPaginaFuncionarios <= 1} 
             onClick={() => setCurrentPaginaFuncionarios(prev => prev - 1)} 
-            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
+            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer"
           >
             Anterior
           </button>
           <button 
             disabled={currentPaginaFuncionarios >= totalPagesFuncs || totalPagesFuncs === 0} 
             onClick={() => setCurrentPaginaFuncionarios(prev => prev + 1)} 
-            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
+            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer"
           >
             Siguiente
           </button>

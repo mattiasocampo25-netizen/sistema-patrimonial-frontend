@@ -106,7 +106,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-control border pl-10 pr-4 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border pl-10 pr-4 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary motion disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -144,7 +144,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-control border pl-10 pr-10 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border pl-10 pr-10 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary motion disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -174,7 +174,7 @@ export default function LoginScreen({
                 type="submit"
                 disabled={isProcessing}
                 aria-busy={isProcessing || undefined}
-                className="w-full rounded-control bg-brand-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none transition-all cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                className="w-full rounded-control bg-brand-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
               >
                 {isProcessing ? (
                   <>
@@ -197,13 +197,13 @@ export default function LoginScreen({
       {/* TOASTS FLOTANTES */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none">
         {toasts?.map(t => (
-          <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-bold bg-surface-1 text-content-1 dark:bg-surface-1 dark:text-white border border-line dark:border-line transition-all animate-slide-up login-rise login-rise-2">
+          <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-bold bg-surface-1 text-content-1 dark:bg-surface-1 dark:text-white border border-line dark:border-line motion animate-slide-up login-rise login-rise-2">
             <i className={`fa-solid ${t.type === 'success' ? 'fa-circle-check text-emerald-500' : t.type === 'error' ? 'fa-circle-exclamation text-rose-500' : t.type === 'warning' ? 'fa-triangle-exclamation text-amber-500' : 'fa-circle-info text-brand-primary'} text-base`}></i>
             <span className="flex-1">{t.message}</span>
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-darkbg-hover dark:text-content-1 dark:hover:bg-surface-1 transition-all cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-darkbg-hover dark:text-content-1 dark:hover:bg-surface-1 motion cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>
@@ -229,7 +229,7 @@ export default function LoginScreen({
             </div>
             <button
               onClick={() => setShowRecoveryModal(false)}
-              className="mt-6 w-full py-4 rounded-control bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-surface-1 dark:text-content-1 dark:hover:bg-surface-3 text-sm font-bold transition-all cursor-pointer shadow-md active:scale-[0.98]"
+              className="mt-6 w-full py-4 rounded-control bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-surface-1 dark:text-content-1 dark:hover:bg-surface-3 text-sm font-bold motion cursor-pointer shadow-md active:scale-[0.98]"
             >
               Entendido
             </button>

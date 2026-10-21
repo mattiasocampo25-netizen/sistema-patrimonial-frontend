@@ -252,7 +252,7 @@ export default function RestoreBackupModal({ restore }) {
                 <span className="font-mono">{progreso.hechas}/{progreso.total}</span>
               </div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sky-200/70 dark:bg-sky-500/20">
-                <div className="h-full rounded-full bg-sky-500 transition-all duration-300" style={{ width: `${progreso.total ? (progreso.hechas / progreso.total) * 100 : 0}%` }} />
+                <div className="h-full rounded-full bg-sky-500 motion duration-[var(--dur-base)]" style={{ width: `${progreso.total ? (progreso.hechas / progreso.total) * 100 : 0}%` }} />
               </div>
               <p className="mt-1.5 text-[10px] font-medium text-sky-700/80 dark:text-sky-400/80">
                 No cierres la ventana ni la pestaña mientras restaura.

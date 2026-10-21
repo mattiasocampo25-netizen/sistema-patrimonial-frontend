@@ -8,16 +8,31 @@ import React from 'react';
  * ("anim-rows", "min-w-[900px]", scroll horizontal) en un solo lugar.
  */
 
-export function Table({ className = '', contenedorClassName = '', children, minWidth = 900, ...resto }) {
+export function Table({
+  className = '',
+  contenedorClassName = '',
+  children,
+  minWidth = 900,
+  // Las vistas que ya traen su propio contenedor con scroll pasan
+  // sinContenedor: si no, habria dos barras de desplazamiento.
+  sinContenedor = false,
+  ...resto
+}) {
+  const tabla = (
+    <table
+      className={`w-full text-left border-collapse ${minWidth ? 'min-w-[900px]' : ''} ${className}`}
+      style={minWidth ? { minWidth: typeof minWidth === 'number' ? `${minWidth}px` : minWidth } : undefined}
+      {...resto}
+    >
+      {children}
+    </table>
+  );
+
+  if (sinContenedor) return tabla;
+
   return (
     <div className={`overflow-x-auto custom-scrollbar ${contenedorClassName}`}>
-      <table
-        className={`w-full text-left border-collapse ${minWidth ? 'min-w-[900px]' : ''} ${className}`}
-        style={minWidth ? { minWidth: typeof minWidth === 'number' ? `${minWidth}px` : minWidth } : undefined}
-        {...resto}
-      >
-        {children}
-      </table>
+      {tabla}
     </div>
   );
 }
@@ -45,17 +60,21 @@ export function TRow({ className = '', children, ...resto }) {
 }
 
 export function TH({ className = '', children, ...resto }) {
+  // Sin text-left: hay tablas con la ultima columna a la derecha y esa
+  // alineacion tiene que ganarle a la del sistema.
   return (
-    <th className={`px-3 py-3 text-left font-bold whitespace-nowrap ${className}`} {...resto}>
+    <th className={`px-3 py-3 font-bold whitespace-nowrap ${className}`} {...resto}>
       {children}
     </th>
   );
 }
 
 export function TD({ className = '', children, mono = false, truncate = false, ...resto }) {
+  // Sin align-middle: el inventario alinea sus celdas arriba y eso tiene que
+  // ganarle al valor del sistema.
   return (
     <td
-      className={`px-3 py-2.5 text-body text-content-1 align-middle ${mono ? 'font-mono tabular-nums' : ''} ${
+      className={`px-3 py-2 text-body text-content-1 ${mono ? 'font-mono tabular-nums' : ''} ${
         truncate ? 'max-w-0 truncate' : ''
       } ${className}`}
       {...resto}
@@ -66,8 +85,10 @@ export function TD({ className = '', children, mono = false, truncate = false, .
 }
 
 export function TBody({ className = '', children, ...resto }) {
+  // Sin divide-y: la linea la pone TRow con border-b. Las dos a la vez
+  // dibujaban una linea de 2px.
   return (
-    <tbody className={`divide-y divide-line/60 ${className}`} {...resto}>
+    <tbody className={`${className}`} {...resto}>
       {children}
     </tbody>
   );

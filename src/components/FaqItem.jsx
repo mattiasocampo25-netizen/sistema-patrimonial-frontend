@@ -5,7 +5,7 @@ function FaqItem({ question, answer, categoria }) {
   const [isOpen, setIsOpen] = useState(false); 
   
   return ( 
-    <div className="bg-surface-1 dark:bg-surface-1 rounded-card border border-line/80 dark:border-line shadow-xs hover:shadow-md overflow-hidden transition-all duration-300 mb-3"> 
+    <div className="bg-surface-1 dark:bg-surface-1 rounded-card border border-line/80 dark:border-line shadow-xs hover:shadow-md overflow-hidden motion duration-[var(--dur-base)] mb-3"> 
       <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left px-6 py-4 flex justify-between items-center text-content-1 dark:text-white focus:outline-none hover:bg-surface-2/80 dark:hover:bg-darkbg-hover transition-colors cursor-pointer"> 
         <span className="flex items-center gap-3 text-xs sm:text-sm font-bold text-content-1 dark:text-zinc-200">
           {categoria && (
@@ -18,9 +18,9 @@ function FaqItem({ question, answer, categoria }) {
           </span>
           {question}
         </span> 
-        <i className={`fa-solid fa-chevron-down text-content-3 transition-transform duration-300 text-xs ${isOpen ? 'rotate-180 text-brand-primary' : ''}`}></i> 
+        <i className={`fa-solid fa-chevron-down text-content-3 transition-transform duration-[var(--dur-base)] text-xs ${isOpen ? 'rotate-180 text-brand-primary' : ''}`}></i> 
       </button> 
-      <div className={`transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}> 
+      <div className={`motion duration-[var(--dur-base)] ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}> 
         <div className="px-6 pb-5 pt-0 text-xs sm:text-sm text-content-2 dark:text-content-3 leading-relaxed border-t border-line dark:border-line/60 pt-4 mt-1">{answer}</div>
       </div> 
     </div>

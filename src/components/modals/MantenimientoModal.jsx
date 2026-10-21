@@ -59,7 +59,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ej: Estamos mejorando el sistema"
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion"
             />
           </div>
 
@@ -70,7 +70,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
               placeholder="Ej: El acceso está pausado por trabajos programados..."
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion resize-none"
             />
           </div>
 
@@ -81,19 +81,19 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={mejoras}
               onChange={(e) => setMejoras(e.target.value)}
               placeholder={"Ej:\nNuevo buscador con tildes\nReportes FC más rápidos"}
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion resize-none"
             />
           </div>
         </div>
 
         <div className="flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
-          <button onClick={onClose} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+          <button onClick={onClose} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Cancelar
           </button>
           <button
             onClick={() => onSave({ en_mantenimiento: activo, titulo: titulo.trim(), mensaje: mensaje.trim(), mejoras: mejoras.split('\n').map(s => s.trim()).filter(Boolean) })}
             disabled={isSaving}
-            className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+            className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
           >
             {isSaving ? 'Guardando...' : 'Publicar aviso'}
           </button>

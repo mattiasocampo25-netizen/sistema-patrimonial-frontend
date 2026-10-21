@@ -28,7 +28,7 @@ export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual
               <button
                 onClick={alternarModoCampo}
                 title={modoCampo ? 'Salir del modo campo' : 'Modo campo: resultado grande tras escanear'}
-                className={`flex h-9 shrink-0 items-center gap-2 rounded-control px-3 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${modoCampo ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10'}`}
+                className={`flex h-9 shrink-0 items-center gap-2 rounded-control px-3 text-[11px] font-black uppercase tracking-wider motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${modoCampo ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10'}`}
               >
                 <i className="fa-solid fa-person-walking text-xs"></i>
                 <span className="hidden sm:inline">Campo</span>

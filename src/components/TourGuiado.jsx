@@ -120,7 +120,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
         <p className="text-[13px] text-content-3 dark:text-content-3 mt-1.5 leading-relaxed">{step.texto}</p>
         <div className="flex items-center gap-1.5 mt-4 mb-4">
           {pasos.map((_, i) => (
-            <span key={i} className={`h-1.5 rounded-full transition-all ${i === paso ? 'w-6 bg-brand-primary' : i < paso ? 'w-1.5 bg-brand-primary/50' : 'w-1.5 bg-surface-3 dark:bg-zinc-700'}`}></span>
+            <span key={i} className={`h-1.5 rounded-full motion ${i === paso ? 'w-6 bg-brand-primary' : i < paso ? 'w-1.5 bg-brand-primary/50' : 'w-1.5 bg-surface-3 dark:bg-zinc-700'}`}></span>
           ))}
         </div>
         <div className="flex items-center gap-2">
@@ -128,13 +128,13 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
             Omitir tour
           </button>
           {paso > 0 && (
-            <button onClick={() => setPaso(paso - 1)} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer">
+            <button onClick={() => setPaso(paso - 1)} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer">
               Atrás
             </button>
           )}
           <button
             onClick={() => (ultimo ? onClose(true) : setPaso(paso + 1))}
-            className="h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer"
+            className="h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer"
           >
             {ultimo ? 'Finalizar' : 'Siguiente →'}
           </button>

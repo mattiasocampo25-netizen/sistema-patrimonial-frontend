@@ -72,7 +72,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                 Evidencia fotográfica · {(bien.fotos || []).length}/5
               </p>
               <label
-                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3'}`}
+                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3'}`}
                 title="Tomar o subir foto del estado físico"
               >
                 <i className={`fa-solid ${subiendoFoto ? 'fa-circle-notch fa-spin' : 'fa-camera'}`}></i>
@@ -148,11 +148,11 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
 
         <div className="flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
           {onVerEnInventario && (
-            <button onClick={() => onVerEnInventario(bien)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
+            <button onClick={() => onVerEnInventario(bien)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
               <i className="fa-solid fa-boxes-stacked mr-1.5 text-xs"></i>Ver en inventario
             </button>
           )}
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Cerrar
           </button>
         </div>

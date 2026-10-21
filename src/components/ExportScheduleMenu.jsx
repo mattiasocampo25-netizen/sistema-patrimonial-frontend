@@ -36,7 +36,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
         onClick={() => setAbierto(v => !v)}
         disabled={disabled}
         title="Exportación programada"
-        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
       >
         <i className={`fa-solid ${activa ? 'fa-clock text-brand-primary dark:text-brand-accent' : 'fa-clock'}`}></i>
         <span className="hidden lg:inline">Programar</span>
@@ -76,7 +76,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
                 <button
                   key={f.id}
                   onClick={() => cambiar({ formato: f.id })}
-                  className={`h-9 rounded-control text-xs font-bold border transition-all cursor-pointer ${
+                  className={`h-9 rounded-control text-xs font-bold border motion cursor-pointer ${
                     cfg.formato === f.id
                       ? 'bg-brand-primary text-white border-brand-primary shadow-xs'
                       : 'bg-surface-2 dark:bg-surface-1/5 text-content-2 dark:text-content-3 border-line dark:border-white/10 hover:bg-surface-3'
@@ -103,7 +103,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
             <button
               onClick={() => { setAbierto(false); onEjecutarAhora && onEjecutarAhora(); }}
               disabled={disabled}
-              className="w-full mt-2 h-9 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-xs font-bold hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="w-full mt-2 h-9 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-xs font-bold hover:bg-zinc-700 dark:hover:bg-surface-3 motion active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               <i className="fa-solid fa-download text-[10px]"></i> Generar ahora
             </button>

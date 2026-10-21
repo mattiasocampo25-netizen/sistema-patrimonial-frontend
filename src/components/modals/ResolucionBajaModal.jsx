@@ -54,7 +54,7 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
                     <label className={STYLES.label} htmlFor="motivo-resolucion">
                         Motivo / Observación {esAprobar && <span className="text-content-3 font-normal lowercase">(Opcional)</span>}
                     </label>
-                    <div className={`absolute -inset-0.5 rounded-card blur opacity-0 group-focus-within:opacity-20 transition duration-500 ${esAprobar ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-gradient-to-r from-zinc-500 to-zinc-700'}`}></div>
+                    <div className={`absolute -inset-0.5 rounded-card blur opacity-0 group-focus-within:opacity-20 transition duration-[var(--dur-slow)] ${esAprobar ? 'bg-gradient-to-r from-red-500 to-rose-500' : 'bg-gradient-to-r from-zinc-500 to-zinc-700'}`}></div>
                     <textarea
                         id="motivo-resolucion"
                         required={!esAprobar}

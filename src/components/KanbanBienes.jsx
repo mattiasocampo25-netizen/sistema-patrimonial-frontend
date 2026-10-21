@@ -79,7 +79,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
               onDragOver={(e) => { e.preventDefault(); setColActiva(col.estado); }}
               onDragLeave={() => setColActiva((a) => (a === col.estado ? null : a))}
               onDrop={() => alSoltar(col.estado)}
-              className={`flex flex-col rounded-card border p-2.5 min-h-[140px] transition-all duration-200 ${
+              className={`flex flex-col rounded-card border p-2.5 min-h-[140px] motion duration-[var(--dur-base)] ${
                 resaltada
                   ? 'border-brand-primary bg-brand-primary/[0.06] shadow-md'
                   : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1/[0.03]'
@@ -100,7 +100,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                     draggable={Boolean(onMover)}
                     onDragStart={() => setDragId(b.id)}
                     onDragEnd={() => { setDragId(null); setColActiva(null); }}
-                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs transition-all ${dragId === b.id ? 'opacity-40' : 'hover:border-brand-primary/40 hover:shadow-sm card-lift'}`}
+                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs motion ${dragId === b.id ? 'opacity-40' : 'hover:border-brand-primary/40 hover:shadow-sm card-lift'}`}
                   >
                     <div className="flex items-start gap-2">
                       {onOpenFicha && (

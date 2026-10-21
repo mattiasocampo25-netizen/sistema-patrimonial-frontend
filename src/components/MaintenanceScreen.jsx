@@ -52,7 +52,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
                 <span className="text-[11px] text-slate-300 font-mono">{transcurrido}</span>
               </div>
               <div className="h-1.5 bg-surface-1/10 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: '60%' }}></div>
+                <div className="h-full bg-amber-500 rounded-full motion duration-[var(--dur-slow)]" style={{ width: '60%' }}></div>
               </div>
               {estimado && (
                 <div className="mt-2 flex justify-between">

@@ -47,13 +47,13 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
               onChange={(e) => setNuevo(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
               placeholder="Nueva ubicación... Ej: Dirección General TIC"
-              className="flex-1 rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 h-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all"
+              className="flex-1 rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 h-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion"
             />
             <button
               onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
               disabled={isSaving || !nuevo.trim()}
               title="Agregar ubicación"
-              className="h-11 px-4 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-40 shrink-0"
+              className="h-11 px-4 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-40 shrink-0"
             >
               <i className="fa-solid fa-plus text-xs mr-1.5"></i>Agregar
             </button>
@@ -98,14 +98,14 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
                         <span className="block text-[13px] font-bold text-content-1 dark:text-zinc-200 truncate" title={u.nombre}>{u.nombre}</span>
                         <span className="block text-[11px] text-content-3 tabular-nums">{c.bienes} bienes · {c.funcionarios} funcionarios</span>
                       </span>
-                      <button onClick={() => empezarEdicion(u)} title="Renombrar" aria-label="Renombrar" className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer shrink-0">
+                      <button onClick={() => empezarEdicion(u)} title="Renombrar" aria-label="Renombrar" className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 motion cursor-pointer shrink-0">
                         <i className="fa-solid fa-pen text-xs"></i>
                       </button>
                       <button
                         onClick={() => onDelete(u.id, u.nombre)}
                         title={enUso ? 'En uso: no se puede eliminar' : 'Eliminar ubicación'}
                         disabled={enUso}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="fa-solid fa-trash-can text-xs"></i>
                       </button>
@@ -119,7 +119,7 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
         </div>
 
         <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Listo
           </button>
         </div>

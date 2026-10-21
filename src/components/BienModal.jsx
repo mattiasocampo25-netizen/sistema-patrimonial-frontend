@@ -243,7 +243,7 @@ export default function BienModal({
               <div className="mx-8 mt-6 mb-0 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
                 <i className="fa-solid fa-history text-amber-600 dark:text-amber-400 text-sm"></i>
                 <p className="flex-1 min-w-[200px] text-xs font-bold text-amber-700 dark:text-amber-300">Tienes un borrador sin guardar de este formulario.</p>
-                <button type="button" onClick={continuarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer">Continuar</button>
+                <button type="button" onClick={continuarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
                 <button type="button" onClick={limpiarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
               </div>
             )}

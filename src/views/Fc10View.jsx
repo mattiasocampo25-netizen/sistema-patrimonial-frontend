@@ -108,7 +108,7 @@ export default function Fc10View({
               const estaCambiando = cambiandoEstado[fc.id];
               const estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
               return (
-                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-card border border-line dark:border-line/50 bg-surface-2 dark:bg-surface-2/50 hover:border-brand-primary/50 hover:shadow-md transition-all duration-200 group">
+                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-card border border-line dark:border-line/50 bg-surface-2 dark:bg-surface-2/50 hover:border-brand-primary/50 hover:shadow-md motion duration-[var(--dur-base)] group">
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-content-1 dark:text-white truncate" title={fc.funcionarioNombre || 'Sin responsable'}>
@@ -137,7 +137,7 @@ export default function Fc10View({
                           key={op.valor}
                           onClick={() => !estaCambiando && handleCambiarEstadoFirma(fc, op.valor)}
                           disabled={estaCambiando || !puedeGestionarFirmas}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium motion duration-[var(--dur-base)] ${
                             seleccionado
                               ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/30'
                               : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5 border border-transparent hover:border-line dark:hover:border-white/10'
@@ -246,7 +246,7 @@ export default function Fc10View({
                 {setActiveTab && (
                   <button
                     onClick={() => setActiveTab('inventario')}
-                    className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer active:scale-95"
+                    className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer active:scale-95"
                   >
                     <i className="fa-solid fa-boxes-stacked text-xs"></i> Asignar desde inventario
                   </button>
@@ -264,7 +264,7 @@ export default function Fc10View({
                 </p>
                 <button
                   onClick={() => setFiltroEtapa('todas')}
-                  className="mt-4 inline-flex items-center gap-2 h-9 px-4 rounded-control text-[12px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer"
+                  className="mt-4 inline-flex items-center gap-2 h-9 px-4 rounded-control text-[12px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer"
                 >
                   <i className="fa-solid fa-arrow-left text-[10px]"></i> Ver todas las actas
                 </button>
@@ -285,7 +285,7 @@ export default function Fc10View({
               const esLegada = esFC10Legado(fc);
               const ponerEnTramite = ponerFC10EnTramite;
               return (
-                <div key={fc.id} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                <div key={fc.id} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm hover:shadow-md motion flex flex-col relative overflow-hidden group">
                   <div className={`h-1 w-full ${info.dot}`}></div>
                   <div className="p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start gap-2 mb-4">
@@ -307,10 +307,10 @@ export default function Fc10View({
                               </span>
                           </div>
                           <div className="flex gap-1 shrink-0 rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 p-1">
-                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
-                              <button onClick={() => openFC10Modal(bien, fc)} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
+                              <button onClick={() => openFC10Modal(bien, fc)} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                               {isAdmin && (
-                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
                               )}
                           </div>
                       </div>
@@ -354,7 +354,7 @@ export default function Fc10View({
                       <button
                         onClick={() => ponerEnTramite(fc)}
                         disabled={poniendoEnTramite === fc.id}
-                        className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-lg bg-zinc-800 dark:bg-surface-1 text-white dark:text-content-1 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+                        className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-lg bg-zinc-800 dark:bg-surface-1 text-white dark:text-content-1 text-[11px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
                       >
                         {poniendoEnTramite === fc.id
                           ? <><i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> Activando...</>
@@ -373,7 +373,7 @@ export default function Fc10View({
                             onClick={() => registrarAmbasFirmas(fc)}
                             disabled={estaFirmando}
                             title="Registrar las dos firmas y cerrar el ciclo de una vez"
-                            className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 shadow-sm shadow-emerald-500/25"
+                            className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 shadow-sm shadow-emerald-500/25"
                           >
                             {estaFirmando
                               ? <><i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> Cerrando...</>
@@ -387,7 +387,7 @@ export default function Fc10View({
                           onClick={() => registrarFirmaFC10(fc)}
                           disabled={estaFirmando}
                           title={`Registrar solo la firma ${pendiente.orden} de ${pendiente.nombre || pendiente.puesto}`}
-                          className="w-full inline-flex items-center justify-center gap-2 h-8 rounded-lg text-content-1 dark:text-zinc-100 bg-surface-3 dark:bg-surface-1/10 hover:bg-surface-3 dark:hover:bg-surface-1/5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 border border-line dark:border-white/10"
+                          className="w-full inline-flex items-center justify-center gap-2 h-8 rounded-lg text-content-1 dark:text-zinc-100 bg-surface-3 dark:bg-surface-1/10 hover:bg-surface-3 dark:hover:bg-surface-1/5 text-[10px] font-bold uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 border border-line dark:border-white/10"
                         >
                           <i className="fa-solid fa-signature text-[10px]"></i>
                           Solo {pendiente.puesto}

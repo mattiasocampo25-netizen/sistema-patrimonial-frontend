@@ -155,7 +155,7 @@ export default function DashboardView({
             <button
               onClick={() => setMenuWidgets(v => !v)}
               title="Personalizar panel" aria-label="Personalizar panel"
-              className="flex items-center gap-2 h-11 px-4 rounded-card bg-surface-1 dark:bg-surface-1/5 border border-line/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-2 dark:hover:bg-surface-1/10 transition-all cursor-pointer"
+              className="flex items-center gap-2 h-11 px-4 rounded-card bg-surface-1 dark:bg-surface-1/5 border border-line/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-2 dark:hover:bg-surface-1/10 motion cursor-pointer"
             >
               <i className="fa-solid fa-sliders text-xs"></i> <span className="hidden sm:inline">Personalizar</span>
             </button>
@@ -201,13 +201,13 @@ export default function DashboardView({
             key={card.id}
             onClick={card.onClick}
             title={card.label}
-            className={`group relative text-left bg-surface-1 dark:bg-surface-1 rounded-control border ${card.border} p-2 sm:p-2.5 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none transition-all duration-200 cursor-pointer`}
+            className={`group relative text-left bg-surface-1 dark:bg-surface-1 rounded-control border ${card.border} p-2 sm:p-2.5 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none motion duration-[var(--dur-base)] cursor-pointer`}
           >
             <div className="flex items-center justify-between gap-1 mb-1.5">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${card.iconBg} shadow-xs`}>
                 <i className={`fa-solid ${card.icon} text-sm ${card.iconColor}`}></i>
               </div>
-              <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-3 group-hover:text-content-3 dark:group-hover:text-content-3 group-hover:translate-x-0 transition-all"></i>
+              <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-3 group-hover:text-content-3 dark:group-hover:text-content-3 group-hover:translate-x-0 motion"></i>
             </div>
             <p className="text-xl sm:text-2xl font-black text-content-1 dark:text-white tracking-tight tabular-nums leading-snug">
               {isLoading ? '…' : card.numero}
@@ -220,7 +220,7 @@ export default function DashboardView({
             </p>
             {card.showProgress && (
               <div className="mt-1.5 h-1 w-full bg-surface-3 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className={`h-full ${card.progressColor} rounded-full transition-all duration-1000 shadow-xs shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
+                <div className={`h-full ${card.progressColor} rounded-full motion duration-[var(--dur-slow)] shadow-xs shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
               </div>
             )}
           </button>
@@ -254,7 +254,7 @@ export default function DashboardView({
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 transition-all active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 motion active:scale-95 cursor-pointer shrink-0"
             >
               Gestionar →
             </button>
@@ -285,7 +285,7 @@ export default function DashboardView({
                     onClick={() => registrarAmbasFirmas(fc)}
                     disabled={firmandoId === fc.id}
                     title="Registrar las dos firmas"
-                    className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60"
+                    className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60"
                   >
                     {firmandoId === fc.id
                       ? <i className="fa-solid fa-circle-notch fa-spin text-[9px]"></i>
@@ -325,7 +325,7 @@ export default function DashboardView({
                       key={p.id}
                       onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
                       title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                      className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left motion duration-[var(--dur-base)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                       <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border ` + p.box}>
                           <i className={`fa-solid ${p.icon} text-sm`}></i>
@@ -334,7 +334,7 @@ export default function DashboardView({
                           <span className="block text-xl font-black tabular-nums text-content-1 dark:text-white leading-tight"><AnimatedNumber value={p.count} /></span>
                           <span className="block text-[11px] font-semibold text-content-3 dark:text-content-3 truncate">{p.label}</span>
                       </span>
-                      <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-2 group-hover:text-content-3 group-hover:translate-x-0.5 transition-all shrink-0"></i>
+                      <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-2 group-hover:text-content-3 group-hover:translate-x-0.5 motion shrink-0"></i>
                   </button>
               ))}
           </div>
@@ -369,20 +369,20 @@ export default function DashboardView({
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm p-5 sm:p-6">
           <p className="px-2 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3">Accesos directos</p>
           <div className="flex flex-wrap items-center gap-2">
-              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-card bg-zinc-900 hover:bg-zinc-800 dark:bg-surface-1 dark:hover:bg-surface-3 text-white dark:text-content-1 font-black text-[13px] transition-all shadow-lg shadow-zinc-900/25 active:scale-95 cursor-pointer">
+              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-card bg-zinc-900 hover:bg-zinc-800 dark:bg-surface-1 dark:hover:bg-surface-3 text-white dark:text-content-1 font-black text-[13px] motion shadow-lg shadow-zinc-900/25 active:scale-95 cursor-pointer">
                   <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
               </button>
               <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1.5"></span>
-              <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i> Importar
               </button>
-              <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-export text-sky-600 dark:text-sky-400"></i> Exportar
               </button>
-              <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-qrcode text-violet-600 dark:text-violet-400"></i> Lote QRs
               </button>
-              <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] transition-all active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-print text-amber-600 dark:text-amber-400"></i> FC-03
               </button>
           </div>
@@ -412,7 +412,7 @@ export default function DashboardView({
                 <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percFC10.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000 shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
+                <div className="h-full bg-emerald-500 rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
               </div>
             </div>
 
@@ -425,7 +425,7 @@ export default function DashboardView({
                 <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-primary rounded-full transition-all duration-1000 shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
+                <div className="h-full bg-brand-primary rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
               </div>
             </div>
           </div>

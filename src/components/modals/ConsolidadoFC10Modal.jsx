@@ -35,7 +35,7 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
                             placeholder="Buscar por nombre o número de cédula..."
                             value={searchConsolidadoModal}
                             onChange={(e) => setSearchConsolidadoModal(e.target.value)}
-                            className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 py-3 pl-11 pr-4 text-xs font-bold text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand-primary focus:bg-surface-1 dark:focus:bg-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary outline-none transition-all"
+                            className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 py-3 pl-11 pr-4 text-xs font-bold text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand-primary focus:bg-surface-1 dark:focus:bg-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary outline-none motion"
                         />
                     </div>
                     
@@ -84,7 +84,7 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
                         const infoPadron = funcionariosPadron.find(f => f.dependencia === dependenciaActual && normalizeStr(f.nombre) === normalizeStr(funcNombre));
 
                         return (
-                            <div key={funcNombre} className="flex items-center justify-between p-4 rounded-card bg-surface-2 dark:bg-zinc-950 border border-line/80 dark:border-zinc-800 hover:border-line-strong dark:hover:border-white/20 transition-all">
+                            <div key={funcNombre} className="flex items-center justify-between p-4 rounded-card bg-surface-2 dark:bg-zinc-950 border border-line/80 dark:border-zinc-800 hover:border-line-strong dark:hover:border-white/20 motion">
                                 <div className="space-y-1">
                                     <p className="text-sm font-black text-content-1 dark:text-white">{funcNombre}</p>
                                     <p className="text-xs font-bold text-content-3 tabular-nums">
@@ -94,7 +94,7 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
                                 <button 
                                     onClick={() => handleGenerateConsolidatedFC10PDF(funcNombre, fechaDesde, fechaHasta)}
                                     disabled={bienesFiltrados.length === 0}
-                                    className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer disabled:opacity-50 tabular-nums"
+                                    className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer disabled:opacity-50 tabular-nums"
                                 >
                                     <i className="fa-solid fa-print"></i> Generar Acta
                                 </button>
@@ -104,7 +104,7 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
                 </div>
 
                 <div className="flex justify-end px-8 py-5 border-t border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-900">
-                    <button onClick={() => { onClose(); setSearchConsolidadoModal(''); }} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer">Cerrar</button>
+                    <button onClick={() => { onClose(); setSearchConsolidadoModal(''); }} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer">Cerrar</button>
                 </div>
             </div>
         </div>

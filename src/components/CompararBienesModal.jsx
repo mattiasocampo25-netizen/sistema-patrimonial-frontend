@@ -61,7 +61,7 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
           </table>
         </div>
         <div className="flex justify-end px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer">Cerrar</button>
+          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Cerrar</button>
         </div>
       </div>
     </div>

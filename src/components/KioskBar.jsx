@@ -62,14 +62,14 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
       {/* Indicador de inactividad */}
       <div className="fixed top-0 inset-x-0 h-1 z-[700] bg-slate-300/60">
         <div
-          className="h-full bg-blue-600 transition-[width] duration-1000 ease-linear"
+          className="h-full bg-blue-600 transition-[width] duration-[var(--dur-slow)] ease-linear"
           style={{ width: `${pct}%` }}
         />
       </div>
 
       {/* Barra de controles */}
       <div
-        className={`fixed bottom-0 inset-x-0 z-[700] flex items-center justify-between gap-2 px-4 py-3 bg-slate-900/85 backdrop-blur-md text-white transition-transform duration-300 ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`fixed bottom-0 inset-x-0 z-[700] flex items-center justify-between gap-2 px-4 py-3 bg-slate-900/85 backdrop-blur-md text-white transition-transform duration-[var(--dur-base)] ${visible ? 'translate-y-0' : 'translate-y-full'}`}
       >
         <span className="text-[11px] font-bold tabular-nums opacity-80">
           <i className="fa-regular fa-clock mr-1.5"></i>
@@ -78,14 +78,14 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
         <div className="flex items-center gap-2">
           <button
             onClick={onEscanearOtro}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold motion active:scale-95 cursor-pointer"
           >
             <i className="fa-solid fa-qrcode text-[11px]"></i> Escanear otro QR
           </button>
           <button
             onClick={onSalir}
             title="Salir del modo kiosco"
-            className="flex h-9 w-9 items-center justify-center rounded-control bg-surface-1/10 hover:bg-surface-1/20 text-white transition-all cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-control bg-surface-1/10 hover:bg-surface-1/20 text-white motion cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-xs"></i>
           </button>
@@ -115,7 +115,7 @@ export function BotonPantallaCompleta({ onCambio }) {
     <button
       onClick={toggle}
       title={activo ? 'Salir de pantalla completa' : 'Pantalla completa'}
-      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 motion cursor-pointer"
     >
       <i className={`fa-solid ${activo ? 'fa-compress' : 'fa-expand'} text-[10px]`}></i>
       <span className="hidden sm:inline">{activo ? 'Reducir' : 'Pantalla completa'}</span>

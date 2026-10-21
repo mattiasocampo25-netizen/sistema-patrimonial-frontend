@@ -60,13 +60,13 @@ export default class ErrorBoundary extends React.Component {
           <div className="mt-6 flex gap-2">
             <button
               onClick={() => window.location.reload()}
-              className="flex-1 py-3 rounded-card bg-brand-primary hover:bg-brand-hover text-white text-xs font-black transition-all cursor-pointer active:scale-[0.98]"
+              className="flex-1 py-3 rounded-card bg-brand-primary hover:bg-brand-hover text-white text-xs font-black motion cursor-pointer active:scale-[0.98]"
             >
               Recargar
             </button>
             <button
               onClick={() => { try { sessionStorage.clear(); } catch { /* noop */ } window.location.href = '/'; }}
-              className="flex-1 py-3 rounded-card bg-surface-3 hover:bg-surface-3 dark:bg-surface-1/10 dark:hover:bg-surface-1/20 text-content-1 dark:text-zinc-100 text-xs font-black transition-all cursor-pointer active:scale-[0.98]"
+              className="flex-1 py-3 rounded-card bg-surface-3 hover:bg-surface-3 dark:bg-surface-1/10 dark:hover:bg-surface-1/20 text-content-1 dark:text-zinc-100 text-xs font-black motion cursor-pointer active:scale-[0.98]"
             >
               Ir al inicio
             </button>

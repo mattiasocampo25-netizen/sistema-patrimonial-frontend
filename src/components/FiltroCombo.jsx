@@ -131,7 +131,7 @@ export default function FiltroCombo({
         aria-required={required || undefined}
         aria-invalid={error || undefined}
         aria-describedby={error && mensajeErrorId ? mensajeErrorId : undefined}
-        className={`w-full ${alto} rounded-control border ${error ? 'border-rose-400 dark:border-rose-500' : 'border-line dark:border-white/10'} bg-surface-1 dark:bg-surface-1/5 px-4 font-medium text-content-1 dark:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-line-strong dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
+        className={`w-full ${alto} rounded-control border ${error ? 'border-rose-400 dark:border-rose-500' : 'border-line dark:border-white/10'} bg-surface-1 dark:bg-surface-1/5 px-4 font-medium text-content-1 dark:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 motion focus-visible:ring-2 cursor-pointer hover:border-line-strong dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
       >
         <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-content-3 dark:text-content-3' : ''}`} title={etiqueta}>
           {etiqueta}

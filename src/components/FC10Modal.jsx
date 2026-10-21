@@ -384,7 +384,7 @@ const valorOrgExplicito = (campo) => {
                   <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
                     <i className="fa-solid fa-history text-amber-600 dark:text-amber-400 text-sm"></i>
                     <p className="flex-1 min-w-[200px] text-xs font-bold text-amber-700 dark:text-amber-300">Tienes un borrador sin guardar.</p>
-                    <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer">Continuar</button>
+                    <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
                     <button type="button" onClick={limpiarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
                   </div>
                 )}<form key={formKeyFC} onSubmit={async (e) => { e.preventDefault(); if (step !== 3) return; if (Date.now() - bloqueoRef.current < 1000) return; if (enviandoRef.current) return; if (!puedeGuardar) return; enviandoRef.current = true; try { const ok = await saveFC10(e); if (ok) limpiarBorradorFC(); } finally { enviandoRef.current = false; } }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} onKeyDown={handleKeyDown} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
@@ -398,7 +398,7 @@ const valorOrgExplicito = (campo) => {
                             ].map((s, i, arr) => (
                                 <React.Fragment key={s.n}>
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black transition-all duration-300 ${
+                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${
                                             step > s.n
                                                 ? 'bg-emerald-500 text-white'
                                                 : step === s.n
@@ -414,7 +414,7 @@ const valorOrgExplicito = (campo) => {
                                         </span>
                                     </div>
                                     {i < arr.length - 1 && (
-                                        <div className={`h-px flex-1 min-w-4 transition-colors duration-300 ${step > s.n ? 'bg-emerald-400/60' : 'bg-surface-3 dark:bg-surface-3'}`}></div>
+                                        <div className={`h-px flex-1 min-w-4 transition-colors duration-[var(--dur-base)] ${step > s.n ? 'bg-emerald-400/60' : 'bg-surface-3 dark:bg-surface-3'}`}></div>
                                     )}
                                 </React.Fragment>
                             ))}
@@ -759,17 +759,17 @@ const valorOrgExplicito = (campo) => {
                     <div className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-t border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1 shrink-0 z-10">
                         <span className="text-[11px] font-semibold text-content-3 dark:text-content-3 hidden sm:block">Paso {step} de 3</span>
                         {step === 1 ? (
-                            <button type="button" onClick={() => setIsFC10ModalOpen(false)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer">Cancelar</button>
+                            <button type="button" onClick={() => setIsFC10ModalOpen(false)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer">Cancelar</button>
                         ) : (
-                            <button type="button" onClick={() => irPaso(step - 1)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer">Anterior</button>
+                            <button type="button" onClick={() => irPaso(step - 1)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer">Anterior</button>
                         )}
                         
                         {step < 3 ? (
-                            <button type="button" onClick={nextStep} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer">
+                            <button type="button" onClick={nextStep} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer">
                                 Siguiente Paso <i className="fa-solid fa-arrow-right text-xs ml-1"></i>
                             </button>
                         ) : (
-                            <button type="submit" disabled={!puedeGuardar} title={puedeGuardar ? 'Confirmar y guardar' : 'Espere...'} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-all active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button type="submit" disabled={!puedeGuardar} title={puedeGuardar ? 'Confirmar y guardar' : 'Espere...'} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i className="fa-solid fa-floppy-disk text-xs mr-1"></i> Confirmar y Guardar
                             </button>
                         )}

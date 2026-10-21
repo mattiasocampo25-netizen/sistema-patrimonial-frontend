@@ -104,7 +104,7 @@ export default function AnunciosView({
           <input
             type="text" value={titulo} onChange={(e) => { setTitulo(e.target.value); try { localStorage.setItem('anuncio_borrador_titulo', e.target.value); } catch {} }} maxLength={120}
             placeholder="Ej: Mantenimiento programado este sábado"
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 h-11 px-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all shadow-sm"
+            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 h-11 px-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion shadow-sm"
           />
         </div>
         <div>
@@ -112,20 +112,20 @@ export default function AnunciosView({
           <textarea
             rows={3} value={mensaje} onChange={(e) => { setMensaje(e.target.value); try { localStorage.setItem('anuncio_borrador_mensaje', e.target.value); } catch {} }} maxLength={1000}
             placeholder="Detalle del aviso que verán en la campana de notificaciones..."
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all resize-none shadow-sm"
+            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion resize-none shadow-sm"
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="flex gap-2">
             <button
               type="button" onClick={() => setDestino('TODOS')}
-              className={`flex-1 h-11 rounded-control text-[13px] font-bold border transition-all cursor-pointer shadow-sm ${destino === 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
+              className={`flex-1 h-11 rounded-control text-[13px] font-bold border motion cursor-pointer shadow-sm ${destino === 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
             >
               <i className="fa-solid fa-users mr-2 text-xs"></i>Todos ({usuariosList.length})
             </button>
             <button
               type="button" onClick={() => setDestino(usuariosOrdenados.find(u => u.username !== currentUser?.username)?.username || '')}
-              className={`flex-1 h-11 rounded-control text-[13px] font-bold border transition-all cursor-pointer shadow-sm ${destino !== 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
+              className={`flex-1 h-11 rounded-control text-[13px] font-bold border motion cursor-pointer shadow-sm ${destino !== 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
             >
               <i className="fa-solid fa-user mr-2 text-xs"></i>Específico
             </button>
@@ -143,7 +143,7 @@ export default function AnunciosView({
         <div className="flex justify-end pt-1">
           <button
             type="button" onClick={handleEnviar} disabled={!puedeEnviar || enviando}
-            className="inline-flex items-center gap-2 px-5 h-11 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-black hover:bg-zinc-800 dark:hover:bg-surface-3 transition-all active:scale-95 cursor-pointer disabled:opacity-50 shadow-lg shadow-zinc-900/25 dark:shadow-white/10 hover:shadow-xl"
+            className="inline-flex items-center gap-2 px-5 h-11 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-black hover:bg-zinc-800 dark:hover:bg-surface-3 motion active:scale-95 cursor-pointer disabled:opacity-50 shadow-lg shadow-zinc-900/25 dark:shadow-white/10 hover:shadow-xl"
           >
             <i className={`fa-solid ${enviando ? 'fa-circle-notch fa-spin' : 'fa-paper-plane'} text-xs`}></i>
             {enviando ? 'Enviando...' : `Enviar a ${cantDest} usuario${cantDest === 1 ? '' : 's'}`}
@@ -198,7 +198,7 @@ export default function AnunciosView({
                 <button
                   type="button" onClick={() => handleEliminar(a.grupo)} disabled={eliminando === a.grupo}
                   title="Eliminar anuncio para todos" aria-label="Eliminar anuncio"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-control transition-all cursor-pointer disabled:opacity-50 shadow-sm"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-control motion cursor-pointer disabled:opacity-50 shadow-sm"
                 >
                   <i className={`fa-solid ${eliminando === a.grupo ? 'fa-circle-notch fa-spin' : 'fa-trash-can'} text-xs`}></i>
                 </button>

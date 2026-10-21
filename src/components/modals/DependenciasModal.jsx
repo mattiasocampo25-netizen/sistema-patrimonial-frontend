@@ -116,7 +116,7 @@ export default function DependenciasModal({
           else { setSelId(d.id); setSelDetectada(null); }
         }}
         title={d.nombre}
-        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
+        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
           activo || activoDet
             ? 'bg-brand-light dark:bg-brand-primary/10 border border-brand-primary/30 border-l-4 border-brand-primary text-content-1 dark:text-white shadow-sm'
             : 'hover:bg-surface-3 dark:hover:bg-surface-1/5 text-content-1 dark:text-zinc-100 border border-transparent'
@@ -216,7 +216,7 @@ export default function DependenciasModal({
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
-                  className="flex h-9 w-9 items-center justify-center rounded-control bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover transition-all active:scale-95"
+                  className="flex h-9 w-9 items-center justify-center rounded-control bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover motion active:scale-95"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
@@ -253,7 +253,7 @@ export default function DependenciasModal({
                   <button
                     onClick={() => onSave(null, detSel.nombre)}
                     title="Agregar como dependencia oficial"
-                    className="h-10 px-4 rounded-control text-[13px] font-bold bg-brand-primary text-white hover:bg-brand-hover transition-all cursor-pointer shadow-sm shadow-blue-500/20"
+                    className="h-10 px-4 rounded-control text-[13px] font-bold bg-brand-primary text-white hover:bg-brand-hover motion cursor-pointer shadow-sm shadow-blue-500/20"
                   >
                     Agregar como oficial
                   </button>
@@ -303,13 +303,13 @@ export default function DependenciasModal({
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-control text-xs font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer">
+                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-control text-xs font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer">
                       <i className="fa-solid fa-users"></i><span className="hidden sm:inline">Padrón</span>
                     </button>
-                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer">
+                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 motion cursor-pointer">
                       <i className="fa-solid fa-pen text-xs"></i>
                     </button>
-                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer">
+                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer">
                       <i className="fa-solid fa-trash-can text-xs"></i>
                     </button>
                   </div>
@@ -412,7 +412,7 @@ export default function DependenciasModal({
         </div>
 
         <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-line shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Listo
           </button>
         </div>

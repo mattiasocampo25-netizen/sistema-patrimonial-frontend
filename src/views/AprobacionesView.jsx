@@ -1,7 +1,7 @@
 // Vista de solicitudes de aprobación (bajas, firmas, etc.) - solo admin/desarrollador.
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
 import React, { useState } from 'react';
-import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30', dot: 'bg-amber-500' },
@@ -76,17 +76,17 @@ export default function AprobacionesView({
 
       <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm overflow-hidden flex-1 min-h-[400px]">
         <div className="overflow-x-auto custom-scrollbar">
-          <table className="w-full text-left border-collapse min-w-[700px]">
-            <thead className="bg-surface-2/50 dark:bg-surface-2/50 border-b border-line/50 dark:border-line/50">
-              <tr className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
-                <th className="py-4 pl-6 sm:pl-8 pr-4">Bien / Solicitud</th>
-                <th className="px-4 py-4">Solicitante</th>
-                <th className="px-4 py-4">Fecha</th>
-                <th className="px-4 py-4">Estado</th>
-                <th className="py-4 pl-4 pr-6 sm:pr-8 text-right">Decisión</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100/80 dark:divide-darkbg-border/30">
+          <Table sinContenedor minWidth={false} className="w-full text-left border-collapse min-w-[700px]">
+            <THead>
+              <TRow className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
+                <TH className="py-4 pl-6 sm:pl-8 pr-4">Bien / Solicitud</TH>
+                <TH className="px-4 py-4">Solicitante</TH>
+                <TH className="px-4 py-4">Fecha</TH>
+                <TH className="px-4 py-4">Estado</TH>
+                <TH className="py-4 pl-4 pr-6 sm:pr-8 text-right">Decisión</TH>
+              </TRow>
+            </THead>
+            <TBody>
               {listaFiltrada.map((notif) => {
                 // Dos tipos de solicitud: la baja de un bien y la eliminacion de
                 // un funcionario del padron. Cada una muestra los datos de su
@@ -109,8 +109,8 @@ export default function AprobacionesView({
                 const estaResuelto = estado !== 'PENDIENTE';
 
                 return (
-                  <tr key={notif.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
-                    <td className="py-4 pl-6 sm:pl-8 pr-4 align-top">
+                  <TRow key={notif.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
+                    <TD className="py-4 pl-6 sm:pl-8 pr-4 align-top">
                       <div className="space-y-1">
                         <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-1/10 px-2 py-0.5 rounded-lg">
                           {bienAsociado.rotulo}
@@ -134,23 +134,23 @@ export default function AprobacionesView({
                           </div>
                         )}
                       </div>
-                    </td>
-                    <td className="px-4 py-4 align-top text-xs font-medium text-content-1 dark:text-content-3">
+                    </TD>
+                    <TD className="px-4 py-4 align-top text-xs font-medium text-content-1 dark:text-content-3">
                       <div className="flex items-center gap-2">
                         <i className="fa-solid fa-user text-content-3"></i>
                         <span>{notif.solicitante || 'Funcionario'}</span>
                       </div>
-                    </td>
-                    <td className="px-4 py-4 align-top text-xs text-content-3 font-mono">
+                    </TD>
+                    <TD className="px-4 py-4 align-top text-xs text-content-3 font-mono">
                       {notif.created_at ? new Date(notif.created_at).toLocaleDateString() : 'Reciente'}
-                    </td>
-                    <td className="px-4 py-4 align-top">
+                    </TD>
+                    <TD className="px-4 py-4 align-top">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${info.color}`}>
                         <span className={`h-2 w-2 rounded-full ${info.dot}`}></span>
                         {info.label}
                       </span>
-                    </td>
-                    <td className="py-4 pl-4 pr-6 sm:pr-8 align-top text-right">
+                    </TD>
+                    <TD className="py-4 pl-4 pr-6 sm:pr-8 align-top text-right">
                       {!estaResuelto && (
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -172,24 +172,24 @@ export default function AprobacionesView({
                           {estado.toLowerCase()}
                         </span>
                       )}
-                    </td>
-                  </tr>
+                    </TD>
+                  </TRow>
                 );
               })}
 
               {listaFiltrada.length === 0 && (
-                <tr>
-                  <td colSpan="5">
+                <TRow>
+                  <TD colSpan="5">
                     <EmptyState
                       icon="fa-check-double"
                       titulo="Bandeja de aprobaciones al día"
                       descripcion="No hay solicitudes pendientes con el filtro seleccionado."
                     />
-                  </td>
-                </tr>
+                  </TD>
+                </TRow>
               )}
-            </tbody>
-          </table>
+            </TBody>
+          </Table>
         </div>
       </div>
 

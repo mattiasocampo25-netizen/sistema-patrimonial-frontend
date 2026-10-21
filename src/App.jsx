@@ -8,8 +8,7 @@ import AnimatedNumber from './components/AnimatedNumber';
 import CommandPalette from './components/CommandPalette';
 import AtajosModal from './components/modals/AtajosModal';
 import TourGuiado from './components/TourGuiado';
-import Sidebar from './components/Sidebar';
-import Header from './components/Header';
+import AppShell from './components/shell/AppShell';
 // Modales de apertura bajo demanda: carga diferida para acelerar el arranque
 import localforage from 'localforage';
 import LoginScreen from './components/LoginScreen';
@@ -1885,7 +1884,9 @@ if (publicBienId) {
         )}
 
         {toasts.map(t => (
-          <div key={t.id} className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-white/95 dark:bg-zinc-900/95 text-zinc-800 dark:text-zinc-100 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800 transition-all animate-slide-up">
+          // role="status": hace que un lector de pantalla anuncie el aviso
+          // (antes no se anunciaba nada) y permite detectarlo en los tests.
+          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-white/95 dark:bg-zinc-900/95 text-zinc-800 dark:text-zinc-100 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800 transition-all animate-slide-up">
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-inner ${
               t.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50' : 
               t.type === 'error' ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 
@@ -1923,20 +1924,44 @@ if (publicBienId) {
           )}
         </div>
       )}
-      <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} appLogo={appLogo} activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} esDesarrollador={esDesarrollador} solicitudesBaja={solicitudesBaja} dependenciaActual={dependenciaActual} onExportBackup={() => setConfirmBackupModal(true)} mantenimiento={mantenimiento} onOpenMantenimiento={() => setIsMantenimientoModalOpen(true)} onOpenDependencias={() => setIsDependenciasModalOpen(true)} onOpenRestore={restore.openRestore} />
-      
-      <div className="flex flex-1 flex-col min-w-0 bg-zinc-50 dark:bg-darkbg-main relative">
-          {dbError && (
-            <div className="flex items-center justify-center gap-x-6 bg-red-50 px-6 py-2.5 sm:px-3.5 border-b border-red-200 dark:bg-red-900/30 dark:border-red-900/50 shadow-sm z-50">
-              <p className="text-sm leading-6 text-red-700 dark:text-red-400 font-medium">
-                <i className="fa-solid fa-wifi mr-2"></i> Error de sincronización con Supabase. Verifique su conexión.
-              </p>
-            </div>
-          )}
-
-          <Header setIsSidebarOpen={setIsSidebarOpen} activeTab={activeTab} setActiveTab={setActiveTab} setIsScannerOpen={setIsScannerOpen} dependenciaActual={dependenciaActual} setDependenciaActual={requestDependenciaChange} todasDependencias={todasDependencias} clearAllFilters={clearAllFilters} darkMode={darkMode} setDarkMode={fijarTemaUsuario} isNotifOpen={isNotifOpen} setIsNotifOpen={setIsNotifOpen} unreadCount={unreadCount} misNotificaciones={misNotificaciones} markAsRead={markAsRead} onMarkAllRead={markAllAsRead} currentUser={currentUser} isAdmin={isAdmin} handleLogout={() => setShowLogoutConfirm(true)} actasPorFirmarCount={actasPorFirmarCount} />
-
-          <main id="contenido" className="flex-1 overflow-y-auto custom-scrollbar">
+      <AppShell
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        appLogo={appLogo}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isAdmin={isAdmin}
+        esDesarrollador={esDesarrollador}
+        solicitudesBaja={solicitudesBaja}
+        dependenciaActual={dependenciaActual}
+        onExportBackup={() => setConfirmBackupModal(true)}
+        onOpenRestore={restore.openRestore}
+        mantenimiento={mantenimiento}
+        onOpenMantenimiento={() => setIsMantenimientoModalOpen(true)}
+        onOpenDependencias={() => setIsDependenciasModalOpen(true)}
+        setIsScannerOpen={setIsScannerOpen}
+        setDependenciaActual={requestDependenciaChange}
+        todasDependencias={todasDependencias}
+        clearAllFilters={clearAllFilters}
+        darkMode={darkMode}
+        setDarkMode={fijarTemaUsuario}
+        isNotifOpen={isNotifOpen}
+        setIsNotifOpen={setIsNotifOpen}
+        unreadCount={unreadCount}
+        misNotificaciones={misNotificaciones}
+        markAsRead={markAsRead}
+        onMarkAllRead={markAllAsRead}
+        currentUser={currentUser}
+        handleLogout={() => setShowLogoutConfirm(true)}
+        actasPorFirmarCount={actasPorFirmarCount}
+        errorBanner={dbError ? (
+          <div className="flex items-center justify-center gap-x-6 bg-danger-soft px-6 py-2.5 sm:px-3.5 border-b border-danger/30 z-50">
+            <p className="text-body leading-6 text-danger font-medium">
+              <i className="fa-solid fa-wifi mr-2" aria-hidden="true"></i> Error de sincronización con Supabase. Verifique su conexión.
+            </p>
+          </div>
+        ) : null}
+      >
             <div key={activeTab} className="tab-enter mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-full flex flex-col">
                 {activeTab === 'dashboard' && (<DashboardView currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} />)}
 
@@ -1956,8 +1981,7 @@ if (publicBienId) {
                 {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
                 {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} />)}
             </div>
-          </main>
-      </div>
+      </AppShell>
 
       {/* Modales y componentes flotantes (carga diferida) */}
       <Suspense fallback={null}>

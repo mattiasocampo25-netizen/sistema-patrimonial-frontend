@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
 @custom-variant dark (&:where(.dark, .dark *));
 
 html {
@@ -8,7 +9,10 @@ html {
 @theme {
   /* Open Sans es la única tipografía del sistema. */
   --font-sans: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+  /* La monoespaciada es de verdad monoespaciada: los rótulos, las cédulas y
+     las cifras con tabular-nums tienen que alinearse en columna. Antes
+     apuntaba a la sans y tabular-nums no hacía nada. */
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
   /* Paleta de marca institucional UNP */
   --color-brand-primary: #1d4ed8;
   --color-brand-hover: #1e40af;

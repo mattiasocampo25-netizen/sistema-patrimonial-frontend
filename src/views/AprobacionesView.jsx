@@ -1,8 +1,7 @@
 // Vista de solicitudes de aprobación (bajas, firmas, etc.) - solo admin/desarrollador.
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
 import React, { useState } from 'react';
-import EmptyState from '../components/EmptyState';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30', dot: 'bg-amber-500' },

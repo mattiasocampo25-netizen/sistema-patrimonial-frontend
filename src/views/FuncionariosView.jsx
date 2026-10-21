@@ -1,7 +1,6 @@
 import { formatCI } from '../utils/helpers';
-import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({

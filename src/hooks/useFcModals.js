@@ -7,6 +7,7 @@ import { numeroALetras } from '../utils/numeroLetras';
 import { extraerCodigoQR } from '../utils/qr';
 import { ESTADOS_FC10, ESTADO_NUEVO_FC10, estadoInicialFC10, pendienteDeFirma, registrarFirma, registrarAmbasFirmas, habilitaFC10EnBien, ESTADO_INFO, esFC10Legado, iniciarTramiteFC10 } from '../utils/fc10Firmas';
 import { registrarAuditoria } from '../services/auditService';
+import { prepararFuente, aplanarImagen, guardarPDF, FUENTE_PDF } from '../utils/pdfSanear';
 import { enqueueOfflineAction } from '../services/offlineSyncService';
 import { FORMATO_PDF } from '../constants/appConstants';
 
@@ -152,10 +153,14 @@ export function useFcModals({
     setTimeout(async () => {
       try {
         const { jsPDF } = window.jspdf; 
-        const doc = new jsPDF('l', 'mm', FORMATO_PDF); 
+        const doc = new jsPDF('l', 'mm', FORMATO_PDF);
+  await prepararFuente(doc); 
         const pageWidth = doc.internal.pageSize.width; 
         const pageHeight = doc.internal.pageSize.height;
-        const logoImg = await resolveLogoImg(dependenciaActual); 
+        const logoImg = await resolveLogoImg(dependenciaActual);
+  // Aplanado antes del autoTable: didDrawPage es un callback sincrono y ahi
+  // no se puede esperar. Ademas, sin reducirlo el PDF se iba en 16 MB.
+  const logoPlano = await aplanarImagen(logoImg); 
 
         let totalValor = 0;
         
@@ -222,15 +227,15 @@ export function useFcModals({
             styles: { fontSize: 6, cellPadding: 1, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15 }, 
             headStyles: { fillColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', textColor: [0,0,0], lineWidth: 0.3 }, 
             didDrawPage: function(_data) {
-                doc.addImage(logoImg, 'PNG', 12, 6, 18, 18); 
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); 
+                doc.addImage(logoPlano, 'PNG', 12, 6, 18, 18); 
+                doc.setFont(FUENTE_PDF, "bold"); doc.setFontSize(12); 
                 doc.text("UNIVERSIDAD NACIONAL DE PILAR", pageWidth / 2, 11, { align: 'center' }); 
                 doc.setFontSize(9.5); 
                 doc.text("DEPARTAMENTO DE BIENES PATRIMONIALES", pageWidth / 2, 16, { align: 'center' }); 
                 doc.setFontSize(10.5); 
                 doc.text("INVENTARIO DE BIENES DE USO (FC-03)", pageWidth / 2, 22, { align: 'center' }); 
                 
-                doc.setFontSize(8); doc.setFont("helvetica", "bold");
+                doc.setFontSize(8); doc.setFont(FUENTE_PDF, "bold");
                 doc.text("F.C. - 03", 10, 29);
                 
                 doc.setDrawColor(0); doc.setLineWidth(0.2);
@@ -251,43 +256,43 @@ export function useFcModals({
                 doc.line(195, 31, 195, 70); 
                 doc.line(235, 55.5, 235, 70); 
 
-                doc.setFontSize(7.5); doc.setFont("helvetica", "bold");
+                doc.setFontSize(7.5); doc.setFont(FUENTE_PDF, "bold");
                 doc.text("ENTIDAD", 12, 35.5);
                 doc.text("UNIDAD JERÁRQUICA", 12, 43.1);
                 doc.text("REPARTICIÓN", 12, 50.7);
                 doc.text("DEPENDENCIA", 12, 58.3);
                 doc.text("ÁREA", 12, 65.9);
 
-                doc.setFont("helvetica", "normal");
+                doc.setFont(FUENTE_PDF, "normal");
                 doc.text("28 - UNIVERSIDAD NACIONAL DE PILAR", 44, 35.5);
                 doc.text(dependenciaActual.toUpperCase(), 44, 43.1, { maxWidth: 94 });
                 doc.text(repText, 44, 50.7, { maxWidth: 94 });
                 doc.text(dependenciaActual.toUpperCase(), 44, 58.3, { maxWidth: 94 });
                 doc.text(`${repText} (Resp: ${funcText})`, 44, 65.9, { maxWidth: 94 });
 
-                doc.setFont("helvetica", "bold"); doc.text("ESTADO DE CONSERVACIÓN", 142, 35.5);
-                doc.setFont("helvetica", "normal");
+                doc.setFont(FUENTE_PDF, "bold"); doc.text("ESTADO DE CONSERVACIÓN", 142, 35.5);
+                doc.setFont(FUENTE_PDF, "normal");
                 doc.text("MB........Muy Bueno", 142, 43.1);
                 doc.text("B..........Bueno", 142, 50.7);
                 doc.text("R..........Regular", 142, 58.3);
                 doc.text("M.........Malo", 142, 65.9);
 
-                doc.setFont("helvetica", "bold"); doc.text("BIENES", 197, 35);
-                doc.setFont("helvetica", "normal");
+                doc.setFont(FUENTE_PDF, "bold"); doc.text("BIENES", 197, 35);
+                doc.setFont(FUENTE_PDF, "normal");
                 doc.text("NR.... No Registrado", 197, 41);
                 doc.text("F.......Faltante", 197, 47);
                 doc.text("C...... Conforme", 197, 53);
 
-                doc.setFont("helvetica", "bold");
+                doc.setFont(FUENTE_PDF, "bold");
                 doc.text(`Hoja N° ${doc.internal.getCurrentPageInfo().pageNumber}`, pageWidth - 35, 35);
 
                 doc.text("Fecha", 197, 59); 
-                doc.setFont("helvetica", "normal"); 
+                doc.setFont(FUENTE_PDF, "normal"); 
                 doc.text(todayStr, 238, 59);
                 
-                doc.setFont("helvetica", "bold"); 
+                doc.setFont(FUENTE_PDF, "bold"); 
                 doc.text("Lugar", 197, 65); 
-                doc.setFont("helvetica", "normal"); 
+                doc.setFont(FUENTE_PDF, "normal"); 
                 doc.text(fc03Config.lugar.toUpperCase(), 238, 65);
 
                 const finalY = pageHeight - 18; 
@@ -295,7 +300,7 @@ export function useFcModals({
                 const sigWidth = 65;
                 
                 doc.line(15, finalY, 15 + sigWidth, finalY); 
-                doc.setFont("helvetica", "bold"); doc.setFontSize(8); 
+                doc.setFont(FUENTE_PDF, "bold"); doc.setFontSize(8); 
                 doc.text("Jefe de Dependencia", 15 + (sigWidth/2), finalY + 4, { align: 'center' });
                 
                 const midX = pageWidth / 2;
@@ -306,7 +311,7 @@ export function useFcModals({
                 doc.line(rightX, finalY, rightX + sigWidth, finalY); 
                 doc.text("Directora General de Administración y Finanzas", rightX + (sigWidth/2), finalY + 4, { align: 'center' });
 
-                doc.setFont("helvetica", "italic"); doc.setFontSize(6); doc.setTextColor(100);
+                doc.setFont(FUENTE_PDF, "normal"); doc.setFontSize(6); doc.setTextColor(100);
                 doc.text("Generado por el Sistema Integrado de Gestión Patrimonial UNP", 14, pageHeight - 4);
                 doc.setTextColor(0);
             }
@@ -314,7 +319,7 @@ export function useFcModals({
         
         const descFiltro = fc03Config.tipoFiltro === 'general' ? 'General' : fc03Config.filtroValor.replace(/[^a-zA-Z0-9]/g, '_');
         const cleanDepName = dependenciaActual.replace(/\s+/g, '_'); 
-        doc.save(`FC03_${cleanDepName}_${descFiltro}_${todayStr}.pdf`); 
+        guardarPDF(doc, `FC03_${cleanDepName}_${descFiltro}_${todayStr}.pdf`); 
         notify("Reporte Inventario Oficial generado", "success");
       } catch(e) { 
         console.error(e); 

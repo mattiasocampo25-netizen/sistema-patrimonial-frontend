@@ -45,6 +45,10 @@
     "self": "readonly",
     "caches": "readonly",
     "CustomEvent": "readonly",
-    "MutationObserver": "readonly"
+    "MutationObserver": "readonly",
+    "btoa": "readonly",
+    "atob": "readonly",
+    "CompressionStream": "readonly",
+    "DecompressionStream": "readonly"
   }
 }

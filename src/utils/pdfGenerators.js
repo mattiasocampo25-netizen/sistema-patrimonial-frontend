@@ -1,3 +1,5 @@
+import { prepararFuente, aplanarImagen, FUENTE_PDF } from './pdfSanear';
+
 // Nota: 'qrcode' (npm) se importa dinámicamente dentro de cada función que lo
 // usa, para no inflar el bundle inicial.
 
@@ -19,12 +21,15 @@ const sanearTextoPDF = (val) => {
     for (const [mal, bien] of mapa) out = out.split(mal).join(bien);
     return out;
 };
-export const buildFC10PDFDoc = (fcs, bienesAListar) => {
+export const buildFC10PDFDoc = async (fcs, bienesAListar) => {
     // FC-10 en UNA sola hoja, tamaño oficio, solo ORIGINAL.
     // El formato oficio es el único del sistema (ver FORMATO_PDF en App.jsx);
     // no hay selector de tamaño en la interfaz.
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', [216, 330]);
+    // La fuente incrustada: sin ella Acrobat avisa de que el texto puede
+    // cambiar de aspecto y de que las fuentes no estan integradas.
+    await prepararFuente(doc);
     const pageWidth = doc.internal.pageSize.width;
 
     const fc = fcs[0];
@@ -45,24 +50,27 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
 
     const pages = ['ORIGINAL - DPTO. BIENES PATRIMONIALES'];
 
+    // El logo se aplana ANTES del bucle: dentro de un forEach no se puede
+    // esperar, y aplanarlo una sola vez es lo que toca.
+    const logoImg = localStorage.getItem('logoOficial');
+    const logoPlano = logoImg ? await aplanarImagen(logoImg) : null;
+
     pages.forEach((pageTitle, index) => {
         if (index > 0) doc.addPage();
 
         let finalY = 10;
 
-        doc.setFont("helvetica", "bold");
+        doc.setFont(FUENTE_PDF, "bold");
         doc.setFontSize(8);
         doc.setTextColor(130, 130, 130);
         doc.text(pageTitle, pageWidth - 14, finalY, { align: 'right' });
         doc.setTextColor(0, 0, 0);
         finalY += 8;
 
-        const logoImg = localStorage.getItem('logoOficial');
-        if (logoImg) {
-            try { doc.addImage(logoImg, 'PNG', 14, 13, 22, 22); } catch{}
+        if (logoPlano) {
+            try { doc.addImage(logoPlano, 'PNG', 14, 13, 22, 22); } catch{}
         }
-
-        doc.setFont("helvetica", "bold");
+        doc.setFont(FUENTE_PDF, "bold");
         doc.setFontSize(12);
         doc.text("UNIVERSIDAD NACIONAL DE PILAR", pageWidth / 2, finalY, { align: 'center' });
         finalY += 5;
@@ -92,8 +100,8 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
                 [`Área o Departamento: ${fc.area || 'DESPACHO DEL DIRECTOR/A'}`, fc.areaCod || '02']
             ],
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2 },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2 },
             columnStyles: { 1: { halign: 'center', fontStyle: 'bold' } },
             margin: { left: 14, right: 14, bottom: 25 }
         });
@@ -108,8 +116,8 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
                 ["Cargo que desempeña:", fc.funcionarioCargo || 'Director/a']
             ],
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2 },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2 },
             columnStyles: { 0: { fontStyle: 'bold', cellWidth: 50 } },
             margin: { left: 14, right: 14, bottom: 25 }
         });
@@ -145,8 +153,8 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
             ]],
             body: tableRows,
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 7, lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
-            bodyStyles: { fontSize: 7, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 7, lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 7, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
             columnStyles: {
                 0: { halign: 'center', cellWidth: 15 },
                 1: { halign: 'center', cellWidth: 13 },
@@ -172,8 +180,8 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
                 bienRef.hasQR ? 'CON CÓDIGO QR' : 'SIN CÓDIGO QR'
             ]],
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center' },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center', cellPadding: 2 },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center' },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center', cellPadding: 2 },
             margin: { left: 14, right: 14, bottom: 25 }
         });
         finalY = doc.lastAutoTable.finalY + 3;
@@ -183,8 +191,8 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
             head: [["OBSERVACIONES ADICIONALES:"]],
             body: [[sanearTextoPDF(fc.observaciones) || 'Ninguna.']],
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'left' },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, minCellHeight: 14, valign: 'top' },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'left' },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, minCellHeight: 14, valign: 'top' },
             margin: { left: 14, right: 14, bottom: 25 }
         });
         finalY = doc.lastAutoTable.finalY + 3;
@@ -197,31 +205,31 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
                 ["DEVOLUCIÓN", fc.devolucionLugar || '', fc.devolucionFecha ? formatDateText(fc.devolucionFecha) : '', fc.devolucionReceptor || '']
             ],
             theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center' },
-            bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center', cellPadding: 2 },
+            headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center' },
+            bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, halign: 'center', cellPadding: 2 },
             columnStyles: { 0: { fontStyle: 'bold' } },
             margin: { left: 14, right: 14, bottom: 25 }
         });
         finalY = doc.lastAutoTable.finalY + 5;
 
         doc.setFontSize(7.5);
-        doc.setFont("helvetica", "normal");
+        doc.setFont(FUENTE_PDF, "normal");
         const disclaimer = "Con la firma del presente documento, el funcionario asume la total responsabilidad por la tenencia, uso y debida conservación del bien patrimonial detallado. Asimismo, se obliga a informar al Departamento de Bienes Patrimoniales sobre su renuncia, traslado o desvinculación del cargo, así como reportar inmediatamente cualquier daño, pérdida o hurto del bien asignado para su gestión, en estricto cumplimiento del Manual de Normas y Procedimientos para la Administración, Uso, Custodia, Clasificación y Contabilización de los Bienes del Estado del Ministerio de Economía y Finanzas.";
         const disclaimerLines = doc.splitTextToSize(disclaimer, pageWidth - 28);
         // Todo el FC-10 vive en una sola hoja oficio: el texto legal y las
         // firmas van directo, sin salto a otra página.
         doc.setFontSize(7.5);
-        doc.setFont("helvetica", "normal");
+        doc.setFont(FUENTE_PDF, "normal");
         doc.text(disclaimerLines, 14, finalY);
         finalY += (disclaimerLines.length * 3.5) + 30;
 
         const leftX = 20;
         doc.setLineWidth(0.3);
         doc.line(leftX, finalY, leftX + 80, finalY);
-        doc.setFont("helvetica", "bold");
+        doc.setFont(FUENTE_PDF, "bold");
         doc.setFontSize(8);
         doc.text("Firma del Funcionario Responsable", leftX + 40, finalY + 5, { align: 'center' });
-        doc.setFont("helvetica", "normal");
+        doc.setFont(FUENTE_PDF, "normal");
         doc.text(`Aclaración: ${sanearTextoPDF(fc.funcionarioNombre) || ''}`, leftX, finalY + 11);
         doc.text(`C.I.: ${formatCI(fc.funcionarioDoc) || ''}`, leftX, finalY + 17);
 
@@ -230,9 +238,9 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
         // en el sistema, la constancia de ese registro.
         const rightX = pageWidth - 100;
         doc.line(rightX, finalY, rightX + 80, finalY);
-        doc.setFont("helvetica", "bold");
+        doc.setFont(FUENTE_PDF, "bold");
         doc.text("Firma del Jefe Inmediato", rightX + 40, finalY + 5, { align: 'center' });
-        doc.setFont("helvetica", "normal");
+        doc.setFont(FUENTE_PDF, "normal");
         doc.text(`Aclaración: ${sanearTextoPDF(fc.jefeInmediatoNombre) || ''}`, rightX, finalY + 11);
         if (fc.jefeInmediatoDoc) {
             doc.text(`C.I.: ${formatCI(fc.jefeInmediatoDoc)}`, rightX, finalY + 17);
@@ -250,9 +258,9 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
         }
         if (partes.length > 0) {
             doc.setFontSize(6.5);
-            doc.setFont("helvetica", "italic");
+            doc.setFont(FUENTE_PDF, "normal");
             doc.text(partes.join(' · '), leftX, finalY + 25);
-            doc.setFont("helvetica", "normal");
+            doc.setFont(FUENTE_PDF, "normal");
         }
 
     });
@@ -265,6 +273,10 @@ export const buildFC10PDFDoc = (fcs, bienesAListar) => {
 export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance, auditor, resumen, filas, logoDataUrl }) => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('p', 'mm', [216, 330]);
+    await prepararFuente(doc);
+    // La fuente incrustada: sin ella Acrobat avisa de que el texto puede
+    // cambiar de aspecto y de que las fuentes no estan integradas.
+    await prepararFuente(doc);
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
 
@@ -272,9 +284,10 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
     let finalY = 12;
 
     if (logoDataUrl) {
-        try { doc.addImage(logoDataUrl, 'PNG', 14, 10, 24, 24); } catch {}
+        const logoPlano = await aplanarImagen(logoDataUrl);
+      try { doc.addImage(logoPlano, 'PNG', 14, 10, 24, 24); } catch {}
     }
-    doc.setFont("helvetica", "bold");
+    doc.setFont(FUENTE_PDF, "bold");
     doc.setFontSize(12);
     doc.text("UNIVERSIDAD NACIONAL DE PILAR", pageWidth / 2, finalY + 2, { align: 'center' });
     finalY += 7;
@@ -296,8 +309,8 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
             ["Resultado:", resumen || '']
         ],
         theme: 'grid',
-        headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
-        bodyStyles: { fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2.5 },
+        headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 8, lineColor: [0, 0, 0], lineWidth: 0.2 },
+        bodyStyles: { font: FUENTE_PDF, fontSize: 8, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, cellPadding: 2.5 },
         columnStyles: { 0: { fontStyle: 'bold', cellWidth: 55 } },
         margin: { left: 14, right: 14, bottom: 25 }
     });
@@ -314,8 +327,8 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
         ]],
         body: (filas || []).map((f, i) => [String(i + 1), f.rotulo || '-', f.descripcion || '-', f.ubicacion || '-', f.resultado || '-']),
         theme: 'grid',
-        headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 7, lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
-        bodyStyles: { fontSize: 7, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
+        headStyles: { font: FUENTE_PDF, fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', fontSize: 7, lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
+        bodyStyles: { font: FUENTE_PDF, fontSize: 7, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.2, valign: 'middle' },
         columnStyles: {
             0: { halign: 'center', cellWidth: 10 },
             1: { halign: 'center', cellWidth: 30 },
@@ -329,7 +342,7 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
 
     const disclaimer = "El presente acta deja constancia del procedimiento de verificación física realizado. Los bienes detallados fueron contrastados contra los registros del Sistema Integrado de Gestión Patrimonial. Las diferencias detectadas deberán ser analizadas por el Departamento de Bienes Patrimoniales conforme a la normativa vigente.";
     doc.setFontSize(7.5);
-    doc.setFont("helvetica", "normal");
+    doc.setFont(FUENTE_PDF, "normal");
     const disclaimerLines = doc.splitTextToSize(disclaimer, pageWidth - 28);
     const bloqueAltura = (disclaimerLines.length * 3.5) + 14 + 22;
     if (finalY + bloqueAltura > pageHeight - 20) {
@@ -342,22 +355,22 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
     doc.setLineWidth(0.3);
     const leftX = 25;
     doc.line(leftX, finalY, leftX + 70, finalY);
-    doc.setFont("helvetica", "bold");
+    doc.setFont(FUENTE_PDF, "bold");
     doc.setFontSize(8);
     doc.text("Auditor Responsable", leftX + 35, finalY + 4, { align: 'center' });
-    doc.setFont("helvetica", "normal");
+    doc.setFont(FUENTE_PDF, "normal");
     doc.text(`Aclaración: ${auditor || ''}`, leftX, finalY + 9);
     const rightX = pageWidth - 95;
     doc.line(rightX, finalY, rightX + 70, finalY);
-    doc.setFont("helvetica", "bold");
+    doc.setFont(FUENTE_PDF, "bold");
     doc.text("Jefe de Dependencia", rightX + 35, finalY + 4, { align: 'center' });
-    doc.setFont("helvetica", "normal");
+    doc.setFont(FUENTE_PDF, "normal");
     doc.text("Aclaración:", rightX, finalY + 9);
 
     const totalPagesDoc = doc.internal.getNumberOfPages();
     for (let p = 1; p <= totalPagesDoc; p++) {
         doc.setPage(p);
-        doc.setFont("helvetica", "normal");
+        doc.setFont(FUENTE_PDF, "normal");
         doc.setFontSize(7);
         doc.setTextColor(130, 130, 130);
         doc.text(`Página ${p} de ${totalPagesDoc}`, pageWidth / 2, pageHeight - 10, { align: 'center' });

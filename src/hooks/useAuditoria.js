@@ -4,6 +4,7 @@ import { normalizeStr, parseDateInfo } from '../utils/helpers';
 import { extraerCodigoQR } from '../utils/qr';
 import { buildActaAuditoriaPDF } from '../utils/pdfGenerators';
 import { registrarAuditoria } from '../services/auditService';
+import { guardarPDF } from '../utils/pdfSanear';
 import { estimarUsoDB, alertaUso } from '../services/supabaseFreeTier';
 import { tomarMuestra } from '../utils/muestreo';
 
@@ -281,7 +282,7 @@ export function useAuditoria({
         resumen: `${resultadoConteo.hallados} hallados de ${resultadoConteo.total} · ${resultadoConteo.faltantes.length} faltantes · ${resultadoConteo.noRegistrados.length} no registrados`,
         filas, logoDataUrl: logo
       });
-      doc.save(`Acta_Conciliacion_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+      guardarPDF(doc, `Acta_Conciliacion_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
       notify('Acta de conciliación generada.', 'success');
     } catch (e) {
       notify('Error al generar el acta: ' + (e.message || 'desconocido'), 'error');
@@ -309,7 +310,7 @@ export function useAuditoria({
         })),
         logoDataUrl: logo
       });
-      doc.save(`Acta_Muestreo_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+      guardarPDF(doc, `Acta_Muestreo_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
       notify('Acta de muestreo generada.', 'success');
     } catch (e) {
       notify('Error al generar el acta: ' + (e.message || 'desconocido'), 'error');

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { toInputDateFormat, formatearMiles, normalizeStr } from '../utils/helpers';
 import { useDraft, serializarForm } from '../hooks/useDraft';
+import Dialogo from './ui/Dialogo';
 import FiltroCombo from './FiltroCombo';
 
 export default function BienModal({
@@ -213,7 +214,7 @@ export default function BienModal({
     };
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
           <div className={STYLES.modalContent + " max-w-4xl overflow-hidden"}>
             
             {/* Header */}
@@ -501,6 +502,6 @@ export default function BienModal({
 
             </form>
           </div>
-        </div>
+        </Dialogo>
     );
 }

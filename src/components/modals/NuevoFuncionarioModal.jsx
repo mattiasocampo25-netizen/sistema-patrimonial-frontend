@@ -1,6 +1,7 @@
 // src/components/modals/NuevoFuncionarioModal.jsx
 import FiltroCombo from '../FiltroCombo';
 import React, { useState } from 'react';
+import Dialogo from '../ui/Dialogo';
 import { formatearMiles } from '../../utils/helpers';
 
 export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, dependenciaActual, ubicaciones = [], STYLES }) {
@@ -16,7 +17,7 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
     };
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={STYLES.modalContent + " max-w-lg overflow-hidden"}>
                 <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
                     <div className="flex items-center gap-3">
@@ -79,6 +80,6 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                     </div>
                 </form>
             </div>
-        </div>
+        </Dialogo>
     );
 }

@@ -1,4 +1,5 @@
 // src/components/modals/ScannerModal.jsx
+import Dialogo from '../ui/Dialogo';
 import React from 'react';
 
 export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual, modoCampo, setModoCampo, STYLES }) {
@@ -11,7 +12,7 @@ export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual
     };
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
           <div className={STYLES.modalContent + " max-w-md !p-0 overflow-hidden rounded-[24px]"}>
             <div className="flex items-center gap-3 px-5 py-4 border-b border-line dark:border-white/10">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 text-content-1 dark:bg-surface-1/10 dark:text-white">
@@ -56,6 +57,6 @@ export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual
                 </button>
             </div>
           </div>
-        </div>
+        </Dialogo>
     );
 }

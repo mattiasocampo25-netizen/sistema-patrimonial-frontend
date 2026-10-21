@@ -1,10 +1,11 @@
 import React from 'react';
+import Dialogo from '../ui/Dialogo';
 import { SHORTCUTS } from '../../constants/appConstants';
 
 export default function AtajosModal({ isOpen, onClose, STYLES }) {
   if (!isOpen) return null;
   return (
-    <div className={STYLES.modalOverlay} onClick={onClose}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-md"} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Atajos de teclado">
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3">
@@ -36,6 +37,6 @@ export default function AtajosModal({ isOpen, onClose, STYLES }) {
           <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Entendido</button>
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }

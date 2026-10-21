@@ -1,3 +1,4 @@
+import Dialogo from './ui/Dialogo';
 import React from 'react';
 
 export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYLES }) {
@@ -6,7 +7,7 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
   const { validos = [], duplicados = [], errores = [], tipo = 'bienes' } = data;
 
   return (
-    <div className={STYLES.modalOverlay}>
+    <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-2xl overflow-hidden"}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
           <div className="flex items-center gap-3">
@@ -83,6 +84,6 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
           </button>
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }

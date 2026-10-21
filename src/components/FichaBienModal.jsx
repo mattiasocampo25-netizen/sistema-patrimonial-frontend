@@ -1,3 +1,4 @@
+import Dialogo from './ui/Dialogo';
 import React, { useState } from 'react';
 
 const TIPO_STYLE = {
@@ -22,7 +23,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
   );
 
   return (
-    <div className={STYLES.modalOverlay} onClick={onClose}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-2xl"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -169,6 +170,6 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
           </button>
         </div>
       )}
-    </div>
+    </Dialogo>
   );
 }

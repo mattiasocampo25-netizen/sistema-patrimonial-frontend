@@ -7,6 +7,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
+import Dialogo from '../components/ui/Dialogo';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
@@ -873,7 +874,7 @@ export default function InventarioView({
         />
       )}
       {confirmaBajaMasiva && (
-        <div className={STYLES.modalOverlay} onClick={() => setConfirmaBajaMasiva(false)}>
+        <Dialogo className={STYLES.modalOverlay} onClick={() => setConfirmaBajaMasiva(false)}>
           <div className={STYLES.modalContent + ' max-w-[380px] !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line animate-slide-up'} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Confirmar baja masiva">
             <div className="p-8 text-center bg-surface-1 dark:bg-surface-1">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-card mb-6 bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
@@ -887,11 +888,11 @@ export default function InventarioView({
               </p>
             </div>
             <div className="flex items-center gap-3 p-6 bg-surface-2 dark:bg-surface-2 border-t border-line dark:border-line">
-              <button onClick={() => setConfirmaBajaMasiva(false)} className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer">Cancelar</button>
+              <button data-modal-close onClick={() => setConfirmaBajaMasiva(false)} className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer">Cancelar</button>
               <button onClick={() => { setConfirmaBajaMasiva(false); if (onBajaMasiva) onBajaMasiva(seleccionados); }} className="flex-1 h-10 px-5 rounded-control text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer">Confirmar</button>
             </div>
           </div>
-        </div>
+        </Dialogo>
       )}
 
                 </div>

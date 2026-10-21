@@ -1,3 +1,4 @@
+import Dialogo from '../ui/Dialogo';
 import React, { useState, useEffect } from 'react';
 
 // Gestor del catálogo de ubicaciones de la dependencia (solo admin).
@@ -22,7 +23,7 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
   };
 
   return (
-    <div className={STYLES.modalOverlay} onClick={onClose}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-lg"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3">
@@ -124,6 +125,6 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
           </button>
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }

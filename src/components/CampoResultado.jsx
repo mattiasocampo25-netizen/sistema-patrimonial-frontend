@@ -4,7 +4,7 @@ export default function CampoResultado({ escaneo, onVerFicha, onSeguir, onCerrar
   if (!escaneo?.bien) return null;
   const bien = escaneo.bien;
   return (
-    <div className={STYLES.modalOverlay} onClick={onCerrar}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onCerrar}>
       <div
         className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center"}
         onClick={(e) => e.stopPropagation()}
@@ -50,6 +50,6 @@ export default function CampoResultado({ escaneo, onVerFicha, onSeguir, onCerrar
           Cerrar
         </button>
       </div>
-    </div>
+    </Dialogo>
   );
 }

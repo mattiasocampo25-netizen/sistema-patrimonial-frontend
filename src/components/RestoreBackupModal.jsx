@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { STYLES } from '../constants/appConstants';
+import Dialogo from './ui/Dialogo';
 import { TABLAS_RESTORABLES, ORDEN_RESTAURACION } from '../services/restore';
 
 // ============================================================================
@@ -46,7 +47,7 @@ export default function RestoreBackupModal({ restore }) {
   const totalSeleccionado = totalFilasElegidas();
 
   return (
-    <div className={STYLES.modalOverlay}>
+    <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-3xl"}>
         {/* Encabezado */}
         <div className="flex items-start justify-between gap-4 border-b border-line dark:border-white/10 px-6 py-5">
@@ -321,7 +322,7 @@ export default function RestoreBackupModal({ restore }) {
           )}
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }
 

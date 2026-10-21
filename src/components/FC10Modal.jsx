@@ -3,6 +3,7 @@ import { normalizeStr } from '../utils/helpers';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import CampoCatalogo from './CampoCatalogo';
 import SelectorPersona from './SelectorPersona';
+import Dialogo from './ui/Dialogo';
 import { FC10_ORGANOS, FC10_UNIDADES, opcionesCatalogoFC10, organoDeUnidad } from '../constants/fc10Catalogo';
 
 export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Editing, saveFC10, STYLES, formatCurrency, funcionariosConDatos, dependenciaActual, estructurasDB, dependenciasList }) {
@@ -359,7 +360,7 @@ const valorOrgExplicito = (campo) => {
     const jefeConDatos = !!(matchJefe?.doc || matchJefe?.cargo);
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={`${STYLES.modalContent} max-w-3xl`}>
                 
                 <div className="px-5 sm:px-6 py-4 border-b border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1 shrink-0 z-10 flex items-center justify-between gap-4">
@@ -776,6 +777,6 @@ const valorOrgExplicito = (campo) => {
                     </div>
                 </form>
             </div>
-        </div>
+        </Dialogo>
     );
 }

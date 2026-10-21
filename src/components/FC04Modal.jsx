@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDraft, serializarForm } from '../hooks/useDraft';
+import Dialogo from './ui/Dialogo';
 import FiltroCombo from './FiltroCombo';
 
 const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
@@ -25,7 +26,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
     };
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={STYLES.modalContent + " max-w-5xl"}>
                 <div className={STYLES.modalHeader + " gap-4"}>
                     <div className="flex items-center gap-3">
@@ -106,6 +107,6 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                     </div>
                 </form>
             </div>
-        </div>
+        </Dialogo>
     );
 }

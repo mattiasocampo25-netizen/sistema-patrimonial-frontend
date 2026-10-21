@@ -22,6 +22,7 @@ import DependenciasModal from './modals/DependenciasModal';
 import UbicacionesModal from './modals/UbicacionesModal';
 import MantenimientoModal from './modals/MantenimientoModal';
 import CampoResultado from './CampoResultado';
+import Dialogo from './ui/Dialogo';
 import { formatCurrency, formatDateText, formatCI, matchSearchWords, normalizeStr } from '../utils/helpers';
 
 // Cableado de modales y flotantes (extraído de App.jsx, Fase 6).
@@ -246,7 +247,7 @@ export default function AppModals({
         STYLES={STYLES}
     />
           {isFC03ModalOpen && (
-            <div className={STYLES.modalOverlay}>
+            <Dialogo className={STYLES.modalOverlay}>
               <div className={STYLES.modalContent + " max-w-md overflow-hidden border border-line/80 dark:border-zinc-800 shadow-2xl bg-surface-1 dark:bg-zinc-900 animate-slide-up"}>
                 {/* CABECERA LIMPIA */}
                 <div className="relative px-6 sm:px-8 py-6 border-b border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 flex justify-between items-center">
@@ -407,7 +408,7 @@ export default function AppModals({
                   </button>
                 </div>
               </div>
-            </div>
+            </Dialogo>
           )}
           {isFC04ModalOpen && (
               <FC04Modal 
@@ -637,7 +638,7 @@ export default function AppModals({
           if (nBienes > 0) impacto.push(nBienes + (nBienes === 1 ? ' bien a su cargo' : ' bienes a su cargo'));
         }
             return (
-            <div className={STYLES.modalOverlay}>
+            <Dialogo className={STYLES.modalOverlay}>
                 <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
 
                     <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-card mb-4 ${esSolicitud ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
@@ -691,12 +692,12 @@ export default function AppModals({
                     </div>
 
                 </div>
-            </div>
+            </Dialogo>
             );
           })()}
           {/* MODAL DE CONFIRMACIÓN DE BACKUP GENERAL */}
           {confirmBackupModal && (
-            <div className={STYLES.modalOverlay}>
+            <Dialogo className={STYLES.modalOverlay}>
               <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-database text-xl"></i>
@@ -709,7 +710,8 @@ export default function AppModals({
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
-                    onClick={() => setConfirmBackupModal(false)}
+                    data-modal-close
+              onClick={() => setConfirmBackupModal(false)}
                     className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                     Cancelar
@@ -725,12 +727,12 @@ export default function AppModals({
                   </button>
                 </div>
               </div>
-            </div>
+            </Dialogo>
           )}
 
           {/* MODAL DE CONFIRMACIÓN DE IMPORTACIÓN MASIVA CSV */}
           {pendingCSVImport && (
-            <div className={STYLES.modalOverlay}>
+            <Dialogo className={STYLES.modalOverlay}>
               <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-file-csv text-xl"></i>
@@ -774,11 +776,11 @@ export default function AppModals({
                   </button>
                 </div>
               </div>
-            </div>
+            </Dialogo>
           )}
 
           {showChangelog && (
-            <div className={STYLES.modalOverlay}>
+            <Dialogo className={STYLES.modalOverlay}>
                 <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
                     <div className="px-6 py-8 sm:px-8 text-center relative overflow-hidden bg-[#0a1c38]">
                         <div className="absolute -top-20 left-1/2 -translate-x-1/2 h-48 w-[22rem] rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
@@ -813,7 +815,7 @@ export default function AppModals({
                         </button>
                     </div>
                 </div>
-            </div>
+            </Dialogo>
           )}
           <ConsolidadoFC10Modal 
         isOpen={isConsolidatedFC10ModalOpen}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Dialogo from '../ui/Dialogo';
 import { formatCI, normalizeStr } from '../../utils/helpers';
 
 export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependenciaActual, funcionariosPadron, handleGenerateConsolidatedFC10PDF, STYLES }) {
@@ -9,7 +10,7 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
     if (!isOpen) return null;
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={STYLES.modalContent + " max-w-2xl"}>
                 
                 <div className="px-8 py-6 border-b border-line dark:border-zinc-800 bg-surface-1 dark:bg-zinc-900 flex justify-between items-center gap-4">
@@ -107,6 +108,6 @@ export default function ConsolidadoFC10Modal({ isOpen, onClose, bienes, dependen
                     <button onClick={() => { onClose(); setSearchConsolidadoModal(''); }} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary motion active:scale-95 cursor-pointer">Cerrar</button>
                 </div>
             </div>
-        </div>
+        </Dialogo>
     );
 }

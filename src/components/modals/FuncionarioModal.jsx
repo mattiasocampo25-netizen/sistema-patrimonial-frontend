@@ -1,13 +1,14 @@
 // src/components/modals/FuncionarioModal.jsx
 import FiltroCombo from '../FiltroCombo';
 import React from 'react';
+import Dialogo from '../ui/Dialogo';
 import { formatCI } from '../../utils/helpers';
 
 export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, saveFuncionarioEdit, ubicaciones = [], STYLES }) {
     if (!isOpen || !funcionarioToEdit) return null;
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
                 <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
                     <div className="flex items-center gap-3">
@@ -83,6 +84,6 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                     </div>
                 </form>
             </div>
-        </div>
+        </Dialogo>
     );
 }

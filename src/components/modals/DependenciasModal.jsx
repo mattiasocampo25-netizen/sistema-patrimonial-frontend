@@ -1,5 +1,6 @@
 import FiltroCombo from '../FiltroCombo';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import Dialogo from '../ui/Dialogo';
 import { normalizeStr } from '../../utils/helpers';
 
 // Gestor de dependencias v4: maestro-detalle con búsqueda unificada.
@@ -143,7 +144,7 @@ export default function DependenciasModal({
   };
 
   return (
-    <div className={STYLES.modalOverlay} onClick={onClose}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-5xl !max-h-[90dvh]"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-line dark:border-line shrink-0">
           <div className="flex items-center gap-3 min-w-0">
@@ -417,7 +418,7 @@ export default function DependenciasModal({
           </button>
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }
 

@@ -1,5 +1,6 @@
 // src/components/modals/UsuarioModal.jsx
 import React from 'react';
+import Dialogo from '../ui/Dialogo';
 import FiltroCombo from '../FiltroCombo';
 
 const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
@@ -8,7 +9,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
     if (!isOpen) return null;
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
           <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
             <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
               <div className="flex items-center gap-3">
@@ -107,6 +108,6 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
               </div>
             </form>
           </div>
-        </div>
+        </Dialogo>
     );
 }

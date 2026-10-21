@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDraft, serializarForm } from '../hooks/useDraft';
+import Dialogo from './ui/Dialogo';
 import FiltroCombo from './FiltroCombo';
 
 export default function FC11Modal({
@@ -42,7 +43,7 @@ export default function FC11Modal({
     };
 
     return (
-        <div className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay}>
             <div className={STYLES.modalContent + " max-w-4xl"}>
                 
                 {/* CABECERA */}
@@ -206,6 +207,6 @@ export default function FC11Modal({
                     </div>
                 </form>
             </div>
-        </div>
+        </Dialogo>
     );
 }

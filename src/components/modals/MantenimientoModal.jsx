@@ -1,3 +1,4 @@
+import Dialogo from '../ui/Dialogo';
 import React, { useState, useEffect } from 'react';
 
 export default function MantenimientoModal({ isOpen, onClose, initial, onSave, isSaving, STYLES }) {
@@ -19,7 +20,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
   if (!isOpen) return null;
 
   return (
-    <div className={STYLES.modalOverlay} onClick={onClose}>
+    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-md"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3">
@@ -99,6 +100,6 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
           </button>
         </div>
       </div>
-    </div>
+    </Dialogo>
   );
 }

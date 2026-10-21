@@ -1,3 +1,4 @@
+import Dialogo from '../ui/Dialogo';
 import React, { useState, useEffect } from 'react';
 
 export default function QRModal({
@@ -49,7 +50,7 @@ export default function QRModal({
   if (!isOpen) return null;
 
   return (
-    <div className={STYLES.modalOverlay}>
+    <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-md"}>
         
         {/* Cabecera */}
@@ -170,6 +171,6 @@ export default function QRModal({
         </div>
 
       </div>
-    </div>
+    </Dialogo>
   );
 }

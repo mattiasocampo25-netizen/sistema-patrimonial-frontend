@@ -69,6 +69,15 @@ const PDF_CON_PROBLEMAS = [
 ].join('\n');
 
 describe('saneado de PDF', () => {
+  test('el PDF conserva EXACTAMENTE el mismo numero de bytes', () => {
+    // Esto es lo mas importante: si el saneado acortara el archivo, los
+    // desplazamientos de la tabla xref dejarian de valer y Acrobat
+    // responderia "Hay un error en esta pagina".
+    const original = aBuffer(PDF_CON_PROBLEMAS);
+    const limpio = sanearPDF(original);
+    assert.equal(limpio.byteLength, original.byteLength, 'el tamaño no puede cambiar');
+  });
+
   test('quita la accion automatica al abrir (OpenAction)', () => {
     const limpio = aTexto(sanearPDF(aBuffer(PDF_CON_PROBLEMAS)));
     assert.ok(!limpio.includes('/OpenAction'), 'el catalogo no debe llevar /OpenAction');
@@ -97,12 +106,6 @@ describe('saneado de PDF', () => {
     const raro = aBuffer('esto no es un PDF');
     const salida = sanearPDF(raro);
     assert.ok(salida instanceof ArrayBuffer);
-  });
-
-  test('el tamano del PDF se mantiene dentro de lo razonable', () => {
-    const original = aBuffer(PDF_CON_PROBLEMAS).byteLength;
-    const limpio = sanearPDF(aBuffer(PDF_CON_PROBLEMAS)).byteLength;
-    assert.ok(limpio <= original, 'el saneado no puede agrandar el PDF');
   });
 });
 

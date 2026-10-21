@@ -62,7 +62,6 @@ export default function AppShell({
         isAdmin={isAdmin}
         esDesarrollador={esDesarrollador}
         solicitudesBaja={solicitudesBaja}
-        dependenciaActual={dependenciaActual}
         onExportBackup={onExportBackup}
         onOpenRestore={onOpenRestore}
         mantenimiento={mantenimiento}

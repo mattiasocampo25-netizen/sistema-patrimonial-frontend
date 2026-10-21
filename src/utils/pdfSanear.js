@@ -236,23 +236,22 @@ export function sanearPDF(arrayBuffer) {
   try {
     let txt = new TextDecoder('latin1').decode(new Uint8Array(arrayBuffer));
 
-    // 1) la accion automatica al abrir
-    txt = txt.replace(/\/OpenAction\s*\[[^\]]*\]\s*/g, '');
-
-    // 2) las fuentes declaradas en /Font que no usa el contenido
+    // Las fuentes que usa el contenido: se calculan ANTES de tocar nada.
     const usadas = new Set();
     for (const m of txt.matchAll(/\/(F\d+)\s+[\d.]+\s+Tf/g)) usadas.add(m[1]);
 
+    // 1) La accion automatica al abrir.
+    //    Se sustituye por ESPACIOS del mismo numero de bytes: el PDF pierde
+    //    la accion, pero el archivo no cambia de tamano y la tabla xref
+    //    sigue siendo valida. (Borrarla dejaba los desplazamientos
+    //    desfasados y Acrobat avisaba de un error en la pagina.)
+    txt = txt.replace(/\/OpenAction\s*\[[^\]]*\]/g, (m) => ' '.repeat(m.length));
+
+    // 2) Las fuentes declaradas en /Font que no usa el contenido: igual,
+    //    con espacios.
     txt = txt.replace(/\/Font\s*<<([^>]*?)>>/g, (todo, cuerpo) => {
-      const limpio = cuerpo
-        .split(/\s+/)
-        .filter(Boolean)
-        .filter((tok) => {
-          const m = /^\/(F\d+)$/.exec(tok);
-          return !m || usadas.has(m[1]);
-        })
-        .join(' ');
-      return '/Font << ' + limpio + ' >>';
+      const limpio = cuerpo.replace(/\/(F\d+)\s+\d+\s+0\s+R/g, (m, f) => (usadas.has(f) ? m : ' '.repeat(m.length)));
+      return '/Font <<' + limpio + '>>';
     });
 
     const salida = new Uint8Array(txt.length);

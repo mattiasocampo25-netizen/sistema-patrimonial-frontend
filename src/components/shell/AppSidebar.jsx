@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getLogoPorDependencia } from '../../utils/helpers';
 import { useIdioma } from '../../utils/i18n';
 
 /**
@@ -113,7 +112,6 @@ export default function AppSidebar({
   isAdmin,
   esDesarrollador,
   solicitudesBaja,
-  dependenciaActual,
   onExportBackup,
   onOpenRestore,
   mantenimiento,
@@ -145,9 +143,7 @@ export default function AppSidebar({
   }, [isSidebarOpen]);
   const { t } = useIdioma();
   const LOGO_SISTEMA = '/UNP-Site-Logo.webp';
-  const LOGO_SISTEMA_NEGRO = '/UNP-Site-Logo-negro.webp';
   const LOGO_SISTEMA_PNG = '/UNP-Site-Logo.png';
-  const logoDep = getLogoPorDependencia(dependenciaActual, 'webp');
 
   const cerrar = () => setIsSidebarOpen && setIsSidebarOpen(false);
 
@@ -188,17 +184,15 @@ export default function AppSidebar({
             </div>
           ) : (
             <div className="flex items-center gap-3">
+              {/* El menu lateral es siempre oscuro (bg-sidebar no cambia con
+                  el tema), asi que el logo tiene que ser el BLANCO siempre.
+                  Antes se elegia segun el tema de la aplicacion y en modo
+                  claro salia el logo negro sobre el panel negro. */}
               <img
                 src={LOGO_SISTEMA}
                 alt="Universidad Nacional de Pilar"
-                className="hidden dark:block h-9 w-auto max-w-[150px] object-contain object-left"
+                className="h-9 w-auto max-w-[150px] object-contain object-left"
                 onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }}
-              />
-              <img
-                src={LOGO_SISTEMA_NEGRO}
-                alt="Universidad Nacional de Pilar"
-                className="dark:hidden h-9 w-auto max-w-[150px] object-contain object-left"
-                onError={(e) => { e.target.onerror = null; e.target.src = logoDep; }}
               />
               <div className="flex-1" />
             </div>

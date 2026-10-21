@@ -67,11 +67,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t }) {
       aria-current={activo ? 'page' : undefined}
       title={t(item.label)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-        activo
-          ? 'bg-surface-1/10 text-white font-bold'
-          : 'text-sidebar-content-2 font-medium hover:bg-surface-1/[0.07] hover:text-sidebar-content'
-      }`}
+      className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-surface-1/10 text-white font-bold' : 'text-sidebar-content-2 font-medium hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
       {activo ? (
         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-pill bg-brand" aria-hidden="true" />
@@ -148,9 +144,7 @@ export default function AppSidebar({
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-transform duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-transform duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${ isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full' }`}
         aria-label="Navegación principal"
       >
         {/* Identidad */}

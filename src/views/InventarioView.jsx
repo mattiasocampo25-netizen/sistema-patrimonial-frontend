@@ -167,7 +167,7 @@ export default function InventarioView({
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
   return (
-<div className="space-y-6 pb-12 font-sans text-slate-900 dark:text-slate-100">
+<div className="space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <Card className="p-0">
@@ -192,7 +192,7 @@ export default function InventarioView({
           className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Descargar Plantilla CSV"
         >
-          <i className="fa-solid fa-file-excel text-emerald-600"></i>
+          <i className="fa-solid fa-file-excel text-ok"></i>
           <span>{t('inv.plantilla')}</span>
         </button>
   
@@ -201,7 +201,7 @@ export default function InventarioView({
           className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Importar archivo CSV"
         >
-          <i className="fa-solid fa-file-import text-emerald-600"></i>
+          <i className="fa-solid fa-file-import text-ok"></i>
           <span>{t('inv.importar')}</span>
         </button>
   
@@ -219,7 +219,7 @@ export default function InventarioView({
           className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Exportar Excel real (.xlsx)"
         >
-          <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+          <i className="fa-solid fa-file-excel text-ok dark:text-emerald-400"></i>
           <span>{t('inv.excel')}</span>
         </button>
   
@@ -249,7 +249,7 @@ export default function InventarioView({
           className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Generar Reporte FC-03"
         >
-          <i className="fa-solid fa-print text-amber-600"></i>
+          <i className="fa-solid fa-print text-warn"></i>
           <span>FC-03</span>
         </button>
   
@@ -304,7 +304,7 @@ export default function InventarioView({
           <button
             type="button" onMouseDown={(e) => e.preventDefault()}
             onClick={() => { setRecientes([]); try { localStorage.removeItem('inv_recientes'); } catch {} }}
-            className="w-full px-4 py-1.5 text-left text-[11px] font-bold text-content-3 hover:text-rose-500 transition-colors cursor-pointer"
+            className="w-full px-4 py-1.5 text-left text-[11px] font-bold text-content-3 hover:text-danger transition-colors cursor-pointer"
           >
             Borrar historial
           </button>
@@ -444,7 +444,7 @@ export default function InventarioView({
         {hasFilters && (
           <button
             onClick={clearAllFilters}
-            className="text-xs font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-400 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="text-xs font-semibold text-danger hover:text-danger dark:text-rose-400 flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-xs"></i> Restablecer filtros
           </button>
@@ -528,7 +528,7 @@ export default function InventarioView({
             title={compacto ? 'Vista cómoda' : 'Vista compacta'}
             className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           >
-            <i className={'fa-solid text-xs ' + (compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right')}></i>
+            <i className={'fa-solid text-xs' + (compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right')}></i>
           </button>
           <div className="relative">
             <button
@@ -548,7 +548,7 @@ export default function InventarioView({
                       onClick={() => alternarCol(k)}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer"
                     >
-                      <span className={'flex h-4 w-4 items-center justify-center rounded border ' + (cols[k] ? 'bg-brand-primary border-brand-primary text-white' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
+                      <span className={'flex h-4 w-4 items-center justify-center rounded border' + (cols[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
                         <i className="fa-solid fa-check text-[9px]"></i>
                       </span>
                       {label}
@@ -592,14 +592,14 @@ export default function InventarioView({
                     <div className="p-4 sm:p-5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                         {itemsPaginados.map((item) => (
-                          <div key={item.id} className={`relative rounded-card border p-4 shadow-xs card-lift bg-surface-1 dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand-primary/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
+                          <div key={item.id} className={`relative rounded-card border p-4 shadow-xs card-lift bg-surface-1 dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
                               <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{item.descripcion}</p>
-                                <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-emerald-500 text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
-                                <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-rose-500 text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
+                                <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
+                                <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-line dark:border-zinc-700/50">
@@ -678,10 +678,10 @@ export default function InventarioView({
                             const getCondicionBadge = (cond) => {
                               const c = (cond || '').toLowerCase();
                               if (c.includes('muy bueno') || c.includes('excelente')) 
-                                return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+                                return 'bg-emerald-500/10 text-ok dark:text-emerald-400 border-emerald-500/20';
                               if (c.includes('bueno')) 
                                 return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
-                              return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+                              return 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20';
                             };
 
                             return (
@@ -725,11 +725,11 @@ export default function InventarioView({
                                 <TD className={`px-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
-                                      <i className="fa-solid fa-user-check text-emerald-500 text-xs shrink-0"></i>
+                                      <i className="fa-solid fa-user-check text-ok text-xs shrink-0"></i>
                                       <span className="truncate">{item.funcionario || 'Sin asignación'}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
-                                      <i className="fa-solid fa-location-dot text-rose-500 text-xs shrink-0"></i>
+                                      <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>
                                       <span className="truncate">{item.ubicacion || 'Sin ubicación'}</span>
                                     </div>
                                     {(() => {
@@ -757,11 +757,7 @@ export default function InventarioView({
                                       type="button"
                                       onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }}
                                       title={item.hasQR ? "Ver / Descargar Código QR" : "Generar Código QR"}
-                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 min-w-[76px] rounded-control text-[11px] font-semibold border transition-all cursor-pointer active:scale-95 ${
-                                        item.hasQR 
-                                          ? 'bg-zinc-900 text-white dark:bg-zinc-900 dark:text-zinc-100 border-zinc-900 dark:border-white shadow-xs hover:opacity-85' 
-                                          : 'bg-surface-3 dark:bg-zinc-800/50 text-content-3 dark:text-content-3 border-line dark:border-zinc-700/30 hover:border-zinc-400'
-                                      }`}
+                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 min-w-[76px] rounded-control text-[11px] font-semibold border transition-all cursor-pointer active:scale-95 ${ item.hasQR ? 'bg-zinc-900 text-white dark:bg-zinc-900 dark:text-zinc-100 border-zinc-900 dark:border-white shadow-xs hover:opacity-85' : 'bg-surface-3 dark:bg-zinc-800/50 text-content-3 dark:text-content-3 border-line dark:border-zinc-700/30 hover:border-zinc-400' }`}
                                     >
                                       <i className="fa-solid fa-qrcode text-[10px]"></i>
                                       <span>{item.hasQR ? 'Con QR' : 'Sin QR'}</span>
@@ -827,7 +823,7 @@ export default function InventarioView({
                                           setItemToDelete({ type: 'requestBaja', id: item.id, item });
                                         }
                                       }}
-                                      className="h-9 w-9 flex items-center justify-center text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-control transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-danger dark:text-rose-400 bg-danger-soft dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Eliminar o Solicitar Baja" aria-label="Eliminar o Solicitar Baja"
                                     >
                                       <i className="fa-solid fa-trash-can text-xs"></i>
@@ -877,7 +873,7 @@ export default function InventarioView({
         <Dialogo className={STYLES.modalOverlay} onClick={() => setConfirmaBajaMasiva(false)}>
           <div className={STYLES.modalContent + ' max-w-[380px] !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line animate-slide-up'} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Confirmar baja masiva">
             <div className="p-8 text-center bg-surface-1 dark:bg-surface-1">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-card mb-6 bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-card mb-6 bg-rose-100 text-danger dark:bg-rose-500/10 dark:text-rose-400">
                 <i className="fa-solid fa-trash-can text-xl"></i>
               </div>
               <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-3">

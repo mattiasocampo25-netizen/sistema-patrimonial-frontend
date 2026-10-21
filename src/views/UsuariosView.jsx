@@ -78,7 +78,7 @@ export default function UsuariosView({
                                 <i className="fa-solid fa-pen-to-square text-[13px]"></i>
                             </button>
                             {u.username !== currentUser.username && (
-                                <button onClick={() => setItemToDelete({type:'usuario', username: u.username, cargo: u.cargo, item: u})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar usuario" aria-label="Eliminar usuario">
+                                <button onClick={() => setItemToDelete({type:'usuario', username: u.username, cargo: u.cargo, item: u})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar usuario" aria-label="Eliminar usuario">
                                     <i className="fa-solid fa-trash-can text-[13px]"></i>
                                 </button>
                             )}

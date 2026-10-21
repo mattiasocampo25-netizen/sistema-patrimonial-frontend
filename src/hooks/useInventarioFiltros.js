@@ -317,9 +317,9 @@ useEffect(() => {
       };
       return [
         { id: 'sinQR', label: 'Sin etiqueta QR', count: base.filter(b => b.hasQR !== true).length, icon: 'fa-qrcode', box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20' },
-        { id: 'sinFC10', label: 'Sin acta FC-10', count: base.filter(b => b.hasFC10 !== true).length, icon: 'fa-file-signature', box: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+        { id: 'sinFC10', label: 'Sin acta FC-10', count: base.filter(b => b.hasFC10 !== true).length, icon: 'fa-file-signature', box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20' },
         { id: 'sinUbicacion', label: 'Sin ubicación', count: base.filter(b => !String(b.ubicacion || '').trim()).length, icon: 'fa-location-dot', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
-        { id: 'sinFuncionario', label: 'Sin responsable', count: base.filter(b => !String(b.funcionario || '').trim()).length, icon: 'fa-user-tie', box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' },
+        { id: 'sinFuncionario', label: 'Sin responsable', count: base.filter(b => !String(b.funcionario || '').trim()).length, icon: 'fa-user-tie', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20' },
         { id: 'vidaVencida', label: 'Vida útil vencida', count: base.filter(esVidaVencida).length, icon: 'fa-hourglass-end', box: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
         { id: 'porVencer', label: 'Por vencer (12 m.)', count: base.filter(b => { const r = mesesRestantes(b); return r !== null && r > 0 && r <= 12; }).length, icon: 'fa-hourglass-half', box: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20' },
       ];

@@ -39,10 +39,10 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                                 <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-content-3 dark:text-content-3 mb-2 whitespace-normal">Cédula de Identidad</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm"></i>
-                                    <input type="text" name="cedula" required inputMode="numeric" onInput={(e) => { e.target.value = formatearMiles(e.target.value); validarCI(e.target.value); }} onBlur={(e) => validarCI(e.target.value)} className={`${STYLES.input} pl-11 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. 1.234.567" />
+                                    <input type="text" name="cedula" required inputMode="numeric" onInput={(e) => { e.target.value = formatearMiles(e.target.value); validarCI(e.target.value); }} onBlur={(e) => validarCI(e.target.value)} className={`${STYLES.input} pl-11 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej. 1.234.567" />
                                 </div>
                                 {ciAviso && (
-                                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-warn dark:text-amber-400">
                                     <i className="fa-solid fa-triangle-exclamation text-[10px]"></i>{ciAviso}
                                   </p>
                                 )}
@@ -51,14 +51,14 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                                 <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-content-3 dark:text-content-3 mb-2 whitespace-normal">Nombre Completo</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm"></i>
-                                    <input type="text" name="nombre" required className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. Juan Pérez" />
+                                    <input type="text" name="nombre" required className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej. Juan Pérez" />
                                 </div>
                             </div>
                             <div>
                                 <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-content-3 dark:text-content-3 mb-2 whitespace-normal">Cargo Institucional</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm"></i>
-                                    <input type="text" name="cargo" className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej. Administrador" />
+                                    <input type="text" name="cargo" className={`${STYLES.input} pl-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej. Administrador" />
                                 </div>
                             </div>
                             <div>

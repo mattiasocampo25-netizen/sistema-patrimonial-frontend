@@ -8,7 +8,7 @@ export default function UnsavedChangesModal({ isOpen, onConfirmClose, onCancel, 
     <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-sm rounded-[24px] p-6 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
         
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 mb-4">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-amber-100 dark:bg-amber-500/10 text-warn dark:text-amber-400 mb-4">
           <i className="fa-solid fa-triangle-exclamation text-xl"></i>
         </div>
 

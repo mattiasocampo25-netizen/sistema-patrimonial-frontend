@@ -17,11 +17,11 @@ import { normalizeStr } from '../utils/helpers';
 // ( emerald = bueno, sky = muy bueno, amber = regular, rose = malo,
 // zinc = inutilizable) para no inventar un código de color nuevo.
 const COLUMNAS = [
-  { estado: 'Muy bueno', icon: 'fa-circle-check',   chip: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25' },
+  { estado: 'Muy bueno', icon: 'fa-circle-check',   chip: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border-emerald-500/25' },
   { estado: 'Bueno',      icon: 'fa-circle',         chip: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/25' },
-  { estado: 'Regular',    icon: 'fa-circle-half-stroke', chip: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25' },
+  { estado: 'Regular',    icon: 'fa-circle-half-stroke', chip: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/25' },
   { estado: 'Malo',       icon: 'fa-circle-exclamation', chip: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/25' },
-  { estado: 'Inutilizable', icon: 'fa-ban',          chip: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25' },
+  { estado: 'Inutilizable', icon: 'fa-ban',          chip: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/25' },
   { estado: 'De Baja',    icon: 'fa-trash-can',      chip: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/25' }
 ];
 
@@ -79,11 +79,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
               onDragOver={(e) => { e.preventDefault(); setColActiva(col.estado); }}
               onDragLeave={() => setColActiva((a) => (a === col.estado ? null : a))}
               onDrop={() => alSoltar(col.estado)}
-              className={`flex flex-col rounded-card border p-2.5 min-h-[140px] motion duration-[var(--dur-base)] ${
-                resaltada
-                  ? 'border-brand-primary bg-brand-primary/[0.06] shadow-md'
-                  : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1/[0.03]'
-              }`}
+              className={`flex flex-col rounded-card border p-2.5 min-h-[140px] motion duration-[var(--dur-base)] ${ resaltada ? 'border-brand bg-brand/[0.06] shadow-md' : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1/[0.03]' }`}
             >
               <div className="flex items-center gap-2 px-1 pb-2.5 mb-2 border-b border-line dark:border-white/5">
                 <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${col.chip}`}>
@@ -100,7 +96,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                     draggable={Boolean(onMover)}
                     onDragStart={() => setDragId(b.id)}
                     onDragEnd={() => { setDragId(null); setColActiva(null); }}
-                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs motion ${dragId === b.id ? 'opacity-40' : 'hover:border-brand-primary/40 hover:shadow-sm card-lift'}`}
+                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs motion ${dragId === b.id ? 'opacity-40' : 'hover:border-brand/40 hover:shadow-sm card-lift'}`}
                   >
                     <div className="flex items-start gap-2">
                       {onOpenFicha && (

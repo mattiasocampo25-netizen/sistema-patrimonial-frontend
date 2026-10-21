@@ -12,7 +12,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
 
   return (
     <div className="min-h-dvh flex flex-col w-full bg-[#0b0f19] font-sans antialiased relative overflow-hidden selection:bg-brand/30">
-      <span className="absolute bottom-4 right-5 z-10 text-[10px] font-semibold text-slate-400">v{APP_VERSION}</span>
+      <span className="absolute bottom-4 right-5 z-10 text-[10px] font-semibold text-content-3">v{APP_VERSION}</span>
       {/* Fondo decorativo */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-blue-900/20 blur-[100px]"></div>
@@ -48,7 +48,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           {(transcurrido || estimado) && (
             <div className="mb-6 rounded-card bg-surface-1/5 border border-white/10 p-4 sm:p-5 text-left">
               <div className="flex justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiempo transcurrido</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-content-3">Tiempo transcurrido</span>
                 <span className="text-[11px] text-slate-300 font-mono">{transcurrido}</span>
               </div>
               <div className="h-1.5 bg-surface-1/10 rounded-full overflow-hidden">
@@ -56,7 +56,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
               </div>
               {estimado && (
                 <div className="mt-2 flex justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiempo estimado restante</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-content-3">Tiempo estimado restante</span>
                   <span className="text-[11px] text-slate-300 font-mono">{estimado}</span>
                 </div>
               )}
@@ -65,7 +65,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
 
           {mejoras.length > 0 && (
             <div className="mb-8 rounded-card bg-surface-1/5 border border-white/10 p-5 sm:p-6 backdrop-blur-sm text-left">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-4">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 mb-4">
                 Mejoras en curso
               </p>
               <ul className="space-y-3">
@@ -81,13 +81,13 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
             </div>
           )}
 
-          <p className="text-xs text-slate-400 mb-8">
+          <p className="text-xs text-content-3 mb-8">
             Contacto: <span className="font-bold text-slate-300">patrimonio@unp.edu.py</span>
           </p>
           {onAccesoDesarrollador && (
             <button
               onClick={onAccesoDesarrollador}
-              className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold text-slate-500 hover:text-slate-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-lg px-3 py-2"
+              className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold text-content-3 hover:text-slate-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-lg px-3 py-2"
               title="Acceso del desarrollador del sistema"
             >
               <i className="fa-solid fa-key text-[10px]"></i>
@@ -98,10 +98,10 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
       </main>
 
       <footer className="relative z-10 text-center pb-6 px-6">
-        <p className="text-[11px] font-medium text-slate-500">
+        <p className="text-[11px] font-medium text-content-3">
           Universidad Nacional de Pilar · Dpto. Bienes Patrimoniales
         </p>
-        <p className="text-[11px] font-bold text-slate-400 mt-1">
+        <p className="text-[11px] font-bold text-content-3 mt-1">
           Desarrollador del Sistema: Matias Ocampo
         </p>
       </footer>

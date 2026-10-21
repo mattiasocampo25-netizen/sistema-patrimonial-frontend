@@ -60,16 +60,16 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
   return (
     <>
       {/* Indicador de inactividad */}
-      <div className="fixed top-0 inset-x-0 h-1 z-[700] bg-slate-300/60">
+      <div className="fixed top-0 inset-x-0 h-1 z-[700] bg-black/15 dark:bg-white/20">
         <div
-          className="h-full bg-blue-600 transition-[width] duration-[var(--dur-slow)] ease-linear"
+          className="h-full bg-brand transition-[width] duration-[var(--dur-slow)] ease-linear"
           style={{ width: `${pct}%` }}
         />
       </div>
 
       {/* Barra de controles */}
       <div
-        className={`fixed bottom-0 inset-x-0 z-[700] flex items-center justify-between gap-2 px-4 py-3 bg-slate-900/85 backdrop-blur-md text-white transition-transform duration-[var(--dur-base)] ${visible ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`fixed bottom-0 inset-x-0 z-[700] flex items-center justify-between gap-2 px-4 py-3 bg-black/85 backdrop-blur-md text-white transition-transform duration-[var(--dur-base)] ${visible ? 'translate-y-0' : 'translate-y-full'}`}
       >
         <span className="text-[11px] font-bold tabular-nums opacity-80">
           <i className="fa-regular fa-clock mr-1.5"></i>
@@ -78,7 +78,7 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
         <div className="flex items-center gap-2">
           <button
             onClick={onEscanearOtro}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold motion active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-brand hover:bg-blue-500 text-content-inverse text-xs font-bold motion active:scale-95 cursor-pointer"
           >
             <i className="fa-solid fa-qrcode text-[11px]"></i> Escanear otro QR
           </button>
@@ -115,7 +115,7 @@ export function BotonPantallaCompleta({ onCambio }) {
     <button
       onClick={toggle}
       title={activo ? 'Salir de pantalla completa' : 'Pantalla completa'}
-      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 motion cursor-pointer"
+      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-line bg-surface-1 text-content-2 text-[11px] font-bold hover:bg-surface-2 active:scale-95 motion cursor-pointer"
     >
       <i className={`fa-solid ${activo ? 'fa-compress' : 'fa-expand'} text-[10px]`}></i>
       <span className="hidden sm:inline">{activo ? 'Reducir' : 'Pantalla completa'}</span>

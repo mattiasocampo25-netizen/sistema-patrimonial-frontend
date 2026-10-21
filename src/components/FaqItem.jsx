@@ -18,7 +18,7 @@ function FaqItem({ question, answer, categoria }) {
           </span>
           {question}
         </span> 
-        <i className={`fa-solid fa-chevron-down text-content-3 transition-transform duration-[var(--dur-base)] text-xs ${isOpen ? 'rotate-180 text-brand-primary' : ''}`}></i> 
+        <i className={`fa-solid fa-chevron-down text-content-3 transition-transform duration-[var(--dur-base)] text-xs ${isOpen ? 'rotate-180 text-brand-text' : ''}`}></i> 
       </button> 
       <div className={`motion duration-[var(--dur-base)] ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}> 
         <div className="px-6 pb-5 pt-0 text-xs sm:text-sm text-content-2 dark:text-content-3 leading-relaxed border-t border-line dark:border-line/60 pt-4 mt-1">{answer}</div>

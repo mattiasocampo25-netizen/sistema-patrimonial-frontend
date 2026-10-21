@@ -310,7 +310,7 @@ export default function AppModals({
                                         Buscar Funcionario Responsable
                                     </label>
                                     {fc03Config.filtroValor && (
-                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                                        <span className="text-[10px] font-bold text-warn dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
                                             <i className="fa-solid fa-check mr-1"></i> Seleccionado
                                         </span>
                                     )}
@@ -372,11 +372,7 @@ export default function AppModals({
                                                                 setFc03FuncionarioTexto(f.nombre);
                                                                 setShowFC03FuncDropdown(false);
                                                             }}
-                                                            className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${
-                                                                isSelected 
-                                                                    ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold' 
-                                                                    : 'text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800 font-medium'
-                                                            }`}
+                                                            className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${ isSelected ? 'bg-amber-500/10 text-warn dark:text-amber-300 font-bold' : 'text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800 font-medium' }`}
                                                         >
                                                             <div className="flex flex-col truncate pr-2">
                                                                 <span className="truncate">{f.nombre}</span>
@@ -384,7 +380,7 @@ export default function AppModals({
                                                                     {f.cedula !== 'S/C' ? `CI: ${formatCI(f.cedula)}` : 'Sin Cédula'}
                                                                 </span>
                                                             </div>
-                                                            {isSelected && <i className="fa-solid fa-check text-amber-600 shrink-0"></i>}
+                                                            {isSelected && <i className="fa-solid fa-check text-warn shrink-0"></i>}
                                                         </button>
                                                     );
                                                 })
@@ -403,7 +399,7 @@ export default function AppModals({
                 {/* BOTONES DE ACCIÓN */}
                 <div className="flex justify-end gap-3 px-6 sm:px-8 py-5 border-t border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 rounded-b-[24px]">
                   <button onClick={() => setIsFC03ModalOpen(false)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3/70 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">Cancelar</button>
-                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold motion focus-visible:ring-2 focus-visible:ring-brand-primary/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-content-3 bg-surface-3 dark:bg-zinc-800 dark:text-content-3 cursor-not-allowed opacity-60' : 'text-white bg-brand-primary hover:bg-brand-hover shadow-md shadow-brand-primary/25 cursor-pointer'}`}>
+                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold motion focus-visible:ring-2 focus-visible:ring-brand/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-content-3 bg-surface-3 dark:bg-zinc-800 dark:text-content-3 cursor-not-allowed opacity-60' : 'text-content-inverse bg-brand hover:bg-brand-hover shadow-md shadow-brand/25 cursor-pointer'}`}>
                     <i className="fa-solid fa-file-pdf text-xs"></i> Generar Documento
                   </button>
                 </div>
@@ -641,7 +637,7 @@ export default function AppModals({
             <Dialogo className={STYLES.modalOverlay}>
                 <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
 
-                    <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-card mb-4 ${esSolicitud ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
+                    <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-card mb-4 ${esSolicitud ? 'bg-amber-500/10 text-warn dark:text-amber-400' : 'bg-rose-500/10 text-danger dark:text-rose-400'}`}>
                         <i className={`fa-solid ${esSolicitud ? 'fa-paper-plane' : 'fa-triangle-exclamation'} text-xl`}></i>
                     </div>
 
@@ -653,7 +649,7 @@ export default function AppModals({
                         {descripcion}
                     </p>
                     {impacto.length > 0 && (
-                      <p className="animate-fade-in mx-auto mb-4 flex w-fit items-center gap-1.5 rounded-control bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+                      <p className="animate-fade-in mx-auto mb-4 flex w-fit items-center gap-1.5 rounded-control bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] font-bold text-warn dark:text-amber-400">
                         <i className="fa-solid fa-link text-[10px]"></i>
                         Vinculado a {impacto.join(' y ')}
                       </p>
@@ -662,7 +658,7 @@ export default function AppModals({
                     {esSolicitud && (
                       <div className="text-left mb-6 space-y-1.5">
                         <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">
-                          Motivo de la solicitud <span className="text-rose-500">*</span>
+                          Motivo de la solicitud <span className="text-danger">*</span>
                         </label>
                         <textarea
                           required
@@ -744,7 +740,7 @@ export default function AppModals({
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider">Archivo seleccionado:</p>
                   <p className="text-xs font-mono font-bold text-content-1 dark:text-zinc-200 truncate">{pendingCSVImport.file?.name}</p>
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider pt-1">Destino:</p>
-                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{dependenciaActual}</p>
+                  <p className="text-xs font-bold text-ok dark:text-emerald-400">{dependenciaActual}</p>
                 </div>
                 <p className="text-xs font-medium text-content-3 dark:text-content-3 mb-6 leading-relaxed">
                   Los registros serán validados para evitar duplicados e incorporados a la base de datos oficial. ¿Desea proceder con la carga?
@@ -796,7 +792,7 @@ export default function AppModals({
                             {(Array.isArray(mantenimiento?.notas_version) ? mantenimiento.notas_version : []).map((n, i) => (
                                 <li key={i} className="flex items-start gap-3 text-sm text-content-1 dark:text-content-3 font-medium leading-relaxed">
                                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-500/25 mt-0.5">
-                                        <i className="fa-solid fa-check text-[9px] text-emerald-500"></i>
+                                        <i className="fa-solid fa-check text-[9px] text-ok"></i>
                                     </span>
                                     <span>{n}</span>
                                 </li>

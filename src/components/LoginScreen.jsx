@@ -82,7 +82,7 @@ export default function LoginScreen({
             <form onSubmit={handleLogin} className="w-full space-y-6">
               {loginError && (
                 <div id="login-error" role="alert" className="rounded-control bg-danger-soft p-4 text-sm text-danger font-medium flex items-center gap-3 border border-danger/25 animate-slide-up shadow-sm">
-                  <i className="fa-solid fa-circle-exclamation text-base text-rose-500 shrink-0" aria-hidden="true"></i>
+                  <i className="fa-solid fa-circle-exclamation text-base text-danger shrink-0" aria-hidden="true"></i>
                   <span>Credenciales inválidas. Verifique su usuario y contraseña.</span>
                 </div>
               )}
@@ -148,7 +148,7 @@ export default function LoginScreen({
                   </button>
                 </div>
                 {capsLock && (
-                  <p className="flex items-center gap-1.5 text-[10px] font-bold text-amber-600 dark:text-amber-400">
+                  <p className="flex items-center gap-1.5 text-[10px] font-bold text-warn dark:text-amber-400">
                     <i className="fa-solid fa-triangle-exclamation text-[9px]"></i>
                     Bloq Mayús activado
                   </p>
@@ -159,7 +159,7 @@ export default function LoginScreen({
                 type="submit"
                 disabled={isProcessing}
                 aria-busy={isProcessing || undefined}
-                className="w-full rounded-control bg-brand px-4 py-3.5 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                className="w-full rounded-control bg-brand px-4 py-3.5 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand/20 hover:shadow-brand/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
               >
                 {isProcessing ? (
                   <>
@@ -183,7 +183,7 @@ export default function LoginScreen({
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none">
         {toasts?.map(t => (
           <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-bold bg-surface-1 text-content-1 dark:bg-surface-1 dark:text-white border border-line dark:border-line motion animate-slide-up login-rise login-rise-2">
-            <i className={`fa-solid ${t.type === 'success' ? 'fa-circle-check text-emerald-500' : t.type === 'error' ? 'fa-circle-exclamation text-rose-500' : t.type === 'warning' ? 'fa-triangle-exclamation text-amber-500' : 'fa-circle-info text-brand-primary'} text-base`}></i>
+            <i className={`fa-solid ${t.type === 'success' ? 'fa-circle-check text-ok' : t.type === 'error' ? 'fa-circle-exclamation text-danger' : t.type === 'warning' ? 'fa-triangle-exclamation text-warn' : 'fa-circle-info text-brand-text'} text-base`}></i>
             <span className="flex-1">{t.message}</span>
             {t.action && (
               <button

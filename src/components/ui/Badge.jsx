@@ -36,11 +36,7 @@ export function Chip({ activo = false, conteo, onClick, children, className = ''
       type="button"
       onClick={onClick}
       aria-pressed={activo}
-      className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-label font-semibold border transition-colors duration-[var(--dur-fast)] ${
-        activo
-          ? 'bg-brand text-white border-brand shadow-sm'
-          : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:text-content-1'
-      } ${className}`}
+      className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-label font-semibold border transition-colors duration-[var(--dur-fast)] ${ activo ? 'bg-brand text-content-inverse border-brand shadow-sm' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:text-content-1' } ${className}`}
       {...resto}
     >
       {children}

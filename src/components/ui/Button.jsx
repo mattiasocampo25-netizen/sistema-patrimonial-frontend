@@ -19,7 +19,7 @@ import React from 'react';
 
 const VARIANTES = {
   primary:
-    'bg-brand text-white shadow-sm hover:bg-brand-hover active:bg-brand-hover ' +
+    'bg-brand text-content-inverse shadow-sm hover:bg-brand-hover active:bg-brand-hover' +
     'focus-visible:outline-brand disabled:bg-brand/40 disabled:shadow-none',
   secondary:
     'bg-surface-1 text-content-1 border border-line hover:bg-surface-2 hover:border-line-strong ' +

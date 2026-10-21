@@ -39,9 +39,7 @@ export default function Tile({
     <Etiqueta
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`group flex flex-col gap-3 rounded-card ${fondo} p-4 text-left border border-black/[0.04] dark:border-white/[0.06] shadow-sm transition-[transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-out)] ${
-        onClick ? 'hover:-translate-y-1 hover:shadow-panel cursor-pointer' : ''
-      } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${className}`}
+      className={`group flex flex-col gap-3 rounded-card ${fondo} p-4 text-left border border-black/[0.04] dark:border-white/[0.06] shadow-sm transition-[transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-out)] ${ onClick ? 'hover:-translate-y-1 hover:shadow-panel cursor-pointer' : '' } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

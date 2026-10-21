@@ -199,11 +199,7 @@ export default function AppTopbar({
                           type="button"
                           onClick={() => setLang(l)}
                           aria-pressed={lang === l}
-                          className={`px-2.5 h-7 text-label font-black uppercase transition-colors ${
-                            lang === l
-                              ? 'bg-brand text-white'
-                              : 'text-content-3 hover:bg-surface-2 hover:text-content-1'
-                          }`}
+                          className={`px-2.5 h-7 text-label font-black uppercase transition-colors ${ lang === l ? 'bg-brand text-content-inverse' : 'text-content-3 hover:bg-surface-2 hover:text-content-1' }`}
                         >
                           {l === 'es' ? 'ES' : 'GN'}
                         </button>
@@ -227,15 +223,11 @@ export default function AppTopbar({
                       <i className={`fa-solid ${icon} text-[10px] text-content-3 shrink-0`} aria-hidden="true" />
                       <span className="flex-1 text-left">{label}</span>
                       <span
-                        className={`relative inline-flex h-5 w-9 items-center rounded-pill transition-colors ${
-                          val ? 'bg-brand' : 'bg-surface-3'
-                        }`}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-pill transition-colors ${ val ? 'bg-brand' : 'bg-surface-3' }`}
                         aria-hidden="true"
                       >
                         <span
-                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-surface-1 shadow transition-transform ${
-                            val ? 'translate-x-4' : 'translate-x-0.5'
-                          }`}
+                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-surface-1 shadow transition-transform ${ val ? 'translate-x-4' : 'translate-x-0.5' }`}
                         />
                       </span>
                     </button>
@@ -291,11 +283,7 @@ export default function AppTopbar({
                           type="button"
                           onClick={() => setFiltroNotif(f.id)}
                           aria-pressed={filtroNotif === f.id}
-                          className={`flex-1 h-8 rounded-control text-label font-bold transition-colors ${
-                            filtroNotif === f.id
-                              ? 'bg-surface-1 text-content-1 shadow-sm'
-                              : 'text-content-3 hover:text-content-1'
-                          }`}
+                          className={`flex-1 h-8 rounded-control text-label font-bold transition-colors ${ filtroNotif === f.id ? 'bg-surface-1 text-content-1 shadow-sm' : 'text-content-3 hover:text-content-1' }`}
                         >
                           {f.label}
                         </button>
@@ -323,44 +311,24 @@ export default function AppTopbar({
                               setIsNotifOpen(false);
                             }
                           }}
-                          className={`w-full text-left p-4 border-b border-line/60 hover:bg-surface-2 transition-colors relative ${
-                            !n.leido ? 'bg-surface-2' : ''
-                          }`}
+                          className={`w-full text-left p-4 border-b border-line/60 hover:bg-surface-2 transition-colors relative ${ !n.leido ? 'bg-surface-2' : '' }`}
                         >
                           {!n.leido ? (
                             <span className="absolute left-0 top-0 bottom-0 w-1 bg-brand" aria-hidden="true" />
                           ) : null}
                           <div className="flex items-start gap-3 pl-1">
                             <span
-                              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control ${
-                                n.esSolicitud
-                                  ? 'bg-warn-soft text-warn'
-                                  : n.accion === 'anuncio'
-                                    ? 'bg-info-soft text-info'
-                                    : n.accion === 'aprobar'
-                                      ? 'bg-ok-soft text-ok'
-                                      : 'bg-danger-soft text-danger'
-                              }`}
+                              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control ${ n.esSolicitud ? 'bg-warn-soft text-warn' : n.accion === 'anuncio' ? 'bg-info-soft text-info' : n.accion === 'aprobar' ? 'bg-ok-soft text-ok' : 'bg-danger-soft text-danger' }`}
                               aria-hidden="true"
                             >
                               <i
-                                className={`fa-solid ${
-                                  n.esSolicitud
-                                    ? 'fa-paper-plane'
-                                    : n.accion === 'anuncio'
-                                      ? 'fa-bullhorn'
-                                      : n.accion === 'aprobar'
-                                        ? 'fa-check'
-                                        : 'fa-xmark'
-                                } text-xs`}
+                                className={`fa-solid ${ n.esSolicitud ? 'fa-paper-plane' : n.accion === 'anuncio' ? 'fa-bullhorn' : n.accion === 'aprobar' ? 'fa-check' : 'fa-xmark' } text-xs`}
                               />
                             </span>
                             <span className="flex-1 min-w-0">
                               <span className="flex items-center justify-between gap-2">
                                 <span
-                                  className={`text-body text-content-1 leading-tight tracking-tight ${
-                                    !n.leido ? 'font-black' : 'font-bold'
-                                  }`}
+                                  className={`text-body text-content-1 leading-tight tracking-tight ${ !n.leido ? 'font-black' : 'font-bold' }`}
                                 >
                                   {n.titulo}
                                 </span>

@@ -74,9 +74,7 @@ export function TD({ className = '', children, mono = false, truncate = false, .
   // ganarle al valor del sistema.
   return (
     <td
-      className={`px-3 py-2 text-body text-content-1 ${mono ? 'font-mono tabular-nums' : ''} ${
-        truncate ? 'max-w-0 truncate' : ''
-      } ${className}`}
+      className={`px-3 py-2 text-body text-content-1 ${mono ? 'font-mono tabular-nums' : ''} ${ truncate ? 'max-w-0 truncate' : '' } ${className}`}
       {...resto}
     >
       {children}

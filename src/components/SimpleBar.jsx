@@ -7,7 +7,7 @@ function SimpleBar({ label, value, max, colorClass, bgClass, onClick, title }) {
 
     return (
         <div
-            className={`w-full flex flex-col gap-1.5 ${interactive ? 'cursor-pointer group/sbar rounded-lg focus-visible:ring-2 focus-visible:ring-brand-primary outline-none' : ''}`}
+            className={`w-full flex flex-col gap-1.5 ${interactive ? 'cursor-pointer group/sbar rounded-lg focus-visible:ring-2 focus-visible:ring-brand outline-none' : ''}`}
             onClick={onClick}
             title={title}
             role={interactive ? 'button' : undefined}

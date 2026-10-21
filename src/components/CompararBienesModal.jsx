@@ -53,7 +53,7 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
                   <tr key={label} className={difieren ? 'bg-amber-500/[0.06]' : ''}>
                     <td className="p-3 text-[11px] font-bold uppercase tracking-wider text-content-3">{label}</td>
                     {vals.map((v, i) => (
-                      <td key={bienes[i].id} className={`p-3 text-[13px] font-semibold ${difieren ? 'text-amber-700 dark:text-amber-300' : 'text-content-1 dark:text-zinc-200'}`}>{v}</td>
+                      <td key={bienes[i].id} className={`p-3 text-[13px] font-semibold ${difieren ? 'text-warn dark:text-amber-300' : 'text-content-1 dark:text-zinc-200'}`}>{v}</td>
                     ))}
                   </tr>
                 );

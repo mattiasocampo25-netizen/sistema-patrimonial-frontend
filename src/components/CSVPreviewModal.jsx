@@ -28,17 +28,17 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
         <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto custom-scrollbar">
           {/* Resumen rápido */}
           <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-3 sm:gap-4">
-            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-900/40 rounded-card text-center">
-              <p className="text-2xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400">{validos.length}</p>
-              <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300 mt-1 uppercase tracking-wider">Listos para importar</p>
+            <div className="p-4 bg-ok-soft dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-900/40 rounded-card text-center">
+              <p className="text-2xl font-bold tabular-nums text-ok dark:text-emerald-400">{validos.length}</p>
+              <p className="text-[11px] font-bold text-ok dark:text-emerald-300 mt-1 uppercase tracking-wider">Listos para importar</p>
             </div>
-            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-card text-center">
-              <p className="text-2xl font-bold tabular-nums text-amber-600 dark:text-amber-400">{duplicados.length}</p>
-              <p className="text-[11px] font-bold text-amber-700 dark:text-amber-300 mt-1 uppercase tracking-wider">Duplicados (Omitidos)</p>
+            <div className="p-4 bg-warn-soft dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/40 rounded-card text-center">
+              <p className="text-2xl font-bold tabular-nums text-warn dark:text-amber-400">{duplicados.length}</p>
+              <p className="text-[11px] font-bold text-warn dark:text-amber-300 mt-1 uppercase tracking-wider">Duplicados (Omitidos)</p>
             </div>
-            <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/40 rounded-card text-center">
-              <p className="text-2xl font-bold tabular-nums text-rose-600 dark:text-rose-400">{errores.length}</p>
-              <p className="text-[11px] font-bold text-rose-700 dark:text-rose-300 mt-1 uppercase tracking-wider">Con Errores</p>
+            <div className="p-4 bg-danger-soft dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900/40 rounded-card text-center">
+              <p className="text-2xl font-bold tabular-nums text-danger dark:text-rose-400">{errores.length}</p>
+              <p className="text-[11px] font-bold text-danger dark:text-rose-300 mt-1 uppercase tracking-wider">Con Errores</p>
             </div>
           </div>
 
@@ -48,7 +48,7 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
               <p className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Filas con errores (Descartadas):</p>
               <div className="bg-surface-1 dark:bg-zinc-950 border border-rose-200 dark:border-rose-900/40 rounded-card p-4 max-h-40 overflow-y-auto space-y-1">
                 {errores.map((err, idx) => (
-                  <div key={idx} className="text-xs text-rose-700 dark:text-rose-400 font-mono tabular-nums">
+                  <div key={idx} className="text-xs text-danger dark:text-rose-400 font-mono tabular-nums">
                     • Fila {err.linea}: {err.motivo}
                   </div>
                 ))}

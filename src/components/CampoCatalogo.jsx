@@ -116,7 +116,7 @@ export default function CampoCatalogo({
                         onChange={(e) => { setTexto(e.target.value); onEscribirNombre(e.target.value); completarCodigo(e.target.value); }}
                         onFocus={() => { setAbierto(true); setActivo(0); }}
                         onKeyDown={onKeyDown}
-                        className={`${STYLES.input} py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}
+                        className={`${STYLES.input} py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}
                     />
                     {abierto && listado.length > 0 && (
                         <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
@@ -162,14 +162,12 @@ export default function CampoCatalogo({
                         value={codigo || ''}
                         placeholder="—"
                         onChange={(e) => onCambiarCodigo(e.target.value)}
-                        className={`${STYLES.input} py-2.5 pl-10 text-center font-mono text-[13px] font-bold tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${hayCodigo
-                            ? 'bg-emerald-50/60 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/40'
-                            : `bg-surface-2 dark:bg-surface-2 text-content-3 ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}`}
+                        className={`${STYLES.input} py-2.5 pl-10 text-center font-mono text-[13px] font-bold tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${hayCodigo ? 'bg-ok-soft/60 text-ok dark:bg-emerald-900/20 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/40' :`bg-surface-2 dark:bg-surface-2 text-content-3 ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}`}
                     />
                 </div>
             </div>
             {(faltaCodigo || nota) && (
-                <p className={`mt-1 text-[11px] font-medium ${faltaCodigo ? 'text-amber-600 dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
+                <p className={`mt-1 text-[11px] font-medium ${faltaCodigo ? 'text-warn dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
                     {faltaCodigo ? 'Cargá el código patrimonial.' : nota}
                 </p>
             )}

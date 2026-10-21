@@ -38,7 +38,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
         title="Exportación programada"
         className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
       >
-        <i className={`fa-solid ${activa ? 'fa-clock text-brand-primary dark:text-brand-accent' : 'fa-clock'}`}></i>
+        <i className={`fa-solid ${activa ? 'fa-clock text-brand-text dark:text-brand' : 'fa-clock'}`}></i>
         <span className="hidden lg:inline">Programar</span>
         {pendientes.length > 0 && (
           <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[9px] font-black text-content-inverse">
@@ -76,11 +76,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
                 <button
                   key={f.id}
                   onClick={() => cambiar({ formato: f.id })}
-                  className={`h-9 rounded-control text-xs font-bold border motion cursor-pointer ${
-                    cfg.formato === f.id
-                      ? 'bg-brand-primary text-white border-brand-primary shadow-xs'
-                      : 'bg-surface-2 dark:bg-surface-1/5 text-content-2 dark:text-content-3 border-line dark:border-white/10 hover:bg-surface-3'
-                  }`}
+                  className={`h-9 rounded-control text-xs font-bold border motion cursor-pointer ${ cfg.formato === f.id ? 'bg-brand text-content-inverse border-brand shadow-xs' : 'bg-surface-2 dark:bg-surface-1/5 text-content-2 dark:text-content-3 border-line dark:border-white/10 hover:bg-surface-3' }`}
                 >
                   <i className={`fa-solid ${f.icon} mr-1 text-[10px]`}></i> {f.label}
                 </button>
@@ -117,7 +113,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
                 <div className="flex flex-col gap-1 max-h-40 overflow-y-auto hide-scrollbar">
                   {pendientes.map(p => (
                     <div key={p.nombre} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg bg-surface-2 dark:bg-surface-1/5">
-                      <i className={`fa-solid ${p.formato === 'xlsx' ? 'fa-file-excel text-emerald-500' : 'fa-file-csv text-sky-500'} text-[11px] shrink-0`}></i>
+                      <i className={`fa-solid ${p.formato === 'xlsx' ? 'fa-file-excel text-ok' : 'fa-file-csv text-info'} text-[11px] shrink-0`}></i>
                       <span className="text-[10px] font-semibold text-content-2 dark:text-content-3 truncate flex-1" title={p.nombre}>{p.nombre}</span>
                       <button
                         onClick={async () => { await descargarPendiente(p.nombre); refrescar(); }}

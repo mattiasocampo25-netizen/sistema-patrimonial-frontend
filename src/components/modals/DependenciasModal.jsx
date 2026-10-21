@@ -117,16 +117,12 @@ export default function DependenciasModal({
           else { setSelId(d.id); setSelDetectada(null); }
         }}
         title={d.nombre}
-        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-          activo || activoDet
-            ? 'bg-brand-light dark:bg-brand-primary/10 border border-brand-primary/30 border-l-4 border-brand-primary text-content-1 dark:text-white shadow-sm'
-            : 'hover:bg-surface-3 dark:hover:bg-surface-1/5 text-content-1 dark:text-zinc-100 border border-transparent'
-        }`}
+        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo || activoDet ? 'bg-brand-soft dark:bg-brand/10 border border-brand/30 border-l-4 border-brand text-content-1 dark:text-white shadow-sm' : 'hover:bg-surface-3 dark:hover:bg-surface-1/5 text-content-1 dark:text-zinc-100 border border-transparent' }`}
       >
-        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-brand-primary ring-1 ring-brand-primary/50' : 'bg-zinc-400 dark:bg-zinc-600 ring-1 ring-zinc-900/10')}`}></span>
+        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-brand ring-1 ring-brand/50' : 'bg-zinc-400 dark:bg-zinc-600 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-content-1 dark:text-white'}`} title={d.nombre}>
+            <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-warn dark:text-amber-400' : 'text-content-1 dark:text-white'}`} title={d.nombre}>
               {d.nombre}
             </span>
             {d.codigo && (
@@ -191,7 +187,7 @@ export default function DependenciasModal({
             {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
             {detFiltradas.length > 0 && (
               <>
-                <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-600 dark:text-amber-400 border-t border-amber-100/30 mt-2">
+                <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-warn dark:text-amber-400 border-t border-warn/25/30 mt-2">
                   Posibles duplicados ({detFiltradas.length})
                 </div>
                 {detFiltradas.map(d => <ItemDep key={'det-' + d.nombre} d={d} detectada />)}
@@ -231,12 +227,12 @@ export default function DependenciasModal({
             {detSel ? (
               <div className="space-y-6">
                 {/* Banner de posible duplicado */}
-                <div className="rounded-card border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                <div className="rounded-card border border-amber-200 dark:border-amber-900/30 bg-warn-soft dark:bg-amber-900/10 p-4 flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-900/30 text-warn dark:text-amber-300">
                     <i className="fa-solid fa-triangle-exclamation text-sm"></i>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400 mb-1">Nombre detectado en datos (posible duplicado)</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-warn dark:text-amber-400 mb-1">Nombre detectado en datos (posible duplicado)</p>
                     <h3 className="text-base font-bold text-content-1 dark:text-white">{detSel.nombre}</h3>
                     <p className="text-xs text-content-3 dark:text-content-3 mt-1 tabular-nums">{detSel.bienes} bienes · {detSel.funcionarios} funcionarios con este nombre</p>
                   </div>
@@ -310,7 +306,7 @@ export default function DependenciasModal({
                     <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 motion cursor-pointer">
                       <i className="fa-solid fa-pen text-xs"></i>
                     </button>
-                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer">
+                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer">
                       <i className="fa-solid fa-trash-can text-xs"></i>
                     </button>
                   </div>
@@ -454,7 +450,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
             <button onClick={onEmpezarEditar} title="Renombrar" aria-label="Renombrar" className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3/70 dark:hover:text-white dark:hover:bg-surface-1/10 cursor-pointer shrink-0">
               <i className="fa-solid fa-pen text-[10px]"></i>
             </button>
-            <button onClick={() => onEliminarUbicacion(u.id, u.nombre)} title="Eliminar" aria-label="Eliminar" className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 cursor-pointer shrink-0">
+            <button onClick={() => onEliminarUbicacion(u.id, u.nombre)} title="Eliminar" aria-label="Eliminar" className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 cursor-pointer shrink-0">
               <i className="fa-solid fa-trash-can text-[10px]"></i>
             </button>
           </>
@@ -465,7 +461,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
           {asignados.map(f => (
             <span key={f.id} className="inline-flex items-center gap-1 rounded-lg bg-surface-1 dark:bg-surface-1/10 border border-line/70 dark:border-white/10 px-2 py-0.5 text-[10px] font-bold text-content-2 dark:text-content-3" title={`${f.nombre} · CI ${f.cedula || 'S/C'}`}>
               <span className="max-w-[180px] truncate">{f.nombre}</span>
-              <button onClick={() => onAsignarFuncionario(f.id, '')} title={`Quitar a ${f.nombre} de ${u.nombre}`} className="text-content-3 hover:text-rose-500 cursor-pointer shrink-0">
+              <button onClick={() => onAsignarFuncionario(f.id, '')} title={`Quitar a ${f.nombre} de ${u.nombre}`} className="text-content-3 hover:text-danger cursor-pointer shrink-0">
                 <i className="fa-solid fa-xmark text-[9px]"></i>
               </button>
             </span>
@@ -607,7 +603,7 @@ function ComboUbicacion({ valor, ubicaciones, onElegir, titulo, compacto }) {
                 key={u.id}
                 onClick={() => { onElegir(u.nombre); setAbierto(false); }}
                 title={u.nombre}
-                className={`w-full px-2.5 py-1.5 text-left text-[11px] font-bold truncate cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${u.nombre === valor ? 'text-brand-primary dark:text-brand-accent' : 'text-content-1 dark:text-zinc-200'}`}
+                className={`w-full px-2.5 py-1.5 text-left text-[11px] font-bold truncate cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${u.nombre === valor ? 'text-brand-text dark:text-brand' : 'text-content-1 dark:text-zinc-200'}`}
               >
                 {u.nombre}
               </button>

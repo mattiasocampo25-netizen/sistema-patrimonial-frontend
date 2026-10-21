@@ -44,7 +44,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                       required
                       defaultValue={usuarioEditing?.username}
                       disabled={!!usuarioEditing}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${usuarioEditing ? 'bg-surface-3 dark:bg-zinc-900/80 cursor-not-allowed text-content-3' : ''}`}
+                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${usuarioEditing ? 'bg-surface-3 dark:bg-zinc-900/80 cursor-not-allowed text-content-3' : ''}`}
                       placeholder="Ej. mocampo"
                     />
                   </div>
@@ -59,7 +59,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                       name="nombre"
                       required
                       defaultValue={usuarioEditing?.nombre}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`}
+                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                       placeholder="Ej. Matías Ocampo"
                     />
                   </div>

@@ -71,21 +71,15 @@ export default function AnunciosView({
           <Toolbar className="mt-4">
   
           <div className="flex gap-3 sm:gap-6">
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${
-              totalEnviados > 0 ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm'
-            }`}>
+            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalEnviados > 0 ? 'bg-ok-soft dark:bg-emerald-900/10 border-ok/25 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
               <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Total enviados</div>
               <div className="text-xl font-black text-content-1 dark:text-white">{totalEnviados}</div>
             </div>
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${
-              totalDestinatarios > 0 ? 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/20 text-brand-primary shadow-brand-primary/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm'
-            }`}>
+            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalDestinatarios > 0 ? 'bg-brand/5 dark:bg-brand/10 border-brand/20 text-brand-text shadow-brand/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
               <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Destinatarios</div>
               <div className="text-xl font-black text-content-1 dark:text-white">{totalDestinatarios}</div>
             </div>
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${
-              totalLeidos > 0 ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-100 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm'
-            }`}>
+            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalLeidos > 0 ? 'bg-info-soft dark:bg-sky-900/10 border-info/25 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
               <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Leídos</div>
               <div className="text-xl font-black text-content-1 dark:text-white">{totalLeidos}</div>
             </div>
@@ -173,18 +167,10 @@ export default function AnunciosView({
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <p className="text-sm font-bold text-content-1 dark:text-white line-clamp-1">{a.titulo}</p>
-                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${
-                      a.alcance === 'TODOS'
-                        ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 shadow-sky-500/20'
-                        : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20'
-                    }`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${ a.alcance === 'TODOS' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 shadow-sky-500/20' : 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20' }`}>
                       {a.alcance === 'TODOS' ? 'Todos' : `@${a.alcance}`}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${
-                      a.leidos >= (a.total || 1)
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20'
-                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-amber-500/20'
-                    }`}>
+                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-sm ${ a.leidos >= (a.total || 1) ? 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20 shadow-emerald-500/20' : 'bg-amber-500/10 text-warn dark:text-amber-400 border border-amber-500/20 shadow-amber-500/20' }`}>
                       {a.leidos}/{a.total} leídos
                     </span>
                   </div>
@@ -198,7 +184,7 @@ export default function AnunciosView({
                 <button
                   type="button" onClick={() => handleEliminar(a.grupo)} disabled={eliminando === a.grupo}
                   title="Eliminar anuncio para todos" aria-label="Eliminar anuncio"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-control motion cursor-pointer disabled:opacity-50 shadow-sm"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center text-rose-400 dark:text-rose-400 bg-danger-soft dark:bg-rose-950/10 hover:bg-rose-100 dark:hover:bg-rose-900/20 rounded-control motion cursor-pointer disabled:opacity-50 shadow-sm"
                 >
                   <i className={`fa-solid ${eliminando === a.grupo ? 'fa-circle-notch fa-spin' : 'fa-trash-can'} text-xs`}></i>
                 </button>

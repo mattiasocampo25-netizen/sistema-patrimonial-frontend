@@ -2,11 +2,11 @@ import Dialogo from './ui/Dialogo';
 import React, { useState } from 'react';
 
 const TIPO_STYLE = {
-  alta: { box: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', icon: 'fa-plus', dot: 'bg-emerald-500' },
-  asignacion: { box: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20', icon: 'fa-file-signature', dot: 'bg-blue-500' },
-  traslado: { box: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', icon: 'fa-truck-fast', dot: 'bg-amber-500' },
+  alta: { box: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border-emerald-500/20', icon: 'fa-plus', dot: 'bg-emerald-500' },
+  asignacion: { box: 'bg-blue-500/10 text-brand dark:text-blue-400 border-blue-500/20', icon: 'fa-file-signature', dot: 'bg-blue-500' },
+  traslado: { box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20', icon: 'fa-truck-fast', dot: 'bg-amber-500' },
   modificacion: { box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20', icon: 'fa-pen-to-square', dot: 'bg-zinc-400' },
-  baja: { box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20', icon: 'fa-flag', dot: 'bg-rose-500' },
+  baja: { box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20', icon: 'fa-flag', dot: 'bg-rose-500' },
   otro: { box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20', icon: 'fa-circle-info', dot: 'bg-violet-500' },
 };
 
@@ -36,11 +36,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                   {bien.rotulo || 'S/R'}
                 </h2>
                 {bien.estadoConservacion && (
-                  <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
-                    bien.estadoConservacion === 'De Baja'
-                      ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
-                      : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20'
-                  }`}>
+                  <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${ bien.estadoConservacion === 'De Baja' ? 'bg-rose-500/10 text-danger dark:text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20' }`}>
                     {bien.estadoConservacion}
                   </span>
                 )}
@@ -73,7 +69,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                 Evidencia fotográfica · {(bien.fotos || []).length}/5
               </p>
               <label
-                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3'}`}
+                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3'}`}
                 title="Tomar o subir foto del estado físico"
               >
                 <i className={`fa-solid ${subiendoFoto ? 'fa-circle-notch fa-spin' : 'fa-camera'}`}></i>

@@ -22,7 +22,7 @@ export default function ResumenView({ dependenciaActual, stats, pendientes, fc10
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3 mt-1">Bienes activos</p>
         </div>
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 shadow-sm">
-          <p className="text-2xl sm:text-3xl font-bold tabular-nums text-emerald-600 dark:text-emerald-400 tracking-tight">Gs. {formatCurrency(stats.totalValue)}</p>
+          <p className="text-2xl sm:text-3xl font-bold tabular-nums text-ok dark:text-emerald-400 tracking-tight">Gs. {formatCurrency(stats.totalValue)}</p>
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3 mt-1">Valor patrimonial</p>
         </div>
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 shadow-sm">

@@ -42,7 +42,7 @@ export default class ErrorBoundary extends React.Component {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-[#0a1c38] px-6 font-sans">
         <div className="w-full max-w-md rounded-panel bg-surface-1 dark:bg-zinc-900 p-8 sm:p-10 shadow-2xl border border-line dark:border-zinc-800 text-center animate-slide-up">
-          <div className="h-14 w-14 rounded-card bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <div className="h-14 w-14 rounded-card bg-amber-500/10 text-warn border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
             <i className="fa-solid fa-triangle-exclamation text-xl"></i>
           </div>
           <h2 className="text-lg font-black text-content-1 dark:text-white tracking-tight">
@@ -76,7 +76,7 @@ export default class ErrorBoundary extends React.Component {
             className="mt-3 text-[11px] font-bold text-content-3 hover:text-content-2 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             title="Copia el detalle técnico para enviarlo al administrador"
           >
-            <i className={`fa-solid ${this.state.copiado ? 'fa-check text-emerald-500' : 'fa-copy'} mr-1.5`}></i>
+            <i className={`fa-solid ${this.state.copiado ? 'fa-check text-ok' : 'fa-copy'} mr-1.5`}></i>
             {this.state.copiado ? 'Detalle copiado' : 'Copiar detalle técnico'}
           </button>
         </div>

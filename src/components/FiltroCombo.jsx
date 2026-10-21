@@ -139,7 +139,7 @@ export default function FiltroCombo({
         <i className={`fa-solid fa-chevron-down text-[10px] text-content-3 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
       {error && (
-        <p id={mensajeErrorId} role="alert" className="mt-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+        <p id={mensajeErrorId} role="alert" className="mt-1 text-[11px] font-semibold text-danger dark:text-rose-400">
           {errorMsg || 'Este campo es obligatorio.'}
         </p>
       )}
@@ -164,7 +164,7 @@ export default function FiltroCombo({
             <button
               type="button"
               onClick={() => elegir('')}
-              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${!valorActual ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-content-3 dark:text-content-3'}`}
+              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${!valorActual ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-3 dark:text-content-3'}`}
               title={etiquetaTodos}
             >
               <span className="block truncate">{etiquetaTodos}</span>
@@ -175,7 +175,7 @@ export default function FiltroCombo({
                 type="button"
                 onClick={() => elegir(o.value)}
                 title={o.label}
-                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
+                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
               >
                 <span className="block truncate" title={o.label}>{o.label}</span>
               </button>

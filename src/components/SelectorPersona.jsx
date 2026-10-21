@@ -75,9 +75,7 @@ export default function SelectorPersona({
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-required={requerido || undefined}
-        className={`w-full ${altura} rounded-control border bg-surface-1 dark:bg-zinc-900 px-4 text-left font-medium outline-none motion focus:ring-2 flex items-center gap-2 cursor-pointer ${
-          requerido && !valor ? 'border-rose-300 dark:border-rose-800' : 'border-line dark:border-white/10'
-        } focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-zinc-900/5 dark:focus:ring-white/10 hover:border-line-strong dark:hover:border-white/20`}
+        className={`w-full ${altura} rounded-control border bg-surface-1 dark:bg-zinc-900 px-4 text-left font-medium outline-none motion focus:ring-2 flex items-center gap-2 cursor-pointer ${ requerido && !valor ? 'border-rose-300 dark:border-rose-800' : 'border-line dark:border-white/10' } focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-zinc-900/5 dark:focus:ring-white/10 hover:border-line-strong dark:hover:border-white/20`}
       >
         <span className={`flex-1 min-w-0 truncate ${!etiqueta ? 'text-content-3 dark:text-content-3' : 'text-content-1 dark:text-content-3'}`}>
           {etiqueta || placeholder}
@@ -116,9 +114,7 @@ export default function SelectorPersona({
                 type="button"
                 onClick={() => seleccionar(f)}
                 title={f.doc ? `${f.nombre} · CI ${f.doc}` : f.nombre}
-                className={`w-full px-3.5 py-2 text-left transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${
-                  normalizeStr(f.nombre) === normalizeStr(valor || '') ? 'bg-brand-primary/[0.07] dark:bg-brand-primary/[0.14]' : ''
-                }`}
+                className={`w-full px-3.5 py-2 text-left transition-colors cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${ normalizeStr(f.nombre) === normalizeStr(valor || '') ? 'bg-brand/[0.07] dark:bg-brand/[0.14]' : '' }`}
               >
                 <span className="flex items-center gap-2">
                   <i className="fa-solid fa-user text-[9px] text-content-3 shrink-0"></i>

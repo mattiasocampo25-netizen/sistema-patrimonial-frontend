@@ -1581,26 +1581,26 @@ if (rutaDesconocida && !publicBienId) {
 }
 if (publicBienId) {
   return (
-    <div className="h-dvh overflow-y-auto bg-slate-100 flex flex-col items-center p-3 sm:p-6 text-slate-900 font-sans selection:bg-blue-600 selection:text-white custom-scrollbar">
-      <div className="bg-surface-1 border border-slate-200/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden m-auto">
+    <div className="h-dvh overflow-y-auto bg-surface-3 flex flex-col items-center p-3 sm:p-6 text-content-1 font-sans selection:bg-brand selection:text-white custom-scrollbar">
+      <div className="bg-surface-1 border border-line/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden m-auto">
 
         {/* Acento superior institucional */}
         <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500"></div>
 
         {/* Header institucional */}
-        <div className="flex flex-col items-center text-center pb-4 border-b border-slate-100">
-          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-blue-50 text-blue-600 mb-2 border border-blue-100 shadow-sm">
+        <div className="flex flex-col items-center text-center pb-4 border-b border-line">
+          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-blue-50 text-brand mb-2 border border-brand/25 shadow-sm">
             <i className="fa-solid fa-shield-halved text-xl"></i>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-blue-700 mb-2 border border-blue-200/60">
-            <i className="fa-solid fa-circle-check text-[10px] text-blue-600"></i> Verificación Oficial de Activo
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-brand-text mb-2 border border-blue-200/60">
+            <i className="fa-solid fa-circle-check text-[10px] text-brand"></i> Verificación Oficial de Activo
           </span>
 
-          <h1 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-base sm:text-lg font-black text-content-1 tracking-tight leading-tight">
             Universidad Nacional de Pilar
           </h1>
-          <p className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">
+          <p className="text-[11px] sm:text-xs text-content-3 font-semibold mt-0.5">
             Sistema Integrado de Gestión Patrimonial
           </p>
         </div>
@@ -1613,7 +1613,7 @@ if (publicBienId) {
               <button
                 onClick={() => setPublicFotoAmpliada(publicBienData.fotos[0].url)}
                 title="Ampliar foto"
-                className="block w-full rounded-card overflow-hidden border border-slate-200/80 shadow-xs bg-slate-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                className="block w-full rounded-card overflow-hidden border border-line/80 shadow-xs bg-surface-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
               >
                 <img
                   src={publicBienData.fotos[0].url}
@@ -1627,32 +1627,28 @@ if (publicBienId) {
             )}
 
             {/* Tarjeta de Rótulo y Estado */}
-            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-card border border-slate-200/80 shadow-xs">
+            <div className="bg-surface-2 p-3.5 sm:p-4 rounded-card border border-line/80 shadow-xs">
               <div className="flex justify-between items-center gap-2">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Código / Rótulo</p>
-                  <p className="text-xl sm:text-2xl font-black text-slate-900 font-mono tracking-tight mt-0.5 truncate">
+                  <p className="text-[10px] font-black text-content-3 uppercase tracking-widest">Código / Rótulo</p>
+                  <p className="text-xl sm:text-2xl font-black text-content-1 font-mono tracking-tight mt-0.5 truncate">
                     {publicBienData.rotulo || "S/Rótulo"}
                   </p>
                 </div>
                 {publicBienData.estadoConservacion && (
-                  <span className={`px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider ${
-                    publicBienData.estadoConservacion === "De Baja"
-                      ? "bg-rose-50 text-rose-600 border border-rose-200"
-                      : "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  }`}>
+                  <span className={`px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider ${ publicBienData.estadoConservacion === "De Baja" ? "bg-danger-soft text-danger border border-rose-200" : "bg-ok-soft text-ok border border-emerald-200" }`}>
                     {publicBienData.estadoConservacion}
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 pt-3 border-t border-slate-200/60">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Descripción General</p>
-                <p className={`text-xs sm:text-sm font-bold text-slate-800 mt-1 leading-relaxed ${!publicDescExpandida && (publicBienData.descripcion || '').length > 140 ? 'line-clamp-3' : ''}`}>
+              <div className="mt-3 pt-3 border-t border-line/60">
+                <p className="text-[10px] font-black text-content-3 uppercase tracking-widest">Descripción General</p>
+                <p className={`text-xs sm:text-sm font-bold text-content-1 mt-1 leading-relaxed ${!publicDescExpandida && (publicBienData.descripcion || '').length > 140 ? 'line-clamp-3' : ''}`}>
                   {publicBienData.descripcion || "Sin descripción asignada"}
                 </p>
                 {(publicBienData.descripcion || '').length > 140 && (
-                  <button onClick={() => setPublicDescExpandida(v => !v)} className="mt-1.5 text-[11px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer">
+                  <button onClick={() => setPublicDescExpandida(v => !v)} className="mt-1.5 text-[11px] font-bold text-brand hover:text-blue-800 cursor-pointer">
                     {publicDescExpandida ? 'Ver menos' : 'Ver más'}
                   </button>
                 )}
@@ -1661,52 +1657,52 @@ if (publicBienId) {
 
             {/* Datos Técnicos y Contables */}
             <div className="grid grid-cols-2 gap-2.5">
-              <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-layer-group text-blue-600"></i> Cuenta
+              <div className="bg-surface-2 p-3 rounded-card border border-line/70">
+                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-layer-group text-brand"></i> Cuenta
                 </p>
-                <p className="text-xs font-mono font-bold text-slate-800 mt-1 truncate">
+                <p className="text-xs font-mono font-bold text-content-1 mt-1 truncate">
                   {publicBienData.cuenta || "Sin Cuenta"}
                 </p>
               </div>
 
-              <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-coins text-emerald-600"></i> Valor
+              <div className="bg-surface-2 p-3 rounded-card border border-line/70">
+                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-coins text-ok"></i> Valor
                 </p>
-                <p className="text-xs font-bold text-emerald-700 mt-1">
+                <p className="text-xs font-bold text-ok mt-1">
                   Gs. {formatCurrency(publicBienData.valorUnitario || publicBienData.valor || publicBienData.valorAdquisicion || "0")}
                 </p>
               </div>
 
               {publicBienData.subcuenta && (
-                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
+                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
                     <i className="fa-solid fa-sitemap text-indigo-600"></i> Sub-Cuenta
                   </p>
-                  <p className="text-xs font-bold text-slate-800 mt-1 truncate">
+                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
                     {publicBienData.subcuenta}
                   </p>
                 </div>
               )}
 
               {publicBienData.fechaAdquisicion && (
-                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-regular fa-calendar text-amber-600"></i> Adquisición
+                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
+                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                    <i className="fa-regular fa-calendar text-warn"></i> Adquisición
                   </p>
-                  <p className="text-xs font-bold text-slate-800 mt-1 truncate">
+                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
                     {String(publicBienData.fechaAdquisicion).split("T")[0]}
                   </p>
                 </div>
               )}
 
               {publicBienData.vidaUtil && (
-                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-solid fa-hourglass-half text-purple-600"></i> Vida Útil
+                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
+                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                    <i className="fa-solid fa-hourglass-half text-brand-text"></i> Vida Útil
                   </p>
-                  <p className="text-xs font-bold text-slate-800 mt-1 truncate">
+                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
                     {publicBienData.vidaUtil} años
                   </p>
                 </div>
@@ -1714,36 +1710,36 @@ if (publicBienId) {
             </div>
 
             {/* Custodio, Ubicación y Dependencia */}
-            <div className="bg-slate-50 p-4 rounded-card border border-slate-200/70 space-y-3">
+            <div className="bg-surface-2 p-4 rounded-card border border-line/70 space-y-3">
               <div>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-user-check text-blue-600"></i> Responsable Asignado
+                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-user-check text-brand"></i> Responsable Asignado
                 </p>
-                <p className="text-xs font-bold text-slate-900 mt-1">
+                <p className="text-xs font-bold text-content-1 mt-1">
                   {publicBienData.funcionario || "Sin Responsable Asignado"}
                 </p>
                 {publicBienData.funcionarioCargo && (
-                  <p className="text-[10px] text-slate-500 mt-0.5">
+                  <p className="text-[10px] text-content-3 mt-0.5">
                     Cargo: {publicBienData.funcionarioCargo}
                   </p>
                 )}
               </div>
 
-              <div className="pt-2.5 border-t border-slate-200/60">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-location-dot text-rose-600"></i> Ubicación Física
+              <div className="pt-2.5 border-t border-line/60">
+                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-location-dot text-danger"></i> Ubicación Física
                 </p>
-                <p className="text-xs font-bold text-slate-900 mt-1">
+                <p className="text-xs font-bold text-content-1 mt-1">
                   {publicBienData.ubicacion || "Sin Ubicación Registrada"}
                 </p>
               </div>
 
               {publicBienData.dependencia && (
-                <div className="pt-2.5 border-t border-slate-200/60">
-                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-solid fa-building-columns text-emerald-600"></i> Dependencia
+                <div className="pt-2.5 border-t border-line/60">
+                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                    <i className="fa-solid fa-building-columns text-ok"></i> Dependencia
                   </p>
-                  <p className="text-xs font-bold text-slate-900 mt-1">
+                  <p className="text-xs font-bold text-content-1 mt-1">
                     {publicBienData.dependencia}
                   </p>
                 </div>
@@ -1753,8 +1749,8 @@ if (publicBienId) {
           </div>
         ) : (
           <div className="py-12 flex flex-col items-center justify-center text-center">
-            <i className="fa-solid fa-circle-notch fa-spin text-3xl text-blue-600 mb-3"></i>
-            <p className="text-xs text-slate-500 font-semibold">Consultando datos de registro...</p>
+            <i className="fa-solid fa-circle-notch fa-spin text-3xl text-brand mb-3"></i>
+            <p className="text-xs text-content-3 font-semibold">Consultando datos de registro...</p>
           </div>
         )}
 
@@ -1762,7 +1758,7 @@ if (publicBienId) {
         <div className="pt-2">
           <button 
             onClick={() => window.location.href = window.location.origin} 
-            className="w-full py-3.5 px-4 rounded-card bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold motion cursor-pointer shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-98"
+            className="w-full py-3.5 px-4 rounded-card bg-brand hover:bg-blue-700 text-content-inverse text-xs font-bold motion cursor-pointer shadow-md shadow-brand/25 flex items-center justify-center gap-2 active:scale-98"
           >
             <i className="fa-solid fa-arrow-left text-xs"></i> Ir a la Plataforma Principal
           </button>
@@ -1777,7 +1773,7 @@ if (publicBienId) {
             <a
               href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`}
               title="Abrir en modo kiosco (pantalla completa con temporizador)"
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 motion cursor-pointer"
+              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-line bg-surface-1 text-content-2 text-[11px] font-bold hover:bg-surface-2 active:scale-95 motion cursor-pointer"
             >
               <i className="fa-solid fa-display text-[10px]"></i>
               <span className="hidden sm:inline">Kiosco</span>
@@ -1841,18 +1837,8 @@ if (publicBienId) {
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
           <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-surface-1/95 dark:bg-zinc-900/95 text-content-1 dark:text-zinc-100 backdrop-blur-xl border border-line/80 dark:border-zinc-800 motion animate-slide-up">
-            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${
-              t.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50' : 
-              t.type === 'error' ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 
-              t.type === 'warning' ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50' : 
-              'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50'
-            }`}>
-              <i className={`fa-solid ${
-                t.type === 'success' ? 'fa-circle-check text-sm' : 
-                t.type === 'error' ? 'fa-circle-exclamation text-sm' : 
-                t.type === 'warning' ? 'fa-triangle-exclamation text-sm' : 
-                'fa-circle-info text-sm'
-              }`}></i>
+            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${ t.type === 'success' ? 'bg-ok-soft dark:bg-emerald-950/50 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/50' : t.type === 'error' ? 'bg-danger-soft dark:bg-rose-950/50 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/50' : t.type === 'warning' ? 'bg-warn-soft dark:bg-amber-950/50 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/50' : 'bg-blue-50 dark:bg-blue-950/50 text-brand dark:text-blue-400 border border-brand/25 dark:border-blue-900/50' }`}>
+              <i className={`fa-solid ${ t.type === 'success' ? 'fa-circle-check text-sm' : t.type === 'error' ? 'fa-circle-exclamation text-sm' : t.type === 'warning' ? 'fa-triangle-exclamation text-sm' : 'fa-circle-info text-sm' }`}></i>
             </div>
             <span className="flex-1 leading-relaxed">{t.message}</span>
             {t.action && (

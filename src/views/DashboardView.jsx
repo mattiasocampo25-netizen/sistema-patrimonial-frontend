@@ -55,7 +55,7 @@ export default function DashboardView({
       iconColor: 'text-white dark:text-zinc-200',
       border: 'border-line/80 dark:border-white/20',
       hoverBorder: 'hover:border-line-strong dark:hover:border-white/30',
-      ring: 'focus-visible:ring-brand-primary',
+      ring: 'focus-visible:ring-brand',
       numero: <AnimatedNumber value={stats.totalItems} />,
       onClick: () => { clearAllFilters(); setActiveTab('inventario'); },
       showProgress: false,
@@ -71,7 +71,7 @@ export default function DashboardView({
       iconColor: 'text-violet-600 dark:text-violet-300',
       border: 'border-line/80 dark:border-white/20',
       hoverBorder: 'hover:border-line-strong dark:hover:border-white/30',
-      ring: 'focus-visible:ring-brand-primary',
+      ring: 'focus-visible:ring-brand',
       numero: <><AnimatedNumber value={stats.withQR} /><span className="text-base text-content-3 font-semibold"> / {Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>,
       onClick: () => irInventario(() => setFiltroQR('YES')),
       showProgress: true,
@@ -85,7 +85,7 @@ export default function DashboardView({
       sublabel: stats.fc10Pendientes > 0
         ? stats.fc10Pendientes + ' en firma · ' + Math.max(0, stats.withoutFc10 - stats.fc10Pendientes) + ' sin acta'
         : 'Pendientes de asignación',
-      subColor: stats.fc10Pendientes > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-amber-600 dark:text-amber-400',
+      subColor: stats.fc10Pendientes > 0 ? 'text-warn dark:text-amber-400' : 'text-warn dark:text-amber-400',
       icon: 'fa-file-signature',
       iconBg: 'bg-amber-500 text-white',
       iconColor: 'text-white',
@@ -169,7 +169,7 @@ export default function DashboardView({
                       key={k} onClick={() => alternarWidget(k)}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer"
                     >
-                      <span className={'flex h-4 w-4 items-center justify-center rounded border ' + (widgets[k] ? 'bg-brand-primary border-brand-primary text-white' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
+                      <span className={'flex h-4 w-4 items-center justify-center rounded border' + (widgets[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
                         <i className="fa-solid fa-check text-[9px]"></i>
                       </span>
                       {label}
@@ -267,7 +267,7 @@ export default function DashboardView({
                   onClick={() => setActiveTab('fc10')}
                   className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-warn dark:text-amber-400">
                     <i className="fa-solid fa-file-signature text-[9px]"></i>
                   </span>
                   <span className="min-w-0 flex-1">
@@ -297,7 +297,7 @@ export default function DashboardView({
             {actasPorFirmar.length > 5 && (
               <button
                 onClick={() => setActiveTab('fc10')}
-                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.02] transition-colors cursor-pointer"
+                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-warn dark:text-amber-400 hover:bg-amber-500/[0.02] transition-colors cursor-pointer"
               >
                 Ver las {actasPorFirmar.length} actas en FC-10
               </button>
@@ -314,7 +314,7 @@ export default function DashboardView({
                   <i className="fa-solid fa-list-check text-content-3"></i> Atención requerida
               </h2>
               {pendientes.every(p => p.count === 0) && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-ok dark:text-emerald-400">
                       <i className="fa-solid fa-circle-check"></i> Todo al día
                   </span>
               )}
@@ -327,7 +327,7 @@ export default function DashboardView({
                       title={`Atender: ${p.label}`}
                       className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left motion duration-[var(--dur-base)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                   >
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border ` + p.box}>
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border` + p.box}>
                           <i className={`fa-solid ${p.icon} text-sm`}></i>
                       </span>
                       <span className="min-w-0 flex-1">
@@ -374,7 +374,7 @@ export default function DashboardView({
               </button>
               <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1.5"></span>
               <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i> Importar
+                  <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i> Importar
               </button>
               <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-export text-sky-600 dark:text-sky-400"></i> Exportar
@@ -383,7 +383,7 @@ export default function DashboardView({
                   <i className="fa-solid fa-qrcode text-violet-600 dark:text-violet-400"></i> Lote QRs
               </button>
               <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-print text-amber-600 dark:text-amber-400"></i> FC-03
+                  <i className="fa-solid fa-print text-warn dark:text-amber-400"></i> FC-03
               </button>
           </div>
       </div>
@@ -397,7 +397,7 @@ export default function DashboardView({
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-               <i className="fa-solid fa-chart-pie text-emerald-500"></i> Metas de Cobertura
+               <i className="fa-solid fa-chart-pie text-ok"></i> Metas de Cobertura
             </h2>
             <span className="text-[10px] font-bold text-content-3 uppercase tracking-wider bg-surface-3 dark:bg-surface-1/5 px-2.5 py-1 rounded-lg border border-line dark:border-white/5">Metas</span>
           </div>
@@ -425,7 +425,7 @@ export default function DashboardView({
                 <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-brand rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
+                <div className="h-full bg-brand rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ export default function CampoResultado({ escaneo, onVerFicha, onSeguir, onCerrar
         className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center"}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="animate-pop mx-auto flex h-16 w-16 items-center justify-center rounded-panel bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-4">
+        <div className="animate-pop mx-auto flex h-16 w-16 items-center justify-center rounded-panel bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20 mb-4">
           <i className="fa-solid fa-circle-check text-2xl"></i>
         </div>
         <p className="text-[11px] font-black uppercase tracking-widest text-content-3 dark:text-content-3">

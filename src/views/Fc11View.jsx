@@ -26,7 +26,7 @@ export default function Fc11View({
           <div className="flex flex-wrap gap-2 items-center">
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
             <button onClick={handleExportFC11CSV} className={STYLES.btnSecondary}>
-                <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar CSV
+                <i className="fa-solid fa-file-csv text-ok dark:text-emerald-400"></i> Exportar CSV
             </button>
           </div>
           </Toolbar>
@@ -48,11 +48,11 @@ export default function Fc11View({
               const depDestinataria = fc.dependenciaDestinataria || fc.destinatario || '';
               const esSalida = depRemitente === dependenciaActual;
               return (
-                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand-primary/50 motion group relative overflow-hidden`}>
-                  <div className={`absolute top-0 left-0 w-full h-1 ${esSalida ? 'bg-zinc-500' : 'bg-brand-primary'}`}></div>
+                <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand/50 motion group relative overflow-hidden`}>
+                  <div className={`absolute top-0 left-0 w-full h-1 ${esSalida ? 'bg-zinc-500' : 'bg-brand'}`}></div>
                   <div className="flex justify-between items-start mb-5">
                     <div className="flex items-center gap-3">
-                      <div className={`flex h-11 w-11 items-center justify-center rounded-card text-lg shadow-2xs ${esSalida ? 'bg-surface-3 text-content-1 dark:bg-surface-2 dark:text-content-3' : 'bg-brand-light text-brand-primary dark:bg-brand-primary/20 dark:text-brand-accent'}`}>
+                      <div className={`flex h-11 w-11 items-center justify-center rounded-card text-lg shadow-2xs ${esSalida ? 'bg-surface-3 text-content-1 dark:bg-surface-2 dark:text-content-3' : 'bg-brand-soft text-brand-text dark:bg-brand/20 dark:text-brand'}`}>
                           <i className={`fa-solid ${esSalida ? 'fa-arrow-right-from-bracket' : 'fa-arrow-right-to-bracket'}`}></i>
                       </div>
                       <div className="flex flex-col">

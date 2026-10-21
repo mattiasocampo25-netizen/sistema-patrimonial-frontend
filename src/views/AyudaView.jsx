@@ -138,11 +138,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           <button
             key={s.id}
             onClick={() => setSeccionActiva(s.id)}
-            className={`flex items-center gap-2 rounded-control px-4 py-2 text-[12px] font-medium motion cursor-pointer ${
-              seccionActiva === s.id
-                ? 'bg-brand-primary text-white shadow-sm shadow-blue-500/30'
-                : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5'
-            }`}
+            className={`flex items-center gap-2 rounded-control px-4 py-2 text-[12px] font-medium motion cursor-pointer ${ seccionActiva === s.id ? 'bg-brand text-content-inverse shadow-sm shadow-blue-500/30' : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5' }`}
           >
             <i className={`fa-solid ${s.icon} text-[13px] ${seccionActiva === s.id ? '' : 'opacity-70'}`}></i>
             {s.label}
@@ -188,7 +184,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
                 <div className="absolute left-[56px] top-12 bottom-12 w-0.5 bg-surface-3 dark:bg-surface-3 hidden sm:block z-0"></div>
                 <div className="space-y-2 relative z-10">
                   <WorkflowStep number="1" title="Alta (FC-04)" description="La incorporación inicial exige la creación de un FC-04 de Alta. Esto registra contablemente el ítem en la base de datos principal." icon="fa-arrow-trend-up" color="bg-zinc-500" />
-                  <WorkflowStep number="2" title="Delegación (FC-10)" description="La entrega física requiere el levantamiento de un FC-10 nominal. Este instrumento legal transfiere la responsabilidad civil del objeto." icon="fa-file-signature" color="bg-brand-primary" />
+                  <WorkflowStep number="2" title="Delegación (FC-10)" description="La entrega física requiere el levantamiento de un FC-10 nominal. Este instrumento legal transfiere la responsabilidad civil del objeto." icon="fa-file-signature" color="bg-brand" />
                   <WorkflowStep number="3" title="Movilidad (FC-11)" description="Toda reubicación entre facultades debe ampararse en un FC-11, el cual extingue automáticamente la responsabilidad del custodio anterior." icon="fa-dolly" color="bg-zinc-600" />
                   <WorkflowStep number="4" title="Extinción (FC-04)" description="El desuso o rotura definitiva obliga a tramitar un FC-04 de Baja para remover contablemente el valor del patrimonio activo." icon="fa-ban" color="bg-red-500" />
                 </div>
@@ -226,7 +222,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
             </h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-blue-50 dark:bg-blue-900/20 text-brand dark:text-blue-400">
                   <i className="fa-solid fa-envelope text-sm"></i>
                 </div>
                 <div>
@@ -235,7 +231,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-ok-soft dark:bg-emerald-900/20 text-ok dark:text-emerald-400">
                   <i className="fa-solid fa-building text-sm"></i>
                 </div>
                 <div>

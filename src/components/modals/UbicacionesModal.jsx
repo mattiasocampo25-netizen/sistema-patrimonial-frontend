@@ -106,7 +106,7 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
                         onClick={() => onDelete(u.id, u.nombre)}
                         title={enUso ? 'En uso: no se puede eliminar' : 'Eliminar ubicación'}
                         disabled={enUso}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                       >
                         <i className="fa-solid fa-trash-can text-xs"></i>
                       </button>

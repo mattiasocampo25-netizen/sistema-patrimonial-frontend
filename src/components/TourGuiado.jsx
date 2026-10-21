@@ -104,9 +104,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
       {!rect && <div className="absolute inset-0 bg-[#050814]/70" onClick={onClose} />}
 
       <div
-        className={`absolute z-10 rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${
-          esMovil || !rect ? 'inset-x-4 bottom-4' : ''
-        }`}
+        className={`absolute z-10 rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${ esMovil || !rect ? 'inset-x-4 bottom-4' : '' }`}
         style={esMovil || !rect ? { maxHeight: '70vh', overflowY: 'auto' } : { ...cardStyle, maxHeight: '60vh', overflowY: 'auto' }}
         role="dialog" aria-label={`Paso ${paso + 1} de ${pasos.length}`}
       >
@@ -120,7 +118,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
         <p className="text-[13px] text-content-3 dark:text-content-3 mt-1.5 leading-relaxed">{step.texto}</p>
         <div className="flex items-center gap-1.5 mt-4 mb-4">
           {pasos.map((_, i) => (
-            <span key={i} className={`h-1.5 rounded-full motion ${i === paso ? 'w-6 bg-brand-primary' : i < paso ? 'w-1.5 bg-brand-primary/50' : 'w-1.5 bg-surface-3 dark:bg-zinc-700'}`}></span>
+            <span key={i} className={`h-1.5 rounded-full motion ${i === paso ? 'w-6 bg-brand' : i < paso ? 'w-1.5 bg-brand/50' : 'w-1.5 bg-surface-3 dark:bg-zinc-700'}`}></span>
           ))}
         </div>
         <div className="flex items-center gap-2">

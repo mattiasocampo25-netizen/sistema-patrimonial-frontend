@@ -47,7 +47,7 @@ export default function FuncionariosView({
                 className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Descargar plantilla de funcionarios"
               >
-                <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+                <i className="fa-solid fa-file-excel text-ok dark:text-emerald-400"></i>
                 <span>Plantilla</span>
               </button>
   
@@ -56,7 +56,7 @@ export default function FuncionariosView({
                 className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Importar lista de funcionarios desde CSV"
               >
-                <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i>
+                <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i>
                 <span>Importar CSV</span>
               </button>
   
@@ -169,7 +169,7 @@ export default function FuncionariosView({
                                 </button>
                                 <button
                                     onClick={() => handleDeleteFuncionario(f.id)}
-                                    className="h-8 w-8 flex items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                                    className="h-8 w-8 flex items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                                     title={isAdmin ? 'Eliminar funcionario' : 'Solicitar eliminación al administrador'}
                                 >
                                     <i className={`fa-solid ${isAdmin ? 'fa-trash-can' : 'fa-paper-plane'} text-xs`}></i>

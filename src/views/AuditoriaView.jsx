@@ -46,9 +46,9 @@ export default function AuditoriaView({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="aud-kpis">
         {[
           { label: 'Eventos (30 días)', valor: kpisAud.total, icon: 'fa-bolt', box: 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 shadow-sm shadow-zinc-900/20' },
-          { label: 'Altas registradas', valor: kpisAud.altas, icon: 'fa-plus', box: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/20' },
+          { label: 'Altas registradas', valor: kpisAud.altas, icon: 'fa-plus', box: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/20' },
           { label: 'Modificaciones', valor: kpisAud.mods, icon: 'fa-pen-to-square', box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border border-zinc-500/20 shadow-sm shadow-zinc-500/20' },
-          { label: 'Bajas y eliminaciones', valor: kpisAud.bajas, icon: 'fa-flag', box: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/20' },
+          { label: 'Bajas y eliminaciones', valor: kpisAud.bajas, icon: 'fa-flag', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/20' },
         ].map(k => (
           <div key={k.label} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className={`flex h-11 w-11 items-center justify-center rounded-card mb-4 ${k.box}`}>
@@ -63,7 +63,7 @@ export default function AuditoriaView({
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-chart-line text-emerald-500"></i> Evolución del valor patrimonial
+                  <i className="fa-solid fa-chart-line text-ok"></i> Evolución del valor patrimonial
               </h3>
               <span className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Últimos 12 meses</span>
           </div>
@@ -92,7 +92,7 @@ export default function AuditoriaView({
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-heart-pulse text-rose-500"></i> Salud de datos
+                  <i className="fa-solid fa-heart-pulse text-danger"></i> Salud de datos
               </h3>
               <span className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Solo lectura</span>
           </div>
@@ -107,17 +107,13 @@ export default function AuditoriaView({
                 <span className="text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 flex items-center gap-1.5">
                   <i className="fa-solid fa-database text-[10px]"></i> Consumo de base de datos
                 </span>
-                <span className={`text-[11px] font-black tabular-nums ${alertaDb?.nivel === 'critico' ? 'text-rose-600 dark:text-rose-400' : alertaDb?.nivel === 'aviso' ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                <span className={`text-[11px] font-black tabular-nums ${alertaDb?.nivel === 'critico' ? 'text-danger dark:text-rose-400' : alertaDb?.nivel === 'aviso' ? 'text-warn dark:text-amber-400' : 'text-ok dark:text-emerald-400'}`}>
                   {usoDb.pctUso.toFixed(1)}% de 500 MB
                 </span>
               </div>
               <div className="w-full h-2 rounded-full bg-surface-3/60 dark:bg-surface-1/10 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ${
-                    alertaDb?.nivel === 'critico' ? 'bg-rose-500' : alertaDb?.nivel === 'aviso' ? 'bg-amber-500' : 'bg-emerald-500'
-                  } shadow-sm ${
-                    alertaDb?.nivel === 'critico' ? 'shadow-rose-500/40' : alertaDb?.nivel === 'aviso' ? 'shadow-amber-500/40' : 'shadow-emerald-500/40'
-                  }`}
+                  className={`h-full rounded-full transition-all duration-700 ${ alertaDb?.nivel === 'critico' ? 'bg-rose-500' : alertaDb?.nivel === 'aviso' ? 'bg-amber-500' : 'bg-emerald-500' } shadow-sm ${ alertaDb?.nivel === 'critico' ? 'shadow-rose-500/40' : alertaDb?.nivel === 'aviso' ? 'shadow-amber-500/40' : 'shadow-emerald-500/40' }`}
                   style={{ width: `${Math.min(100, Math.max(1.5, usoDb.pctUso))}%` }}
                 ></div>
               </div>
@@ -170,7 +166,7 @@ export default function AuditoriaView({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2 mb-1">
-            <i className="fa-solid fa-clipboard-check text-emerald-500"></i> Conciliación física
+            <i className="fa-solid fa-clipboard-check text-ok"></i> Conciliación física
           </h3>
           <p className="text-xs text-content-3 dark:text-content-3 mb-4">Escanea o escribe rótulos y compara contra el inventario activo del alcance elegido.</p>
           <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -205,11 +201,11 @@ export default function AuditoriaView({
               <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">Hallados</p>
             </div>
             <div className="rounded-card bg-surface-2 dark:bg-surface-1/5 border border-line/60 dark:border-white/10 py-3">
-              <p className="text-xl font-bold tabular-nums text-amber-600 dark:text-amber-400">{resultadoConteo.faltantes.length}</p>
+              <p className="text-xl font-bold tabular-nums text-warn dark:text-amber-400">{resultadoConteo.faltantes.length}</p>
               <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">Faltantes</p>
             </div>
             <div className="rounded-card bg-surface-2 dark:bg-surface-1/5 border border-line/60 dark:border-white/10 py-3">
-              <p className="text-xl font-bold tabular-nums text-rose-600 dark:text-rose-400">{resultadoConteo.noRegistrados.length}</p>
+              <p className="text-xl font-bold tabular-nums text-danger dark:text-rose-400">{resultadoConteo.noRegistrados.length}</p>
               <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">No registrados</p>
             </div>
           </div>
@@ -230,7 +226,7 @@ export default function AuditoriaView({
             <button onClick={() => { setConteoCodigos([]); setConteoInput(''); }} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">Limpiar</button>
             <button onClick={exportarConteoCSV} disabled={conteoCodigos.length === 0} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none disabled:opacity-40">Exportar CSV</button>
             <button onClick={descargarActaConteoPDF} disabled={conteoCodigos.length === 0} title="Descargar acta en PDF con estructura oficial" className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none disabled:opacity-40">
-              <i className="fa-solid fa-file-pdf mr-1.5 text-rose-500"></i>Acta PDF
+              <i className="fa-solid fa-file-pdf mr-1.5 text-danger"></i>Acta PDF
             </button>
             <button onClick={guardarActaConteo} disabled={conteoCodigos.length === 0} className="h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none disabled:opacity-40">Guardar acta</button>
           </div>
@@ -289,7 +285,7 @@ export default function AuditoriaView({
                 Guardar acta de muestreo
               </button>
               <button onClick={descargarActaMuestreoPDF} title="Descargar acta en PDF con estructura oficial" className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">
-                <i className="fa-solid fa-file-pdf mr-1.5 text-rose-500"></i>Acta PDF
+                <i className="fa-solid fa-file-pdf mr-1.5 text-danger"></i>Acta PDF
               </button>
             </>
           )}

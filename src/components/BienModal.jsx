@@ -242,8 +242,8 @@ export default function BienModal({
             
             {esNuevo && hayBorrador && !restaurado && (
               <div className="mx-8 mt-6 mb-0 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                <i className="fa-solid fa-history text-amber-600 dark:text-amber-400 text-sm"></i>
-                <p className="flex-1 min-w-[200px] text-xs font-bold text-amber-700 dark:text-amber-300">Tienes un borrador sin guardar de este formulario.</p>
+                <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
+                <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar de este formulario.</p>
                 <button type="button" onClick={continuarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
                 <button type="button" onClick={limpiarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
               </div>
@@ -261,27 +261,27 @@ export default function BienModal({
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Cuenta</label>
-                        <input name="cuenta" defaultValue={defecto('cuenta', bienEditing?.cuenta)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 11" />
+                        <input name="cuenta" defaultValue={defecto('cuenta', bienEditing?.cuenta)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 11" />
                     </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Subcuenta</label>
-                        <input name="subcuenta" defaultValue={defecto('subcuenta', bienEditing?.subcuenta)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 01" />
+                        <input name="subcuenta" defaultValue={defecto('subcuenta', bienEditing?.subcuenta)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 01" />
                     </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Analítico 1</label>
-                        <input name="analitico1" defaultValue={defecto('analitico1', bienEditing?.analitico1)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 001" />
+                        <input name="analitico1" defaultValue={defecto('analitico1', bienEditing?.analitico1)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 001" />
                     </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Analítico 2</label>
-                        <input name="analitico2" defaultValue={defecto('analitico2', bienEditing?.analitico2)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 000" />
+                        <input name="analitico2" defaultValue={defecto('analitico2', bienEditing?.analitico2)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 000" />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Rótulo / Código de Barra *</label>
-                    <input name="rotulo" required onBlur={(e) => validarRotulo(e.target.value)} onChange={(e) => validarRotulo(e.target.value)} defaultValue={defecto('rotulo', bienEditing?.rotulo)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 104523" />
+                    <input name="rotulo" required onBlur={(e) => validarRotulo(e.target.value)} onChange={(e) => validarRotulo(e.target.value)} defaultValue={defecto('rotulo', bienEditing?.rotulo)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 104523" />
                       {rotuloError && (
-                        <p className="animate-fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-rose-600 dark:text-rose-400">
+                        <p className="animate-fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-danger dark:text-rose-400">
                           <i className="fa-solid fa-circle-exclamation text-[10px]"></i>{rotuloError}
                         </p>
                       )}
@@ -304,7 +304,7 @@ export default function BienModal({
                       defaultValue={defecto('descripcion', bienEditing?.descripcion)}
                       onChange={(e) => { setDescTexto(e.target.value); setShowDescDropdown(true); }}
                       onFocus={() => { if (normalizeStr(descTexto).length >= 3) setShowDescDropdown(true); }}
-                      className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`}
+                      className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                       placeholder="Escribe y elige una descripción similar para autocompletar cuenta y valores..."
                     ></textarea>
                     {showDescDropdown && sugerenciasDesc.length > 0 && (
@@ -349,18 +349,18 @@ export default function BienModal({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Valor de Adquisición (Gs.)</label>
-                        <input type="text" inputMode="numeric" name="valorUnitario" defaultValue={defecto('valorUnitario', bienEditing?.valorUnitario) ? formatearMiles(defecto('valorUnitario', bienEditing?.valorUnitario)) : ''} onInput={(e) => { e.target.value = formatearMiles(e.target.value); }} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 1.500.000" />
+                        <input type="text" inputMode="numeric" name="valorUnitario" defaultValue={defecto('valorUnitario', bienEditing?.valorUnitario) ? formatearMiles(defecto('valorUnitario', bienEditing?.valorUnitario)) : ''} onInput={(e) => { e.target.value = formatearMiles(e.target.value); }} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 1.500.000" />
                     </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Fecha de Adquisición</label>
-                        <input type="date" name="fechaAdquisicion" defaultValue={toInputDateFormat(bienEditing?.fechaAdquisicion)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`}  onBlur={(e) => validarFecha(e.target.value)}/>
+                        <input type="date" name="fechaAdquisicion" defaultValue={toInputDateFormat(bienEditing?.fechaAdquisicion)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}  onBlur={(e) => validarFecha(e.target.value)}/>
                     </div>
                     <div>
-                        {fechaAviso && (<p className="animate-fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-amber-600 dark:text-amber-400"><i className="fa-solid fa-triangle-exclamation text-[10px]"></i>{fechaAviso}</p>)}
+                        {fechaAviso && (<p className="animate-fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-warn dark:text-amber-400"><i className="fa-solid fa-triangle-exclamation text-[10px]"></i>{fechaAviso}</p>)}
                     </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Vida Útil (Años)</label>
-                        <input type="number" name="vidaUtil" defaultValue={defecto('vidaUtil', bienEditing?.vidaUtil)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Ej: 5 o 10" />
+                        <input type="number" name="vidaUtil" defaultValue={defecto('vidaUtil', bienEditing?.vidaUtil)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 5 o 10" />
                     </div>
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export default function BienModal({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">C.I. Custodio</label>
-                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Auto-completado" />
+                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
                     </div>
                     <div className="md:col-span-2 relative" ref={custodioDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Custodio Designado (Nombre)</label>
@@ -391,7 +391,7 @@ export default function BienModal({
                             value={custodioTexto} 
                             onChange={handleCustodioChange} 
                             onFocus={() => setShowCustodioDropdown(true)}
-                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} 
+                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} 
                             placeholder="Escribe o selecciona custodio..." 
                             autoComplete="off"
                         />
@@ -429,7 +429,7 @@ export default function BienModal({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Cargo Funcional</label>
-                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} placeholder="Auto-completado" />
+                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
                     </div>
                     <div className="relative" ref={ubicacionDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Ubicación Operativa</label>
@@ -441,7 +441,7 @@ export default function BienModal({
                                 setShowUbicacionDropdown(true);
                             }}
                             onFocus={() => setShowUbicacionDropdown(true)}
-                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary`} 
+                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} 
                             placeholder="Oficina / Laboratorio..." 
                             autoComplete="off"
                         />

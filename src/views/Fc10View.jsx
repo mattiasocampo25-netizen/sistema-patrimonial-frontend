@@ -55,9 +55,9 @@ export default function Fc10View({
 
   const ESTADOS_FIRMA_OPCIONES = [
     { valor: 'BORRADOR', label: 'Borrador', icon: 'fa-pen-ruler', color: 'text-content-2 dark:text-content-3' },
-    { valor: 'ESPERA_FIRMA_1', label: 'Espera funcionario', icon: 'fa-user', color: 'text-amber-600 dark:text-amber-400' },
+    { valor: 'ESPERA_FIRMA_1', label: 'Espera funcionario', icon: 'fa-user', color: 'text-warn dark:text-amber-400' },
     { valor: 'ESPERA_FIRMA_2', label: 'Espera jefe', icon: 'fa-user-tie', color: 'text-sky-600 dark:text-sky-400' },
-    { valor: 'CERRADO', label: 'Firmado (ambas)', icon: 'fa-circle-check', color: 'text-emerald-600 dark:text-emerald-400' }
+    { valor: 'CERRADO', label: 'Firmado (ambas)', icon: 'fa-circle-check', color: 'text-ok dark:text-emerald-400' }
   ];
 
   const handleCambiarEstadoFirma = async (fc, nuevoEstado) => {
@@ -82,7 +82,7 @@ export default function Fc10View({
         <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 shadow-sm shadow-blue-500/20">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-blue-50 dark:bg-blue-900/10 text-brand dark:text-blue-400 shadow-sm shadow-blue-500/20">
                 <i className="fa-solid fa-clipboard-check text-lg"></i>
               </div>
               <div>
@@ -93,11 +93,11 @@ export default function Fc10View({
               </div>
             </div>
             {puedeGestionarFirmas ? (
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shadow-sm shadow-emerald-500/20`}>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-ok-soft dark:bg-emerald-900/20 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/30 shadow-sm shadow-emerald-500/20`}>
                 <i className="fa-solid fa-shield-halved text-[9px]"></i> Modo administrador activo
               </span>
             ) : (
-              <span className="text-[10px] font-bold text-rose-500">Control restringido a administrador</span>
+              <span className="text-[10px] font-bold text-danger">Control restringido a administrador</span>
             )}
           </div>
 
@@ -118,13 +118,7 @@ export default function Fc10View({
                         <i className="fa-solid fa-tag text-[9px]"></i>{bien.rotulo || 'S/R'}
                       </p>
                     </div>
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${
-                      estadoActual === 'CERRADO'
-                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                        : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2'
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                          : 'bg-surface-3 text-content-1 dark:bg-surface-1/10 dark:text-content-3'
-                    }`}>
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${ estadoActual === 'CERRADO' ? 'bg-emerald-100 text-ok dark:bg-emerald-900/30 dark:text-emerald-400' : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2' ? 'bg-amber-100 text-warn dark:bg-amber-900/30 dark:text-amber-400' : 'bg-surface-3 text-content-1 dark:bg-surface-1/10 dark:text-content-3' }`}>
                       {estadoActual === 'CERRADO' ? '✓' : estadoActual === 'BORRADOR' ? 'B' : 'P'}
                     </div>
                   </div>
@@ -137,11 +131,7 @@ export default function Fc10View({
                           key={op.valor}
                           onClick={() => !estaCambiando && handleCambiarEstadoFirma(fc, op.valor)}
                           disabled={estaCambiando || !puedeGestionarFirmas}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium motion duration-[var(--dur-base)] ${
-                            seleccionado
-                              ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/30'
-                              : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5 border border-transparent hover:border-line dark:hover:border-white/10'
-                          } ${!puedeGestionarFirmas ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium motion duration-[var(--dur-base)] ${ seleccionado ? 'bg-brand text-content-inverse shadow-sm shadow-brand/30' : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5 border border-transparent hover:border-line dark:hover:border-white/10' } ${!puedeGestionarFirmas ? 'opacity-60 cursor-not-allowed' : ''}`}
                           title={!puedeGestionarFirmas ? 'Solo el administrador puede cambiar este estado' : `Marcar como ${op.label}`}
                         >
                           <i className={`fa-solid ${op.icon} text-[10px] ${seleccionado ? 'text-white' : op.color}`}></i>
@@ -161,7 +151,7 @@ export default function Fc10View({
             })}
           </div>
           {!puedeGestionarFirmas && (
-            <p className="mt-4 text-[11px] text-rose-500 text-center">
+            <p className="mt-4 text-[11px] text-danger text-center">
               <i className="fa-solid fa-triangle-exclamation mr-1.5"></i>
               Esta sección solo está disponible para el rol Administrador.
             </p>
@@ -310,7 +300,7 @@ export default function Fc10View({
                               <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
                               <button onClick={() => openFC10Modal(bien, fc)} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                               {isAdmin && (
-                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
                               )}
                           </div>
                       </div>
@@ -329,7 +319,7 @@ export default function Fc10View({
                           { n: 2, puesto: 'Jefe Inmediato', nombre: fc.jefeInmediatoNombre, f: f2 }
                         ].map(({ n, puesto, nombre, f }) => (
                           <div key={n} className="flex items-center gap-2 text-[11px]">
-                            <i className={`fa-solid ${f ? 'fa-circle-check text-emerald-500' : 'fa-circle text-content-3 dark:text-content-2'} text-[11px] shrink-0`}></i>
+                            <i className={`fa-solid ${f ? 'fa-circle-check text-ok' : 'fa-circle text-content-3 dark:text-content-2'} text-[11px] shrink-0`}></i>
                             <span className="font-semibold text-content-2 dark:text-content-3 shrink-0">{puesto}:</span>
                             <span className="truncate text-content-3 dark:text-content-3">
                               {f ? (
@@ -379,7 +369,7 @@ export default function Fc10View({
                               ? <><i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> Cerrando...</>
                               : <><i className="fa-solid fa-circle-check text-[11px]"></i> Ya firmaron ambos</>}
                           </button>
-                          <p className="text-[10px] text-emerald-700/80 dark:text-emerald-400/70 text-center">o registralas de a poco:</p>
+                          <p className="text-[10px] text-ok/80 dark:text-emerald-400/70 text-center">o registralas de a poco:</p>
                         </>
                       )}
                       {registrarFirmaFC10 && (

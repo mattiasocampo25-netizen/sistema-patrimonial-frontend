@@ -22,7 +22,7 @@ const VARIANTES = {
   },
   403: {
     icon: 'fa-lock',
-    tono: 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400',
+    tono: 'bg-warn-soft dark:bg-amber-950/40 text-warn dark:text-amber-400',
     codigo: '403',
     titulo: 'Acceso restringido',
     descripcion: 'Tu cuenta no tiene permisos para ver esta sección. Si creés que es un error, pedile a un administrador que revise tu rol.',
@@ -30,7 +30,7 @@ const VARIANTES = {
   },
   session: {
     icon: 'fa-user-clock',
-    tono: 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400',
+    tono: 'bg-info-soft dark:bg-sky-950/40 text-sky-600 dark:text-sky-400',
     codigo: 'Sesión expirada',
     titulo: 'Tu sesión se cerró',
     descripcion: 'Por seguridad cerramos la sesión después de un tiempo sin actividad. Volvé a iniciar sesión para continuar.',
@@ -38,7 +38,7 @@ const VARIANTES = {
   },
   error: {
     icon: 'fa-triangle-exclamation',
-    tono: 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400',
+    tono: 'bg-danger-soft dark:bg-rose-950/40 text-danger dark:text-rose-400',
     codigo: 'Error',
     titulo: 'Algo salió mal',
     descripcion: 'Ocurrió un problema inesperado al cargar esta sección. Probá de nuevo; si persiste, contactá al administrador.',

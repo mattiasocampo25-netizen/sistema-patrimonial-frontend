@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 const ESTADO_INFO = {
-  PENDIENTE: { label: 'Pendiente', color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30', dot: 'bg-amber-500' },
-  APROBADO: { label: 'Aprobado', color: 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30', dot: 'bg-emerald-500' },
-  RECHAZADO: { label: 'Rechazado', color: 'bg-rose-50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30', dot: 'bg-rose-500' },
-  EN_REVISION: { label: 'En Revisión', color: 'bg-sky-50 dark:bg-sky-950/20 text-sky-700 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30', dot: 'bg-sky-500' }
+  PENDIENTE: { label: 'Pendiente', color: 'bg-warn-soft dark:bg-amber-950/20 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/30', dot: 'bg-amber-500' },
+  APROBADO: { label: 'Aprobado', color: 'bg-ok-soft dark:bg-emerald-950/20 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/30', dot: 'bg-emerald-500' },
+  RECHAZADO: { label: 'Rechazado', color: 'bg-danger-soft dark:bg-rose-950/20 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/30', dot: 'bg-rose-500' },
+  EN_REVISION: { label: 'En Revisión', color: 'bg-info-soft dark:bg-sky-950/20 text-info dark:text-sky-400 border border-info/25 dark:border-sky-900/30', dot: 'bg-sky-500' }
 };
 
 export default function AprobacionesView({
@@ -59,11 +59,7 @@ export default function AprobacionesView({
               <button
                 key={et.id}
                 onClick={() => setFiltroEstado(et.id)}
-                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                  filtroEstado === et.id
-                    ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1'
-                    : 'bg-surface-3 dark:bg-surface-1/5 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10'
-                }`}
+                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ filtroEstado === et.id ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1' : 'bg-surface-3 dark:bg-surface-1/5 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10' }`}
               >
                 {et.label}
                 <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-content-3 dark:text-content-3'}`}>{et.n}</span>
@@ -119,8 +115,8 @@ export default function AprobacionesView({
                           {bienAsociado.descripcion}
                         </p>
                         {notif.motivo && (
-                          <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-control px-3 py-2">
-                            <i className="fa-solid fa-comment-dots text-xs mt-0.5 shrink-0 text-amber-600"></i>
+                          <div className="mt-2 flex items-start gap-2 text-xs text-warn dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-control px-3 py-2">
+                            <i className="fa-solid fa-comment-dots text-xs mt-0.5 shrink-0 text-warn"></i>
                             <div className="flex-1">
                               <span className="font-bold">Motivo:</span> {notif.motivo}
                             </div>

@@ -86,21 +86,13 @@ export default function QRModal({
               <div className="flex rounded-card bg-surface-3 dark:bg-surface-1/5 p-1 border border-line/60 dark:border-white/5">
                 <button 
                   onClick={() => setPreviewType('label')}
-                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                    previewType === 'label' 
-                      ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' 
-                      : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200'
-                  }`}
+                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'label' ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
                 >
                   Etiqueta Completa
                 </button>
                 <button 
                   onClick={() => setPreviewType('simple')}
-                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                    previewType === 'simple' 
-                      ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' 
-                      : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200'
-                  }`}
+                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'simple' ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
                 >
                   Solo Código QR
                 </button>

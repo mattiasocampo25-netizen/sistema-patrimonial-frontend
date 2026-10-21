@@ -41,7 +41,7 @@ export const ESTADO_INFO = {
     label: 'Esperando firma del funcionario',
     corto: 'Falta funcionario',
     icon: 'fa-file-signature',
-    badge: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/25',
+    badge: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/25',
     dot: 'bg-amber-500',
     descripcion: 'Firma el funcionario responsable.'
   },
@@ -49,7 +49,7 @@ export const ESTADO_INFO = {
     label: 'Esperando firma del jefe inmediato',
     corto: 'Falta jefe',
     icon: 'fa-user-tie',
-    badge: 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/25',
+    badge: 'bg-sky-500/10 text-info dark:text-sky-400 border-sky-500/25',
     dot: 'bg-sky-500',
     descripcion: 'Ya firmó el funcionario. Falta el jefe inmediato.'
   },
@@ -57,7 +57,7 @@ export const ESTADO_INFO = {
     label: 'Cerrado (firmas completas)',
     corto: 'Cerrado',
     icon: 'fa-circle-check',
-    badge: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25',
+    badge: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border-emerald-500/25',
     dot: 'bg-emerald-500',
     descripcion: 'Ambas firmas registradas. El bien ya cuenta con FC-10.'
   }

@@ -383,8 +383,8 @@ const valorOrgExplicito = (campo) => {
                 
 {esNuevoFC && hayBorradorFC && !restauradoFC && (
                   <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                    <i className="fa-solid fa-history text-amber-600 dark:text-amber-400 text-sm"></i>
-                    <p className="flex-1 min-w-[200px] text-xs font-bold text-amber-700 dark:text-amber-300">Tienes un borrador sin guardar.</p>
+                    <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
+                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar.</p>
                     <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
                     <button type="button" onClick={limpiarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
                   </div>
@@ -399,18 +399,10 @@ const valorOrgExplicito = (campo) => {
                             ].map((s, i, arr) => (
                                 <React.Fragment key={s.n}>
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${
-                                            step > s.n
-                                                ? 'bg-emerald-500 text-white'
-                                                : step === s.n
-                                                    ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 ring-4 ring-zinc-900/10 dark:ring-white/10'
-                                                    : 'bg-surface-3 dark:bg-surface-3 text-content-3 dark:text-content-2'
-                                        }`}>
+                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${ step > s.n ? 'bg-emerald-500 text-white' : step === s.n ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 ring-4 ring-zinc-900/10 dark:ring-white/10' : 'bg-surface-3 dark:bg-surface-3 text-content-3 dark:text-content-2' }`}>
                                             {step > s.n ? <i className="fa-solid fa-check text-[10px]"></i> : s.n}
                                         </span>
-                                        <span className={`hidden sm:block text-xs font-bold whitespace-nowrap transition-colors ${
-                                            step >= s.n ? 'text-content-1 dark:text-white' : 'text-content-3 dark:text-content-2'
-                                        }`}>
+                                        <span className={`hidden sm:block text-xs font-bold whitespace-nowrap transition-colors ${ step >= s.n ? 'text-content-1 dark:text-white' : 'text-content-3 dark:text-content-2' }`}>
                                             {s.label}
                                         </span>
                                     </div>
@@ -431,7 +423,7 @@ const valorOrgExplicito = (campo) => {
                             </p>
                             <div className="text-right shrink-0 ml-auto">
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-content-3 dark:text-content-3">Valor</p>
-                                <p className="font-bold text-emerald-600 dark:text-emerald-400 text-xs tabular-nums">Gs. {formatCurrency(fc10TargetBien.valorUnitario)}</p>
+                                <p className="font-bold text-ok dark:text-emerald-400 text-xs tabular-nums">Gs. {formatCurrency(fc10TargetBien.valorUnitario)}</p>
                             </div>
                         </div>
 
@@ -563,7 +555,7 @@ const valorOrgExplicito = (campo) => {
                                                     requerido
                                                 />
                                                 {funcData.nombre.trim() !== '' && (
-                                                    <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${padronConDatos ? 'text-emerald-600 dark:text-emerald-400' : coincidePadron ? 'text-amber-600 dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
+                                                    <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${padronConDatos ? 'text-ok dark:text-emerald-400' : coincidePadron ? 'text-warn dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
                                                         <i className={`fa-solid ${padronConDatos ? 'fa-circle-check' : coincidePadron ? 'fa-triangle-exclamation' : 'fa-circle-info'} text-[9px]`}></i>
                                                         {padronConDatos ? 'Datos del padron aplicados' : coincidePadron ? 'En el padron sin CI/cargo' : 'No esta en el padron'}
                                                     </p>
@@ -619,7 +611,7 @@ const valorOrgExplicito = (campo) => {
                                                     requerido
                                                 />
                                                 {jefeData.nombre.trim() !== '' && (
-                                                    <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${jefeConDatos ? 'text-emerald-600 dark:text-emerald-400' : jefeEnPadron ? 'text-amber-600 dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
+                                                    <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${jefeConDatos ? 'text-ok dark:text-emerald-400' : jefeEnPadron ? 'text-warn dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
                                                         <i className={`fa-solid ${jefeConDatos ? 'fa-circle-check' : jefeEnPadron ? 'fa-triangle-exclamation' : 'fa-circle-info'} text-[9px]`}></i>
                                                         {jefeConDatos ? 'Datos del padron aplicados' : jefeEnPadron ? 'En el padron sin CI/cargo' : 'No esta en el padron'}
                                                     </p>
@@ -653,9 +645,9 @@ const valorOrgExplicito = (campo) => {
                                 {/* Que va a pasar al guardar: conviene que quede claro
                                     antes de confirmar, no despues. */}
                                 {errorFirmantes && (
-                                    <div role="alert" className="px-5 py-3 border-t border-rose-200 dark:border-rose-900/40 bg-rose-50 dark:bg-rose-950/20 flex items-start gap-2.5">
-                                        <i className="fa-solid fa-circle-exclamation text-rose-500 text-[11px] mt-0.5 shrink-0"></i>
-                                        <p className="text-[11px] font-semibold text-rose-700 dark:text-rose-400 leading-relaxed">
+                                    <div role="alert" className="px-5 py-3 border-t border-rose-200 dark:border-rose-900/40 bg-danger-soft dark:bg-rose-950/20 flex items-start gap-2.5">
+                                        <i className="fa-solid fa-circle-exclamation text-danger text-[11px] mt-0.5 shrink-0"></i>
+                                        <p className="text-[11px] font-semibold text-danger dark:text-rose-400 leading-relaxed">
                                             {errorFirmantes}
                                         </p>
                                     </div>
@@ -708,20 +700,16 @@ const valorOrgExplicito = (campo) => {
                                 acción mayor (libera el bien) y no debe quedar a
                                 la vista como si fuera parte del alta. */}
                             {fc10Editing && (
-                                <div className={`rounded-card border overflow-hidden transition-colors ${
-                                    isReturning
-                                        ? 'border-rose-500/30 bg-rose-50/40 dark:bg-rose-950/10'
-                                        : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1'
-                                }`}>
+                                <div className={`rounded-card border overflow-hidden transition-colors ${ isReturning ? 'border-rose-500/30 bg-danger-soft/40 dark:bg-rose-950/10' : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1' }`}>
                                     <label className="flex items-center gap-3 px-5 py-4 cursor-pointer">
                                         <input
                                             type="checkbox"
                                             checked={isReturning}
                                             onChange={(e) => setIsReturning(e.target.checked)}
-                                            className="h-4 w-4 rounded border-line-strong dark:border-zinc-600 text-rose-600 focus:ring-rose-500 focus-visible:outline-none cursor-pointer shrink-0"
+                                            className="h-4 w-4 rounded border-line-strong dark:border-zinc-600 text-danger focus:ring-rose-500 focus-visible:outline-none cursor-pointer shrink-0"
                                         />
                                         <div className="min-w-0 flex-1">
-                                            <p className={`text-xs font-bold ${isReturning ? 'text-rose-700 dark:text-rose-400' : 'text-content-1 dark:text-white'}`}>
+                                            <p className={`text-xs font-bold ${isReturning ? 'text-danger dark:text-rose-400' : 'text-content-1 dark:text-white'}`}>
                                                 Registrar devolución y liberar el bien
                                             </p>
                                             <p className="text-[10px] text-content-3 dark:text-content-3 mt-0.5">
@@ -733,19 +721,19 @@ const valorOrgExplicito = (campo) => {
                                     {isReturning && (
                                         <div className="px-5 pb-5 pt-4 border-t border-rose-500/20 grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in">
                                             <div>
-                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-rose-500/70 mb-1.5">Lugar</label>
+                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-danger/70 mb-1.5">Lugar</label>
                                                 <input name="devolucionLugar" required defaultValue={defectoFC('devolucionLugar', (fc10Editing?.devolucionLugar || 'Pilar'))} className={STYLES.input} />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-rose-500/70 mb-1.5">Fecha</label>
+                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-danger/70 mb-1.5">Fecha</label>
                                                 <input type="date" name="devolucionFecha" required defaultValue={defectoFC('devolucionFecha', (fc10Editing?.devolucionFecha || new Date().toISOString().split('T')[0]))} className={`${STYLES.input} tabular-nums`} />
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-rose-500/70 mb-1.5">Cargo del receptor</label>
+                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-danger/70 mb-1.5">Cargo del receptor</label>
                                                 <input name="devolucionCargoReceptor" defaultValue={defectoFC('devolucionCargoReceptor', (fc10Editing?.devolucionCargoReceptor))} className={STYLES.input} />
                                             </div>
                                             <div className="sm:col-span-3">
-                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-rose-500/70 mb-1.5">Nombre de quien recibe</label>
+                                                <label className="block text-[10px] font-bold uppercase tracking-wider text-rose-400 dark:text-danger/70 mb-1.5">Nombre de quien recibe</label>
                                                 <input name="devolucionReceptor" defaultValue={defectoFC('devolucionReceptor', (fc10Editing?.devolucionReceptor))} className={STYLES.input} />
                                             </div>
                                         </div>

@@ -20,10 +20,10 @@ import { TABLAS_RESTORABLES, ORDEN_RESTAURACION } from '../services/restore';
 const Chip = ({ children, tono = 'zinc' }) => {
   const tonos = {
     zinc: 'bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3',
-    verde: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-    ambar: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
-    rojo: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400',
-    azul: 'bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400'
+    verde: 'bg-ok-soft dark:bg-emerald-500/10 text-ok dark:text-emerald-400',
+    ambar: 'bg-warn-soft dark:bg-amber-500/10 text-warn dark:text-amber-400',
+    rojo: 'bg-danger-soft dark:bg-rose-500/10 text-danger dark:text-rose-400',
+    azul: 'bg-info-soft dark:bg-sky-500/10 text-info dark:text-sky-400'
   };
   return (
     <span className={`inline-flex items-center gap-1 rounded-lg px-1.5 py-0.5 text-[10px] font-bold ${tonos[tono]}`}>
@@ -52,7 +52,7 @@ export default function RestoreBackupModal({ restore }) {
         {/* Encabezado */}
         <div className="flex items-start justify-between gap-4 border-b border-line dark:border-white/10 px-6 py-5">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-500/15 text-warn dark:text-amber-400">
               <i className="fa-solid fa-clock-rotate-left"></i>
             </div>
             <div className="min-w-0">
@@ -108,9 +108,9 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* Avisos del análisis (filas descartadas, respaldo viejo, etc.) */}
           {hayAnalisis && analisis.avisos.length > 0 && (
-            <section className="space-y-1.5 rounded-control border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-500/25 dark:bg-amber-500/5">
+            <section className="space-y-1.5 rounded-control border border-amber-200 bg-warn-soft/60 p-3 dark:border-amber-500/25 dark:bg-amber-500/5">
               {analisis.avisos.map((a, i) => (
-                <p key={i} className={`text-[11px] font-semibold leading-snug ${/CRÍTICO/.test(a) ? 'text-rose-700 dark:text-rose-400' : 'text-amber-800 dark:text-amber-300'}`}>
+                <p key={i} className={`text-[11px] font-semibold leading-snug ${/CRÍTICO/.test(a) ? 'text-danger dark:text-rose-400' : 'text-amber-800 dark:text-amber-300'}`}>
                   <i className={`fa-solid ${/CRÍTICO/.test(a) ? 'fa-triangle-exclamation' : 'fa-circle-info'} mr-1.5`}></i>
                   {a}
                 </p>
@@ -128,7 +128,7 @@ export default function RestoreBackupModal({ restore }) {
 
               {!hayCambios ? (
                 <div className="rounded-control border border-line bg-surface-2 dark:border-white/10 dark:bg-surface-1/5 p-4 text-center">
-                  <i className="fa-solid fa-circle-check text-emerald-500 text-xl"></i>
+                  <i className="fa-solid fa-circle-check text-ok text-xl"></i>
                   <p className="mt-2 text-xs font-semibold text-content-1 dark:text-zinc-200">
                     El respaldo coincide con la base actual. No hay nada que restaurar.
                   </p>
@@ -220,7 +220,7 @@ export default function RestoreBackupModal({ restore }) {
                 Cómo restaurar
               </label>
               <div className="grid gap-2 sm:grid-cols-2">
-                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'merge' ? 'border-brand-primary bg-brand-primary/5' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
+                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'merge' ? 'border-brand bg-brand/5' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="restore-modo" checked={modo === 'merge'} onChange={() => setModo('merge')} disabled={ejecutando}
                       className="h-4 w-4 cursor-pointer border-line-strong text-brand-text focus:ring-brand" />
@@ -230,11 +230,11 @@ export default function RestoreBackupModal({ restore }) {
                     Lo que viene en el archivo pisa al registro con la misma clave. Lo demás se conserva.
                   </p>
                 </label>
-                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'reemplazar' ? 'border-rose-400 bg-rose-50/60 dark:border-rose-500/40 dark:bg-rose-500/10' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
+                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'reemplazar' ? 'border-rose-400 bg-danger-soft/60 dark:border-rose-500/40 dark:bg-rose-500/10' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="restore-modo" checked={modo === 'reemplazar'} onChange={() => setModo('reemplazar')} disabled={ejecutando}
-                      className="h-4 w-4 cursor-pointer border-line-strong text-rose-500 focus:ring-rose-500" />
-                    <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Reemplazar todo</span>
+                      className="h-4 w-4 cursor-pointer border-line-strong text-danger focus:ring-rose-500" />
+                    <span className="text-xs font-bold text-danger dark:text-rose-400">Reemplazar todo</span>
                   </div>
                   <p className="mt-1.5 text-[11px] font-medium leading-snug text-content-3 dark:text-content-3">
                     Borra lo que no está en el archivo. Solo para volver a un estado anterior conocido.
@@ -247,7 +247,7 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* --- Progreso --- */}
           {ejecutando && progreso && (
-            <section className="rounded-control border border-sky-200 bg-sky-50/60 p-3 dark:border-sky-500/25 dark:bg-sky-500/5">
+            <section className="rounded-control border border-sky-200 bg-info-soft/60 p-3 dark:border-sky-500/25 dark:bg-sky-500/5">
               <div className="flex items-center justify-between text-[11px] font-bold text-sky-800 dark:text-sky-300">
                 <span>{progreso.texto}</span>
                 <span className="font-mono">{progreso.hechas}/{progreso.total}</span>
@@ -255,7 +255,7 @@ export default function RestoreBackupModal({ restore }) {
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-sky-200/70 dark:bg-sky-500/20">
                 <div className="h-full rounded-full bg-sky-500 motion duration-[var(--dur-base)]" style={{ width: `${progreso.total ? (progreso.hechas / progreso.total) * 100 : 0}%` }} />
               </div>
-              <p className="mt-1.5 text-[10px] font-medium text-sky-700/80 dark:text-sky-400/80">
+              <p className="mt-1.5 text-[10px] font-medium text-info/80 dark:text-sky-400/80">
                 No cierres la ventana ni la pestaña mientras restaura.
               </p>
             </section>
@@ -263,7 +263,7 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* --- Resultado --- */}
           {resultado && (
-            <section className={`rounded-control border p-3 ${resultado.errores.length === 0 ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-500/25 dark:bg-emerald-500/5' : 'border-rose-200 bg-rose-50/60 dark:border-rose-500/25 dark:bg-rose-500/5'}`}>
+            <section className={`rounded-control border p-3 ${resultado.errores.length === 0 ? 'border-emerald-200 bg-ok-soft/60 dark:border-emerald-500/25 dark:bg-emerald-500/5' : 'border-rose-200 bg-danger-soft/60 dark:border-rose-500/25 dark:bg-rose-500/5'}`}>
               <p className={`text-xs font-bold ${resultado.errores.length === 0 ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300'}`}>
                 <i className={`fa-solid ${resultado.errores.length === 0 ? 'fa-circle-check' : 'fa-triangle-exclamation'} mr-1.5`}></i>
                 {resultado.errores.length === 0 ? 'Restauración completada' : `Restauración con ${resultado.errores.length} problema(s)`}
@@ -277,7 +277,7 @@ export default function RestoreBackupModal({ restore }) {
                 ))}
               </ul>
               {resultado.errores.length > 0 && (
-                <p className="mt-2 text-[11px] font-medium text-rose-700 dark:text-rose-400">
+                <p className="mt-2 text-[11px] font-medium text-danger dark:text-rose-400">
                   Las tablas con error quedaron como estaban. Podés volver a intentarlas con el mismo archivo.
                 </p>
               )}
@@ -350,21 +350,21 @@ function DetallePerdidas({ restore }) {
     return <p className="mt-2 text-[11px] font-medium text-content-3 dark:text-content-3"><i className="fa-solid fa-spinner fa-spin mr-1.5"></i>Calculando qué se perdería…</p>;
   }
   if (totalPerdidas === 0) {
-    return <p className="mt-2 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-circle-check mr-1.5"></i>Nada se perdería: el archivo contiene todo lo que hay hoy.</p>;
+    return <p className="mt-2 text-[11px] font-medium text-ok dark:text-emerald-400"><i className="fa-solid fa-circle-check mr-1.5"></i>Nada se perdería: el archivo contiene todo lo que hay hoy.</p>;
   }
   return (
-    <div className="mt-2 space-y-1 rounded-control border border-rose-200 bg-rose-50/60 p-3 dark:border-rose-500/25 dark:bg-rose-500/5">
-      <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400">
+    <div className="mt-2 space-y-1 rounded-control border border-rose-200 bg-danger-soft/60 p-3 dark:border-rose-500/25 dark:bg-rose-500/5">
+      <p className="text-[11px] font-bold text-danger dark:text-rose-400">
         <i className="fa-solid fa-triangle-exclamation mr-1.5"></i>
         Se borrarán {totalPerdidas} registro(s) que no están en el archivo:
       </p>
       {Object.entries(perdidas).filter(([, v]) => v.length > 0).map(([clave, ids]) => (
-        <p key={clave} className="text-[10px] font-medium text-rose-700/90 dark:text-rose-400/90">
+        <p key={clave} className="text-[10px] font-medium text-danger/90 dark:text-rose-400/90">
           <span className="font-bold">{clave}</span>: {ids.slice(0, 12).join(', ')}
           {ids.length > 12 ? ` … y ${ids.length - 12} más` : ''}
         </p>
       ))}
-      <p className="pt-1 text-[10px] font-semibold text-rose-600 dark:text-rose-400">
+      <p className="pt-1 text-[10px] font-semibold text-danger dark:text-rose-400">
         Descargá una copia nueva antes de seguir: esto no se puede deshacer.
       </p>
     </div>

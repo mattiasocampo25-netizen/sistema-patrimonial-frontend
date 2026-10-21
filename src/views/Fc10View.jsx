@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
+import {
+  Card, PageHeader, Toolbar, ToolbarDivider,
+  Button, Badge, Chip, ChipGroup
+} from '../components/ui';
 import { formatDateText, formatCI } from '../utils/helpers';
 import { ESTADOS_FC10, ESTADO_INFO, estadoInicialFC10, pendienteDeFirma, esFC10Legado } from '../utils/fc10Firmas';
 
@@ -165,60 +169,68 @@ export default function Fc10View({
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-            <i className="fa-solid fa-file-signature text-lg"></i>
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Actas de Responsabilidad (FC-10)</h2>
-              {conteo.pendientes > 0 && (
-                <span
-                  title={`${conteo.pendientes} actas esperando firma`}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold tabular-nums bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25"
-                >
-                  <i className="fa-solid fa-hourglass-half text-[10px]"></i>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          {/* Cabecera: identidad a la izquierda, acciones a la derecha.
+              Los filtros (etapas + periodo) van en una Toolbar aparte: antes
+              todo estaba en una sola fila con `sm:flex-row`, `justify-between`
+              y los hijos con `shrink-0`, y con cinco bloques en linea el
+              ultimo (Exportar año) se salia de la tarjeta. */}
+          <PageHeader
+            titulo="Actas de Responsabilidad (FC-10)"
+            descripcion="Delegación y custodia legal de los bienes institucionales"
+            icono="fa-file-signature"
+            contador={
+              conteo.pendientes > 0 ? (
+                <Badge tono="warn" icono="fa-hourglass-half">
                   {conteo.pendientes} sin cerrar
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Delegación y custodia legal de los bienes institucionales</p>
-          </div>
-        </div>
+                </Badge>
+              ) : null
+            }
+            acciones={
+              <>
+                <Button
+                  variante="secondary"
+                  icono="fa-file-lines"
+                  onClick={() => setIsConsolidatedFC10ModalOpen(true)}
+                >
+                  FC-10 Consolidado
+                </Button>
+                <Button
+                  variante="secondary"
+                  icono="fa-file-csv"
+                  onClick={handleExportFC10CSV}
+                  title={`Exportar actas del año ${fc10Year} a CSV`}
+                >
+                  Exportar ano
+                </Button>
+              </>
+            }
+          />
 
-        <div className="flex flex-wrap items-center gap-1.5 -mb-1">
-          {ETAPAS.map(et => (
-            <button
-              key={et.id}
-              onClick={() => setFiltroEtapa(et.id)}
-              className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                filtroEtapa === et.id
-                  ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/40'
-                  : 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-              }`}
-            >
-              {et.label}
-              <span className={`tabular-nums ${filtroEtapa === et.id ? 'opacity-90' : 'text-zinc-400 dark:text-zinc-400'}`}>{et.n}</span>
-            </button>
-          ))}
+          <Toolbar className="mt-4">
+            <ChipGroup>
+              {ETAPAS.map((et) => (
+                <Chip
+                  key={et.id}
+                  activo={filtroEtapa === et.id}
+                  conteo={et.n}
+                  onClick={() => setFiltroEtapa(et.id)}
+                >
+                  {et.label}
+                </Chip>
+              ))}
+            </ChipGroup>
+            <ToolbarDivider />
+            <PeriodSelector
+              selectedYear={fc10Year}
+              setSelectedYear={setFc10Year}
+              selectedMonth={fc10Month}
+              setSelectedMonth={setFc10Month}
+            />
+          </Toolbar>
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 p-1">
-            <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider px-2">Periodo</span>
-            <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsConsolidatedFC10ModalOpen(true)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-800 dark:bg-zinc-700 px-5 h-10 shrink-0 text-[13px] font-bold text-white dark:text-white hover:bg-zinc-700 dark:hover:bg-zinc-600 focus-visible:ring-2 focus-visible:ring-brand-primary focus:outline-none transition-all active:scale-95 cursor-pointer">
-                <i className="fa-solid fa-file-lines text-xs"></i> FC-10 Consolidado
-            </button>
-            <button onClick={handleExportFC10CSV} title={`Exportar actas del año ${fc10Year} a CSV`} className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/10 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
-                <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar año
-            </button>
-          </div>
-        </div>
-      </div>
+      </Card>
       <div className="bg-white dark:bg-darkbg-card p-6 sm:p-8 rounded-2xl border border-zinc-200/80 dark:border-darkbg-border shadow-2xs min-h-[400px]">
         {isLoading ? (
           <SkeletonLoader />

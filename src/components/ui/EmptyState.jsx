@@ -54,7 +54,7 @@ export default function EmptyState({
         <button
           type="button"
           onClick={onAccion}
-          className="mt-5 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-body font-semibold bg-brand text-white hover:bg-brand-hover transition-colors"
+          className="mt-5 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-body font-semibold bg-brand text-content-inverse hover:bg-brand-hover transition-colors"
         >
           {accion}
         </button>

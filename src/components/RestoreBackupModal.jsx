@@ -90,7 +90,7 @@ export default function RestoreBackupModal({ restore }) {
               accept=".json,application/json"
               disabled={ejecutando}
               onChange={(e) => manejarArchivo(e.target.files?.[0])}
-              className="block w-full cursor-pointer rounded-control border border-line bg-surface-2/50 text-xs font-medium text-content-1 dark:border-white/10 dark:bg-surface-1/5 dark:text-zinc-200 focus:border-brand-primary focus:outline-none disabled:opacity-50"
+              className="block w-full cursor-pointer rounded-control border border-line bg-surface-2/50 text-xs font-medium text-content-1 dark:border-white/10 dark:bg-surface-1/5 dark:text-zinc-200 focus:border-brand focus:outline-none disabled:opacity-50"
             />
             {nombreArchivo && hayAnalisis && (
               <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-content-1 dark:text-zinc-200">
@@ -171,7 +171,7 @@ export default function RestoreBackupModal({ restore }) {
                                 disabled={ejecutando || !d.hayCambios}
                                 onChange={() => alternarTabla(clave)}
                                 aria-label={`Restaurar ${d.etiqueta}`}
-                                className="h-4 w-4 cursor-pointer rounded border-line-strong text-brand-primary focus:ring-brand-primary disabled:cursor-not-allowed dark:border-white/20 dark:bg-surface-1/10"
+                                className="h-4 w-4 cursor-pointer rounded border-line-strong text-brand-text focus:ring-brand disabled:cursor-not-allowed dark:border-white/20 dark:bg-surface-1/10"
                               />
                             </td>
                           </tr>
@@ -223,7 +223,7 @@ export default function RestoreBackupModal({ restore }) {
                 <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'merge' ? 'border-brand-primary bg-brand-primary/5' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="restore-modo" checked={modo === 'merge'} onChange={() => setModo('merge')} disabled={ejecutando}
-                      className="h-4 w-4 cursor-pointer border-line-strong text-brand-primary focus:ring-brand-primary" />
+                      className="h-4 w-4 cursor-pointer border-line-strong text-brand-text focus:ring-brand" />
                     <span className="text-xs font-bold text-content-1 dark:text-zinc-100">Combinando (recomendado)</span>
                   </div>
                   <p className="mt-1.5 text-[11px] font-medium leading-snug text-content-3 dark:text-content-3">

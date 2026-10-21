@@ -124,7 +124,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           <button
             onClick={() => setTourPaso(0)}
             title="Recorrer la guía interactiva"
-            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-line dark:hover:border-white/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-inverse bg-brand hover:bg-brand-hover border border-transparent hover:border-line dark:hover:border-white/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none shadow-md shadow-blue-500/25 shrink-0"
           >
             <i className="fa-solid fa-route"></i> Hacer tour guiado
           </button>
@@ -157,7 +157,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           {seccionActiva === 'faq' && (
             <>
               <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-circle-question text-brand-primary"></i> Preguntas Frecuentes
+                <i className="fa-solid fa-circle-question text-brand-text"></i> Preguntas Frecuentes
               </h2>
               <div className="relative mb-6">
                 <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
@@ -166,7 +166,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
                   value={busquedaFaq}
                   onChange={(e) => setBusquedaFaq(e.target.value)}
                   placeholder="Buscar en la ayuda..."
-                  className="w-full rounded-card border border-line dark:border-line bg-surface-1 dark:bg-surface-2 py-2.5 pl-10 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 motion"
+                  className="w-full rounded-card border border-line dark:border-line bg-surface-1 dark:bg-surface-2 py-2.5 pl-10 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 motion"
                 />
               </div>
               <div className="space-y-3">
@@ -182,7 +182,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           {seccionActiva === 'procedimiento' && (
             <>
               <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-network-wired text-brand-primary"></i> Procedimiento Lógico
+                <i className="fa-solid fa-network-wired text-brand-text"></i> Procedimiento Lógico
               </h2>
               <div className={`${STYLES.card} p-6 sm:p-8 relative overflow-hidden flex-1`}>
                 <div className="absolute left-[56px] top-12 bottom-12 w-0.5 bg-surface-3 dark:bg-surface-3 hidden sm:block z-0"></div>
@@ -198,7 +198,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           {seccionActiva === 'atajos' && (
             <>
               <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-keyboard text-brand-primary"></i> Atajos de Teclado
+                <i className="fa-solid fa-keyboard text-brand-text"></i> Atajos de Teclado
               </h2>
               <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
                 <div className="space-y-3">
@@ -222,7 +222,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
         <div className="lg:col-span-7 flex flex-col gap-6">
           <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
             <h3 className="text-base font-bold text-content-1 dark:text-white mb-4 flex items-center gap-2">
-              <i className="fa-solid fa-envelope text-brand-primary"></i> Contacto y Soporte
+              <i className="fa-solid fa-envelope text-brand-text"></i> Contacto y Soporte
             </h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">

@@ -1871,7 +1871,7 @@ if (publicBienId) {
       {isProcessing.active && (
         <div className="fixed inset-0 bg-surface-1/80 dark:bg-black/80 backdrop-blur-sm z-[500] flex flex-col items-center justify-center animate-fade-in">
           <div className="proc-track"><div className={`proc-fill ${isProcessing.pct == null ? 'indete' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined}></div></div>
-          <i className="fa-solid fa-circle-notch fa-spin text-4xl text-brand-primary mb-4"></i>
+          <i className="fa-solid fa-circle-notch fa-spin text-4xl text-brand-text mb-4"></i>
           <h2 className="text-xl font-medium text-content-1 dark:text-white tracking-tight">{isProcessing.text}</h2>
           {isProcessing.pct != null && (
             <p className="text-sm font-bold text-content-3 dark:text-content-3 mt-2 tabular-nums">{Math.round(isProcessing.pct)}%</p>

@@ -37,7 +37,7 @@ export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual
               <button
                 onClick={onClose}
                 title="Cerrar" aria-label="Cerrar"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:bg-surface-3 dark:text-content-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:bg-surface-3 dark:text-content-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
               
                 <i className="fa-solid fa-xmark"></i>
               </button>
@@ -51,7 +51,7 @@ export default function ScannerModal({ isOpen, onClose, modoConteo, conteoActual
             <div className={STYLES.modalFooter}>
                 <button 
                     onClick={onClose} 
-                    className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                    className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                     Cancelar
                 </button>

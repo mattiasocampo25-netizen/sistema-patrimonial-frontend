@@ -49,7 +49,7 @@ export default function UsuariosView({
                   <TRow key={u.username} className="hover:bg-surface-2 dark:hover:bg-darkbg-hover/50 transition-colors border-b border-zinc-50 dark:border-line/30">
                       <TD className="py-3 pl-6 pr-4 align-middle">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-2 text-brand-primary dark:text-brand-accent font-bold text-sm border border-line/60 dark:border-line/60 shadow-sm">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-2 text-brand-text dark:text-brand font-bold text-sm border border-line/60 dark:border-line/60 shadow-sm">
                                 {u.nombre ? u.nombre.charAt(0).toUpperCase() : 'U'}
                             </div>
                             <div>
@@ -74,7 +74,7 @@ export default function UsuariosView({
                                 </span>
                             ) : (
                             <>
-                            <button onClick={() => { setUsuarioEditing(u); setIsUsuarioModalOpen(true); }} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Editar usuario" aria-label="Editar usuario">
+                            <button onClick={() => { setUsuarioEditing(u); setIsUsuarioModalOpen(true); }} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Editar usuario" aria-label="Editar usuario">
                                 <i className="fa-solid fa-pen-to-square text-[13px]"></i>
                             </button>
                             {u.username !== currentUser.username && (

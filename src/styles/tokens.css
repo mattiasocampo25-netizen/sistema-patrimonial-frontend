@@ -57,6 +57,14 @@
   --color-brand-soft: var(--brand-soft);
   --color-brand-text: var(--brand-text);
 
+  /* Alias historicos. Antes eran colores fijos (--color-brand-primary:
+     #1d4ed8) y por eso en modo oscuro eran azul oscuro sobre fondo oscuro:
+     ilegibles, y el anillo de foco tampoco se veia. Ahora apuntan a los
+     tokens semanticos y se adaptan al tema. */
+  --color-brand-primary: var(--brand);
+  --color-brand-accent: var(--brand);
+  --color-brand-light: var(--brand-soft);
+
   /* --- Estados --- */
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);

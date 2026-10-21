@@ -35,7 +35,7 @@ export default function FuncionariosView({
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={sincronizarBienesConPadron}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Sincronizar custodios con inventario"
               >
                 <i className="fa-solid fa-rotate"></i>
@@ -44,7 +44,7 @@ export default function FuncionariosView({
   
               <button
                 onClick={handleDownloadTemplateFuncionarios}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Descargar plantilla de funcionarios"
               >
                 <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
@@ -53,7 +53,7 @@ export default function FuncionariosView({
   
               <button
                 onClick={() => fileInputFuncionariosRef.current?.click()}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Importar lista de funcionarios desde CSV"
               >
                 <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i>
@@ -63,7 +63,7 @@ export default function FuncionariosView({
               {isAdmin && (
               <button
                 onClick={() => setIsUbicacionesModalOpen(true)}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                 title="Gestionar catálogo de ubicaciones"
               >
                 <i className="fa-solid fa-location-dot text-sky-600 dark:text-sky-400"></i>
@@ -76,7 +76,7 @@ export default function FuncionariosView({
               <button
                 onClick={() => setIsNewFuncionarioModalOpen(true)}
                 title="Registrar nuevo funcionario"
-                className="inline-flex items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-surface-1 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-content-1 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                className="inline-flex items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-surface-1 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-content-1 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
               >
                 <i className="fa-solid fa-user-plus text-xs"></i>
                 <span>Nuevo Funcionario</span>
@@ -162,7 +162,7 @@ export default function FuncionariosView({
                             <div className="flex items-center justify-end gap-1">
                                 <button
                                     onClick={() => handleEditFuncionario(f)}
-                                    className="h-8 w-8 flex items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                                    className="h-8 w-8 flex items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                                     title="Editar funcionario" aria-label="Editar funcionario"
                                 >
                                     <i className="fa-solid fa-pen-to-square text-xs"></i>

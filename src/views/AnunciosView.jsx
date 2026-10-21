@@ -97,14 +97,14 @@ export default function AnunciosView({
       {/* Formulario: Nuevo anuncio */}
       <div className="bg-surface-1 dark:bg-surface-1 p-5 sm:p-6 rounded-panel border border-line/70 dark:border-line shadow-sm space-y-4">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white flex items-center gap-2">
-          <i className="fa-solid fa-paper-plane text-brand-primary"></i> Nuevo anuncio
+          <i className="fa-solid fa-paper-plane text-brand-text"></i> Nuevo anuncio
         </h3>
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Título</label>
           <input
             type="text" value={titulo} onChange={(e) => { setTitulo(e.target.value); try { localStorage.setItem('anuncio_borrador_titulo', e.target.value); } catch {} }} maxLength={120}
             placeholder="Ej: Mantenimiento programado este sábado"
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 h-11 px-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion shadow-sm"
+            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 h-11 px-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion shadow-sm"
           />
         </div>
         <div>
@@ -112,7 +112,7 @@ export default function AnunciosView({
           <textarea
             rows={3} value={mensaje} onChange={(e) => { setMensaje(e.target.value); try { localStorage.setItem('anuncio_borrador_mensaje', e.target.value); } catch {} }} maxLength={1000}
             placeholder="Detalle del aviso que verán en la campana de notificaciones..."
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion resize-none shadow-sm"
+            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none shadow-sm"
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

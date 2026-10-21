@@ -151,7 +151,7 @@ export default function AppTopbar({
               onClick={() => setIsScannerOpen(true)}
               title="Escanear código QR"
               data-tour="scan"
-              className="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-control bg-brand text-white font-bold hover:bg-brand-hover transition-colors"
+              className="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-control bg-brand text-content-inverse font-bold hover:bg-brand-hover transition-colors"
             >
               <i className="fa-solid fa-qrcode text-xs" aria-hidden="true" />
               Escanear QR
@@ -398,7 +398,7 @@ export default function AppTopbar({
               </div>
               <div
                 title={currentUser?.nombre || 'Usuario'}
-                className="flex h-10 w-10 items-center justify-center rounded-control bg-brand text-white font-bold select-none"
+                className="flex h-10 w-10 items-center justify-center rounded-control bg-brand text-content-inverse font-bold select-none"
               >
                 {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
               </div>

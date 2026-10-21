@@ -325,7 +325,7 @@ export default function DashboardView({
                       key={p.id}
                       onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
                       title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left motion duration-[var(--dur-base)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                      className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left motion duration-[var(--dur-base)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                   >
                       <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border ` + p.box}>
                           <i className={`fa-solid ${p.icon} text-sm`}></i>
@@ -425,7 +425,7 @@ export default function DashboardView({
                 <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-brand-primary rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
+                <div className="h-full bg-brand rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand-primary/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
               </div>
             </div>
           </div>
@@ -435,7 +435,7 @@ export default function DashboardView({
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-               <i className="fa-solid fa-chart-line text-brand-primary"></i> Gestión Anual
+               <i className="fa-solid fa-chart-line text-brand-text"></i> Gestión Anual
             </h2>
           </div>
           <div className="flex flex-1 flex-col sm:flex-row gap-8">

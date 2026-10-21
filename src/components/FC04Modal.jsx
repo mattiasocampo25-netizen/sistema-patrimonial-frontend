@@ -37,7 +37,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                             {fc04Editing ? 'Editar Registro FC-04' : 'Nuevo Registro FC-04'}
                         </h2>
                     </div>
-                    <button type="button" title="Cerrar" aria-label="Cerrar" onClick={() => setIsFC04ModalOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary transition-colors cursor-pointer shrink-0"><i className="fa-solid fa-xmark text-base"></i></button>
+                    <button type="button" title="Cerrar" aria-label="Cerrar" onClick={() => setIsFC04ModalOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-colors cursor-pointer shrink-0"><i className="fa-solid fa-xmark text-base"></i></button>
                 </div>
                 
                 {esNuevoFC && hayBorradorFC && !restauradoFC && (
@@ -57,7 +57,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                         </div>
 
                         <div className="flex items-center gap-2 mb-6 p-4 rounded-lg bg-surface-2 border border-line dark:bg-surface-2 dark:border-line">
-                            <input type="checkbox" id="sinMovimiento" checked={fc04SinMovimiento} onChange={(e) => setFc04SinMovimiento(e.target.checked)} className="h-4 w-4 rounded border-line-strong text-brand-primary focus:ring-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary cursor-pointer" />
+                            <input type="checkbox" id="sinMovimiento" checked={fc04SinMovimiento} onChange={(e) => setFc04SinMovimiento(e.target.checked)} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer" />
                             <label htmlFor="sinMovimiento" className="text-sm font-semibold text-content-1 dark:text-zinc-200 cursor-pointer">Declarar "Sin Movimiento" para este periodo</label>
                         </div>
 
@@ -91,7 +91,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs"} value={item.rotulo || ''} onChange={e => handleFC04ItemChange(item.id, 'rotulo', e.target.value)} /></td>
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs"} value={item.descripcion || ''} onChange={e => handleFC04ItemChange(item.id, 'descripcion', e.target.value)} /></td>
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs text-right font-mono font-bold tabular-nums"} value={item.valorUnitario || ''} onChange={e => handleFC04ItemChange(item.id, 'valorUnitario', e.target.value)} /></td>
-                                                    <td className="p-1.5 text-center"><button type="button" onClick={()=>handleRemoveFC04Item(item.id)} className="text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-surface-1/10 p-2 rounded-control transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"><i className="fa-solid fa-trash-can"></i></button></td>
+                                                    <td className="p-1.5 text-center"><button type="button" onClick={()=>handleRemoveFC04Item(item.id)} className="text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-surface-1/10 p-2 rounded-control transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-trash-can"></i></button></td>
                                                 </tr>
                                             ))}
                                         </tbody>

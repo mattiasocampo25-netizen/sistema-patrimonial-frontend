@@ -36,12 +36,12 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
         onClick={() => setAbierto(v => !v)}
         disabled={disabled}
         title="Exportación programada"
-        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
       >
         <i className={`fa-solid ${activa ? 'fa-clock text-brand-primary dark:text-brand-accent' : 'fa-clock'}`}></i>
         <span className="hidden lg:inline">Programar</span>
         {pendientes.length > 0 && (
-          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[9px] font-black text-white">
+          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[9px] font-black text-content-inverse">
             {pendientes.length}
           </span>
         )}
@@ -61,7 +61,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
               <select
                 value={cfg.frecuencia}
                 onChange={(e) => cambiar({ frecuencia: e.target.value })}
-                className="w-full h-9 rounded-control border border-line dark:border-white/10 bg-surface-1 dark:bg-surface-1/5 px-2.5 pr-8 text-xs font-semibold text-content-1 dark:text-zinc-100 outline-none focus:border-brand-primary"
+                className="w-full h-9 rounded-control border border-line dark:border-white/10 bg-surface-1 dark:bg-surface-1/5 px-2.5 pr-8 text-xs font-semibold text-content-1 dark:text-zinc-100 outline-none focus:border-brand"
               >
                 {FRECUENCIAS.map(f => (
                   <option key={f.id} value={f.id}>{f.label}</option>

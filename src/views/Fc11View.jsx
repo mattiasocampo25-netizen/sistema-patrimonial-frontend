@@ -56,13 +56,13 @@ export default function Fc11View({
                           <i className={`fa-solid ${esSalida ? 'fa-arrow-right-from-bracket' : 'fa-arrow-right-to-bracket'}`}></i>
                       </div>
                       <div className="flex flex-col">
-                          {esSalida ? <span className="inline-flex items-center rounded-lg bg-surface-3 px-2.5 py-0.5 text-[10px] font-black text-content-1 border border-line dark:bg-surface-2 dark:text-content-3 dark:border-line uppercase tracking-wider">Despacho</span> : <span className="inline-flex items-center rounded-lg bg-brand-light px-2.5 py-0.5 text-[10px] font-black text-brand-primary border border-brand-primary/20 dark:bg-brand-primary/20 dark:text-brand-accent uppercase tracking-wider">Recepción</span>}
+                          {esSalida ? <span className="inline-flex items-center rounded-lg bg-surface-3 px-2.5 py-0.5 text-[10px] font-black text-content-1 border border-line dark:bg-surface-2 dark:text-content-3 dark:border-line uppercase tracking-wider">Despacho</span> : <span className="inline-flex items-center rounded-lg bg-brand-soft px-2.5 py-0.5 text-[10px] font-black text-brand-text border border-brand/20 dark:bg-brand/20 dark:text-brand uppercase tracking-wider">Recepción</span>}
                           <p className="text-xs font-mono font-bold text-content-1 dark:text-zinc-100 mt-1 uppercase">Nº {fc.numeroFormulario}</p>
                       </div>
                     </div>
                     <div className="flex gap-1">
                       <button onClick={()=>handleGenerateFC11PDF([fc])} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:bg-darkbg-hover transition cursor-pointer" title="Re-imprimir" aria-label="Re-imprimir"><i className="fa-solid fa-print text-xs"></i></button>
-                      <button onClick={()=>openFC11Modal(bienes.find(b => b.id === fc.bienId) || fc.bienSnapshot, fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-primary hover:bg-brand-light dark:hover:bg-brand-primary/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                      <button onClick={()=>openFC11Modal(bienes.find(b => b.id === fc.bienId) || fc.bienSnapshot, fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-text hover:bg-brand-soft dark:hover:bg-brand/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                       {isAdmin && (
                           <button onClick={()=>setItemToDelete({type:'fc11', id:fc.id, item: fc})} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition cursor-pointer"><i className="fa-solid fa-trash-can text-xs"></i></button>
                       )}

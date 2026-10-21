@@ -11,7 +11,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
   const estimado = config?.estimado || '';
 
   return (
-    <div className="min-h-dvh flex flex-col w-full bg-[#0b0f19] font-sans antialiased relative overflow-hidden selection:bg-brand-primary/30">
+    <div className="min-h-dvh flex flex-col w-full bg-[#0b0f19] font-sans antialiased relative overflow-hidden selection:bg-brand/30">
       <span className="absolute bottom-4 right-5 z-10 text-[10px] font-semibold text-slate-400">v{APP_VERSION}</span>
       {/* Fondo decorativo */}
       <div className="absolute inset-0 pointer-events-none">

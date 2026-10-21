@@ -9,7 +9,7 @@ function FaqItem({ question, answer, categoria }) {
       <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left px-6 py-4 flex justify-between items-center text-content-1 dark:text-white focus:outline-none hover:bg-surface-2/80 dark:hover:bg-darkbg-hover transition-colors cursor-pointer"> 
         <span className="flex items-center gap-3 text-xs sm:text-sm font-bold text-content-1 dark:text-zinc-200">
           {categoria && (
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-light dark:bg-brand-primary/10 text-brand-primary dark:text-brand-accent text-[10px] font-black uppercase tracking-wider">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-soft dark:bg-brand/10 text-brand-text dark:text-brand text-[10px] font-black uppercase tracking-wider">
               {categoria.charAt(0)}
             </span>
           )}

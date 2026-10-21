@@ -62,7 +62,7 @@ export default function Fc04View({
                     </div>
                     <div className="flex gap-1">
                       <button onClick={()=>handleGenerateFC04PDF(fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:bg-darkbg-hover transition cursor-pointer" title="Imprimir PDF" aria-label="Imprimir PDF"><i className="fa-solid fa-print text-xs"></i></button>
-                      <button onClick={()=>openFC04Modal(fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-primary hover:bg-brand-light dark:hover:bg-brand-primary/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                      <button onClick={()=>openFC04Modal(fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-text hover:bg-brand-soft dark:hover:bg-brand/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                       {isAdmin && (
                           <button onClick={()=>setItemToDelete({type:'fc04', id:fc.id, item: fc})} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition cursor-pointer"><i className="fa-solid fa-trash-can text-xs"></i></button>
                       )}
@@ -77,7 +77,7 @@ export default function Fc04View({
                           <p className="text-xs font-bold text-content-3 mb-2 uppercase tracking-wider">Activos ({fc.bienesSnapshot?.length || 0})</p>
                           <div className="flex flex-wrap gap-1.5">
                             {fc.bienesSnapshot?.slice(0, 3).map(b => ( <span key={b.id} className="inline-flex items-center rounded-lg bg-surface-3 px-2.5 py-1 text-xs font-mono font-bold text-content-1 dark:bg-surface-2 dark:text-content-3 border border-line/60 dark:border-line">{b.rotulo}</span> ))}
-                            {fc.bienesSnapshot?.length > 3 && <span className="text-xs font-bold text-brand-primary self-center ml-1">+{fc.bienesSnapshot.length - 3}</span>}
+                            {fc.bienesSnapshot?.length > 3 && <span className="text-xs font-bold text-brand-text self-center ml-1">+{fc.bienesSnapshot.length - 3}</span>}
                           </div>
                       </div>
                     )}

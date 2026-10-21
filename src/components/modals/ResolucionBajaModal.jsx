@@ -26,7 +26,7 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
             tamano="sm"
             pie={(
                 <>
-                    <button type="button" onClick={() => setResolucionBaja(null)} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+                    <button type="button" onClick={() => setResolucionBaja(null)} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
                         Cancelar
                     </button>
                     <button type="submit" form="form-resolucion-baja" className={`inline-flex items-center justify-center h-10 px-5 rounded-control text-[13px] font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 ${esAprobar ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1'}`}>
@@ -37,14 +37,14 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
         >
             <form id="form-resolucion-baja" onSubmit={submitResolucionBaja} className="p-5 sm:p-6 bg-surface-2/50 space-y-6">
                 <div className="bg-surface-1 p-5 rounded-panel border border-line/60 shadow-sm relative overflow-hidden">
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand-primary"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-brand"></div>
                     <p className="text-[10px] font-black text-content-3 uppercase tracking-widest mb-1.5">
                         {esFuncionario ? 'Funcionario solicitado:' : 'Bien Solicitado:'}
                     </p>
                     <p className="text-sm font-black text-content-1">{resolucionBaja.bien.rotulo}</p>
                     <p className="text-xs text-content-3 mt-1 font-medium leading-relaxed">{resolucionBaja.bien.descripcion}</p>
                     <div className="mt-4 pt-4 border-t border-line">
-                        <p className="text-[11px] font-bold text-brand-primary flex items-center gap-1.5">
+                        <p className="text-[11px] font-bold text-brand-text flex items-center gap-1.5">
                             <i className="fa-solid fa-user-clock"></i> Solicitado por: {solicitante}
                         </p>
                     </div>

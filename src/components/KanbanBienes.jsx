@@ -134,7 +134,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                           onChange={(e) => onMover(b, e.target.value)}
                           disabled={!isAdmin}
                           title={isAdmin ? 'Cambiar estado' : 'Solo el administrador puede cambiar el estado'}
-                          className="flex-1 min-w-0 h-7 rounded-lg border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 px-1.5 text-[10px] font-bold text-content-1 dark:text-zinc-200 outline-none focus:border-brand-primary disabled:opacity-60"
+                          className="flex-1 min-w-0 h-7 rounded-lg border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 px-1.5 text-[10px] font-bold text-content-1 dark:text-zinc-200 outline-none focus:border-brand disabled:opacity-60"
                         >
                           {ESTADOS_CONSERVACION.map(e => (
                             <option key={e} value={e}>{e}</option>

@@ -44,6 +44,7 @@
     "performance": "readonly",
     "self": "readonly",
     "caches": "readonly",
-    "CustomEvent": "readonly"
+    "CustomEvent": "readonly",
+    "MutationObserver": "readonly"
   }
 }

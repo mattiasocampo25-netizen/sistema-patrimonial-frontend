@@ -189,7 +189,7 @@ export default function InventarioView({
       <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
         <button 
           onClick={handleDownloadTemplateCSV} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Descargar Plantilla CSV"
         >
           <i className="fa-solid fa-file-excel text-emerald-600"></i>
@@ -198,7 +198,7 @@ export default function InventarioView({
   
         <button 
           onClick={() => fileInputRef.current?.click()} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Importar archivo CSV"
         >
           <i className="fa-solid fa-file-import text-emerald-600"></i>
@@ -207,7 +207,7 @@ export default function InventarioView({
   
         <button 
           onClick={handleExportInventarioCSV} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Exportar archivo CSV"
         >
           <i className="fa-solid fa-file-export text-sky-600"></i>
@@ -216,7 +216,7 @@ export default function InventarioView({
   
         <button 
           onClick={handleExportInventarioExcel} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Exportar Excel real (.xlsx)"
         >
           <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
@@ -226,7 +226,7 @@ export default function InventarioView({
         {ultimaExportacion && (
           <button 
             onClick={onRepetirExport} 
-            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
             title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}
           >
             <i className="fa-solid fa-rotate-right text-content-3"></i>
@@ -236,7 +236,7 @@ export default function InventarioView({
   
         <button 
           onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Generar Lote Masivo de QRs"
         >
           <i className="fa-solid fa-qrcode text-indigo-600 dark:text-indigo-400"></i>
@@ -246,7 +246,7 @@ export default function InventarioView({
   
         <button 
           onClick={openFC03Modal} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           title="Generar Reporte FC-03"
         >
           <i className="fa-solid fa-print text-amber-600"></i>
@@ -257,7 +257,7 @@ export default function InventarioView({
   
         <button 
           onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} 
-          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
         >
           <i className="fa-solid fa-plus text-xs"></i>
           <span className="whitespace-nowrap">{t('inv.anadir')}</span>
@@ -466,7 +466,7 @@ export default function InventarioView({
               key={c.id}
               onClick={c.limpiar}
               title={'Quitar filtro: ' + c.label}
-              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none animate-pop"
+              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none animate-pop"
             >
               <span className="max-w-[220px] truncate">{c.label}</span>
               <i className="fa-solid fa-xmark text-[10px]"></i>
@@ -498,7 +498,7 @@ export default function InventarioView({
             <button
               onClick={onCopiarLink}
               title="Copiar un link con estos filtros aplicados"
-              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-zinc-700/30 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-zinc-700/30 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <i className="fa-solid fa-link text-[10px]"></i>
               <span className="hidden sm:inline">Copiar link</span>
@@ -526,7 +526,7 @@ export default function InventarioView({
           <button
             onClick={cambiarDensidad}
             title={compacto ? 'Vista cómoda' : 'Vista compacta'}
-            className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+            className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           >
             <i className={'fa-solid text-xs ' + (compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right')}></i>
           </button>
@@ -534,7 +534,7 @@ export default function InventarioView({
             <button
               onClick={() => setMenuCols(v => !v)}
               title="Columnas visibles" aria-label="Columnas visibles"
-              className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+              className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
             >
               <i className="fa-solid fa-table-columns text-xs"></i>
             </button>
@@ -594,7 +594,7 @@ export default function InventarioView({
                         {itemsPaginados.map((item) => (
                           <div key={item.id} className={`relative rounded-card border p-4 shadow-xs card-lift bg-surface-1 dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand-primary/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
-                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer" />
+                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{item.descripcion}</p>
@@ -658,7 +658,7 @@ export default function InventarioView({
                                 type="checkbox" title="Seleccionar página" aria-label="Seleccionar página"
                                 checked={itemsPaginados.length > 0 && itemsPaginados.every(i => seleccionados.includes(i.id))}
                                 onChange={(e) => { if (e.target.checked) { itemsPaginados.forEach(i => { if (!seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } else { itemsPaginados.forEach(i => { if (seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } }}
-                                className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle"
+                                className="h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer align-middle"
                               />
                             </TH>
                             <TH className="py-4 pr-4 w-[38%]">
@@ -689,7 +689,7 @@ export default function InventarioView({
 
                                 {/* Selección */}
                                 <TD className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
-                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle" />
+                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer align-middle" />
                                 </TD>
                                 {/* Columna 1: Identificación */}
                                 <TD className={`pr-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
@@ -738,7 +738,7 @@ export default function InventarioView({
                                       if (!fechaAsig) return null;
                                       return (
                                         <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3" title={`Asignado por FC-10 el ${formatDateText(fechaAsig)}`}>
-                                          <i className="fa-solid fa-file-signature text-brand-primary dark:text-brand-accent text-xs shrink-0"></i>
+                                          <i className="fa-solid fa-file-signature text-brand-text dark:text-brand text-xs shrink-0"></i>
                                           <span className="truncate tabular-nums">Asignado: {formatDateText(fechaAsig)}</span>
                                         </div>
                                       );

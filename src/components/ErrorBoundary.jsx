@@ -60,7 +60,7 @@ export default class ErrorBoundary extends React.Component {
           <div className="mt-6 flex gap-2">
             <button
               onClick={() => window.location.reload()}
-              className="flex-1 py-3 rounded-card bg-brand-primary hover:bg-brand-hover text-white text-xs font-black motion cursor-pointer active:scale-[0.98]"
+              className="flex-1 py-3 rounded-card bg-brand hover:bg-brand-hover text-content-inverse text-xs font-black motion cursor-pointer active:scale-[0.98]"
             >
               Recargar
             </button>

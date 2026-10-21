@@ -113,7 +113,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
         {caret && !caret.abajo && (
           <span className="absolute -top-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-zinc-900 border-l border-t border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
         )}
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-primary dark:text-brand-accent mb-1.5">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-text dark:text-brand mb-1.5">
           Paso {paso + 1} de {pasos.length}
         </p>
         <h3 className="text-base font-bold text-content-1 dark:text-white tracking-tight">{step.titulo}</h3>

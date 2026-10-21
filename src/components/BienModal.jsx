@@ -234,7 +234,7 @@ export default function BienModal({
               <button
                 onClick={() => setIsBienModalOpen(false)}
                 title="Cerrar" aria-label="Cerrar"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                  <i className="fa-solid fa-xmark text-base"></i>
               </button>
@@ -374,7 +374,7 @@ export default function BienModal({
                       </div>
                       
                       <label className="flex items-center gap-2 text-xs font-semibold text-content-2 dark:text-content-3 cursor-pointer">
-                        <input type="checkbox" name="hasQR" defaultChecked={restaurado ? restaurado.hasQR === 'on' : bienEditing?.hasQR} className="h-4 w-4 rounded border-line-strong text-brand-primary focus:ring-brand-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary" />
+                        <input type="checkbox" name="hasQR" defaultChecked={restaurado ? restaurado.hasQR === 'on' : bienEditing?.hasQR} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" />
                         <span>Etiqueta QR Impresa</span>
                       </label>
                   </div>
@@ -404,10 +404,10 @@ export default function BienModal({
                                         type="button"
                                         key={f.id || f.cedula}
                                         onClick={() => handleSelectCustodio(f)}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                                     >
                                         <div className="min-w-0 pr-2">
-                                            <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-primary dark:group-hover:text-blue-400 truncate">
+                                            <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-text dark:group-hover:text-blue-400 truncate">
                                                 {f.nombre}
                                             </p>
                                             <p className="text-[10px] text-content-3 dark:text-content-3 truncate mt-0.5">
@@ -454,12 +454,12 @@ export default function BienModal({
                                         type="button"
                                         key={ub}
                                         onClick={() => handleSelectUbicacion(ub)}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                                     >
-                                        <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-primary dark:group-hover:text-blue-400 truncate">
+                                        <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-text dark:group-hover:text-blue-400 truncate">
                                             {ub}
                                         </p>
-                                        <i className="fa-solid fa-location-dot text-[10px] text-content-3 group-hover:text-brand-primary"></i>
+                                        <i className="fa-solid fa-location-dot text-[10px] text-content-3 group-hover:text-brand-text"></i>
                                     </button>
                                 ))}
                             </div>
@@ -475,7 +475,7 @@ export default function BienModal({
                 <button 
                   type="button" 
                   onClick={() => setIsBienModalOpen(false)} 
-                  className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+                  className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   Cancelar
                 </button>
@@ -485,7 +485,7 @@ export default function BienModal({
                       type="button" 
                       disabled={isSaving}
                       onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }} 
-                      className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+                      className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
                     >
                       + Guardar y Añadir Otro
                     </button>
@@ -494,7 +494,7 @@ export default function BienModal({
                 <button 
                   type="submit" 
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+                  className="inline-flex items-center justify-center h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
                 >
                   {isSaving ? 'Guardando...' : (esNuevo ? '+ Guardar Registro' : 'Actualizar Bien')}
                 </button>

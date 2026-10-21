@@ -13,11 +13,9 @@ html {
      las cifras con tabular-nums tienen que alinearse en columna. Antes
      apuntaba a la sans y tabular-nums no hacía nada. */
   --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
-  /* Paleta de marca institucional UNP */
-  --color-brand-primary: #1d4ed8;
-  --color-brand-hover: #1e40af;
-  --color-brand-accent: #60a5fa;
-  --color-brand-light: #eff6ff;
+  /* La paleta de marca vive en styles/tokens.css, que la declara por
+     token semantico para que se adapte al tema. Aqui no puede quedar un
+     color fijo: --color-brand-primary era #1d4ed8 tambien en modo oscuro. */
   /* Modo oscuro moderno: grises muy oscuros con tono azuláceo */
   --color-darkbg-main: #0b0f19;
   --color-darkbg-card: #111827;
@@ -35,9 +33,8 @@ body {
   overflow: hidden;
 } 
 
-.dark body { 
-  background-color: #0b0f19; 
-}
+/* El fondo lo pone el token --canvas, que ya cambia con el tema. */
+
 
 /* Barra de desplazamiento consistente */
 ::-webkit-scrollbar { 

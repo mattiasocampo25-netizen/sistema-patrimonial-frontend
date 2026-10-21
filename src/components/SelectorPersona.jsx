@@ -132,7 +132,7 @@ export default function SelectorPersona({
               <button
                 type="button"
                 onClick={() => seleccionar({ nombre: texto.trim(), doc: '', cargo: '' })}
-                className="w-full px-3.5 py-2 text-left text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 transition-colors cursor-pointer"
+                className="w-full px-3.5 py-2 text-left text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-brand/10 dark:hover:bg-brand/20 transition-colors cursor-pointer"
               >
                 <i className="fa-solid fa-plus text-[10px] mr-1.5"></i>
                 Usar "{texto.trim()}" (no está en el padrón)

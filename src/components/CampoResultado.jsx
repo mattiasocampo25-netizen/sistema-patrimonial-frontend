@@ -1,3 +1,6 @@
+import React from 'react';
+import Dialogo from './ui/Dialogo';
+
 // Resultado grande para modo campo: tras escanear muestra el bien con
 // acciones claras (ver ficha o seguir escaneando). Pensado para móvil.
 export default function CampoResultado({ escaneo, onVerFicha, onSeguir, onCerrar, STYLES }) {

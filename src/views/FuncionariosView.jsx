@@ -1,6 +1,7 @@
 import { formatCI } from '../utils/helpers';
 import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
+import { Card, PageHeader, Toolbar } from '../components/ui';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -17,79 +18,75 @@ export default function FuncionariosView({
 
       {/* CABECERA DE SECCIÓN */}
       <div className="bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-
-          {/* Identificación de la sección */}
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-              <i className="fa-solid fa-address-book text-lg"></i>
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Plantel de Funcionarios</h2>
+        <Card className="p-0">
+          <div className="p-5 sm:p-6">
+            <PageHeader
+              titulo={'Plantel de Funcionarios'}
+              descripcion={'Directorio oficial de personal asignado a <strong className=\'text-zinc-900 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
+              icono="fa-address-book"
+              contador={(
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                   {funcionariosPurosDependencia.length}
                 </span>
-              </div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                Directorio oficial de personal asignado a <strong className="text-zinc-900 dark:text-white font-semibold">{dependenciaActual}</strong>
-              </p>
+              )}
+            />
+            <Toolbar className="mt-4">
+  
+            {/* Botones de Acción Principal */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={sincronizarBienesConPadron}
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                title="Sincronizar custodios con inventario"
+              >
+                <i className="fa-solid fa-rotate"></i>
+                <span>Sincronizar</span>
+              </button>
+  
+              <button
+                onClick={handleDownloadTemplateFuncionarios}
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                title="Descargar plantilla de funcionarios"
+              >
+                <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+                <span>Plantilla</span>
+              </button>
+  
+              <button
+                onClick={() => fileInputFuncionariosRef.current?.click()}
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                title="Importar lista de funcionarios desde CSV"
+              >
+                <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i>
+                <span>Importar CSV</span>
+              </button>
+  
+              {isAdmin && (
+              <button
+                onClick={() => setIsUbicacionesModalOpen(true)}
+                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                title="Gestionar catálogo de ubicaciones"
+              >
+                <i className="fa-solid fa-location-dot text-sky-600 dark:text-sky-400"></i>
+                <span>Ubicaciones</span>
+              </button>
+              )}
+  
+              <span className="hidden sm:block h-6 w-px bg-zinc-200 dark:bg-white/10 mx-1"></span>
+  
+              <button
+                onClick={() => setIsNewFuncionarioModalOpen(true)}
+                title="Registrar nuevo funcionario"
+                className="inline-flex items-center gap-2 px-5 h-10 rounded-xl bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+              >
+                <i className="fa-solid fa-user-plus text-xs"></i>
+                <span>Nuevo Funcionario</span>
+              </button>
             </div>
+  
+            </Toolbar>
           </div>
-
-          {/* Botones de Acción Principal */}
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={sincronizarBienesConPadron}
-              className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-              title="Sincronizar custodios con inventario"
-            >
-              <i className="fa-solid fa-rotate"></i>
-              <span>Sincronizar</span>
-            </button>
-
-            <button
-              onClick={handleDownloadTemplateFuncionarios}
-              className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-              title="Descargar plantilla de funcionarios"
-            >
-              <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
-              <span>Plantilla</span>
-            </button>
-
-            <button
-              onClick={() => fileInputFuncionariosRef.current?.click()}
-              className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-              title="Importar lista de funcionarios desde CSV"
-            >
-              <i className="fa-solid fa-file-import text-emerald-600 dark:text-emerald-400"></i>
-              <span>Importar CSV</span>
-            </button>
-
-            {isAdmin && (
-            <button
-              onClick={() => setIsUbicacionesModalOpen(true)}
-              className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-              title="Gestionar catálogo de ubicaciones"
-            >
-              <i className="fa-solid fa-location-dot text-sky-600 dark:text-sky-400"></i>
-              <span>Ubicaciones</span>
-            </button>
-            )}
-
-            <span className="hidden sm:block h-6 w-px bg-zinc-200 dark:bg-white/10 mx-1"></span>
-
-            <button
-              onClick={() => setIsNewFuncionarioModalOpen(true)}
-              title="Registrar nuevo funcionario"
-              className="inline-flex items-center gap-2 px-5 h-10 rounded-xl bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-            >
-              <i className="fa-solid fa-user-plus text-xs"></i>
-              <span>Nuevo Funcionario</span>
-            </button>
-          </div>
-
-        </div>
+        </Card>
 
         {/* Barra de búsqueda del padrón */}
         <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-white/10">

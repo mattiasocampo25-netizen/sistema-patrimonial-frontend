@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
+import { Card } from '../components/ui';
 
 // Vista del panel principal (extraída de App.jsx, Fase 5).
 export default function DashboardView({
@@ -114,7 +115,8 @@ export default function DashboardView({
     <div className="space-y-6 sm:space-y-7 pb-16">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <Card className="p-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6">
         <div className="flex items-center gap-4 min-w-0">
           <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-xl sm:text-2xl shadow-md shadow-zinc-900/25 dep-accent-ring">
             {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
@@ -170,6 +172,7 @@ export default function DashboardView({
           </div>
         </div>
       </div>
+      </Card>
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
       {widgets.metricas && (

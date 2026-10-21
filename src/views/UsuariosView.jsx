@@ -1,32 +1,32 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
-import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
   esDesarrollador, currentUser, setItemToDelete, STYLES, isLoading
 }) {
   return (
     <div className="flex flex-col flex-1 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-            <i className="fa-solid fa-users-gear text-lg"></i>
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Gestión de Usuarios</h2>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          <PageHeader
+            titulo={'Gestión de Usuarios'}
+            descripcion={'Gestión de cuentas y roles de acceso al sistema'}
+            icono="fa-users-gear"
+            contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                 {usuariosList.length}
               </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Gestión de cuentas y roles de acceso al sistema</p>
-          </div>
+            )}
+          />
+          <Toolbar className="mt-4">
+  
+          <button onClick={() => { setUsuarioEditing(null); setIsUsuarioModalOpen(true); }} className={STYLES.btnPrimary}>
+            <i className="fa-solid fa-user-plus text-xs"></i> Nuevo Usuario
+          </button>
+          </Toolbar>
         </div>
-
-        <button onClick={() => { setUsuarioEditing(null); setIsUsuarioModalOpen(true); }} className={STYLES.btnPrimary}>
-          <i className="fa-solid fa-user-plus text-xs"></i> Nuevo Usuario
-        </button>
-      </div>
+      </Card>
 
       {isLoading ? (
         /* Durante la carga inicial se muestra el esqueleto en vez del estado

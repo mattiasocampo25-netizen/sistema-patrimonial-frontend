@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import FiltroCombo from '../components/FiltroCombo';
+import { Card, PageHeader, Toolbar } from '../components/ui';
 
 // Módulo Anuncios (solo desarrollador): envía avisos a todos los usuarios
 // o a uno específico. Diseño con tarjetas elegantes, banners visuales,
@@ -55,43 +56,43 @@ export default function AnunciosView({
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Encabezado con métricas */}
-      <div className="bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white shadow-sm">
-            <i className="fa-solid fa-bullhorn text-lg"></i>
-          </div>
-          <div>
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight whitespace-nowrap">Anuncios del Sistema</h2>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          <PageHeader
+            titulo={'Anuncios del Sistema'}
+            descripcion={'Comunicados oficiales del desarrollador a todos o a un usuario específico'}
+            icono="fa-bullhorn"
+            contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10 whitespace-nowrap shrink-0">
                 {totalEnviados} enviados
               </span>
+            )}
+          />
+          <Toolbar className="mt-4">
+  
+          <div className="flex gap-3 sm:gap-6">
+            <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+              totalEnviados > 0 ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
+            }`}>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total enviados</div>
+              <div className="text-xl font-black text-zinc-900 dark:text-white">{totalEnviados}</div>
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Comunicados oficiales del desarrollador a todos o a un usuario específico</p>
+            <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+              totalDestinatarios > 0 ? 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/20 text-brand-primary shadow-brand-primary/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
+            }`}>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Destinatarios</div>
+              <div className="text-xl font-black text-zinc-900 dark:text-white">{totalDestinatarios}</div>
+            </div>
+            <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
+              totalLeidos > 0 ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-100 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
+            }`}>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Leídos</div>
+              <div className="text-xl font-black text-zinc-900 dark:text-white">{totalLeidos}</div>
+            </div>
           </div>
+          </Toolbar>
         </div>
-
-        <div className="flex gap-3 sm:gap-6">
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
-            totalEnviados > 0 ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
-          }`}>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Total enviados</div>
-            <div className="text-xl font-black text-zinc-900 dark:text-white">{totalEnviados}</div>
-          </div>
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
-            totalDestinatarios > 0 ? 'bg-brand-primary/5 dark:bg-brand-primary/10 border-brand-primary/20 text-brand-primary shadow-brand-primary/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
-          }`}>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Destinatarios</div>
-            <div className="text-xl font-black text-zinc-900 dark:text-white">{totalDestinatarios}</div>
-          </div>
-          <div className={`rounded-2xl p-3 text-left border border-zinc-100 dark:border-darkbg-border shadow-sm ${
-            totalLeidos > 0 ? 'bg-sky-50 dark:bg-sky-900/10 border-sky-100 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-zinc-50 dark:bg-darkbg-main border-zinc-200 dark:border-darkbg-border shadow-sm'
-          }`}>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Leídos</div>
-            <div className="text-xl font-black text-zinc-900 dark:text-white">{totalLeidos}</div>
-          </div>
-        </div>
-      </div>
+      </Card>
 
       {/* Formulario: Nuevo anuncio */}
       <div className="bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm space-y-4">

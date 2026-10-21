@@ -1,5 +1,6 @@
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
+import { Card, PageHeader, Toolbar } from '../components/ui';
 
 // Vista de autorizaciones de traslado FC-11 (extraída de App.jsx, Fase 4).
 export default function Fc11View({
@@ -9,28 +10,28 @@ export default function Fc11View({
 }) {
   return (
     <div className="flex flex-col flex-1 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-            <i className="fa-solid fa-truck-fast text-lg"></i>
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Autorizaciones de Traslado (FC-11)</h2>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          <PageHeader
+            titulo={'Autorizaciones de Traslado (FC-11)'}
+            descripcion={'Movilidad interna institucional de bienes entre dependencias'}
+            icono="fa-truck-fast"
+            contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                 {filteredFC11.length}
               </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Movilidad interna institucional de bienes entre dependencias</p>
+            )}
+          />
+          <Toolbar className="mt-4">
+          <div className="flex flex-wrap gap-2 items-center">
+            <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
+            <button onClick={handleExportFC11CSV} className={STYLES.btnSecondary}>
+                <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar CSV
+            </button>
           </div>
+          </Toolbar>
         </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
-          <button onClick={handleExportFC11CSV} className={STYLES.btnSecondary}>
-              <i className="fa-solid fa-file-csv text-emerald-600 dark:text-emerald-400"></i> Exportar CSV
-          </button>
-        </div>
-      </div>
+      </Card>
       <div className="bg-white dark:bg-white/[0.04] p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm min-h-[400px]">
         {isLoading ? ( <SkeletonLoader /> ) : filteredFC11.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center bg-zinc-50/50 dark:bg-darkbg-main/50 rounded-2xl border border-dashed border-zinc-300 dark:border-darkbg-border">

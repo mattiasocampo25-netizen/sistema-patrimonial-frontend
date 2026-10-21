@@ -2,6 +2,7 @@
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
 import React, { useState } from 'react';
 import EmptyState from '../components/EmptyState';
+import { Card, PageHeader, Toolbar } from '../components/ui';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30', dot: 'bg-amber-500' },
@@ -40,41 +41,39 @@ export default function AprobacionesView({
 
   return (
     <div className="flex flex-col flex-1 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
-            <i className="fa-solid fa-check-to-slot text-lg"></i>
-          </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Centro de Aprobaciones</h2>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          <PageHeader
+            titulo={'Centro de Aprobaciones'}
+            descripcion={'Gestión y auditoría de solicitudes de baja en <strong className=\'text-zinc-900 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
+            icono="fa-check-to-slot"
+            contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
                 {conteo.PENDIENTE} pendientes
               </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Gestión y auditoría de solicitudes de baja en <strong className="text-zinc-900 dark:text-white font-semibold">{dependenciaActual}</strong>
-            </p>
+            )}
+          />
+          <Toolbar className="mt-4">
+  
+          <div className="flex flex-wrap items-center gap-1.5 -mb-1">
+            {ETAPAS.map(et => (
+              <button
+                key={et.id}
+                onClick={() => setFiltroEstado(et.id)}
+                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                  filtroEstado === et.id
+                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
+                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
+                }`}
+              >
+                {et.label}
+                <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-zinc-400 dark:text-zinc-500'}`}>{et.n}</span>
+              </button>
+            ))}
           </div>
+          </Toolbar>
         </div>
-
-        <div className="flex flex-wrap items-center gap-1.5 -mb-1">
-          {ETAPAS.map(et => (
-            <button
-              key={et.id}
-              onClick={() => setFiltroEstado(et.id)}
-              className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
-                filtroEstado === et.id
-                  ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
-                  : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
-              }`}
-            >
-              {et.label}
-              <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-zinc-400 dark:text-zinc-500'}`}>{et.n}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      </Card>
 
       <div className="bg-white dark:bg-darkbg-card border border-zinc-200/70 dark:border-darkbg-border rounded-3xl shadow-sm overflow-hidden flex-1 min-h-[400px]">
         <div className="overflow-x-auto custom-scrollbar">

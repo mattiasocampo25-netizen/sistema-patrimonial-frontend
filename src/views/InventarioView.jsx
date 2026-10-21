@@ -3,11 +3,11 @@ import { PENDIENTE_LABELS, ESTADOS_CONSERVACION } from '../constants/appConstant
 import FiltroCombo from '../components/FiltroCombo';
 import CompararBienesModal from '../components/CompararBienesModal';
 import KanbanBienes from '../components/KanbanBienes';
-import EmptyState from '../components/EmptyState';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
 // Es la vista más grande del sistema; recibe todo por props.
@@ -169,109 +169,103 @@ export default function InventarioView({
 <div className="space-y-6 pb-12 font-sans text-slate-900 dark:text-slate-100">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
-  <div className="bg-white dark:bg-zinc-900/40 p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-zinc-700/30 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-
-    {/* Título de la Sección + Contador */}
-    <div className="flex items-center gap-4">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800/20 text-zinc-900 dark:text-white">
-        <i className="fa-solid fa-boxes-stacked text-lg"></i>
-      </div>
-      <div>
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight whitespace-nowrap">
-            Inventario General
-          </h2>
-          <span title={hasFilters ? 'Bienes que coinciden con los filtros' : 'Incluye bienes dados de baja; los activos se miden en el Panel'} className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-zinc-800/20 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/30 whitespace-nowrap shrink-0">
-            {hasFilters ? `${filteredBienes.length} resultados` : `${filteredBienes.length} registros · ${stats.totalItems} activos`}
+  <Card className="p-0">
+    <div className="p-5 sm:p-6">
+      <PageHeader
+        titulo={'Inventario General'}
+        descripcion={'Gestión integral e inventario consolidado de activos de la Universidad'}
+        icono="fa-boxes-stacked"
+        contador={(
+          <span className="whitespace-nowrap">
+            {t('inv.anadir')}
           </span>
-        </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-          Gestión integral e inventario consolidado de activos de la Universidad
-        </p>
-      </div>
-    </div>
-
-    {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
-    <div className="flex items-center gap-2 min-w-0">
-    <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
-      <button 
-        onClick={handleDownloadTemplateCSV} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Descargar Plantilla CSV"
-      >
-        <i className="fa-solid fa-file-excel text-emerald-600"></i>
-        <span>{t('inv.plantilla')}</span>
-      </button>
-
-      <button 
-        onClick={() => fileInputRef.current?.click()} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Importar archivo CSV"
-      >
-        <i className="fa-solid fa-file-import text-emerald-600"></i>
-        <span>{t('inv.importar')}</span>
-      </button>
-
-      <button 
-        onClick={handleExportInventarioCSV} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Exportar archivo CSV"
-      >
-        <i className="fa-solid fa-file-export text-sky-600"></i>
-        <span>{t('inv.exportar')}</span>
-      </button>
-
-      <button 
-        onClick={handleExportInventarioExcel} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Exportar Excel real (.xlsx)"
-      >
-        <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
-        <span>{t('inv.excel')}</span>
-      </button>
-
-      {ultimaExportacion && (
+        )}
+      />
+      <Toolbar className="mt-4">
+  
+      {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
+      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
         <button 
-          onClick={onRepetirExport} 
+          onClick={handleDownloadTemplateCSV} 
           className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-          title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}
+          title="Descargar Plantilla CSV"
         >
-          <i className="fa-solid fa-rotate-right text-zinc-500"></i>
-          <span>{t('inv.repetir')}</span>
+          <i className="fa-solid fa-file-excel text-emerald-600"></i>
+          <span>{t('inv.plantilla')}</span>
         </button>
-      )}
-
-      <button 
-        onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Generar Lote Masivo de QRs"
-      >
-        <i className="fa-solid fa-qrcode text-indigo-600 dark:text-indigo-400"></i>
-        <span>{t('inv.loteqr')}</span>
-      </button>
+  
+        <button 
+          onClick={() => fileInputRef.current?.click()} 
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          title="Importar archivo CSV"
+        >
+          <i className="fa-solid fa-file-import text-emerald-600"></i>
+          <span>{t('inv.importar')}</span>
+        </button>
+  
+        <button 
+          onClick={handleExportInventarioCSV} 
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          title="Exportar archivo CSV"
+        >
+          <i className="fa-solid fa-file-export text-sky-600"></i>
+          <span>{t('inv.exportar')}</span>
+        </button>
+  
+        <button 
+          onClick={handleExportInventarioExcel} 
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          title="Exportar Excel real (.xlsx)"
+        >
+          <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+          <span>{t('inv.excel')}</span>
+        </button>
+  
+        {ultimaExportacion && (
+          <button 
+            onClick={onRepetirExport} 
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+            title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}
+          >
+            <i className="fa-solid fa-rotate-right text-zinc-500"></i>
+            <span>{t('inv.repetir')}</span>
+          </button>
+        )}
+  
+        <button 
+          onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} 
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          title="Generar Lote Masivo de QRs"
+        >
+          <i className="fa-solid fa-qrcode text-indigo-600 dark:text-indigo-400"></i>
+          <span>{t('inv.loteqr')}</span>
+        </button>
+      </div>
+  
+        <button 
+          onClick={openFC03Modal} 
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          title="Generar Reporte FC-03"
+        >
+          <i className="fa-solid fa-print text-amber-600"></i>
+          <span>FC-03</span>
+        </button>
+  
+        <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block shrink-0"></div>
+  
+        <button 
+          onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} 
+          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+        >
+          <i className="fa-solid fa-plus text-xs"></i>
+          <span className="whitespace-nowrap">{t('inv.anadir')}</span>
+        </button>
+      </div>
+  
+      </Toolbar>
     </div>
-
-      <button 
-        onClick={openFC03Modal} 
-        className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-        title="Generar Reporte FC-03"
-      >
-        <i className="fa-solid fa-print text-amber-600"></i>
-        <span>FC-03</span>
-      </button>
-
-      <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block shrink-0"></div>
-
-      <button 
-        onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} 
-        className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
-      >
-        <i className="fa-solid fa-plus text-xs"></i>
-        <span className="whitespace-nowrap">{t('inv.anadir')}</span>
-      </button>
-    </div>
-
-  </div>
+  </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
   <div className="bg-white dark:bg-zinc-900/40 p-4 sm:p-5 rounded-3xl border border-zinc-200/70 dark:border-zinc-700/30 shadow-sm space-y-4">

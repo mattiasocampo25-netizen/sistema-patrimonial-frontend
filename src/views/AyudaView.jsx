@@ -3,6 +3,7 @@ import FaqItem from '../components/FaqItem';
 import WorkflowStep from '../components/WorkflowStep';
 import { SHORTCUTS } from '../constants/appConstants';
 import { normalizeStr, APP_VERSION } from '../utils/helpers';
+import { Card, PageHeader, Toolbar } from '../components/ui';
 
 // Vista de ayuda/Soporte y Normativa.
 // Contenido estático + tour guiado + FAQ accordion ampliado.
@@ -112,24 +113,24 @@ export default function AyudaView({ setTourPaso, STYLES }) {
   return (
     <div className="space-y-6 pb-12">
       {/* Encabezado */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-darkbg-card p-5 sm:p-6 rounded-3xl border border-zinc-200/70 dark:border-darkbg-border shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-            <i className="fa-solid fa-circle-question text-xl"></i>
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Centro de Ayuda y Normativa</h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Guía operativa, documentación y preguntas frecuentes del ciclo de vida de los bienes</p>
-          </div>
+      <Card className="p-0">
+        <div className="p-5 sm:p-6">
+          <PageHeader
+            titulo={'Centro de Ayuda y Normativa'}
+            descripcion={'Guía operativa, documentación y preguntas frecuentes del ciclo de vida de los bienes'}
+            icono="fa-circle"
+          />
+          <Toolbar className="mt-4">
+          <button
+            onClick={() => setTourPaso(0)}
+            title="Recorrer la guía interactiva"
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
+          >
+            <i className="fa-solid fa-route"></i> Hacer tour guiado
+          </button>
+          </Toolbar>
         </div>
-        <button
-          onClick={() => setTourPaso(0)}
-          title="Recorrer la guía interactiva"
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
-        >
-          <i className="fa-solid fa-route"></i> Hacer tour guiado
-        </button>
-      </div>
+      </Card>
 
       {/* Navegación de secciones */}
       <div className="flex gap-1 overflow-x-auto pb-2 hide-scrollbar">

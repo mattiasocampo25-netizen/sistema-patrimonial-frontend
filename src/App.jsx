@@ -1040,74 +1040,6 @@ useEffect(() => {
           return normalizeStr(n.dependencia) === normalizeStr(dependenciaActual);
       });
   }, [notificaciones, dependenciaActual, isAdmin]);
-  // Resolver solicitud de eliminación del padrón (solo admin, desde Aprobaciones)
-  const resolverSolicitudFuncionario = async (notif, aprobar) => {
-      // Orden de operaciones corregido. Antes se marcaba la solicitud como
-      // APROBADA y después se intentaba borrar al funcionario, sin comprobar
-      // ninguno de los dos. Si el DELETE fallaba, el funcionario seguía en la
-      // base pero la solicitud ya no aparecía pendiente para nadie: quedaba
-      // huérfano y sin forma de reintentar desde la interfaz.
-      //
-      // Ahora se hace al revés: primero el borrado (que es lo que puede fallar
-      // de verdad), y solo después se cierra la solicitud. Si algo falla, la
-      // solicitud sigue pendiente y se puede volver a intentar.
-      const snapshot = notif;
-      try {
-          setIsProcessing({ active: true, text: aprobar ? 'Aprobando eliminación...' : 'Rechazando solicitud...' });
-          const estadoNuevo = aprobar ? 'APROBADO' : 'RECHAZADO';
-
-          // 1. Borrar al funcionario (solo si se aprueba) y comprobar.
-          if (aprobar && notif.funcionarioId) {
-              const { error: errFun } = await supabase.from('funcionarios').delete().eq('id', notif.funcionarioId);
-              if (errFun) throw new Error(`no se pudo eliminar al funcionario: ${errFun.message}`);
-          }
-
-          // 2. Cerrar la solicitud, ahora que el paso crítico salió bien.
-          const notifActualizada = { ...notif, estado: estadoNuevo, resueltoPor: currentUser?.username || 'Admin', resueltoFecha: new Date().toISOString() };
-          const { error: errNotif } = await supabase.from('notificaciones').update({ data: notifActualizada }).eq('id', notif.id);
-          if (errNotif) throw new Error(`no se pudo cerrar la solicitud: ${errNotif.message}`);
-
-          // Reflejar en el estado local recién cuando la base confirmó.
-          setNotificaciones(prev => prev.map(n => (n.id === notif.id ? notifActualizada : n)));
-          if (aprobar && notif.funcionarioId) {
-              setFuncionariosPadron(prev => prev.filter(f => f.id !== notif.funcionarioId));
-          }
-
-          // 3. Avisar al solicitante. Si esto falla, la resolución ya está
-          //    firme: se informa pero no se rompe lo anterior.
-          const solicitanteUsername = notif.solicitante || 'Usuario';
-          const notifId = generateId();
-          const notifUsuario = {
-              id: notifId, tipoRegistro: 'NOTIFICACION', usuarioDestino: solicitanteUsername,
-              titulo: aprobar ? `Eliminación aprobada: ${notif.nombre || ''}` : `Eliminación rechazada: ${notif.nombre || ''}`,
-              mensaje: aprobar
-                  ? `Tu solicitud de eliminar a "${notif.nombre || ''}" del padrón fue APROBADA.`
-                  : `Tu solicitud de eliminar a "${notif.nombre || ''}" del padrón fue RECHAZADA.`,
-              leido: false, fecha: new Date().toISOString()
-          };
-          const { error: errAviso } = await supabase.from('notificaciones').insert([{ id: notifId, data: notifUsuario }]);
-          if (errAviso) {
-              console.error('No se pudo notificar al solicitante:', errAviso);
-              addToast(`La solicitud se resolvió, pero no se pudo avisar a ${solicitanteUsername}.`, 'warning');
-          } else {
-              setNotificaciones(prev => [notifUsuario, ...prev]);
-          }
-
-          await registrarAuditoria({
-              usuario: currentUser?.username || 'Admin', dependencia: dependenciaActual,
-              accion: aprobar ? 'APROBAR_BAJA_FUNCIONARIO' : 'RECHAZAR_BAJA_FUNCIONARIO',
-              entidad: 'FUNCIONARIO', entidadId: notif.funcionarioId || null,
-              detalles: { nombre: notif.nombre, cedula: notif.cedula, motivo: notif.motivo, solicitante: solicitanteUsername }
-          });
-          addToast(aprobar ? 'Funcionario eliminado y notificado.' : 'Solicitud rechazada y notificada.', 'success');
-      } catch (e) {
-          setNotificaciones(prev => prev.map(n => (n.id === snapshot.id ? snapshot : n)));
-          addToast(`No se pudo resolver la solicitud: ${e.message || 'error desconocido'}. Sigue pendiente.`, 'error');
-      } finally {
-          setIsProcessing({ active: false, text: '' });
-      }
-  };
-
   // --- CAMBIO MANUAL DE ESTADO DE FIRMAS FC-10 (solo administrador) ---
   // Escribe directo en Supabase (tabla fc10, columna JSONB data). No usa backend.
   const actualizarEstadoFirma = async (id, { estadoFirma, registradoPor }) => {
@@ -1588,8 +1520,8 @@ useEffect(() => {
   }, []);
 
   const renderPagination = () => (
-    <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-zinc-200 dark:border-darkbg-border shrink-0 bg-white dark:bg-darkbg-card">
-      <span className="text-sm text-zinc-500 font-medium">{ti('inv.mostrando')} <span className="font-bold text-zinc-900 dark:text-white">{(currentPage - 1) * itemsPorPagina + (filteredBienes.length > 0 ? 1 : 0)} - {Math.min(currentPage * itemsPorPagina, filteredBienes.length)}</span> {ti('inv.de')} {filteredBienes.length}</span>
+    <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-line dark:border-line shrink-0 bg-surface-1 dark:bg-surface-1">
+      <span className="text-sm text-content-3 font-medium">{ti('inv.mostrando')} <span className="font-bold text-content-1 dark:text-white">{(currentPage - 1) * itemsPorPagina + (filteredBienes.length > 0 ? 1 : 0)} - {Math.min(currentPage * itemsPorPagina, filteredBienes.length)}</span> {ti('inv.de')} {filteredBienes.length}</span>
       <div className="flex items-center gap-2">
         <FiltroCombo
           ancho="w-[132px]"
@@ -1600,8 +1532,8 @@ useEffect(() => {
           etiquetaTodos={ti('inv.por_pagina')}
           titulo={ti('inv.por_pagina')}
         />
-        <button disabled={currentPage <= 1} onClick={() => setCurrentPage(prev => prev - 1)} className="rounded-xl bg-white dark:bg-darkbg-main px-4 py-2 text-xs font-bold text-zinc-700 dark:text-zinc-300 shadow-2xs border border-zinc-200 dark:border-darkbg-border hover:bg-zinc-50 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.anterior')}</button>
-        <button disabled={currentPage >= totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="rounded-xl bg-white dark:bg-darkbg-main px-4 py-2 text-xs font-bold text-zinc-700 dark:text-zinc-300 shadow-2xs border border-zinc-200 dark:border-darkbg-border hover:bg-zinc-50 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.siguiente')}</button>
+        <button disabled={currentPage <= 1} onClick={() => setCurrentPage(prev => prev - 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.anterior')}</button>
+        <button disabled={currentPage >= totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer">{ti('inv.siguiente')}</button>
       </div>
     </div>
   );
@@ -1628,14 +1560,14 @@ if (rutaDesconocida && !publicBienId) {
 if (publicBienId) {
   return (
     <div className="h-dvh overflow-y-auto bg-slate-100 flex flex-col items-center p-3 sm:p-6 text-slate-900 font-sans selection:bg-blue-600 selection:text-white custom-scrollbar">
-      <div className="bg-white border border-slate-200/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden m-auto">
+      <div className="bg-surface-1 border border-slate-200/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden m-auto">
 
         {/* Acento superior institucional */}
         <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500"></div>
 
         {/* Header institucional */}
         <div className="flex flex-col items-center text-center pb-4 border-b border-slate-100">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-2 border border-blue-100 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-blue-50 text-blue-600 mb-2 border border-blue-100 shadow-sm">
             <i className="fa-solid fa-shield-halved text-xl"></i>
           </div>
 
@@ -1659,7 +1591,7 @@ if (publicBienId) {
               <button
                 onClick={() => setPublicFotoAmpliada(publicBienData.fotos[0].url)}
                 title="Ampliar foto"
-                className="block w-full rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs bg-slate-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                className="block w-full rounded-card overflow-hidden border border-slate-200/80 shadow-xs bg-slate-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
               >
                 <img
                   src={publicBienData.fotos[0].url}
@@ -1673,7 +1605,7 @@ if (publicBienId) {
             )}
 
             {/* Tarjeta de Rótulo y Estado */}
-            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 shadow-xs">
+            <div className="bg-slate-50 p-3.5 sm:p-4 rounded-card border border-slate-200/80 shadow-xs">
               <div className="flex justify-between items-center gap-2">
                 <div className="min-w-0">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Código / Rótulo</p>
@@ -1682,7 +1614,7 @@ if (publicBienId) {
                   </p>
                 </div>
                 {publicBienData.estadoConservacion && (
-                  <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${
+                  <span className={`px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider ${
                     publicBienData.estadoConservacion === "De Baja"
                       ? "bg-rose-50 text-rose-600 border border-rose-200"
                       : "bg-emerald-50 text-emerald-700 border border-emerald-200"
@@ -1707,7 +1639,7 @@ if (publicBienId) {
 
             {/* Datos Técnicos y Contables */}
             <div className="grid grid-cols-2 gap-2.5">
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+              <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <i className="fa-solid fa-layer-group text-blue-600"></i> Cuenta
                 </p>
@@ -1716,7 +1648,7 @@ if (publicBienId) {
                 </p>
               </div>
 
-              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+              <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <i className="fa-solid fa-coins text-emerald-600"></i> Valor
                 </p>
@@ -1726,7 +1658,7 @@ if (publicBienId) {
               </div>
 
               {publicBienData.subcuenta && (
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <i className="fa-solid fa-sitemap text-indigo-600"></i> Sub-Cuenta
                   </p>
@@ -1737,7 +1669,7 @@ if (publicBienId) {
               )}
 
               {publicBienData.fechaAdquisicion && (
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <i className="fa-regular fa-calendar text-amber-600"></i> Adquisición
                   </p>
@@ -1748,7 +1680,7 @@ if (publicBienId) {
               )}
 
               {publicBienData.vidaUtil && (
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200/70">
+                <div className="bg-slate-50 p-3 rounded-card border border-slate-200/70">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                     <i className="fa-solid fa-hourglass-half text-purple-600"></i> Vida Útil
                   </p>
@@ -1760,7 +1692,7 @@ if (publicBienId) {
             </div>
 
             {/* Custodio, Ubicación y Dependencia */}
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/70 space-y-3">
+            <div className="bg-slate-50 p-4 rounded-card border border-slate-200/70 space-y-3">
               <div>
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <i className="fa-solid fa-user-check text-blue-600"></i> Responsable Asignado
@@ -1808,7 +1740,7 @@ if (publicBienId) {
         <div className="pt-2">
           <button 
             onClick={() => window.location.href = window.location.origin} 
-            className="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-98"
+            className="w-full py-3.5 px-4 rounded-card bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all cursor-pointer shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 active:scale-98"
           >
             <i className="fa-solid fa-arrow-left text-xs"></i> Ir a la Plataforma Principal
           </button>
@@ -1823,7 +1755,7 @@ if (publicBienId) {
             <a
               href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`}
               title="Abrir en modo kiosco (pantalla completa con temporizador)"
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
             >
               <i className="fa-solid fa-display text-[10px]"></i>
               <span className="hidden sm:inline">Kiosco</span>
@@ -1844,8 +1776,8 @@ if (publicBienId) {
 
       {publicFotoAmpliada && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-zinc-950/90 backdrop-blur-sm" onClick={() => setPublicFotoAmpliada(null)}>
-          <img src={publicFotoAmpliada} alt="Foto ampliada del activo" className="max-h-[90dvh] max-w-full rounded-2xl shadow-2xl object-contain" />
-          <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white">
+          <img src={publicFotoAmpliada} alt="Foto ampliada del activo" className="max-h-[90dvh] max-w-full rounded-card shadow-2xl object-contain" />
+          <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-control bg-surface-1/10 text-white">
             <i className="fa-solid fa-xmark"></i>
           </span>
         </div>
@@ -1864,20 +1796,20 @@ if (publicBienId) {
 
   return (
     <div className={`flex h-dvh overflow-hidden bg-canvas ${darkMode ? 'dark' : ''} transition-colors duration-300 text-base`} style={{ '--dep-accent': colorPorDependencia(dependenciaActual) }}>
-      <a href="#contenido" className="skip-link px-4 py-2 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[13px] font-bold shadow-xl">{ti('app.saltar')}</a>
+      <a href="#contenido" className="skip-link px-4 py-2 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-bold shadow-xl">{ti('app.saltar')}</a>
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileUpload} />
       <input type="file" accept=".csv" className="hidden" style={{ display: 'none' }} ref={fileInputFuncionariosRef} onChange={handleFileUploadFuncionarios} />
       
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none">
         
         {!isOnline && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-xl text-xs font-black bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 transition-all animate-slide-up">
+          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 transition-all animate-slide-up">
             <i className="fa-solid fa-wifi-slash text-base"></i>
             <span className="flex-1">{ti('off.sin_conexion')}{colaOffline > 0 ? ` · ${colaOffline} ${colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}` : ''}</span>
           </div>
         )}
         {isOnline && colaOffline > 0 && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-xl text-xs font-black bg-sky-600/90 text-white backdrop-blur-md border border-sky-400/30 transition-all animate-slide-up">
+          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-sky-600/90 text-white backdrop-blur-md border border-sky-400/30 transition-all animate-slide-up">
             <i className="fa-solid fa-cloud-arrow-up text-base"></i>
             <span className="flex-1">{ti('off.sinc')} {colaOffline} {colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}...</span>
           </div>
@@ -1886,8 +1818,8 @@ if (publicBienId) {
         {toasts.map(t => (
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
-          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-white/95 dark:bg-zinc-900/95 text-zinc-800 dark:text-zinc-100 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800 transition-all animate-slide-up">
-            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-inner ${
+          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-surface-1/95 dark:bg-zinc-900/95 text-content-1 dark:text-zinc-100 backdrop-blur-xl border border-line/80 dark:border-zinc-800 transition-all animate-slide-up">
+            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${
               t.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/50' : 
               t.type === 'error' ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/50' : 
               t.type === 'warning' ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50' : 
@@ -1904,7 +1836,7 @@ if (publicBienId) {
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-[11px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>
@@ -1915,12 +1847,12 @@ if (publicBienId) {
       </div>
 
       {isProcessing.active && (
-        <div className="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm z-[500] flex flex-col items-center justify-center animate-fade-in">
+        <div className="fixed inset-0 bg-surface-1/80 dark:bg-black/80 backdrop-blur-sm z-[500] flex flex-col items-center justify-center animate-fade-in">
           <div className="proc-track"><div className={`proc-fill ${isProcessing.pct == null ? 'indete' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined}></div></div>
           <i className="fa-solid fa-circle-notch fa-spin text-4xl text-brand-primary mb-4"></i>
-          <h2 className="text-xl font-medium text-zinc-900 dark:text-white tracking-tight">{isProcessing.text}</h2>
+          <h2 className="text-xl font-medium text-content-1 dark:text-white tracking-tight">{isProcessing.text}</h2>
           {isProcessing.pct != null && (
-            <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400 mt-2 tabular-nums">{Math.round(isProcessing.pct)}%</p>
+            <p className="text-sm font-bold text-content-3 dark:text-content-3 mt-2 tabular-nums">{Math.round(isProcessing.pct)}%</p>
           )}
         </div>
       )}
@@ -1968,7 +1900,7 @@ if (publicBienId) {
                 {activeTab === 'resumen' && (<ResumenView dependenciaActual={dependenciaActual} stats={stats} pendientes={pendientes} fc10List={fc10List} />)}
                 {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} analiticos2Unicos={analiticos2Unicos} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
 
-                {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView solicitudesBaja={solicitudesBaja} dependenciaActual={dependenciaActual} bienes={bienes} resolverSolicitudFuncionario={resolverSolicitudFuncionario} openResolucionModal={openResolucionModal} currentUser={currentUser} />)}
+                {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView solicitudesBaja={solicitudesBaja} dependenciaActual={dependenciaActual} bienes={bienes} openResolucionModal={openResolucionModal} currentUser={currentUser} />)}
 
                 {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
                 {activeTab === 'usuarios' && isAdmin && (<UsuariosView isLoading={isLoading} usuariosList={usuariosList} setUsuarioEditing={setUsuarioEditing} setIsUsuarioModalOpen={setIsUsuarioModalOpen} esDesarrollador={esDesarrollador} currentUser={currentUser} setItemToDelete={setItemToDelete} STYLES={STYLES} />)}

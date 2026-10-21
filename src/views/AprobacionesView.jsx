@@ -44,10 +44,10 @@ export default function AprobacionesView({
         <div className="p-5 sm:p-6">
           <PageHeader
             titulo={'Centro de Aprobaciones'}
-            descripcion={'Gestión y auditoría de solicitudes de baja en <strong className=\'text-zinc-900 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
+            descripcion={'Gestión y auditoría de solicitudes de baja en <strong className=\'text-content-1 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
             icono="fa-check-to-slot"
             contador={(
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/10">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
                 {conteo.PENDIENTE} pendientes
               </span>
             )}
@@ -59,14 +59,14 @@ export default function AprobacionesView({
               <button
                 key={et.id}
                 onClick={() => setFiltroEstado(et.id)}
-                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-xl text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
+                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
                   filtroEstado === et.id
-                    ? 'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900'
-                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
+                    ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1'
+                    : 'bg-surface-3 dark:bg-surface-1/5 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10'
                 }`}
               >
                 {et.label}
-                <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-zinc-400 dark:text-zinc-500'}`}>{et.n}</span>
+                <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-content-3 dark:text-content-3'}`}>{et.n}</span>
               </button>
             ))}
           </div>
@@ -74,11 +74,11 @@ export default function AprobacionesView({
         </div>
       </Card>
 
-      <div className="bg-white dark:bg-darkbg-card border border-zinc-200/70 dark:border-darkbg-border rounded-3xl shadow-sm overflow-hidden flex-1 min-h-[400px]">
+      <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm overflow-hidden flex-1 min-h-[400px]">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[700px]">
-            <thead className="bg-zinc-50/50 dark:bg-darkbg-main/50 border-b border-zinc-200/50 dark:border-darkbg-border/50">
-              <tr className="text-[10px] sm:text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+            <thead className="bg-surface-2/50 dark:bg-surface-2/50 border-b border-line/50 dark:border-line/50">
+              <tr className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
                 <th className="py-4 pl-6 sm:pl-8 pr-4">Bien / Solicitud</th>
                 <th className="px-4 py-4">Solicitante</th>
                 <th className="px-4 py-4">Fecha</th>
@@ -88,27 +88,38 @@ export default function AprobacionesView({
             </thead>
             <tbody className="divide-y divide-zinc-100/80 dark:divide-darkbg-border/30">
               {listaFiltrada.map((notif) => {
-                const bienAsociado = bienes.find(b => b.id === (notif.bienId || notif.bien_id)) || {
-                  id: notif.bienId || notif.bien_id,
-                  rotulo: notif.rotulo || 'S/R',
-                  descripcion: notif.descripcion || 'Sin descripción'
-                };
+                // Dos tipos de solicitud: la baja de un bien y la eliminacion de
+                // un funcionario del padron. Cada una muestra los datos de su
+                // entidad, no los del bien (que en el caso del funcionario no
+                // existe).
+                const esSolicitudFuncionario = notif.tipo === 'BAJA_FUNCIONARIO';
+                const bienAsociado = esSolicitudFuncionario
+                  ? {
+                      id: notif.funcionarioId,
+                      rotulo: notif.cedula || 'S/C',
+                      descripcion: notif.nombre || 'Funcionario del padrón'
+                    }
+                  : bienes.find(b => b.id === (notif.bienId || notif.bien_id)) || {
+                      id: notif.bienId || notif.bien_id,
+                      rotulo: notif.rotulo || 'S/R',
+                      descripcion: notif.descripcion || 'Sin descripción'
+                    };
                 const estado = notif.estado || 'PENDIENTE';
                 const info = ESTADO_INFO[estado] || ESTADO_INFO.PENDIENTE;
                 const estaResuelto = estado !== 'PENDIENTE';
 
                 return (
-                  <tr key={notif.id} className={`hover:bg-zinc-50/50 dark:hover:bg-white/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
+                  <tr key={notif.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
                     <td className="py-4 pl-6 sm:pl-8 pr-4 align-top">
                       <div className="space-y-1">
-                        <span className="font-mono font-semibold text-xs text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/10 px-2 py-0.5 rounded-lg">
+                        <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-1/10 px-2 py-0.5 rounded-lg">
                           {bienAsociado.rotulo}
                         </span>
-                        <p className="font-semibold text-zinc-900 dark:text-white text-sm line-clamp-2">
+                        <p className="font-semibold text-content-1 dark:text-white text-sm line-clamp-2">
                           {bienAsociado.descripcion}
                         </p>
                         {notif.motivo && (
-                          <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+                          <div className="mt-2 flex items-start gap-2 text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-control px-3 py-2">
                             <i className="fa-solid fa-comment-dots text-xs mt-0.5 shrink-0 text-amber-600"></i>
                             <div className="flex-1">
                               <span className="font-bold">Motivo:</span> {notif.motivo}
@@ -116,21 +127,21 @@ export default function AprobacionesView({
                           </div>
                         )}
                         {estaResuelto && notif.resueltoPor && (
-                          <div className="mt-2 flex items-start gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                            <i className="fa-solid fa-user-check text-[10px] shrink-0 text-zinc-400"></i>
+                          <div className="mt-2 flex items-start gap-2 text-xs text-content-3 dark:text-content-3">
+                            <i className="fa-solid fa-user-check text-[10px] shrink-0 text-content-3"></i>
                             <span className="font-semibold">Resuelto por: {notif.resueltoPor}</span>
                             {notif.resueltoEn && <span className="ml-2">· {new Date(notif.resueltoEn).toLocaleDateString()}</span>}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-4 align-top text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    <td className="px-4 py-4 align-top text-xs font-medium text-content-1 dark:text-content-3">
                       <div className="flex items-center gap-2">
-                        <i className="fa-solid fa-user text-zinc-400"></i>
+                        <i className="fa-solid fa-user text-content-3"></i>
                         <span>{notif.solicitante || 'Funcionario'}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-4 align-top text-xs text-zinc-500 font-mono">
+                    <td className="px-4 py-4 align-top text-xs text-content-3 font-mono">
                       {notif.created_at ? new Date(notif.created_at).toLocaleDateString() : 'Reciente'}
                     </td>
                     <td className="px-4 py-4 align-top">
@@ -144,20 +155,20 @@ export default function AprobacionesView({
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => openResolucionModal(bienAsociado, 'rechazar', notif)}
-                            className="px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.05] border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                            className="px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/[0.05] border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                           >
                             Rechazar
                           </button>
                           <button
                             onClick={() => openResolucionModal(bienAsociado, 'aprobar', notif)}
-                            className="px-4 h-10 rounded-xl text-[13px] font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                            className="px-4 h-10 rounded-control text-[13px] font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                           >
-                            Aprobar Baja
+                            {esSolicitudFuncionario ? 'Aprobar Eliminación' : 'Aprobar Baja'}
                           </button>
                         </div>
                       )}
                       {estaResuelto && (
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        <span className="text-[10px] font-bold text-content-3 uppercase tracking-wider">
                           {estado.toLowerCase()}
                         </span>
                       )}
@@ -183,10 +194,10 @@ export default function AprobacionesView({
       </div>
 
       {/* Leyenda de estados */}
-      <div className="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+      <div className="flex flex-wrap gap-2 text-[10px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">
         {Object.entries(ESTADO_INFO).map(([key, info]) => (
           <span key={key} className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full ${info.dot}"></span>
+            <span className={`h-2 w-2 rounded-full ${info.dot}`}></span>
             {info.label}
           </span>
         ))}

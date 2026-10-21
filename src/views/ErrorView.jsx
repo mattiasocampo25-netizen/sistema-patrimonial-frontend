@@ -14,7 +14,7 @@ import React from 'react';
 const VARIANTES = {
   404: {
     icon: 'fa-compass',
-    tono: 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-300',
+    tono: 'bg-surface-3 dark:bg-surface-1/5 text-content-3 dark:text-content-3',
     codigo: '404',
     titulo: 'Página no encontrada',
     descripcion: 'La dirección que abriste no existe o cambió de lugar. Verificá el enlace o volvé al panel principal.',
@@ -49,32 +49,32 @@ const VARIANTES = {
 export default function ErrorView({ variante = '404', onAccion }) {
   const v = VARIANTES[variante] || VARIANTES[404];
   return (
-    <div className="h-dvh w-full flex items-center justify-center bg-zinc-50 dark:bg-darkbg-main px-4 animate-fade-in">
+    <div className="h-dvh w-full flex items-center justify-center bg-surface-2 dark:bg-surface-2 px-4 animate-fade-in">
       <div className="w-full max-w-md text-center">
-        <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-3xl ${v.tono} shadow-inner mb-6`}>
+        <div className={`mx-auto flex h-20 w-20 items-center justify-center rounded-panel ${v.tono} shadow-inner mb-6`}>
           <i className={`fa-solid ${v.icon} text-3xl`}></i>
         </div>
 
-        <p className="text-[11px] font-black uppercase tracking-[0.22em] text-zinc-400 dark:text-zinc-500 mb-2">
+        <p className="text-[11px] font-black uppercase tracking-[0.22em] text-content-3 dark:text-content-3 mb-2">
           {v.codigo}
         </p>
-        <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white mb-3">
+        <h1 className="text-2xl font-black tracking-tight text-content-1 dark:text-white mb-3">
           {v.titulo}
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-sm mx-auto">
+        <p className="text-sm text-content-3 dark:text-content-3 leading-relaxed max-w-sm mx-auto">
           {v.descripcion}
         </p>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5">
           <button
             onClick={onAccion}
-            className="inline-flex items-center gap-2 h-11 px-6 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-[13px] font-bold shadow-sm hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+            className="inline-flex items-center gap-2 h-11 px-6 rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-bold shadow-sm hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
           >
             <i className="fa-solid fa-arrow-left text-xs"></i> {v.accion}
           </button>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 h-11 px-5 rounded-2xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-card text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all active:scale-95 cursor-pointer"
           >
             <i className="fa-solid fa-rotate-right text-xs"></i> Recargar
           </button>

@@ -33,7 +33,7 @@ export const ESTADO_INFO = {
     label: 'Borrador',
     corto: 'Borrador',
     icon: 'fa-pen-ruler',
-    badge: 'bg-zinc-100 text-zinc-600 dark:bg-white/10 dark:text-zinc-300 border-zinc-200 dark:border-white/10',
+    badge: 'bg-surface-3 text-content-2 dark:bg-surface-1/10 dark:text-content-3 border-line dark:border-white/10',
     dot: 'bg-zinc-400',
     descripcion: 'El acta se esta armando todavia.'
   },

@@ -92,7 +92,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
     <div className="fixed inset-0 z-[500]">
       {rect && (
         <div
-          className="absolute rounded-2xl pointer-events-none"
+          className="absolute rounded-card pointer-events-none"
           style={{
             top: rect.top - PAD, left: rect.left - PAD,
             width: rect.width + PAD * 2, height: rect.height + PAD * 2,
@@ -104,43 +104,43 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
       {!rect && <div className="absolute inset-0 bg-[#050814]/70" onClick={onClose} />}
 
       <div
-        className={`absolute z-10 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${
+        className={`absolute z-10 rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${
           esMovil || !rect ? 'inset-x-4 bottom-4' : ''
         }`}
         style={esMovil || !rect ? { maxHeight: '70vh', overflowY: 'auto' } : { ...cardStyle, maxHeight: '60vh', overflowY: 'auto' }}
         role="dialog" aria-label={`Paso ${paso + 1} de ${pasos.length}`}
       >
         {caret && !caret.abajo && (
-          <span className="absolute -top-[7px] h-3.5 w-3.5 rotate-45 bg-white dark:bg-zinc-900 border-l border-t border-zinc-200 dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
+          <span className="absolute -top-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-zinc-900 border-l border-t border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
         )}
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-primary dark:text-brand-accent mb-1.5">
           Paso {paso + 1} de {pasos.length}
         </p>
-        <h3 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight">{step.titulo}</h3>
-        <p className="text-[13px] text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">{step.texto}</p>
+        <h3 className="text-base font-bold text-content-1 dark:text-white tracking-tight">{step.titulo}</h3>
+        <p className="text-[13px] text-content-3 dark:text-content-3 mt-1.5 leading-relaxed">{step.texto}</p>
         <div className="flex items-center gap-1.5 mt-4 mb-4">
           {pasos.map((_, i) => (
-            <span key={i} className={`h-1.5 rounded-full transition-all ${i === paso ? 'w-6 bg-brand-primary' : i < paso ? 'w-1.5 bg-brand-primary/50' : 'w-1.5 bg-zinc-200 dark:bg-zinc-700'}`}></span>
+            <span key={i} className={`h-1.5 rounded-full transition-all ${i === paso ? 'w-6 bg-brand-primary' : i < paso ? 'w-1.5 bg-brand-primary/50' : 'w-1.5 bg-surface-3 dark:bg-zinc-700'}`}></span>
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={onClose} className="text-xs font-semibold text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer mr-auto">
+          <button onClick={onClose} className="text-xs font-semibold text-content-3 hover:text-content-2 dark:hover:text-zinc-200 transition-colors cursor-pointer mr-auto">
             Omitir tour
           </button>
           {paso > 0 && (
-            <button onClick={() => setPaso(paso - 1)} className="h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer">
+            <button onClick={() => setPaso(paso - 1)} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer">
               Atrás
             </button>
           )}
           <button
             onClick={() => (ultimo ? onClose(true) : setPaso(paso + 1))}
-            className="h-10 px-5 rounded-xl text-[13px] font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer"
+            className="h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer"
           >
             {ultimo ? 'Finalizar' : 'Siguiente →'}
           </button>
         </div>
         {caret && caret.abajo && (
-          <span className="absolute -bottom-[7px] h-3.5 w-3.5 rotate-45 bg-white dark:bg-zinc-900 border-r border-b border-zinc-200 dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
+          <span className="absolute -bottom-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-zinc-900 border-r border-b border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
         )}
       </div>
     </div>

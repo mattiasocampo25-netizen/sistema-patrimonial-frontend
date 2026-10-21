@@ -957,56 +957,97 @@ export function useFcModals({
           const estadoNuevo = accion === "aprobar" ? "APROBADO" : "RECHAZADO";
           const solicitanteUsername = notifPendiente?.solicitante || notifPendiente?.solicitadoPor || bien?.bajaSolicitadaPor || "Usuario";
 
-          // 1. Actualizar estado local inmediatamente para máxima fluidez UX sin recargas
+          // Hay dos tipos de solicitud y cada una se resuelve sobre una entidad
+          // distinta: BAJA_BIEN da de baja un bien del inventario y
+          // BAJA_FUNCIONARIO borra a la persona del padron. Antes las dos
+          // pasaban por el camino del bien, con lo que la solicitud de baja de
+          // un funcionario se cerraba sin borrar a nadie (la escritura iba
+          // contra un bien con id indefinido) y la persona se quedaba en la
+          // base para siempre.
+          const esSolicitudFuncionario = notifPendiente?.tipo === "BAJA_FUNCIONARIO";
+          const nombreFuncionario = notifPendiente?.nombre || "";
+
+          // 1. Aplicar el cambio critico. Va ANTES de cerrar la solicitud a
+          //    proposito: si esto falla, la solicitud sigue pendiente y se
+          //    puede reintentar. Cerrarla primero dejaba solicitudes
+          //    huerfanas que nadie podia volver a resolver.
+          if (accion === "aprobar") {
+              if (esSolicitudFuncionario) {
+                  const funcId = notifPendiente.funcionarioId;
+                  if (!funcId) throw new Error("la solicitud no tiene funcionario asociado");
+                  const { error: errFunc } = await supabase.from("funcionarios").delete().eq("id", funcId);
+                  if (errFunc) throw new Error(`no se pudo eliminar al funcionario: ${errFunc.message}`);
+                  setFuncionariosPadron(prev => prev.filter(f => f.id !== funcId));
+              } else {
+                  const bienReal = bienes.find(b => b.id === bien.id) || bien;
+                  const updatedBien = { ...bienReal, estadoConservacion: "De Baja" };
+                  setBienes(prev => prev.map(b => b.id === bien.id ? updatedBien : b));
+                  const { error: errBien } = await supabase.from("bens").update(conSello({ data: updatedBien })).eq("id", bien.id);
+                  if (errBien) throw new Error(`no se pudo dar de baja el bien: ${errBien.message}`);
+                  const cacheKey = "bienes_cache_" + (dependenciaActual || "general");
+                  const cacheActual = (await localforage.getItem(cacheKey)) || [];
+                  await localforage.setItem(cacheKey, cacheActual.map(b => b.id === bien.id ? updatedBien : b));
+              }
+          }
+
+          // 2. Cerrar la solicitud, ahora que el paso critico salio bien.
           if (notifPendiente) {
               const notifActualizada = { ...notifPendiente, estado: estadoNuevo, motivoResolucion: motivoFinal, resueltoPor: currentUser?.username || "Admin", resueltoFecha: new Date().toISOString() };
+              const { error: errNotif } = await supabase.from("notificaciones").update({ data: notifActualizada }).eq("id", notifPendiente.id);
+              if (errNotif) throw new Error(`no se pudo cerrar la solicitud: ${errNotif.message}`);
               setNotificaciones(prev => prev.map(n => n.id === notifPendiente.id ? notifActualizada : n));
-              await supabase.from("notificaciones").update({ data: notifActualizada }).eq("id", notifPendiente.id);
           }
 
-          // 2. Si se aprueba, marcar bien como "De Baja" en React y Supabase
-          if (accion === "aprobar") {
-              const bienReal = bienes.find(b => b.id === bien.id) || bien;
-              const updatedBien = { ...bienReal, estadoConservacion: "De Baja" };
-              setBienes(prev => prev.map(b => b.id === bien.id ? updatedBien : b));
-              await supabase.from("bens").update(conSello({ data: updatedBien })).eq("id", bien.id);
-              const cacheKey = "bienes_cache_" + (dependenciaActual || "general");
-              const cacheActual = (await localforage.getItem(cacheKey)) || [];
-              await localforage.setItem(cacheKey, cacheActual.map(b => b.id === bien.id ? updatedBien : b));
-          }
-
-          // 3. Crear notificación directa en el buzón del funcionario solicitante
+          // 3. Crear notificación directa en el buzón de quien solicitó la baja
           if (solicitanteUsername) {
               const notifId = generateId();
               const rotuloTxt = bien?.rotulo ? `#${bien.rotulo}` : "";
+              const esFuncionario = esSolicitudFuncionario;
+              const sujeto = esFuncionario
+                  ? (nombreFuncionario || "el funcionario del padrón")
+                  : (bien?.descripcion || rotuloTxt);
+              const rotuloAsunto = esFuncionario
+                  ? `Funcionario ${nombreFuncionario || ""}`.trim()
+                  : `Bien ${rotuloTxt}`;
               const notifUsuario = {
                   id: notifId,
                   tipoRegistro: "NOTIFICACION",
                   usuarioDestino: solicitanteUsername,
                   accion,
-                  titulo: accion === "aprobar" ? `Baja Aprobada: Bien ${rotuloTxt}` : `Baja Rechazada: Bien ${rotuloTxt}`,
+                  titulo: accion === "aprobar" ? `Baja Aprobada: ${rotuloAsunto}` : `Baja Rechazada: ${rotuloAsunto}`,
                   mensaje: accion === "aprobar"
-                      ? `La solicitud de baja para el bien "${bien?.descripcion || rotuloTxt}" ha sido APROBADA por la administración.${motivoFinal ? " Motivo: " + motivoFinal : ""}`
-                      : `La solicitud de baja para el bien "${bien?.descripcion || rotuloTxt}" ha sido RECHAZADA.${motivoFinal ? " Motivo: " + motivoFinal : ""}`,
+                      ? `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" ha sido APROBADA por la administración.${motivoFinal ? " Motivo: " + motivoFinal : ""}`
+                      : `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" ha sido RECHAZADA.${motivoFinal ? " Motivo: " + motivoFinal : ""}`,
                   leido: false,
                   fecha: new Date().toISOString(),
-                  bienId: bien.id
+                  bienId: esFuncionario ? undefined : bien.id,
+                  funcionarioId: esFuncionario ? notifPendiente?.funcionarioId : undefined
               };
               setNotificaciones(prev => [notifUsuario, ...prev]);
               await supabase.from("notificaciones").insert([{ id: notifId, data: notifUsuario }]);
           }
 
-          // 4. Registrar auditoría de la resolución
+          // 4. Registrar auditoría de la resolución. La entidad auditada es la
+          //    que de verdad cambio: el bien o el funcionario.
           await registrarAuditoria({
               usuario: currentUser?.username || "Admin",
               dependencia: dependenciaActual,
-              accion: accion === "aprobar" ? "APROBAR_BAJA" : "RECHAZAR_BAJA",
-              entidad: "BIEN",
-              entidadId: bien.id,
-              detalles: { rotulo: bien?.rotulo, motivo: motivoFinal, solicitante: solicitanteUsername }
+              accion: accion === "aprobar"
+                  ? (esSolicitudFuncionario ? "APROBAR_BAJA_FUNCIONARIO" : "APROBAR_BAJA")
+                  : (esSolicitudFuncionario ? "RECHAZAR_BAJA_FUNCIONARIO" : "RECHAZAR_BAJA"),
+              entidad: esSolicitudFuncionario ? "FUNCIONARIO" : "BIEN",
+              entidadId: esSolicitudFuncionario ? notifPendiente?.funcionarioId : bien.id,
+              detalles: esSolicitudFuncionario
+                  ? { nombre: nombreFuncionario, cedula: notifPendiente?.cedula, motivo: motivoFinal, solicitante: solicitanteUsername }
+                  : { rotulo: bien?.rotulo, motivo: motivoFinal, solicitante: solicitanteUsername }
           });
 
-          notify(accion === "aprobar" ? "Baja aprobada y notificada al usuario." : "Solicitud rechazada y notificada al usuario.", "success");
+          notify(
+              accion === "aprobar"
+                  ? (esSolicitudFuncionario ? "Eliminación aprobada y notificada al usuario." : "Baja aprobada y notificada al usuario.")
+                  : "Solicitud rechazada y notificada al usuario.",
+              "success"
+          );
       } catch (e) {
           console.error("Error al resolver baja:", e);
           notify("Error al procesar la resolución.", "error");

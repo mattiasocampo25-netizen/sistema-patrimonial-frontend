@@ -98,7 +98,7 @@ export default function CampoCatalogo({
 
     return (
         <div className="relative">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-1.5">
                 {etiqueta}{required ? ' *' : ''}
             </label>
             <div className="flex items-stretch gap-2">
@@ -119,7 +119,7 @@ export default function CampoCatalogo({
                         className={`${STYLES.input} py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}
                     />
                     {abierto && listado.length > 0 && (
-                        <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
+                        <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
                             {listado.map((o, i) => (
                                 <button
                                     key={`${o.nombre}-${i}`}
@@ -127,16 +127,16 @@ export default function CampoCatalogo({
                                     data-activo={i === activo}
                                     onMouseEnter={() => setActivo(i)}
                                     onClick={() => elegir(o)}
-                                    className={`w-full flex items-center gap-3 px-3.5 py-2 text-left transition-colors cursor-pointer ${i === activo ? 'bg-zinc-100 dark:bg-white/10' : 'hover:bg-zinc-50 dark:hover:bg-white/5'}`}
+                                    className={`w-full flex items-center gap-3 px-3.5 py-2 text-left transition-colors cursor-pointer ${i === activo ? 'bg-surface-3 dark:bg-surface-1/10' : 'hover:bg-surface-2 dark:hover:bg-surface-1/5'}`}
                                 >
-                                    <span className={`min-w-0 flex-1 text-[13px] ${o.aprendida ? 'font-medium normal-case text-zinc-500 dark:text-zinc-400' : 'font-semibold text-zinc-700 dark:text-zinc-200'}`} title={o.nombre}>
+                                    <span className={`min-w-0 flex-1 text-[13px] ${o.aprendida ? 'font-medium normal-case text-content-3 dark:text-content-3' : 'font-semibold text-content-1 dark:text-zinc-200'}`} title={o.nombre}>
                                         {o.nombre}
                                     </span>
                                     {o.aprendida && (
-                                        <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">usada</span>
+                                        <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-content-3 dark:text-content-3">usada</span>
                                     )}
                                     {o.codigo && (
-                                        <span className="shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 whitespace-normal">
+                                        <span className="shrink-0 font-mono text-[10px] font-bold text-content-3 dark:text-content-3 whitespace-normal">
                                             {o.codigo}
                                         </span>
                                     )}
@@ -145,8 +145,8 @@ export default function CampoCatalogo({
                         </div>
                     )}
                     {abierto && listado.length === 0 && (
-                        <div className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl px-3.5 py-2.5 animate-pop">
-                            <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                        <div className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-xl px-3.5 py-2.5 animate-pop">
+                            <p className="text-[11px] font-medium text-content-3 dark:text-content-3">
                                 Sin coincidencias — podés escribirlo y cargar el código.
                             </p>
                         </div>
@@ -154,7 +154,7 @@ export default function CampoCatalogo({
                 </div>
                 <label className="sr-only">{etiquetaCodigo || `Código de ${etiqueta}`}</label>
                 <div className="relative w-[92px] shrink-0">
-                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-600">cód.</span>
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-2">cód.</span>
                     <input
                         type="text"
                         name={codigoName}
@@ -164,12 +164,12 @@ export default function CampoCatalogo({
                         onChange={(e) => onCambiarCodigo(e.target.value)}
                         className={`${STYLES.input} py-2.5 pl-10 text-center font-mono text-[13px] font-bold tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${hayCodigo
                             ? 'bg-emerald-50/60 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-900/40'
-                            : `bg-zinc-50 dark:bg-darkbg-main text-zinc-400 ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}`}
+                            : `bg-surface-2 dark:bg-surface-2 text-content-3 ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}`}
                     />
                 </div>
             </div>
             {(faltaCodigo || nota) && (
-                <p className={`mt-1 text-[11px] font-medium ${faltaCodigo ? 'text-amber-600 dark:text-amber-400' : 'text-zinc-400 dark:text-zinc-500'}`}>
+                <p className={`mt-1 text-[11px] font-medium ${faltaCodigo ? 'text-amber-600 dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
                     {faltaCodigo ? 'Cargá el código patrimonial.' : nota}
                 </p>
             )}

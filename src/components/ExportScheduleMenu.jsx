@@ -36,7 +36,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
         onClick={() => setAbierto(v => !v)}
         disabled={disabled}
         title="Exportación programada"
-        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-xl border border-zinc-200 dark:border-white/10 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/10 hover:text-zinc-800 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-white/10 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"
       >
         <i className={`fa-solid ${activa ? 'fa-clock text-brand-primary dark:text-brand-accent' : 'fa-clock'}`}></i>
         <span className="hidden lg:inline">Programar</span>
@@ -50,18 +50,18 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
       {abierto && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setAbierto(false)}></div>
-          <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl p-3 animate-pop">
-            <p className="px-1 pb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-1.5">
+          <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-xl p-3 animate-pop">
+            <p className="px-1 pb-2 text-[10px] font-bold uppercase tracking-widest text-content-3 flex items-center gap-1.5">
               <i className="fa-solid fa-calendar-clock"></i> Exportación programada
             </p>
 
             {/* Frecuencia */}
-            <label className="block px-1 pt-1 pb-1 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Frecuencia</label>
+            <label className="block px-1 pt-1 pb-1 text-[11px] font-semibold text-content-3 dark:text-content-3">Frecuencia</label>
             <div className="relative">
               <select
                 value={cfg.frecuencia}
                 onChange={(e) => cambiar({ frecuencia: e.target.value })}
-                className="w-full h-9 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 px-2.5 pr-8 text-xs font-semibold text-zinc-800 dark:text-zinc-100 outline-none focus:border-brand-primary"
+                className="w-full h-9 rounded-control border border-line dark:border-white/10 bg-surface-1 dark:bg-surface-1/5 px-2.5 pr-8 text-xs font-semibold text-content-1 dark:text-zinc-100 outline-none focus:border-brand-primary"
               >
                 {FRECUENCIAS.map(f => (
                   <option key={f.id} value={f.id}>{f.label}</option>
@@ -70,16 +70,16 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
             </div>
 
             {/* Formato */}
-            <label className="block px-1 pt-3 pb-1 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">Formato</label>
+            <label className="block px-1 pt-3 pb-1 text-[11px] font-semibold text-content-3 dark:text-content-3">Formato</label>
             <div className="grid grid-cols-2 gap-1.5 px-1">
               {FORMATOS.map(f => (
                 <button
                   key={f.id}
                   onClick={() => cambiar({ formato: f.id })}
-                  className={`h-9 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                  className={`h-9 rounded-control text-xs font-bold border transition-all cursor-pointer ${
                     cfg.formato === f.id
                       ? 'bg-brand-primary text-white border-brand-primary shadow-xs'
-                      : 'bg-zinc-50 dark:bg-white/5 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-white/10 hover:bg-zinc-100'
+                      : 'bg-surface-2 dark:bg-surface-1/5 text-content-2 dark:text-content-3 border-line dark:border-white/10 hover:bg-surface-3'
                   }`}
                 >
                   <i className={`fa-solid ${f.icon} mr-1 text-[10px]`}></i> {f.label}
@@ -87,14 +87,14 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
               ))}
             </div>
 
-            <p className="px-1 pt-2.5 pb-1 text-[10px] text-zinc-400 dark:text-zinc-500 leading-relaxed">
+            <p className="px-1 pt-2.5 pb-1 text-[10px] text-content-3 dark:text-content-3 leading-relaxed">
               {activa
                 ? `Se genera ${String(etiquetaFrecuencia || '').toLowerCase()} al abrir el sistema y queda listo para descargar.`
                 : 'La programación está desactivada. Usá “Generar ahora” para una exportación puntual.'}
             </p>
 
             {cfg.ultimaEjecucion > 0 && (
-              <p className="px-1 pb-1 text-[10px] text-zinc-400 dark:text-zinc-500">
+              <p className="px-1 pb-1 text-[10px] text-content-3 dark:text-content-3">
                 Última: {new Date(cfg.ultimaEjecucion).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}
               </p>
             )}
@@ -103,31 +103,31 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
             <button
               onClick={() => { setAbierto(false); onEjecutarAhora && onEjecutarAhora(); }}
               disabled={disabled}
-              className="w-full mt-2 h-9 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-bold hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="w-full mt-2 h-9 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-xs font-bold hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               <i className="fa-solid fa-download text-[10px]"></i> Generar ahora
             </button>
 
             {/* Pendientes */}
             {pendientes.length > 0 && (
-              <div className="mt-3 pt-2.5 border-t border-zinc-100 dark:border-white/10">
-                <p className="px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+              <div className="mt-3 pt-2.5 border-t border-line dark:border-white/10">
+                <p className="px-1 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-content-3">
                   Pendientes ({pendientes.length})
                 </p>
                 <div className="flex flex-col gap-1 max-h-40 overflow-y-auto hide-scrollbar">
                   {pendientes.map(p => (
-                    <div key={p.nombre} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-white/5">
+                    <div key={p.nombre} className="flex items-center gap-1.5 px-1.5 py-1.5 rounded-lg bg-surface-2 dark:bg-surface-1/5">
                       <i className={`fa-solid ${p.formato === 'xlsx' ? 'fa-file-excel text-emerald-500' : 'fa-file-csv text-sky-500'} text-[11px] shrink-0`}></i>
-                      <span className="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300 truncate flex-1" title={p.nombre}>{p.nombre}</span>
+                      <span className="text-[10px] font-semibold text-content-2 dark:text-content-3 truncate flex-1" title={p.nombre}>{p.nombre}</span>
                       <button
                         onClick={async () => { await descargarPendiente(p.nombre); refrescar(); }}
-                        title="Descargar" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-white dark:hover:bg-white/10 text-zinc-500 dark:text-zinc-400 cursor-pointer transition-colors"
+                        title="Descargar" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-surface-1 dark:hover:bg-surface-1/10 text-content-3 dark:text-content-3 cursor-pointer transition-colors"
                       >
                         <i className="fa-solid fa-download text-[9px]"></i>
                       </button>
                       <button
                         onClick={async () => { await descartarPendiente(p.nombre); refresharSafe(refrescar); }}
-                        title="Descartar" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-white dark:hover:bg-white/10 text-zinc-400 cursor-pointer transition-colors"
+                        title="Descartar" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md hover:bg-surface-1 dark:hover:bg-surface-1/10 text-content-3 cursor-pointer transition-colors"
                       >
                         <i className="fa-solid fa-xmark text-[9px]"></i>
                       </button>

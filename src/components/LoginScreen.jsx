@@ -61,14 +61,14 @@ export default function LoginScreen({
       {/* Contenido centrado, estilo Google */}
       <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
         <div className="w-full max-w-sm login-card-in">
-          <div className={`bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-2xl p-8 sm:p-10 relative flex flex-col ${loginError ? 'animate-shake' : ''}`} style={{ backgroundColor: cardColor, color: textMain }}>
+          <div className={`bg-surface-1 dark:bg-zinc-900 rounded-panel border border-line dark:border-zinc-800 shadow-2xl p-8 sm:p-10 relative flex flex-col ${loginError ? 'animate-shake' : ''}`} style={{ backgroundColor: cardColor, color: textMain }}>
 
             {/* Logo institucional */}
             <div className="flex items-center gap-2 mb-2">
               {appLogo ? (
                 <img src={appLogo} alt="Logo UNP" className="h-9 w-9 object-contain" />
               ) : (
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
+                <div className="flex h-9 w-9 items-center justify-center rounded-control bg-brand-primary/10 border border-brand-primary/20 text-brand-primary">
                   <i className="fa-solid fa-university text-base"></i>
                 </div>
               )}
@@ -84,7 +84,7 @@ export default function LoginScreen({
 
             <form onSubmit={handleLogin} className="w-full space-y-6">
               {loginError && (
-                <div id="login-error" role="alert" className="rounded-xl bg-rose-50 dark:bg-rose-900/30 p-4 text-sm text-rose-700 dark:text-rose-300 font-medium flex items-center gap-3 border border-rose-100 dark:border-rose-800/50 animate-slide-up shadow-sm" style={{ color: loginError ? (darkMode ? '#fb7185' : '#dc2626') : 'inherit' }}>
+                <div id="login-error" role="alert" className="rounded-control bg-rose-50 dark:bg-rose-900/30 p-4 text-sm text-rose-700 dark:text-rose-300 font-medium flex items-center gap-3 border border-rose-100 dark:border-rose-800/50 animate-slide-up shadow-sm" style={{ color: loginError ? (darkMode ? '#fb7185' : '#dc2626') : 'inherit' }}>
                   <i className="fa-solid fa-circle-exclamation text-base text-rose-500 shrink-0" aria-hidden="true"></i>
                   <span>Credenciales inválidas. Verifique su usuario y contraseña.</span>
                 </div>
@@ -106,7 +106,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border pl-10 pr-4 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border pl-10 pr-4 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -144,7 +144,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border pl-10 pr-10 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border pl-10 pr-10 py-3.5 text-sm font-medium focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all disabled:opacity-60 outline-none"
                     style={{
                       backgroundColor: inputColor,
                       borderColor: borderColor,
@@ -174,7 +174,7 @@ export default function LoginScreen({
                 type="submit"
                 disabled={isProcessing}
                 aria-busy={isProcessing || undefined}
-                className="w-full rounded-xl bg-brand-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none transition-all cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                className="w-full rounded-control bg-brand-primary px-4 py-3.5 text-sm font-bold text-white hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus:outline-none transition-all cursor-pointer shadow-lg shadow-brand-primary/20 hover:shadow-brand-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
               >
                 {isProcessing ? (
                   <>
@@ -197,13 +197,13 @@ export default function LoginScreen({
       {/* TOASTS FLOTANTES */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2 pointer-events-none">
         {toasts?.map(t => (
-          <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-xl text-xs font-bold bg-white text-zinc-900 dark:bg-darkbg-card dark:text-white border border-zinc-200 dark:border-darkbg-border transition-all animate-slide-up login-rise login-rise-2">
+          <div key={t.id} className="pointer-events-auto flex items-center gap-3 px-5 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-bold bg-surface-1 text-content-1 dark:bg-surface-1 dark:text-white border border-line dark:border-line transition-all animate-slide-up login-rise login-rise-2">
             <i className={`fa-solid ${t.type === 'success' ? 'fa-circle-check text-emerald-500' : t.type === 'error' ? 'fa-circle-exclamation text-rose-500' : t.type === 'warning' ? 'fa-triangle-exclamation text-amber-500' : 'fa-circle-info text-brand-primary'} text-base`}></i>
             <span className="flex-1">{t.message}</span>
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-darkbg-hover dark:text-zinc-900 dark:hover:bg-white transition-all cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-darkbg-hover dark:text-content-1 dark:hover:bg-surface-1 transition-all cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>
@@ -215,21 +215,21 @@ export default function LoginScreen({
       {/* MODAL DE RECUPERACIÓN / SOPORTE */}
       {showRecoveryModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/70 backdrop-blur-md animate-fade-in">
-          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-darkbg-card p-7 shadow-2xl border border-zinc-100 dark:border-darkbg-border text-center animate-slide-up">
-            <div className="h-14 w-14 rounded-2xl bg-blue-500/10 text-brand-primary dark:text-brand-accent border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
+          <div className="w-full max-w-sm rounded-panel bg-surface-1 dark:bg-surface-1 p-7 shadow-2xl border border-line dark:border-line text-center animate-slide-up">
+            <div className="h-14 w-14 rounded-card bg-blue-500/10 text-brand-primary dark:text-brand-accent border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
               <i className="fa-solid fa-headset text-xl"></i>
             </div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Recuperación de Acceso</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-300 font-medium mt-2 leading-relaxed">
+            <h3 className="text-lg font-bold text-content-1 dark:text-white tracking-tight">Recuperación de Acceso</h3>
+            <p className="text-sm text-content-2 dark:text-content-3 font-medium mt-2 leading-relaxed">
               Por políticas de seguridad patrimonial de la UNP, el restablecimiento de contraseñas es gestionado por el Desarrollador del sistema.
             </p>
-            <div className="mt-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-darkbg-border text-[11px] font-bold text-zinc-700 dark:text-zinc-300">
+            <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-zinc-800/50 border border-line dark:border-line text-[11px] font-bold text-content-1 dark:text-content-3">
               <i className="fa-solid fa-envelope mr-2 text-brand-primary dark:text-blue-400"></i>
               Contacto: patrimonio@unp.edu.py
             </div>
             <button
               onClick={() => setShowRecoveryModal(false)}
-              className="mt-6 w-full py-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 text-sm font-bold transition-all cursor-pointer shadow-md active:scale-[0.98]"
+              className="mt-6 w-full py-4 rounded-control bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-surface-1 dark:text-content-1 dark:hover:bg-surface-3 text-sm font-bold transition-all cursor-pointer shadow-md active:scale-[0.98]"
             >
               Entendido
             </button>

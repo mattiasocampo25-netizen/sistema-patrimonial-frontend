@@ -161,7 +161,7 @@ export function useAuditoria({
     const a = String(accion || '').toUpperCase();
     if (a.includes('BAJA') || a.includes('ELIMINA')) return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
     if (a.includes('CREA') || a.includes('ALTA')) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-    if (a.includes('MODIF')) return 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 border-zinc-500/20';
+    if (a.includes('MODIF')) return 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20';
     if (a.includes('MUESTREO') || a.includes('CONCILIA')) return 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20';
     return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
   };
@@ -219,7 +219,7 @@ export function useAuditoria({
       { id: 'dupfunc', label: 'Posibles duplicados en padrón', count: duplicadosFunc.length, detalle: duplicadosFunc.slice(0, 20), icon: 'fa-user-group', box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20', esPadron: true },
       { id: 'fc10', label: 'FC-10 sin bien asociado', count: fc10List.filter(fc => fc.bienId && !idsBienes.has(fc.bienId)).length, detalle: [], icon: 'fa-file-signature', box: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
       { id: 'fc11', label: 'FC-11 sin bien asociado', count: fc11List.filter(fc => fc.bienId && !idsBienes.has(fc.bienId)).length, detalle: [], icon: 'fa-truck-fast', box: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
-      { id: 'sindep', label: 'Bienes sin dependencia', count: bienes.filter(b => !String(b.dependencia || '').trim()).length, detalle: [], icon: 'fa-building-columns', box: 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-300 border-zinc-500/20' },
+      { id: 'sindep', label: 'Bienes sin dependencia', count: bienes.filter(b => !String(b.dependencia || '').trim()).length, detalle: [], icon: 'fa-building-columns', box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20' },
       { id: 'sinfecha', label: 'Bienes sin fecha de adquisición', count: bienes.filter(b => !String(b.fechaAdquisicion || '').trim()).length, detalle: [], icon: 'fa-calendar-xmark', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
     ];
   }, [bienes, fc10List, fc11List]);

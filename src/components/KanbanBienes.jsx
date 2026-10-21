@@ -22,7 +22,7 @@ const COLUMNAS = [
   { estado: 'Regular',    icon: 'fa-circle-half-stroke', chip: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25' },
   { estado: 'Malo',       icon: 'fa-circle-exclamation', chip: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/25' },
   { estado: 'Inutilizable', icon: 'fa-ban',          chip: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/25' },
-  { estado: 'De Baja',    icon: 'fa-trash-can',      chip: 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/25' }
+  { estado: 'De Baja',    icon: 'fa-trash-can',      chip: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/25' }
 ];
 
 // Agrupa los bienes por estado. Se compara normalizado (sin tildes ni
@@ -60,11 +60,11 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2 px-1">
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">
           Arrastra un bien a otra columna para cambiar su estado
         </span>
         <span className="flex-1" />
-        <span className="text-[11px] font-semibold text-zinc-400 dark:text-zinc-500 tabular-nums">
+        <span className="text-[11px] font-semibold text-content-3 dark:text-content-3 tabular-nums">
           {(bienes || []).length} bien(es)
         </span>
       </div>
@@ -79,18 +79,18 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
               onDragOver={(e) => { e.preventDefault(); setColActiva(col.estado); }}
               onDragLeave={() => setColActiva((a) => (a === col.estado ? null : a))}
               onDrop={() => alSoltar(col.estado)}
-              className={`flex flex-col rounded-2xl border p-2.5 min-h-[140px] transition-all duration-200 ${
+              className={`flex flex-col rounded-card border p-2.5 min-h-[140px] transition-all duration-200 ${
                 resaltada
                   ? 'border-brand-primary bg-brand-primary/[0.06] shadow-md'
-                  : 'border-zinc-200/70 dark:border-white/10 bg-white dark:bg-white/[0.03]'
+                  : 'border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1/[0.03]'
               }`}
             >
-              <div className="flex items-center gap-2 px-1 pb-2.5 mb-2 border-b border-zinc-100 dark:border-white/5">
+              <div className="flex items-center gap-2 px-1 pb-2.5 mb-2 border-b border-line dark:border-white/5">
                 <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border ${col.chip}`}>
                   <i className={`fa-solid ${col.icon} text-[10px]`}></i>
                 </span>
-                <span className="text-xs font-black text-zinc-700 dark:text-zinc-200 truncate">{col.estado}</span>
-                <span className="ml-auto text-[11px] font-bold tabular-nums text-zinc-400 dark:text-zinc-500">{lista.length}</span>
+                <span className="text-xs font-black text-content-1 dark:text-zinc-200 truncate">{col.estado}</span>
+                <span className="ml-auto text-[11px] font-bold tabular-nums text-content-3 dark:text-content-3">{lista.length}</span>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -100,7 +100,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                     draggable={Boolean(onMover)}
                     onDragStart={() => setDragId(b.id)}
                     onDragEnd={() => { setDragId(null); setColActiva(null); }}
-                    className={`group rounded-xl border border-zinc-200/70 dark:border-white/10 bg-white dark:bg-zinc-900/60 p-2.5 shadow-xs transition-all ${dragId === b.id ? 'opacity-40' : 'hover:border-brand-primary/40 hover:shadow-sm card-lift'}`}
+                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs transition-all ${dragId === b.id ? 'opacity-40' : 'hover:border-brand-primary/40 hover:shadow-sm card-lift'}`}
                   >
                     <div className="flex items-start gap-2">
                       {onOpenFicha && (
@@ -109,24 +109,24 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                           title={`Ver ficha 360 de ${b.rotulo || 'el bien'}`}
                           className="flex-1 min-w-0 text-left cursor-pointer"
                         >
-                          <span className="font-mono font-semibold text-[10px] text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/10 px-1.5 py-0.5 rounded-md inline-block">
+                          <span className="font-mono font-semibold text-[10px] text-content-1 dark:text-white bg-surface-3 dark:bg-surface-1/10 px-1.5 py-0.5 rounded-md inline-block">
                             {b.rotulo || 'S/R'}
                           </span>
-                          <p className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-200 leading-snug line-clamp-2 mt-1">
+                          <p className="text-[11px] font-semibold text-content-1 dark:text-zinc-200 leading-snug line-clamp-2 mt-1">
                             {b.descripcion || 'Sin descripción'}
                           </p>
                         </button>
                       )}
                     </div>
 
-                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 truncate mt-1.5">
+                    <p className="text-[10px] text-content-3 dark:text-content-3 truncate mt-1.5">
                       <i className="fa-solid fa-location-dot text-rose-400 text-[9px] mr-1"></i>
                       {b.ubicacion || 'Sin ubicación'}
                     </p>
 
                     {/* Selector compacto: la alternativa al arrastre en táctil y teclado. */}
                     {onMover && (
-                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-zinc-100 dark:border-white/5">
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-line dark:border-white/5">
                         <label className="sr-only" htmlFor={`kb-est-${b.id}`}>Estado de {b.rotulo || 'bien'}</label>
                         <select
                           id={`kb-est-${b.id}`}
@@ -134,7 +134,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                           onChange={(e) => onMover(b, e.target.value)}
                           disabled={!isAdmin}
                           title={isAdmin ? 'Cambiar estado' : 'Solo el administrador puede cambiar el estado'}
-                          className="flex-1 min-w-0 h-7 rounded-lg border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 px-1.5 text-[10px] font-bold text-zinc-700 dark:text-zinc-200 outline-none focus:border-brand-primary disabled:opacity-60"
+                          className="flex-1 min-w-0 h-7 rounded-lg border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 px-1.5 text-[10px] font-bold text-content-1 dark:text-zinc-200 outline-none focus:border-brand-primary disabled:opacity-60"
                         >
                           {ESTADOS_CONSERVACION.map(e => (
                             <option key={e} value={e}>{e}</option>
@@ -146,7 +146,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                 ))}
 
                 {lista.length === 0 && (
-                  <p className="text-[10px] font-semibold text-zinc-300 dark:text-zinc-600 text-center py-4">Vacío</p>
+                  <p className="text-[10px] font-semibold text-content-3 dark:text-content-2 text-center py-4">Vacío</p>
                 )}
               </div>
             </div>

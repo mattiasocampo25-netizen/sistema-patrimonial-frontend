@@ -78,14 +78,14 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
         <div className="flex items-center gap-2">
           <button
             onClick={onEscanearOtro}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer"
           >
             <i className="fa-solid fa-qrcode text-[11px]"></i> Escanear otro QR
           </button>
           <button
             onClick={onSalir}
             title="Salir del modo kiosco"
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-control bg-surface-1/10 hover:bg-surface-1/20 text-white transition-all cursor-pointer"
           >
             <i className="fa-solid fa-xmark text-xs"></i>
           </button>
@@ -115,7 +115,7 @@ export function BotonPantallaCompleta({ onCambio }) {
     <button
       onClick={toggle}
       title={activo ? 'Salir de pantalla completa' : 'Pantalla completa'}
-      className="inline-flex items-center gap-2 h-9 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-slate-200 bg-surface-1 text-slate-600 text-[11px] font-bold hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
     >
       <i className={`fa-solid ${activo ? 'fa-compress' : 'fa-expand'} text-[10px]`}></i>
       <span className="hidden sm:inline">{activo ? 'Reducir' : 'Pantalla completa'}</span>

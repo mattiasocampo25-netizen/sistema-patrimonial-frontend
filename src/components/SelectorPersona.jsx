@@ -75,23 +75,23 @@ export default function SelectorPersona({
         aria-haspopup="listbox"
         aria-expanded={abierto}
         aria-required={requerido || undefined}
-        className={`w-full ${altura} rounded-xl border bg-white dark:bg-zinc-900 px-4 text-left font-medium outline-none transition-all focus:ring-2 flex items-center gap-2 cursor-pointer ${
-          requerido && !valor ? 'border-rose-300 dark:border-rose-800' : 'border-zinc-200 dark:border-white/10'
-        } focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-zinc-900/5 dark:focus:ring-white/10 hover:border-zinc-300 dark:hover:border-white/20`}
+        className={`w-full ${altura} rounded-control border bg-surface-1 dark:bg-zinc-900 px-4 text-left font-medium outline-none transition-all focus:ring-2 flex items-center gap-2 cursor-pointer ${
+          requerido && !valor ? 'border-rose-300 dark:border-rose-800' : 'border-line dark:border-white/10'
+        } focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-zinc-900/5 dark:focus:ring-white/10 hover:border-line-strong dark:hover:border-white/20`}
       >
-        <span className={`flex-1 min-w-0 truncate ${!etiqueta ? 'text-zinc-400 dark:text-zinc-500' : 'text-zinc-700 dark:text-zinc-300'}`}>
+        <span className={`flex-1 min-w-0 truncate ${!etiqueta ? 'text-content-3 dark:text-content-3' : 'text-content-1 dark:text-content-3'}`}>
           {etiqueta || placeholder}
         </span>
-        <i className={`fa-solid fa-chevron-down text-[10px] text-zinc-400 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
+        <i className={`fa-solid fa-chevron-down text-[10px] text-content-3 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
 
       {/* Campo invisible para que FormData siga leyendo el valor real. */}
       <input type="hidden" value={valor || ''} readOnly />
 
       {abierto && (
-        <div className="absolute left-0 w-auto min-w-[260px] z-[60] mt-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
-          <div className="relative border-b border-zinc-100 dark:border-white/10">
-            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+        <div className="absolute left-0 w-auto min-w-[260px] z-[60] mt-1.5 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
+          <div className="relative border-b border-line dark:border-white/10">
+            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
             <input
               autoFocus={autoFocus}
               type="text"
@@ -106,7 +106,7 @@ export default function SelectorPersona({
                 }
               }}
               placeholder="Escribe el nombre para buscar..."
-              className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400"
+              className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-content-1 dark:text-white placeholder:text-content-3"
             />
           </div>
           <div className="max-h-60 overflow-y-auto custom-scrollbar py-1">
@@ -121,10 +121,10 @@ export default function SelectorPersona({
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <i className="fa-solid fa-user text-[9px] text-zinc-400 shrink-0"></i>
-                  <span className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-200 truncate">{f.nombre}</span>
-                  {f.cargo && <span className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">· {f.cargo}</span>}
-                  {f.doc && <span className="text-[10px] text-zinc-400 dark:text-zinc-500 shrink-0 tabular-nums">CI {f.doc}</span>}
+                  <i className="fa-solid fa-user text-[9px] text-content-3 shrink-0"></i>
+                  <span className="text-[13px] font-semibold text-content-1 dark:text-zinc-200 truncate">{f.nombre}</span>
+                  {f.cargo && <span className="text-[11px] text-content-3 dark:text-content-3 truncate">· {f.cargo}</span>}
+                  {f.doc && <span className="text-[10px] text-content-3 dark:text-content-3 shrink-0 tabular-nums">CI {f.doc}</span>}
                 </span>
               </button>
             ))}
@@ -132,14 +132,14 @@ export default function SelectorPersona({
               <button
                 type="button"
                 onClick={() => seleccionar({ nombre: texto.trim(), doc: '', cargo: '' })}
-                className="w-full px-3.5 py-2 text-left text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 transition-colors cursor-pointer"
+                className="w-full px-3.5 py-2 text-left text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 transition-colors cursor-pointer"
               >
                 <i className="fa-solid fa-plus text-[10px] mr-1.5"></i>
                 Usar "{texto.trim()}" (no está en el padrón)
               </button>
             )}
             {lista.length === 0 && !allowLibre && (
-              <p className="px-3.5 py-3 text-xs font-semibold text-zinc-400 text-center">Sin coincidencias.</p>
+              <p className="px-3.5 py-3 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
             )}
           </div>
         </div>

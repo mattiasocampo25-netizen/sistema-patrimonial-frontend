@@ -116,25 +116,25 @@ export default function DependenciasModal({
           else { setSelId(d.id); setSelDetectada(null); }
         }}
         title={d.nombre}
-        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
+        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${
           activo || activoDet
-            ? 'bg-brand-light dark:bg-brand-primary/10 border border-brand-primary/30 border-l-4 border-brand-primary text-zinc-900 dark:text-white shadow-sm'
-            : 'hover:bg-zinc-100 dark:hover:bg-white/5 text-zinc-800 dark:text-zinc-100 border border-transparent'
+            ? 'bg-brand-light dark:bg-brand-primary/10 border border-brand-primary/30 border-l-4 border-brand-primary text-content-1 dark:text-white shadow-sm'
+            : 'hover:bg-surface-3 dark:hover:bg-surface-1/5 text-content-1 dark:text-zinc-100 border border-transparent'
         }`}
       >
         <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-brand-primary ring-1 ring-brand-primary/50' : 'bg-zinc-400 dark:bg-zinc-600 ring-1 ring-zinc-900/10')}`}></span>
         <span className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-900 dark:text-white'}`} title={d.nombre}>
+            <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-amber-700 dark:text-amber-400' : 'text-content-1 dark:text-white'}`} title={d.nombre}>
               {d.nombre}
             </span>
             {d.codigo && (
-              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-300 whitespace-nowrap">
+              <span className="flex-shrink-0 font-mono text-[10px] font-bold text-content-3 dark:text-content-3 whitespace-nowrap">
                 {d.codigo}
               </span>
             )}
           </div>
-          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'text-zinc-600 dark:text-zinc-300 font-medium' : 'text-zinc-500 dark:text-zinc-400'}`}>
+          <span className={`block text-[10px] tabular-nums mt-0.5 ${(activo || activoDet) ? 'text-content-2 dark:text-content-3 font-medium' : 'text-content-3 dark:text-content-3'}`}>
             {detectada ? `${d.bienes + d.funcionarios} registros por fusionar` : `${(conteos[d.nombre]?.bienes || 0)} bienes · ${(conteos[d.nombre]?.funcionarios || 0)} func.`}
           </span>
         </span>
@@ -145,26 +145,26 @@ export default function DependenciasModal({
   return (
     <div className={STYLES.modalOverlay} onClick={onClose}>
       <div className={STYLES.modalContent + " max-w-5xl !max-h-[90dvh]"} onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-zinc-100 dark:border-darkbg-border shrink-0">
+        <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-line dark:border-line shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
               <i className="fa-solid fa-building-columns text-base"></i>
             </div>
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight truncate">Dependencias y departamentos</h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 hidden sm:block">Elige a la izquierda · gestiona a la derecha</p>
+              <h2 className="text-lg font-bold text-content-1 dark:text-white tracking-tight truncate">Dependencias y departamentos</h2>
+              <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 hidden sm:block">Elige a la izquierda · gestiona a la derecha</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <div className="relative hidden md:block">
-              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
               <input
                 type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Buscar dependencia, departamento o funcionario..."
-                className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 w-64"
+                className="rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 w-64"
               />
             </div>
-            <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+            <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
               <i className="fa-solid fa-xmark text-base"></i>
             </button>
           </div>
@@ -172,19 +172,19 @@ export default function DependenciasModal({
 
         <div className="md:hidden px-6 pt-4 shrink-0">
           <div className="relative">
-            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
             <input
               type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar..."
-              className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
+              className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
             />
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Panel izquierdo: lista de dependencias */}
-          <div className="md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-zinc-100 dark:border-darkbg-border p-3 space-y-1 overflow-y-auto custom-scrollbar max-h-48 md:max-h-none">
-            <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">
+          <div className="md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-line dark:border-line p-3 space-y-1 overflow-y-auto custom-scrollbar max-h-48 md:max-h-none">
+            <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">
               Oficiales ({depsFiltradas.length})
             </div>
             {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
@@ -197,7 +197,7 @@ export default function DependenciasModal({
               </>
             )}
             {(depsFiltradas.length + detFiltradas.length) === 0 && (
-              <p className="p-4 text-center text-xs font-semibold text-zinc-400">Sin coincidencias.</p>
+              <p className="p-4 text-center text-xs font-semibold text-content-3">Sin coincidencias.</p>
             )}
             <div className="px-3 pb-6 pt-3 space-y-2">
               <div className="flex items-center gap-1.5">
@@ -205,23 +205,23 @@ export default function DependenciasModal({
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   placeholder="Nueva dependencia..."
-                  className="flex-1 min-w-[110px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-3 h-9 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-500 outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
+                  className="flex-1 min-w-[110px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-zinc-950 px-3 h-9 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 dark:placeholder:text-content-3 outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
                 />
                 <input
                   type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
                   placeholder="Código"
-                  className="min-w-[56px] max-w-[92px] rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold text-center text-zinc-900 dark:text-white outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
+                  className="min-w-[56px] max-w-[92px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold text-center text-content-1 dark:text-white outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
                 />
                 <button
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover transition-all active:scale-95"
+                  className="flex h-9 w-9 items-center justify-center rounded-control bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover transition-all active:scale-95"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
-              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 leading-none">Presiona Enter para guardar.</p>
+              <p className="text-[10px] text-content-3 dark:text-content-3 leading-none">Presiona Enter para guardar.</p>
             </div>
           </div>
 
@@ -230,14 +230,14 @@ export default function DependenciasModal({
             {detSel ? (
               <div className="space-y-6">
                 {/* Banner de posible duplicado */}
-                <div className="rounded-2xl border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                <div className="rounded-card border border-amber-200 dark:border-amber-900/30 bg-amber-50 dark:bg-amber-900/10 p-4 flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
                     <i className="fa-solid fa-triangle-exclamation text-sm"></i>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400 mb-1">Nombre detectado en datos (posible duplicado)</p>
-                    <h3 className="text-base font-bold text-zinc-900 dark:text-white">{detSel.nombre}</h3>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 tabular-nums">{detSel.bienes} bienes · {detSel.funcionarios} funcionarios con este nombre</p>
+                    <h3 className="text-base font-bold text-content-1 dark:text-white">{detSel.nombre}</h3>
+                    <p className="text-xs text-content-3 dark:text-content-3 mt-1 tabular-nums">{detSel.bienes} bienes · {detSel.funcionarios} funcionarios con este nombre</p>
                   </div>
                 </div>
 
@@ -253,7 +253,7 @@ export default function DependenciasModal({
                   <button
                     onClick={() => onSave(null, detSel.nombre)}
                     title="Agregar como dependencia oficial"
-                    className="h-10 px-4 rounded-xl text-[13px] font-bold bg-brand-primary text-white hover:bg-brand-hover transition-all cursor-pointer shadow-sm shadow-blue-500/20"
+                    className="h-10 px-4 rounded-control text-[13px] font-bold bg-brand-primary text-white hover:bg-brand-hover transition-all cursor-pointer shadow-sm shadow-blue-500/20"
                   >
                     Agregar como oficial
                   </button>
@@ -272,7 +272,7 @@ export default function DependenciasModal({
                             if (e.key === 'Enter' && editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); }
                             if (e.key === 'Escape') setEditandoDep(false);
                           }}
-                          className="rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-3 h-9 text-sm font-bold outline-none focus:border-brand-primary min-w-0"
+                          className="rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-3 h-9 text-sm font-bold outline-none focus:border-brand-primary min-w-0"
                         />
                         <input
                           type="text" value={editDepCod}
@@ -282,34 +282,34 @@ export default function DependenciasModal({
                             if (e.key === 'Escape') setEditandoDep(false);
                           }}
                           placeholder="Cód."
-                          className="min-w-[56px] rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
+                          className="min-w-[56px] rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand-primary text-center"
                         />
-                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
+                        <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-control bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
                           <i className="fa-solid fa-check text-xs"></i>
                         </button>
                       </div>
                     ) : (
-                      <h3 className="text-base font-bold text-zinc-900 dark:text-white tracking-tight text-balance" title={depSel.nombre}>
+                      <h3 className="text-base font-bold text-content-1 dark:text-white tracking-tight text-balance" title={depSel.nombre}>
                         {depSel.nombre}
                         {depSel.codigo && (
-                          <span className="flex-shrink-0 font-mono text-[10px] font-bold text-zinc-400 dark:text-zinc-500 ml-1.5">
+                          <span className="flex-shrink-0 font-mono text-[10px] font-bold text-content-3 dark:text-content-3 ml-1.5">
                             {depSel.codigo}
                           </span>
                         )}
                       </h3>
                     )}
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 tabular-nums">
+                    <p className="text-xs text-content-3 dark:text-content-3 mt-1 tabular-nums">
                       {(conteos[depSel.nombre]?.bienes || 0)} bienes · {(conteos[depSel.nombre]?.funcionarios || 0)} funcionarios · {ubicsDeSel.length} departamentos
                     </p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-xl text-xs font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer">
+                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-control text-xs font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer">
                       <i className="fa-solid fa-users"></i><span className="hidden sm:inline">Padrón</span>
                     </button>
-                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-white dark:hover:bg-white/10 transition-all cursor-pointer">
+                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer">
                       <i className="fa-solid fa-pen text-xs"></i>
                     </button>
-                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer">
+                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer">
                       <i className="fa-solid fa-trash-can text-xs"></i>
                     </button>
                   </div>
@@ -317,20 +317,20 @@ export default function DependenciasModal({
 
                 <div>
                   <div className="flex items-center gap-2 mb-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">Departamentos ({ubicsFiltradas.length})</p>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">Departamentos ({ubicsFiltradas.length})</p>
                   </div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <input
                       type="text" value={nuevaUbic} onChange={(e) => setNuevaUbicacion(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter' && nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
                       placeholder={`Nuevo departamento en ${depSel.nombre}...`}
-                      className="flex-1 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-3 h-10 text-[13px] font-medium outline-none focus:border-brand-primary placeholder:text-zinc-400"
+                      className="flex-1 rounded-control border border-dashed border-line-strong dark:border-zinc-700 bg-transparent px-3 h-10 text-[13px] font-medium outline-none focus:border-brand-primary placeholder:text-content-3"
                     />
                     <button
                       onClick={() => { if (nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
                       disabled={isSaving || !nuevaUbic.trim()}
                       title="Agregar departamento" aria-label="Agregar departamento"
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
+                      className="flex h-10 w-10 items-center justify-center rounded-control bg-brand-primary text-white cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-primary transition-colors"
                     >
                       <i className="fa-solid fa-plus text-xs"></i>
                     </button>
@@ -354,32 +354,32 @@ export default function DependenciasModal({
                       />
                     ))}
                     {ubicsFiltradas.length === 0 && (
-                      <p className="text-xs text-zinc-400 font-medium text-center py-3">Sin departamentos aquí. Agrega el primero arriba.</p>
+                      <p className="text-xs text-content-3 font-medium text-center py-3">Sin departamentos aquí. Agrega el primero arriba.</p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500 mb-2.5">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3 mb-2.5">
                     Funcionarios ({funcsDeSel.length})
                   </p>
                   <div className="relative mb-2.5">
-                    <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+                    <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
                     <input
                       type="text" value={buscaFunc} onChange={(e) => setBuscaFunc(e.target.value)}
                       placeholder="Buscar funcionario por nombre o cédula..."
-                      className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 placeholder:text-zinc-400"
+                      className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 placeholder:text-content-3"
                     />
                   </div>
-                  <div className="max-h-56 overflow-y-auto custom-scrollbar rounded-2xl border border-zinc-200/60 dark:border-white/10 divide-y divide-zinc-100 dark:divide-white/5">
+                  <div className="max-h-56 overflow-y-auto custom-scrollbar rounded-card border border-line/60 dark:border-white/10 divide-y divide-zinc-100 dark:divide-white/5">
                     {funcsFiltrados.slice(0, 60).map(f => (
                       <div key={f.id} className="flex items-center gap-2.5 px-3.5 py-2">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300 font-bold text-xs">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 font-bold text-xs">
                           {(f.nombre || '?').charAt(0).toUpperCase()}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block text-[13px] font-bold text-zinc-800 dark:text-zinc-200 truncate" title={f.nombre}>{f.nombre}</span>
-                          <span className="block text-[11px] text-zinc-400 truncate tabular-nums">CI {f.cedula || 'S/C'}{f.ubicacion ? ` · ${f.ubicacion}` : ' · Sin ubicación'}</span>
+                          <span className="block text-[13px] font-bold text-content-1 dark:text-zinc-200 truncate" title={f.nombre}>{f.nombre}</span>
+                          <span className="block text-[11px] text-content-3 truncate tabular-nums">CI {f.cedula || 'S/C'}{f.ubicacion ? ` · ${f.ubicacion}` : ' · Sin ubicación'}</span>
                         </span>
                         <ComboUbicacion
                           valor={f.ubicacion || ''}
@@ -391,28 +391,28 @@ export default function DependenciasModal({
                       </div>
                     ))}
                     {funcsFiltrados.length > 60 && (
-                      <p className="px-3.5 py-2 text-[11px] font-semibold text-zinc-400 text-center">
+                      <p className="px-3.5 py-2 text-[11px] font-semibold text-content-3 text-center">
                         Mostrando 60 de {funcsFiltrados.length}. Afina la búsqueda para ver más.
                       </p>
                     )}
                     {funcsFiltrados.length === 0 && (
-                      <p className="px-3.5 py-4 text-xs font-semibold text-zinc-400 text-center">Sin coincidencias.</p>
+                      <p className="px-3.5 py-4 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
                     )}
                   </div>
                 </div>
               </div>
             ) : (
               <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center p-8">
-                <i className="fa-solid fa-building-columns text-3xl text-zinc-200 dark:text-zinc-700 mb-3"></i>
-                <p className="text-sm font-bold text-zinc-500">Elige una dependencia a la izquierda</p>
-                <p className="text-xs text-zinc-400 mt-1">Verás sus departamentos y funcionarios para gestionarlos.</p>
+                <i className="fa-solid fa-building-columns text-3xl text-zinc-200 dark:text-content-1 mb-3"></i>
+                <p className="text-sm font-bold text-content-3">Elige una dependencia a la izquierda</p>
+                <p className="text-xs text-content-3 mt-1">Verás sus departamentos y funcionarios para gestionarlos.</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-4 border-t border-zinc-100 dark:border-darkbg-border shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+        <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-line shrink-0">
+          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
             Listo
           </button>
         </div>
@@ -429,7 +429,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
   editando, editNombre, onEditNombre, onEmpezarEditar, onTerminarEditar
 }) {
   return (
-    <div className="rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200/70 dark:border-white/10 px-3.5 py-2.5">
+    <div className="rounded-card bg-surface-2 dark:bg-surface-1/[0.03] border border-line/70 dark:border-white/10 px-3.5 py-2.5">
       <div className="flex items-center gap-2">
         {editando ? (
           <>
@@ -440,7 +440,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
                 if (e.key === 'Enter' && editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); }
                 if (e.key === 'Escape') onTerminarEditar();
               }}
-              className="flex-1 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 h-8 text-xs font-medium outline-none focus:border-brand-primary"
+              className="flex-1 rounded-lg border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 h-8 text-xs font-medium outline-none focus:border-brand-primary"
             />
             <button onClick={() => { if (editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); } }} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary text-white cursor-pointer shrink-0 transition-colors">
               <i className="fa-solid fa-check text-[10px]"></i>
@@ -448,12 +448,12 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
           </>
         ) : (
           <>
-            <span className="flex-1 min-w-0 text-[13px] font-bold text-zinc-800 dark:text-zinc-200 leading-snug text-balance" title={u.nombre}>{u.nombre}</span>
-            <span className="text-[10px] tabular-nums text-zinc-400 shrink-0">{asignados.length} func.</span>
-            <button onClick={onEmpezarEditar} title="Renombrar" aria-label="Renombrar" className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-900 hover:bg-zinc-200/70 dark:hover:text-white dark:hover:bg-white/10 cursor-pointer shrink-0">
+            <span className="flex-1 min-w-0 text-[13px] font-bold text-content-1 dark:text-zinc-200 leading-snug text-balance" title={u.nombre}>{u.nombre}</span>
+            <span className="text-[10px] tabular-nums text-content-3 shrink-0">{asignados.length} func.</span>
+            <button onClick={onEmpezarEditar} title="Renombrar" aria-label="Renombrar" className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3/70 dark:hover:text-white dark:hover:bg-surface-1/10 cursor-pointer shrink-0">
               <i className="fa-solid fa-pen text-[10px]"></i>
             </button>
-            <button onClick={() => onEliminarUbicacion(u.id, u.nombre)} title="Eliminar" aria-label="Eliminar" className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 cursor-pointer shrink-0">
+            <button onClick={() => onEliminarUbicacion(u.id, u.nombre)} title="Eliminar" aria-label="Eliminar" className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 cursor-pointer shrink-0">
               <i className="fa-solid fa-trash-can text-[10px]"></i>
             </button>
           </>
@@ -462,9 +462,9 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
       {asignados.length > 0 && (
         <div className="flex flex-wrap gap-1 mt-1.5">
           {asignados.map(f => (
-            <span key={f.id} className="inline-flex items-center gap-1 rounded-lg bg-white dark:bg-white/10 border border-zinc-200/70 dark:border-white/10 px-2 py-0.5 text-[10px] font-bold text-zinc-600 dark:text-zinc-300" title={`${f.nombre} · CI ${f.cedula || 'S/C'}`}>
+            <span key={f.id} className="inline-flex items-center gap-1 rounded-lg bg-surface-1 dark:bg-surface-1/10 border border-line/70 dark:border-white/10 px-2 py-0.5 text-[10px] font-bold text-content-2 dark:text-content-3" title={`${f.nombre} · CI ${f.cedula || 'S/C'}`}>
               <span className="max-w-[180px] truncate">{f.nombre}</span>
-              <button onClick={() => onAsignarFuncionario(f.id, '')} title={`Quitar a ${f.nombre} de ${u.nombre}`} className="text-zinc-400 hover:text-rose-500 cursor-pointer shrink-0">
+              <button onClick={() => onAsignarFuncionario(f.id, '')} title={`Quitar a ${f.nombre} de ${u.nombre}`} className="text-content-3 hover:text-rose-500 cursor-pointer shrink-0">
                 <i className="fa-solid fa-xmark text-[9px]"></i>
               </button>
             </span>
@@ -508,15 +508,15 @@ function ComboFuncionarios({ candidatos, excluirUbicacion, onElegir, titulo }) {
         <button
           onClick={() => { setTexto(''); setAbierto(true); }}
           title={titulo}
-          className="w-full h-8 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent px-2 text-[11px] font-semibold text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 hover:border-zinc-400 text-left outline-none cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-primary"
+          className="w-full h-8 rounded-lg border border-dashed border-line-strong dark:border-zinc-700 bg-transparent px-2 text-[11px] font-semibold text-content-3 hover:text-content-2 dark:hover:text-zinc-200 hover:border-zinc-400 text-left outline-none cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-brand-primary"
         >
           <i className="fa-solid fa-plus mr-1.5 text-[9px]"></i>
           Asignar funcionario ({candidatos.filter(f => normalizeStr(f.ubicacion || '') !== normExcluir).length} disponibles)...
         </button>
       ) : (
-        <div className="rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-950 overflow-hidden">
+        <div className="rounded-lg border border-line-strong dark:border-zinc-600 bg-surface-1 dark:bg-zinc-950 overflow-hidden">
           <div className="relative">
-            <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 text-[10px] pointer-events-none"></i>
+            <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-content-3 text-[10px] pointer-events-none"></i>
             <input
               autoFocus
               type="text" value={texto} onChange={(e) => setTexto(e.target.value)}
@@ -525,10 +525,10 @@ function ComboFuncionarios({ candidatos, excluirUbicacion, onElegir, titulo }) {
                 if (e.key === 'Enter' && lista.length > 0) { onElegir(lista[0].id); setAbierto(false); }
               }}
               placeholder="Escribe para buscar por nombre o cédula..."
-              className="w-full h-8 pl-8 pr-2 text-[11px] font-semibold outline-none bg-transparent text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 placeholder:font-normal"
+              className="w-full h-8 pl-8 pr-2 text-[11px] font-semibold outline-none bg-transparent text-content-1 dark:text-zinc-200 placeholder:text-content-3 placeholder:font-normal"
             />
           </div>
-          <div className="max-h-44 overflow-y-auto custom-scrollbar border-t border-zinc-100 dark:border-white/10">
+          <div className="max-h-44 overflow-y-auto custom-scrollbar border-t border-line dark:border-white/10">
             {lista.slice(0, 50).map(f => (
               <button
                 key={f.id}
@@ -536,15 +536,15 @@ function ComboFuncionarios({ candidatos, excluirUbicacion, onElegir, titulo }) {
                 title={`${f.nombre} · CI ${f.cedula || 'S/C'}`}
                 className="w-full flex items-center gap-2 px-2.5 py-1.5 text-left hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 transition-colors cursor-pointer"
               >
-                <span className="min-w-0 flex-1 truncate text-[11px] font-bold text-zinc-700 dark:text-zinc-200">{f.nombre}</span>
-                <span className="shrink-0 text-[10px] tabular-nums text-zinc-400">CI {f.cedula || 'S/C'}</span>
+                <span className="min-w-0 flex-1 truncate text-[11px] font-bold text-content-1 dark:text-zinc-200">{f.nombre}</span>
+                <span className="shrink-0 text-[10px] tabular-nums text-content-3">CI {f.cedula || 'S/C'}</span>
               </button>
             ))}
             {lista.length === 0 && (
-              <p className="px-2.5 py-2 text-[11px] font-semibold text-zinc-400">Sin coincidencias.</p>
+              <p className="px-2.5 py-2 text-[11px] font-semibold text-content-3">Sin coincidencias.</p>
             )}
             {lista.length > 50 && (
-              <p className="px-2.5 py-1.5 text-[10px] font-semibold text-zinc-400 border-t border-zinc-100 dark:border-white/10">
+              <p className="px-2.5 py-1.5 text-[10px] font-semibold text-content-3 border-t border-line dark:border-white/10">
                 {lista.length - 50} más… afina la búsqueda.
               </p>
             )}
@@ -580,24 +580,24 @@ function ComboUbicacion({ valor, ubicaciones, onElegir, titulo, compacto }) {
       <button
         onClick={() => { setTexto(''); setAbierto(v => !v); }}
         title={titulo}
-        className="w-full h-8 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 px-2 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 outline-none cursor-pointer flex items-center gap-1.5 hover:border-zinc-300 focus-visible:ring-2 focus-visible:ring-brand-primary"
+        className="w-full h-8 rounded-lg border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 text-[11px] font-semibold text-content-2 dark:text-content-3 outline-none cursor-pointer flex items-center gap-1.5 hover:border-line-strong focus-visible:ring-2 focus-visible:ring-brand-primary"
       >
         <span className="flex-1 min-w-0 truncate text-left">{actual ? actual.nombre : 'Sin ubicación'}</span>
-        <i className="fa-solid fa-chevron-down text-[9px] text-zinc-400 shrink-0"></i>
+        <i className="fa-solid fa-chevron-down text-[9px] text-content-3 shrink-0"></i>
       </button>
       {abierto && (
-        <div className="absolute right-0 z-30 mt-1 w-56 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 shadow-xl overflow-hidden">
+        <div className="absolute right-0 z-30 mt-1 w-56 rounded-control border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 shadow-xl overflow-hidden">
           <input
             autoFocus
             type="text" value={texto} onChange={(e) => setTexto(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Escape') setAbierto(false); }}
             placeholder="Buscar departamento..."
-            className="w-full h-8 px-2.5 text-[11px] font-semibold outline-none bg-transparent text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 placeholder:font-normal"
+            className="w-full h-8 px-2.5 text-[11px] font-semibold outline-none bg-transparent text-content-1 dark:text-zinc-200 placeholder:text-content-3 placeholder:font-normal"
           />
-          <div className="max-h-44 overflow-y-auto custom-scrollbar border-t border-zinc-100 dark:border-white/10">
+          <div className="max-h-44 overflow-y-auto custom-scrollbar border-t border-line dark:border-white/10">
             <button
               onClick={() => { onElegir(''); setAbierto(false); }}
-              className="w-full px-2.5 py-1.5 text-left text-[11px] font-bold text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/10 cursor-pointer"
+              className="w-full px-2.5 py-1.5 text-left text-[11px] font-bold text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 cursor-pointer"
             >
               Sin ubicación
             </button>
@@ -606,13 +606,13 @@ function ComboUbicacion({ valor, ubicaciones, onElegir, titulo, compacto }) {
                 key={u.id}
                 onClick={() => { onElegir(u.nombre); setAbierto(false); }}
                 title={u.nombre}
-                className={`w-full px-2.5 py-1.5 text-left text-[11px] font-bold truncate cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${u.nombre === valor ? 'text-brand-primary dark:text-brand-accent' : 'text-zinc-700 dark:text-zinc-200'}`}
+                className={`w-full px-2.5 py-1.5 text-left text-[11px] font-bold truncate cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${u.nombre === valor ? 'text-brand-primary dark:text-brand-accent' : 'text-content-1 dark:text-zinc-200'}`}
               >
                 {u.nombre}
               </button>
             ))}
             {lista.length === 0 && (
-              <p className="px-2.5 py-2 text-[11px] font-semibold text-zinc-400">Sin coincidencias.</p>
+              <p className="px-2.5 py-2 text-[11px] font-semibold text-content-3">Sin coincidencias.</p>
             )}
           </div>
         </div>

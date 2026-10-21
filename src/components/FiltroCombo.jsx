@@ -131,12 +131,12 @@ export default function FiltroCombo({
         aria-required={required || undefined}
         aria-invalid={error || undefined}
         aria-describedby={error && mensajeErrorId ? mensajeErrorId : undefined}
-        className={`w-full ${alto} rounded-xl border ${error ? 'border-rose-400 dark:border-rose-500' : 'border-zinc-200 dark:border-white/10'} bg-white dark:bg-white/5 px-4 font-medium text-zinc-700 dark:text-zinc-300 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-zinc-300 dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
+        className={`w-full ${alto} rounded-control border ${error ? 'border-rose-400 dark:border-rose-500' : 'border-line dark:border-white/10'} bg-surface-1 dark:bg-surface-1/5 px-4 font-medium text-content-1 dark:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 transition-all focus-visible:ring-2 cursor-pointer hover:border-line-strong dark:hover:border-white/20 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 ${className}`}
       >
-        <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-zinc-400 dark:text-zinc-500' : ''}`} title={etiqueta}>
+        <span className={`flex-1 min-w-0 truncate text-left ${!valorTexto ? 'text-content-3 dark:text-content-3' : ''}`} title={etiqueta}>
           {etiqueta}
         </span>
-        <i className={`fa-solid fa-chevron-down text-[10px] text-zinc-400 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
+        <i className={`fa-solid fa-chevron-down text-[10px] text-content-3 shrink-0 transition-transform ${abierto ? 'rotate-180' : ''}`}></i>
       </button>
       {error && (
         <p id={mensajeErrorId} role="alert" className="mt-1 text-[11px] font-semibold text-rose-600 dark:text-rose-400">
@@ -144,9 +144,9 @@ export default function FiltroCombo({
         </p>
       )}
       {abierto && (
-        <div className="absolute left-0 w-auto min-w-[260px] z-50 mt-1.5 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
-          <div className="relative border-b border-zinc-100 dark:border-white/10">
-            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+        <div className="absolute left-0 w-auto min-w-[260px] z-50 mt-1.5 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
+          <div className="relative border-b border-line dark:border-white/10">
+            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
             <input
               autoFocus
               type="text"
@@ -157,14 +157,14 @@ export default function FiltroCombo({
                 if (e.key === 'Enter' && lista.length > 0) elegir(lista[0].value);
               }}
               placeholder="Escribe para buscar..."
-              className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-zinc-900 dark:text-white placeholder:text-zinc-400 placeholder:font-normal"
+              className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal"
             />
           </div>
           <div className="max-h-56 overflow-y-auto custom-scrollbar py-1">
             <button
               type="button"
               onClick={() => elegir('')}
-              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${!valorActual ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-zinc-500 dark:text-zinc-400'}`}
+              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${!valorActual ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-content-3 dark:text-content-3'}`}
               title={etiquetaTodos}
             >
               <span className="block truncate">{etiquetaTodos}</span>
@@ -175,21 +175,21 @@ export default function FiltroCombo({
                 type="button"
                 onClick={() => elegir(o.value)}
                 title={o.label}
-                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-zinc-700 dark:text-zinc-200'}`}
+                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand-primary/10 dark:hover:bg-brand-primary/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-primary dark:text-brand-accent' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
               >
                 <span className="block truncate" title={o.label}>{o.label}</span>
               </button>
             ))}
             {lista.length > 0 && (
-              <div className="px-3.5 py-1 text-[10px] font-semibold text-zinc-400 text-center border-t border-zinc-100 dark:border-white/10">
+              <div className="px-3.5 py-1 text-[10px] font-semibold text-content-3 text-center border-t border-line dark:border-white/10">
                 Pulse sobre una opción para seleccionarla
               </div>
             )}
             {lista.length === 0 && (
-              <p className="px-3.5 py-3 text-xs font-semibold text-zinc-400 text-center">Sin coincidencias.</p>
+              <p className="px-3.5 py-3 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
             )}
             {total > 100 && (
-              <p className="px-3.5 py-1.5 text-[10px] font-semibold text-zinc-400 border-t border-zinc-100 dark:border-white/10">
+              <p className="px-3.5 py-1.5 text-[10px] font-semibold text-content-3 border-t border-line dark:border-white/10">
                 {total - 100} más… afina la búsqueda.
               </p>
             )}

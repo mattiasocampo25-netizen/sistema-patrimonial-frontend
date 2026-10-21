@@ -188,7 +188,7 @@ export default function InventarioView({
       <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
         <button 
           onClick={handleDownloadTemplateCSV} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Descargar Plantilla CSV"
         >
           <i className="fa-solid fa-file-excel text-emerald-600"></i>
@@ -197,7 +197,7 @@ export default function InventarioView({
   
         <button 
           onClick={() => fileInputRef.current?.click()} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Importar archivo CSV"
         >
           <i className="fa-solid fa-file-import text-emerald-600"></i>
@@ -206,7 +206,7 @@ export default function InventarioView({
   
         <button 
           onClick={handleExportInventarioCSV} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Exportar archivo CSV"
         >
           <i className="fa-solid fa-file-export text-sky-600"></i>
@@ -215,7 +215,7 @@ export default function InventarioView({
   
         <button 
           onClick={handleExportInventarioExcel} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Exportar Excel real (.xlsx)"
         >
           <i className="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
@@ -225,17 +225,17 @@ export default function InventarioView({
         {ultimaExportacion && (
           <button 
             onClick={onRepetirExport} 
-            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
             title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}
           >
-            <i className="fa-solid fa-rotate-right text-zinc-500"></i>
+            <i className="fa-solid fa-rotate-right text-content-3"></i>
             <span>{t('inv.repetir')}</span>
           </button>
         )}
   
         <button 
           onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Generar Lote Masivo de QRs"
         >
           <i className="fa-solid fa-qrcode text-indigo-600 dark:text-indigo-400"></i>
@@ -245,18 +245,18 @@ export default function InventarioView({
   
         <button 
           onClick={openFC03Modal} 
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           title="Generar Reporte FC-03"
         >
           <i className="fa-solid fa-print text-amber-600"></i>
           <span>FC-03</span>
         </button>
   
-        <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-800 mx-1 hidden sm:block shrink-0"></div>
+        <div className="h-5 w-px bg-surface-3 dark:bg-zinc-800 mx-1 hidden sm:block shrink-0"></div>
   
         <button 
           onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} 
-          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
         >
           <i className="fa-solid fa-plus text-xs"></i>
           <span className="whitespace-nowrap">{t('inv.anadir')}</span>
@@ -268,11 +268,11 @@ export default function InventarioView({
   </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
-  <div className="bg-white dark:bg-zinc-900/40 p-4 sm:p-5 rounded-3xl border border-zinc-200/70 dark:border-zinc-700/30 shadow-sm space-y-4">
+  <div className="bg-surface-1 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-panel border border-line/70 dark:border-zinc-700/30 shadow-sm space-y-4">
 
     {/* Campo de Búsqueda Principal */}
     <div className="relative w-full">
-      <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-sm pointer-events-none"></i>
+      <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input 
         type="text"
         ref={searchRef}
@@ -284,26 +284,26 @@ export default function InventarioView({
         onFocus={() => setShowHistorial(true)}
         onBlur={() => setTimeout(() => setShowHistorial(false), 150)}
         onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) { guardarReciente(searchTerm); setShowHistorial(false); } }}
-        className="w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 pl-11 pr-11 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-zinc-900 dark:focus:border-zinc-500 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 outline-none transition-all"
+        className="w-full rounded-card border border-line dark:border-zinc-800 bg-surface-1 dark:bg-zinc-900 py-3 pl-11 pr-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-zinc-900 dark:focus:border-zinc-500 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 outline-none transition-all"
       />
       {showHistorial && !searchTerm && recientes.length > 0 && (
-        <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">
-          <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400">Búsquedas recientes</p>
+        <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">
+          <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-content-3">Búsquedas recientes</p>
           {recientes.map(r => (
             <button
               key={r} type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => { setSearchTerm(r); setSearchInput(r); setCurrentPage(1); setShowHistorial(false); }}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-left hover:bg-surface-2 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
             >
-              <i className="fa-solid fa-clock-rotate-left text-[10px] text-zinc-400 shrink-0"></i>
-              <span className="text-[13px] font-semibold text-zinc-700 dark:text-zinc-200 truncate">{r}</span>
+              <i className="fa-solid fa-clock-rotate-left text-[10px] text-content-3 shrink-0"></i>
+              <span className="text-[13px] font-semibold text-content-1 dark:text-zinc-200 truncate">{r}</span>
             </button>
           ))}
           <button
             type="button" onMouseDown={(e) => e.preventDefault()}
             onClick={() => { setRecientes([]); try { localStorage.removeItem('inv_recientes'); } catch {} }}
-            className="w-full px-4 py-1.5 text-left text-[11px] font-bold text-zinc-400 hover:text-rose-500 transition-colors cursor-pointer"
+            className="w-full px-4 py-1.5 text-left text-[11px] font-bold text-content-3 hover:text-rose-500 transition-colors cursor-pointer"
           >
             Borrar historial
           </button>
@@ -313,7 +313,7 @@ export default function InventarioView({
         <button
           onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); }}
           title="Limpiar búsqueda" aria-label="Limpiar búsqueda"
-          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800/20 text-zinc-500 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800/30 transition-all cursor-pointer"
+          className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-3 dark:bg-zinc-800/20 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/30 transition-all cursor-pointer"
         >
           <i className="fa-solid fa-xmark text-xs"></i>
         </button>
@@ -401,13 +401,13 @@ export default function InventarioView({
     <div className="flex flex-wrap items-center gap-2 pt-1">
       {vistasGuardadas.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 mr-auto">
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 dark:text-zinc-500">Vistas:</span>
+          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">Vistas:</span>
           {vistasGuardadas.map(v => (
-            <span key={v.nombre} className="inline-flex items-center gap-1 pl-3 pr-1.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800/20 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700/30">
-              <button onClick={() => aplicarVista(v)} title={`Aplicar vista "${v.nombre}"`} className="hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">
+            <span key={v.nombre} className="inline-flex items-center gap-1 pl-3 pr-1.5 py-1 rounded-full text-xs font-semibold bg-surface-3 dark:bg-zinc-800/20 text-content-2 dark:text-content-3 border border-line dark:border-zinc-700/30">
+              <button onClick={() => aplicarVista(v)} title={`Aplicar vista "${v.nombre}"`} className="hover:text-content-1 dark:hover:text-white transition-colors cursor-pointer">
                 {v.nombre}
               </button>
-              <button onClick={() => eliminarVista(v.nombre)} title="Eliminar vista" aria-label="Eliminar vista" className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-800/30 text-zinc-400 transition-colors cursor-pointer">
+              <button onClick={() => eliminarVista(v.nombre)} title="Eliminar vista" aria-label="Eliminar vista" className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-surface-3 dark:hover:bg-zinc-800/30 text-content-3 transition-colors cursor-pointer">
                 <i className="fa-solid fa-xmark text-[9px]"></i>
               </button>
             </span>
@@ -418,7 +418,7 @@ export default function InventarioView({
         {hasFilters && !mostrarGuardarVista && (
           <button
             onClick={() => setMostrarGuardarVista(true)}
-            className="text-xs font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="text-xs font-semibold text-content-3 hover:text-content-1 dark:text-content-3 dark:hover:text-zinc-200 flex items-center gap-1.5 transition-colors cursor-pointer"
             title="Guardar los filtros actuales como vista"
           >
             <i className="fa-solid fa-bookmark text-xs"></i> Guardar vista
@@ -433,9 +433,9 @@ export default function InventarioView({
               onKeyDown={(e) => { if (e.key === 'Enter') guardarVistaActual(); if (e.key === 'Escape') setMostrarGuardarVista(false); }}
               placeholder="Nombre de la vista..."
               autoFocus
-              className="h-8 w-40 rounded-xl border border-zinc-200 dark:border-zinc-700/30 bg-white dark:bg-zinc-800/50 px-3 text-xs font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 outline-none focus:border-zinc-900 dark:focus:border-zinc-400"
+              className="h-8 w-40 rounded-control border border-line dark:border-zinc-700/30 bg-surface-1 dark:bg-zinc-800/50 px-3 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400"
             />
-            <button onClick={guardarVistaActual} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-xl bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 cursor-pointer">
+            <button onClick={guardarVistaActual} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-control bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 cursor-pointer">
               <i className="fa-solid fa-check text-[11px]"></i>
             </button>
           </span>
@@ -458,14 +458,14 @@ export default function InventarioView({
     <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
           {chips.length === 0 && (
-            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-300 dark:text-zinc-600">Sin filtros</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-2">Sin filtros</span>
           )}
           {chips.map(c => (
             <button
               key={c.id}
               onClick={c.limpiar}
               title={'Quitar filtro: ' + c.label}
-              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none animate-pop"
+              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none animate-pop"
             >
               <span className="max-w-[220px] truncate">{c.label}</span>
               <i className="fa-solid fa-xmark text-[10px]"></i>
@@ -473,22 +473,22 @@ export default function InventarioView({
           ))}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="hidden md:flex items-center rounded-xl border border-zinc-200 dark:border-zinc-700/30 overflow-hidden" title="Vista de resultados">
+          <div className="hidden md:flex items-center rounded-control border border-line dark:border-zinc-700/30 overflow-hidden" title="Vista de resultados">
             <button
               onClick={() => cambiarVistaInv('tabla')} title="Vista tabla" aria-label="Vista tabla"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tabla' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20'}`}
+              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tabla' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
             >
               <i className="fa-solid fa-table-list text-xs"></i>
             </button>
             <button
               onClick={() => cambiarVistaInv('tarjetas')} title="Vista tarjetas" aria-label="Vista tarjetas"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tarjetas' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20'}`}
+              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tarjetas' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
             >
               <i className="fa-solid fa-grip text-xs"></i>
             </button>
             <button
               onClick={() => cambiarVistaInv('kanban')} title="Vista tablero (Kanban por estado)" aria-label="Vista tablero Kanban"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'kanban' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20'}`}
+              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'kanban' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
             >
               <i className="fa-solid fa-table-columns text-xs"></i>
             </button>
@@ -497,7 +497,7 @@ export default function InventarioView({
             <button
               onClick={onCopiarLink}
               title="Copiar un link con estos filtros aplicados"
-              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700/30 text-[11px] font-bold text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 hover:text-zinc-800 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
+              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-zinc-700/30 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
             >
               <i className="fa-solid fa-link text-[10px]"></i>
               <span className="hidden sm:inline">Copiar link</span>
@@ -508,7 +508,7 @@ export default function InventarioView({
             {[['rotulo', 'Rótulo'], ['valor', 'Valor'], ['fecha', 'Fecha']].map(([campo, label]) => (
               <button
                 key={campo} onClick={() => ciclarOrden(campo)} title={`Ordenar por ${label}`}
-                className={`inline-flex items-center gap-1.5 h-9 px-2.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${orden?.campo === campo ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20'}`}
+                className={`inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control text-[11px] font-bold transition-all cursor-pointer ${orden?.campo === campo ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
               >
                 {label} <i className={`fa-solid ${flechaOrden(campo)} text-[9px]`}></i>
               </button>
@@ -525,7 +525,7 @@ export default function InventarioView({
           <button
             onClick={cambiarDensidad}
             title={compacto ? 'Vista cómoda' : 'Vista compacta'}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700/30 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+            className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
           >
             <i className={'fa-solid text-xs ' + (compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right')}></i>
           </button>
@@ -533,21 +533,21 @@ export default function InventarioView({
             <button
               onClick={() => setMenuCols(v => !v)}
               title="Columnas visibles" aria-label="Columnas visibles"
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-700/30 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+              className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
             >
               <i className="fa-solid fa-table-columns text-xs"></i>
             </button>
             {menuCols && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuCols(false)}></div>
-                <div className="absolute right-0 z-50 mt-1.5 w-48 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl p-1.5 animate-pop">
+                <div className="absolute right-0 z-50 mt-1.5 w-48 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-xl p-1.5 animate-pop">
                   {[['fecha', 'Fecha de compra'], ['cuenta', 'Cuenta'], ['qr', 'Estado / QR']].map(([k, label]) => (
                     <button
                       key={k}
                       onClick={() => alternarCol(k)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer"
                     >
-                      <span className={'flex h-4 w-4 items-center justify-center rounded border ' + (cols[k] ? 'bg-brand-primary border-brand-primary text-white' : 'border-zinc-300 dark:border-zinc-600 text-transparent')}>
+                      <span className={'flex h-4 w-4 items-center justify-center rounded border ' + (cols[k] ? 'bg-brand-primary border-brand-primary text-white' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
                         <i className="fa-solid fa-check text-[9px]"></i>
                       </span>
                       {label}
@@ -561,21 +561,21 @@ export default function InventarioView({
       </div>
                     {/* Barra de acciones en lote */}
                     {seleccionados.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 rounded-2xl bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 shadow-md animate-pop">
+                      <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 rounded-card bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 shadow-md animate-pop">
                         <span className="text-[13px] font-bold tabular-nums">
                           {seleccionados.length} seleccionado{seleccionados.length === 1 ? '' : 's'}{selFueraPagina > 0 ? ` (${selFueraPagina} en otras páginas)` : ''}
                         </span>
                         <span className="flex-1"></span>
-                        <button onClick={() => onQRLoteSeleccion && onQRLoteSeleccion()} title="Generar ZIP de etiquetas de la selección" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-xs font-bold bg-white/15 dark:bg-zinc-900/10 hover:bg-white/25 dark:hover:bg-zinc-900/20 transition-all cursor-pointer">
+                        <button onClick={() => onQRLoteSeleccion && onQRLoteSeleccion()} title="Generar ZIP de etiquetas de la selección" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-zinc-900/10 hover:bg-surface-1/25 dark:hover:bg-zinc-900/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-qrcode text-[11px]"></i> QRs
                         </button>
-                        <button onClick={() => setComparando(true)} disabled={seleccionados.length < 2 || seleccionados.length > 3} title="Comparar 2 o 3 bienes lado a lado" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-xs font-bold bg-white/15 dark:bg-zinc-900/10 hover:bg-white/25 dark:hover:bg-zinc-900/20 transition-all cursor-pointer disabled:opacity-40">
+                        <button onClick={() => setComparando(true)} disabled={seleccionados.length < 2 || seleccionados.length > 3} title="Comparar 2 o 3 bienes lado a lado" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-zinc-900/10 hover:bg-surface-1/25 dark:hover:bg-zinc-900/20 transition-all cursor-pointer disabled:opacity-40">
                           <i className="fa-solid fa-columns-compare text-[11px]"></i> Comparar
                         </button>
-                        <button onClick={() => setConfirmaBajaMasiva(true)} title={isAdmin ? 'Dar de baja la selección' : 'Solicitar baja de la selección'} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-xs font-bold bg-rose-500/90 hover:bg-rose-500 text-white transition-all cursor-pointer">
+                        <button onClick={() => setConfirmaBajaMasiva(true)} title={isAdmin ? 'Dar de baja la selección' : 'Solicitar baja de la selección'} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-rose-500/90 hover:bg-rose-500 text-white transition-all cursor-pointer">
                           <i className="fa-solid fa-trash-can text-[11px]"></i> Baja
                         </button>
-                        <button onClick={limpiarSeleccion} title="Limpiar selección" aria-label="Limpiar selección" className="flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white/15 dark:hover:bg-zinc-900/10 transition-all cursor-pointer">
+                        <button onClick={limpiarSeleccion} title="Limpiar selección" aria-label="Limpiar selección" className="flex h-9 w-9 items-center justify-center rounded-control hover:bg-surface-1/15 dark:hover:bg-zinc-900/10 transition-all cursor-pointer">
                           <i className="fa-solid fa-xmark text-xs"></i>
                         </button>
                       </div>
@@ -586,26 +586,26 @@ export default function InventarioView({
                        alarmaba al usuario mientras los datos aún no llegaban. */
                     <SkeletonLoader />
                   ) : (
-                  <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200/70 dark:border-zinc-700/30 rounded-3xl shadow-sm overflow-hidden" data-tour="inv-table">
+                  <div className="bg-surface-1 dark:bg-zinc-900/40 border border-line/70 dark:border-zinc-700/30 rounded-panel shadow-sm overflow-hidden" data-tour="inv-table">
                     {vistaInv === 'tarjetas' ? (
                     <div className="p-4 sm:p-5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                         {itemsPaginados.map((item) => (
-                          <div key={item.id} className={`relative rounded-2xl border p-4 shadow-xs card-lift bg-white dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand-primary/50' : 'border-zinc-200/70 dark:border-zinc-700/30'}`}>
+                          <div key={item.id} className={`relative rounded-card border p-4 shadow-xs card-lift bg-surface-1 dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand-primary/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
-                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-zinc-300 text-brand-primary cursor-pointer" />
+                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer" />
                               <div className="min-w-0 flex-1">
-                                <span className="font-mono font-semibold text-xs text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
-                                <p className="font-semibold text-zinc-900 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{item.descripcion}</p>
-                                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 truncate"><i className="fa-solid fa-user-check text-emerald-500 text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
-                                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate"><i className="fa-solid fa-location-dot text-rose-500 text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
+                                <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
+                                <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{item.descripcion}</p>
+                                <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-emerald-500 text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
+                                <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-rose-500 text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-700/50">
-                              <button onClick={() => openFichaBien(item)} title="Ficha 360" aria-label="Ficha 360" className="flex h-9 w-9 items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all cursor-pointer"><i className="fa-solid fa-timeline text-xs"></i></button>
-                              <button onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} title="QR" aria-label="QR" className="flex h-9 w-9 items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all cursor-pointer"><i className="fa-solid fa-qrcode text-xs"></i></button>
-                              <button onClick={() => openFC10Modal(item)} title="Asignación FC-10" aria-label="Asignación FC-10" className="flex h-9 w-9 items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all cursor-pointer"><i className="fa-solid fa-file-signature text-xs"></i></button>
-                              <button onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} title="Editar" aria-label="Editar" className="flex h-9 w-9 items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all cursor-pointer"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-line dark:border-zinc-700/50">
+                              <button onClick={() => openFichaBien(item)} title="Ficha 360" aria-label="Ficha 360" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-timeline text-xs"></i></button>
+                              <button onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} title="QR" aria-label="QR" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-qrcode text-xs"></i></button>
+                              <button onClick={() => openFC10Modal(item)} title="Asignación FC-10" aria-label="Asignación FC-10" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-file-signature text-xs"></i></button>
+                              <button onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} title="Editar" aria-label="Editar" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                             </div>
                           </div>
                         ))}
@@ -626,7 +626,7 @@ export default function InventarioView({
                     </div>
                     ) : vistaInv === 'kanban' ? (
                     /* Kanban: una columna por estado, arrastrar para reclasificar */
-                    <div className="p-4 sm:p-5 bg-zinc-50/50 dark:bg-black/10">
+                    <div className="p-4 sm:p-5 bg-surface-2/50 dark:bg-black/10">
                       {filteredBienes.length === 0 ? (
                         <EmptyState
                           icon={hasFilters ? 'fa-filter-circle-xmark' : 'fa-boxes-packing'}
@@ -650,18 +650,18 @@ export default function InventarioView({
                     <div className="overflow-x-auto custom-scrollbar">
                       <table className="anim-rows w-full text-left border-collapse min-w-[900px]">
 
-                                                  <thead className="bg-zinc-50/50 dark:bg-zinc-900/50 border-b border-zinc-200/50 dark:border-zinc-800/50">
-                          <tr className="text-[10px] sm:text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+                                                  <thead className="bg-surface-2/50 dark:bg-zinc-900/50 border-b border-line/50 dark:border-zinc-800/50">
+                          <tr className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
                             <th className="py-4 pl-4 sm:pl-5 pr-1 w-[40px] align-middle">
                               <input
                                 type="checkbox" title="Seleccionar página" aria-label="Seleccionar página"
                                 checked={itemsPaginados.length > 0 && itemsPaginados.every(i => seleccionados.includes(i.id))}
                                 onChange={(e) => { if (e.target.checked) { itemsPaginados.forEach(i => { if (!seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } else { itemsPaginados.forEach(i => { if (seleccionados.includes(i.id)) toggleSeleccion(i.id); }); } }}
-                                className="h-4 w-4 rounded border-zinc-300 text-brand-primary cursor-pointer align-middle"
+                                className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle"
                               />
                             </th>
                             <th className="py-4 pr-4 w-[38%]">
-                              <button onClick={() => ciclarOrden('rotulo')} title="Ordenar por rótulo" className="inline-flex items-center gap-1.5 uppercase tracking-widest hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer">
+                              <button onClick={() => ciclarOrden('rotulo')} title="Ordenar por rótulo" className="inline-flex items-center gap-1.5 uppercase tracking-widest hover:text-content-1 dark:hover:text-white transition-colors cursor-pointer">
                                 Identificación y Descripción <i className={`fa-solid ${flechaOrden('rotulo')} text-[9px]`}></i>
                               </button>
                             </th>
@@ -684,35 +684,35 @@ export default function InventarioView({
                             };
 
                             return (
-                              <tr key={item.id} className={`hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
+                              <tr key={item.id} className={`hover:bg-surface-2/50 dark:hover:bg-zinc-800/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
 
                                 {/* Selección */}
                                 <td className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
-                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-zinc-300 text-brand-primary cursor-pointer align-middle" />
+                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-primary cursor-pointer align-middle" />
                                 </td>
                                 {/* Columna 1: Identificación */}
                                 <td className={`pr-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex items-start gap-3.5">
-                                    <div className={`shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 text-xs ${compacto ? 'hidden' : 'mt-1 flex h-10 w-10'}`}>
+                                    <div className={`shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-zinc-800/50 text-content-2 dark:text-content-3 text-xs ${compacto ? 'hidden' : 'mt-1 flex h-10 w-10'}`}>
                                       <i className="fa-solid fa-tag text-sm"></i>
                                     </div>
                                     <div className="space-y-1">
                                       <div className="flex items-center gap-2">
-                                        <span className="font-mono font-semibold text-xs text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">
+                                        <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-zinc-800/20 px-2 py-0.5 rounded-lg">
                                           {item.rotulo || 'S/R'}
                                         </span>
                                         {cols.fecha && item.fechaAdquisicion && (
-                                          <span className="text-[10px] font-bold text-zinc-400 flex items-center gap-1">
+                                          <span className="text-[10px] font-bold text-content-3 flex items-center gap-1">
                                             <i className="fa-regular fa-calendar text-[9px]"></i>
                                             {item.fechaAdquisicion}
                                           </span>
                                         )}
                                       </div>
-                                      <p className={`font-semibold text-zinc-900 dark:text-white text-sm leading-snug ${compacto ? 'line-clamp-1' : 'line-clamp-2'}`} >
+                                      <p className={`font-semibold text-content-1 dark:text-white text-sm leading-snug ${compacto ? 'line-clamp-1' : 'line-clamp-2'}`} >
                                         {item.descripcion}
                                       </p>
                                       {cols.cuenta && item.cuenta && (
-                                        <span className="inline-block text-[10px] font-medium text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-lg">
+                                        <span className="inline-block text-[10px] font-medium text-content-3 bg-surface-3 dark:bg-zinc-800/50 px-2 py-0.5 rounded-lg">
                                           #{item.cuenta}
                                         </span>
                                       )}
@@ -723,11 +723,11 @@ export default function InventarioView({
                                 {/* Columna 2: Localización y Custodio */}
                                 <td className={`px-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="space-y-1.5">
-                                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-emerald-500 text-xs shrink-0"></i>
                                       <span className="truncate">{item.funcionario || 'Sin asignación'}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                                    <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
                                       <i className="fa-solid fa-location-dot text-rose-500 text-xs shrink-0"></i>
                                       <span className="truncate">{item.ubicacion || 'Sin ubicación'}</span>
                                     </div>
@@ -736,7 +736,7 @@ export default function InventarioView({
                                       const fechaAsig = fc10 ? (fc10.entregadoFecha || fc10.fechaGeneracion) : null;
                                       if (!fechaAsig) return null;
                                       return (
-                                        <div className="flex items-center gap-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400" title={`Asignado por FC-10 el ${formatDateText(fechaAsig)}`}>
+                                        <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3" title={`Asignado por FC-10 el ${formatDateText(fechaAsig)}`}>
                                           <i className="fa-solid fa-file-signature text-brand-primary dark:text-brand-accent text-xs shrink-0"></i>
                                           <span className="truncate tabular-nums">Asignado: {formatDateText(fechaAsig)}</span>
                                         </div>
@@ -748,7 +748,7 @@ export default function InventarioView({
                                 {/* Columna 3: Condición y QR (Botón interactivo) */}
                                 <td className={`px-4 align-middle ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className={`inline-flex items-center justify-center px-2.5 py-1 min-w-[76px] text-center rounded-xl text-[11px] font-bold border uppercase tracking-wider ${getCondicionBadge(item.estadoConservacion)}`}>
+                                    <span className={`inline-flex items-center justify-center px-2.5 py-1 min-w-[76px] text-center rounded-control text-[11px] font-bold border uppercase tracking-wider ${getCondicionBadge(item.estadoConservacion)}`}>
                                       {item.estadoConservacion || 'Regular'}
                                     </span>
 
@@ -756,10 +756,10 @@ export default function InventarioView({
                                       type="button"
                                       onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }}
                                       title={item.hasQR ? "Ver / Descargar Código QR" : "Generar Código QR"}
-                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 min-w-[76px] rounded-xl text-[11px] font-semibold border transition-all cursor-pointer active:scale-95 ${
+                                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 min-w-[76px] rounded-control text-[11px] font-semibold border transition-all cursor-pointer active:scale-95 ${
                                         item.hasQR 
                                           ? 'bg-zinc-900 text-white dark:bg-zinc-900 dark:text-zinc-100 border-zinc-900 dark:border-white shadow-xs hover:opacity-85' 
-                                          : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700/30 hover:border-zinc-400'
+                                          : 'bg-surface-3 dark:bg-zinc-800/50 text-content-3 dark:text-content-3 border-line dark:border-zinc-700/30 hover:border-zinc-400'
                                       }`}
                                     >
                                       <i className="fa-solid fa-qrcode text-[10px]"></i>
@@ -775,7 +775,7 @@ export default function InventarioView({
                                     {/* Ficha 360 y trazabilidad */}
                                     <button
                                       onClick={() => openFichaBien(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all active:scale-90 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
+                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all active:scale-90 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
                                       title="Ficha 360 y trazabilidad" aria-label="Ficha 360 y trazabilidad"
                                     >
                                       <i className="fa-solid fa-timeline text-xs"></i>
@@ -784,7 +784,7 @@ export default function InventarioView({
                                     {/* Generar QR */}
                                     <button 
                                       onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }}
-                                      className="h-9 w-9 flex items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Generar Código QR" aria-label="Generar Código QR"
                                     >
                                       <i className="fa-solid fa-qrcode text-xs"></i>
@@ -793,7 +793,7 @@ export default function InventarioView({
                                     {/* Asignar FC-10 */}
                                     <button 
                                       onClick={() => openFC10Modal(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Asignación FC-10" aria-label="Asignación FC-10"
                                     >
                                       <i className="fa-solid fa-file-signature text-xs"></i>
@@ -802,7 +802,7 @@ export default function InventarioView({
                                     {/* Traslado FC-11 */}
                                     <button 
                                       onClick={() => openFC11Modal(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Traslado FC-11" aria-label="Traslado FC-11"
                                     >
                                       <i className="fa-solid fa-truck-fast text-xs"></i>
@@ -811,7 +811,7 @@ export default function InventarioView({
                                     {/* Editar Bien */}
                                     <button 
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
-                                      className="h-9 w-9 flex items-center justify-center text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 hover:bg-zinc-200 dark:hover:bg-zinc-800/20 rounded-xl transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-zinc-800/50 hover:bg-surface-3 dark:hover:bg-zinc-800/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Editar Bien" aria-label="Editar Bien"
                                     >
                                       <i className="fa-solid fa-pen-to-square text-xs"></i>
@@ -826,7 +826,7 @@ export default function InventarioView({
                                           setItemToDelete({ type: 'requestBaja', id: item.id, item });
                                         }
                                       }}
-                                      className="h-9 w-9 flex items-center justify-center text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-xl transition-all active:scale-90 cursor-pointer"
+                                      className="h-9 w-9 flex items-center justify-center text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-control transition-all active:scale-90 cursor-pointer"
                                       title="Eliminar o Solicitar Baja" aria-label="Eliminar o Solicitar Baja"
                                     >
                                       <i className="fa-solid fa-trash-can text-xs"></i>
@@ -874,21 +874,21 @@ export default function InventarioView({
       )}
       {confirmaBajaMasiva && (
         <div className={STYLES.modalOverlay} onClick={() => setConfirmaBajaMasiva(false)}>
-          <div className={STYLES.modalContent + ' max-w-[380px] !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-zinc-200/80 dark:border-darkbg-border animate-slide-up'} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Confirmar baja masiva">
-            <div className="p-8 text-center bg-white dark:bg-darkbg-card">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-2xl mb-6 bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+          <div className={STYLES.modalContent + ' max-w-[380px] !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line animate-slide-up'} onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Confirmar baja masiva">
+            <div className="p-8 text-center bg-surface-1 dark:bg-surface-1">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-card mb-6 bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
                 <i className="fa-solid fa-trash-can text-xl"></i>
               </div>
-              <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white mb-3">
+              <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-3">
                 {isAdmin ? `¿Dar de baja ${seleccionados.length} bienes?` : `¿Solicitar baja de ${seleccionados.length} bienes?`}
               </h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">
+              <p className="text-xs text-content-3 dark:text-content-3 font-medium leading-relaxed">
                 {isAdmin ? 'Pasarán a estado "De Baja" y quedará registro en auditoría.' : 'Se enviarán como solicitudes al administrador para su revisión.'}
               </p>
             </div>
-            <div className="flex items-center gap-3 p-6 bg-zinc-50 dark:bg-darkbg-main border-t border-zinc-100 dark:border-darkbg-border">
-              <button onClick={() => setConfirmaBajaMasiva(false)} className="flex-1 h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer">Cancelar</button>
-              <button onClick={() => { setConfirmaBajaMasiva(false); if (onBajaMasiva) onBajaMasiva(seleccionados); }} className="flex-1 h-10 px-5 rounded-xl text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer">Confirmar</button>
+            <div className="flex items-center gap-3 p-6 bg-surface-2 dark:bg-surface-2 border-t border-line dark:border-line">
+              <button onClick={() => setConfirmaBajaMasiva(false)} className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-1 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer">Cancelar</button>
+              <button onClick={() => { setConfirmaBajaMasiva(false); if (onBajaMasiva) onBajaMasiva(seleccionados); }} className="flex-1 h-10 px-5 rounded-control text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer">Confirmar</button>
             </div>
           </div>
         </div>

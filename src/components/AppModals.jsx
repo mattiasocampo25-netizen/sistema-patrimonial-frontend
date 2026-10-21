@@ -247,26 +247,26 @@ export default function AppModals({
     />
           {isFC03ModalOpen && (
             <div className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md overflow-hidden border border-zinc-200/80 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 animate-slide-up"}>
+              <div className={STYLES.modalContent + " max-w-md overflow-hidden border border-line/80 dark:border-zinc-800 shadow-2xl bg-surface-1 dark:bg-zinc-900 animate-slide-up"}>
                 {/* CABECERA LIMPIA */}
-                <div className="relative px-6 sm:px-8 py-6 border-b border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900 shrink-0 z-10 flex justify-between items-center">
+                <div className="relative px-6 sm:px-8 py-6 border-b border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
                        <i className="fa-solid fa-file-pdf text-lg"></i>
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Generar Inventario FC-03</h2>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Configura los parámetros del reporte</p>
+                      <h2 className="text-lg font-bold text-content-1 dark:text-white tracking-tight">Generar Inventario FC-03</h2>
+                      <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Configura los parámetros del reporte</p>
                     </div>
                   </div>
-                  <button onClick={() => setIsFC03ModalOpen(false)} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-white/10 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
+                  <button onClick={() => setIsFC03ModalOpen(false)} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:bg-surface-1/10 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">
                      <i className="fa-solid fa-xmark"></i>
                   </button>
                 </div>
                 {/* CUERPO DEL MODAL */}
-                <div className="p-8 space-y-6 pb-24 bg-white dark:bg-zinc-900">
+                <div className="p-8 space-y-6 pb-24 bg-surface-1 dark:bg-zinc-900">
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Tipo de Reporte</label>
+                        <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Tipo de Reporte</label>
                         <FiltroCombo
                             valor={fc03Config.tipoFiltro}
                             opciones={[
@@ -285,7 +285,7 @@ export default function AppModals({
                     </div>               
                     {fc03Config.tipoFiltro === 'ubicacion' && (
                         <div className="space-y-2 animate-fade-in">
-                            <label className="block text-[11px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Seleccionar Ubicación</label>
+                            <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Seleccionar Ubicación</label>
                             <FiltroCombo
                                 valor={fc03Config.filtroValor}
                                 opciones={ubicacionesUnicas}
@@ -305,7 +305,7 @@ export default function AppModals({
                         return (
                             <div className="space-y-2 animate-fade-in relative">
                                 <div className="flex items-center justify-between">
-                                    <label className="block text-[11px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                                    <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">
                                         Buscar Funcionario Responsable
                                     </label>
                                     {fc03Config.filtroValor && (
@@ -316,7 +316,7 @@ export default function AppModals({
                                 </div>
 
                                 <div className="relative">
-                                    <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-xs text-zinc-400 pointer-events-none"></i>
+                                    <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-xs text-content-3 pointer-events-none"></i>
                                     <input 
                                         type="text"
                                         value={fc03FuncionarioTexto}
@@ -330,7 +330,7 @@ export default function AppModals({
                                         }}
                                         onFocus={() => setShowFC03FuncDropdown(true)}
                                         placeholder="Escriba Marta Ocampo, apellido o CI..."
-                                        className="block w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950 pl-10 pr-10 py-3.5 text-sm font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 placeholder:font-normal focus:bg-white dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner"
+                                        className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 pl-10 pr-10 py-3.5 text-sm font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner"
                                     />
                                     {fc03FuncionarioTexto && (
                                         <button
@@ -340,7 +340,7 @@ export default function AppModals({
                                                 setFc03Config(prev => ({ ...prev, filtroValor: '' }));
                                                 setShowFC03FuncDropdown(true);
                                             }}
-                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1"
+                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-content-3 hover:text-content-2 dark:hover:text-zinc-200 p-1"
                                         >
                                             <i className="fa-solid fa-xmark text-xs"></i>
                                         </button>
@@ -354,9 +354,9 @@ export default function AppModals({
                                             className="fixed inset-0 z-40" 
                                             onClick={() => setShowFC03FuncDropdown(false)} 
                                         />
-                                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/60 custom-scrollbar">
+                                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/60 custom-scrollbar">
                                             {listadoFiltrado.length === 0 ? (
-                                                <div className="p-4 text-center text-xs font-semibold text-zinc-400">
+                                                <div className="p-4 text-center text-xs font-semibold text-content-3">
                                                     No se encontraron funcionarios coincidentes
                                                 </div>
                                             ) : (
@@ -374,12 +374,12 @@ export default function AppModals({
                                                             className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${
                                                                 isSelected 
                                                                     ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold' 
-                                                                    : 'text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium'
+                                                                    : 'text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800 font-medium'
                                                             }`}
                                                         >
                                                             <div className="flex flex-col truncate pr-2">
                                                                 <span className="truncate">{f.nombre}</span>
-                                                                <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                                                                <span className="text-[10px] text-content-3 dark:text-content-3">
                                                                     {f.cedula !== 'S/C' ? `CI: ${formatCI(f.cedula)}` : 'Sin Cédula'}
                                                                 </span>
                                                             </div>
@@ -395,14 +395,14 @@ export default function AppModals({
                         );
                     })()}
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Lugar de Emisión</label>
-                        <input type="text" className="block w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-950 px-4 py-3.5 text-sm font-bold text-zinc-900 dark:text-white focus:bg-white dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner" value={fc03Config.lugar} onChange={e => setFc03Config({...fc03Config, lugar: e.target.value})} placeholder="Ej: Pilar" />
+                        <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Lugar de Emisión</label>
+                        <input type="text" className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3.5 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner" value={fc03Config.lugar} onChange={e => setFc03Config({...fc03Config, lugar: e.target.value})} placeholder="Ej: Pilar" />
                     </div>
                 </div>
                 {/* BOTONES DE ACCIÓN */}
-                <div className="flex justify-end gap-3 px-6 sm:px-8 py-5 border-t border-zinc-100 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-900 shrink-0 z-10 rounded-b-[24px]">
-                  <button onClick={() => setIsFC03ModalOpen(false)} className="h-10 px-5 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">Cancelar</button>
-                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-zinc-400 bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed opacity-60' : 'text-white bg-brand-primary hover:bg-brand-hover shadow-md shadow-brand-primary/25 cursor-pointer'}`}>
+                <div className="flex justify-end gap-3 px-6 sm:px-8 py-5 border-t border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 rounded-b-[24px]">
+                  <button onClick={() => setIsFC03ModalOpen(false)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3/70 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none">Cancelar</button>
+                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold transition-all focus-visible:ring-2 focus-visible:ring-brand-primary/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-content-3 bg-surface-3 dark:bg-zinc-800 dark:text-content-3 cursor-not-allowed opacity-60' : 'text-white bg-brand-primary hover:bg-brand-hover shadow-md shadow-brand-primary/25 cursor-pointer'}`}>
                     <i className="fa-solid fa-file-pdf text-xs"></i> Generar Documento
                   </button>
                 </div>
@@ -638,21 +638,21 @@ export default function AppModals({
         }
             return (
             <div className={STYLES.modalOverlay}>
-                <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+                <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
 
-                    <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-2xl mb-4 ${esSolicitud ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
+                    <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-card mb-4 ${esSolicitud ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'}`}>
                         <i className={`fa-solid ${esSolicitud ? 'fa-paper-plane' : 'fa-triangle-exclamation'} text-xl`}></i>
                     </div>
 
-                    <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white mb-2">
+                    <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-2">
                         {titulo}
                     </h3>
 
-                    <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-4 leading-relaxed">
+                    <p className="text-xs font-medium text-content-3 dark:text-content-3 mb-4 leading-relaxed">
                         {descripcion}
                     </p>
                     {impacto.length > 0 && (
-                      <p className="animate-fade-in mx-auto mb-4 flex w-fit items-center gap-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
+                      <p className="animate-fade-in mx-auto mb-4 flex w-fit items-center gap-1.5 rounded-control bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400">
                         <i className="fa-solid fa-link text-[10px]"></i>
                         Vinculado a {impacto.join(' y ')}
                       </p>
@@ -660,7 +660,7 @@ export default function AppModals({
 
                     {esSolicitud && (
                       <div className="text-left mb-6 space-y-1.5">
-                        <label className="block text-[11px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                        <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">
                           Motivo de la solicitud <span className="text-rose-500">*</span>
                         </label>
                         <textarea
@@ -669,7 +669,7 @@ export default function AppModals({
                           value={motivoSolicitudBaja}
                           onChange={(e) => setMotivoSolicitudBaja(e.target.value)}
                           placeholder={esFunc ? 'Ej: Renuncia, traslado definitivo, jubilación...' : 'Ej: Avería irreparable, rotura física, obsolescencia, desuso...'}
-                          className="block w-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 p-3.5 text-xs font-bold text-zinc-900 dark:text-white placeholder:text-zinc-400 placeholder:font-normal focus:bg-white dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner resize-none"
+                          className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 p-3.5 text-xs font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none transition-all shadow-inner resize-none"
                         />
                       </div>
                     )}
@@ -677,14 +677,14 @@ export default function AppModals({
                     <div className="flex gap-2 justify-end">
                         <button
                             onClick={() => { setItemToDelete(null); setMotivoSolicitudBaja(''); }}
-                            className="flex-1 h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                            className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                         >
                             Cancelar
                         </button>
                         <button
                             onClick={confirmDeleteAction}
                             disabled={esSolicitud && !motivoSolicitudBaja.trim()}
-                            className="flex-1 h-10 px-4 rounded-xl text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="flex-1 h-10 px-4 rounded-control text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                             {esSolicitud ? 'Enviar Solicitud' : 'Confirmar Acción'}
                         </button>
@@ -697,20 +697,20 @@ export default function AppModals({
           {/* MODAL DE CONFIRMACIÓN DE BACKUP GENERAL */}
           {confirmBackupModal && (
             <div className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-slide-up"}>
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white mb-4">
+              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-database text-xl"></i>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-2">
                   ¿Descargar Copia de Seguridad?
                 </h3>
-                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
+                <p className="text-xs font-medium text-content-3 dark:text-content-3 mb-6 leading-relaxed">
                   Esta operación compilará y descargará una copia completa e íntegra (.json) de todos los registros patrimoniales, funcionarios, asignaciones y auditorías de la Universidad.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
                     onClick={() => setConfirmBackupModal(false)}
-                    className="flex-1 h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                    className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                     Cancelar
                   </button>
@@ -719,7 +719,7 @@ export default function AppModals({
                       setConfirmBackupModal(false);
                       handleExportBackupGeneral();
                     }}
-                    className="flex-1 h-10 px-4 rounded-xl text-[13px] font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                    className="flex-1 h-10 px-4 rounded-control text-[13px] font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-surface-1 dark:text-content-1 dark:hover:bg-surface-3 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                     <i className="fa-solid fa-download mr-1.5 text-xs"></i> Sí, Descargar
                   </button>
@@ -731,20 +731,20 @@ export default function AppModals({
           {/* MODAL DE CONFIRMACIÓN DE IMPORTACIÓN MASIVA CSV */}
           {pendingCSVImport && (
             <div className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl animate-slide-up"}>
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white mb-4">
+              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-file-csv text-xl"></i>
                 </div>
-                <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-2">
                   ¿Confirmar Importación Masiva?
                 </h3>
-                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-zinc-200/60 dark:border-zinc-700/60 text-left mb-6 space-y-1.5">
-                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Archivo seleccionado:</p>
-                  <p className="text-xs font-mono font-bold text-zinc-800 dark:text-zinc-200 truncate">{pendingCSVImport.file?.name}</p>
-                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wider pt-1">Destino:</p>
+                <div className="bg-surface-2 dark:bg-zinc-800/50 p-4 rounded-card border border-line/60 dark:border-zinc-700/60 text-left mb-6 space-y-1.5">
+                  <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider">Archivo seleccionado:</p>
+                  <p className="text-xs font-mono font-bold text-content-1 dark:text-zinc-200 truncate">{pendingCSVImport.file?.name}</p>
+                  <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider pt-1">Destino:</p>
                   <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{dependenciaActual}</p>
                 </div>
-                <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
+                <p className="text-xs font-medium text-content-3 dark:text-content-3 mb-6 leading-relaxed">
                   Los registros serán validados para evitar duplicados e incorporados a la base de datos oficial. ¿Desea proceder con la carga?
                 </p>
                 <div className="flex gap-3 justify-end">
@@ -754,7 +754,7 @@ export default function AppModals({
                       if (fileInputFuncionariosRef.current) fileInputFuncionariosRef.current.value = '';
                       setPendingCSVImport(null);
                     }}
-                    className="flex-1 h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                    className="flex-1 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                     Cancelar
                   </button>
@@ -768,7 +768,7 @@ export default function AppModals({
                         executeProcessFuncionariosCSV(file);
                       }
                     }}
-                    className="flex-1 h-10 px-4 rounded-xl text-[13px] font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                    className="flex-1 h-10 px-4 rounded-control text-[13px] font-bold text-white bg-zinc-900 hover:bg-zinc-700 dark:bg-surface-1 dark:text-content-1 dark:hover:bg-surface-3 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                   >
                     <i className="fa-solid fa-check mr-1.5 text-xs"></i> Sí, Continuar
                   </button>
@@ -789,10 +789,10 @@ export default function AppModals({
                             <h2 className="text-2xl font-bold text-white tracking-tight">Novedades de la v{mantenimiento?.ultima_version || ''}</h2>
                         </div>
                     </div>
-                    <div className="p-6 sm:p-8 bg-white dark:bg-darkbg-card">
+                    <div className="p-6 sm:p-8 bg-surface-1 dark:bg-surface-1">
                         <ul className="space-y-3">
                             {(Array.isArray(mantenimiento?.notas_version) ? mantenimiento.notas_version : []).map((n, i) => (
-                                <li key={i} className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300 font-medium leading-relaxed">
+                                <li key={i} className="flex items-start gap-3 text-sm text-content-1 dark:text-content-3 font-medium leading-relaxed">
                                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 border border-emerald-500/25 mt-0.5">
                                         <i className="fa-solid fa-check text-[9px] text-emerald-500"></i>
                                     </span>
@@ -801,13 +801,13 @@ export default function AppModals({
                             ))}
                         </ul>
                     </div>
-                    <div className="flex px-6 sm:px-8 pb-6 sm:pb-8 bg-white dark:bg-darkbg-card">
+                    <div className="flex px-6 sm:px-8 pb-6 sm:pb-8 bg-surface-1 dark:bg-surface-1">
                         <button
                             onClick={() => {
                                 try { localStorage.setItem('unp_last_version', mantenimiento?.ultima_version || ''); } catch (e) {}
                                 setShowChangelog(false);
                             }}
-                            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 dark:bg-white px-6 h-11 text-[13px] font-bold text-white dark:text-zinc-900 transition-all hover:bg-zinc-700 dark:hover:bg-zinc-200 active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
+                            className="w-full inline-flex items-center justify-center gap-2 rounded-control bg-zinc-900 dark:bg-surface-1 px-6 h-11 text-[13px] font-bold text-white dark:text-content-1 transition-all hover:bg-zinc-700 dark:hover:bg-surface-3 active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none"
                         >
                             Entendido, continuar al sistema
                         </button>

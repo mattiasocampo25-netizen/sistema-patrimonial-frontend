@@ -124,7 +124,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           <button
             onClick={() => setTourPaso(0)}
             title="Recorrer la guía interactiva"
-            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-xl text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-zinc-200 dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
+            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-white bg-brand-primary hover:bg-brand-hover border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none shadow-md shadow-blue-500/25 shrink-0"
           >
             <i className="fa-solid fa-route"></i> Hacer tour guiado
           </button>
@@ -138,10 +138,10 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           <button
             key={s.id}
             onClick={() => setSeccionActiva(s.id)}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-[12px] font-medium transition-all cursor-pointer ${
+            className={`flex items-center gap-2 rounded-control px-4 py-2 text-[12px] font-medium transition-all cursor-pointer ${
               seccionActiva === s.id
                 ? 'bg-brand-primary text-white shadow-sm shadow-blue-500/30'
-                : 'bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5'
+                : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5'
             }`}
           >
             <i className={`fa-solid ${s.icon} text-[13px] ${seccionActiva === s.id ? '' : 'opacity-70'}`}></i>
@@ -156,17 +156,17 @@ export default function AyudaView({ setTourPaso, STYLES }) {
         <div className="lg:col-span-5 flex flex-col">
           {seccionActiva === 'faq' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white flex items-center gap-2 mb-6">
+              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
                 <i className="fa-solid fa-circle-question text-brand-primary"></i> Preguntas Frecuentes
               </h2>
               <div className="relative mb-6">
-                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none"></i>
+                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
                 <input
                   type="text"
                   value={busquedaFaq}
                   onChange={(e) => setBusquedaFaq(e.target.value)}
                   placeholder="Buscar en la ayuda..."
-                  className="w-full rounded-2xl border border-zinc-200 dark:border-darkbg-border bg-white dark:bg-darkbg-main py-2.5 pl-10 pr-4 text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
+                  className="w-full rounded-card border border-line dark:border-line bg-surface-1 dark:bg-surface-2 py-2.5 pl-10 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all"
                 />
               </div>
               <div className="space-y-3">
@@ -174,18 +174,18 @@ export default function AyudaView({ setTourPaso, STYLES }) {
                   <FaqItem key={f.question} question={f.question} answer={f.answer} categoria={f.categoria} />
                 ))}
                 {faqsFiltradas.length === 0 && (
-                  <p className="text-sm font-semibold text-zinc-400 text-center py-8">Sin coincidencias en la ayuda.</p>
+                  <p className="text-sm font-semibold text-content-3 text-center py-8">Sin coincidencias en la ayuda.</p>
                 )}
               </div>
             </>
           )}
           {seccionActiva === 'procedimiento' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white flex items-center gap-2 mb-6">
+              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
                 <i className="fa-solid fa-network-wired text-brand-primary"></i> Procedimiento Lógico
               </h2>
               <div className={`${STYLES.card} p-6 sm:p-8 relative overflow-hidden flex-1`}>
-                <div className="absolute left-[56px] top-12 bottom-12 w-0.5 bg-zinc-200 dark:bg-darkbg-border hidden sm:block z-0"></div>
+                <div className="absolute left-[56px] top-12 bottom-12 w-0.5 bg-surface-3 dark:bg-surface-3 hidden sm:block z-0"></div>
                 <div className="space-y-2 relative z-10">
                   <WorkflowStep number="1" title="Alta (FC-04)" description="La incorporación inicial exige la creación de un FC-04 de Alta. Esto registra contablemente el ítem en la base de datos principal." icon="fa-arrow-trend-up" color="bg-zinc-500" />
                   <WorkflowStep number="2" title="Delegación (FC-10)" description="La entrega física requiere el levantamiento de un FC-10 nominal. Este instrumento legal transfiere la responsabilidad civil del objeto." icon="fa-file-signature" color="bg-brand-primary" />
@@ -197,17 +197,17 @@ export default function AyudaView({ setTourPaso, STYLES }) {
           )}
           {seccionActiva === 'atajos' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-zinc-900 dark:text-white flex items-center gap-2 mb-6">
+              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
                 <i className="fa-solid fa-keyboard text-brand-primary"></i> Atajos de Teclado
               </h2>
               <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
                 <div className="space-y-3">
                   {SHORTCUTS.map(s => (
-                    <div key={s.accion} className="flex items-center justify-between gap-4 py-2 border-b border-zinc-100 dark:border-darkbg-border/60 last:border-0">
-                      <span className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300">{s.accion}</span>
+                    <div key={s.accion} className="flex items-center justify-between gap-4 py-2 border-b border-line dark:border-line/60 last:border-0">
+                      <span className="text-[13px] font-medium text-content-1 dark:text-content-3">{s.accion}</span>
                       <span className="flex gap-1 shrink-0">
                         {s.teclas.map(k => (
-                          <kbd key={k} className="inline-flex items-center rounded-lg border border-zinc-200 dark:border-darkbg-border bg-zinc-50 dark:bg-darkbg-main px-2 py-1 text-[11px] font-black text-zinc-600 dark:text-zinc-300">{k}</kbd>
+                          <kbd key={k} className="inline-flex items-center rounded-lg border border-line dark:border-line bg-surface-2 dark:bg-surface-2 px-2 py-1 text-[11px] font-black text-content-2 dark:text-content-3">{k}</kbd>
                         ))}
                       </span>
                     </div>
@@ -221,31 +221,31 @@ export default function AyudaView({ setTourPaso, STYLES }) {
         {/* Columna derecha: contacto y recursos rápidos */}
         <div className="lg:col-span-7 flex flex-col gap-6">
           <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
-            <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
+            <h3 className="text-base font-bold text-content-1 dark:text-white mb-4 flex items-center gap-2">
               <i className="fa-solid fa-envelope text-brand-primary"></i> Contacto y Soporte
             </h3>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
                   <i className="fa-solid fa-envelope text-sm"></i>
                 </div>
                 <div>
-                  <p className="font-bold text-zinc-900 dark:text-white">Soporte patrimonial</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">patrimonio@unp.edu.py</p>
+                  <p className="font-bold text-content-1 dark:text-white">Soporte patrimonial</p>
+                  <p className="text-xs text-content-3 dark:text-content-3">patrimonio@unp.edu.py</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
                   <i className="fa-solid fa-building text-sm"></i>
                 </div>
                 <div>
-                  <p className="font-bold text-zinc-900 dark:text-white">Departamento de Bienes Patrimoniales</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Universidad Nacional de Pilar</p>
+                  <p className="font-bold text-content-1 dark:text-white">Departamento de Bienes Patrimoniales</p>
+                  <p className="text-xs text-content-3 dark:text-content-3">Universidad Nacional de Pilar</p>
                 </div>
               </div>
-              <div className="pt-4 border-t border-zinc-100 dark:border-darkbg-border/60">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">Versión del sistema</p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-300">v{APP_VERSION} · Entorno de producción</p>
+              <div className="pt-4 border-t border-line dark:border-line/60">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 mb-2">Versión del sistema</p>
+                <p className="text-sm text-content-2 dark:text-content-3">v{APP_VERSION} · Entorno de producción</p>
               </div>
             </div>
           </div>

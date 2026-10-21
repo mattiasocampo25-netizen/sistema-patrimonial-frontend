@@ -107,7 +107,24 @@ const DATOS = {
       titulo: 'prueba'
     }
   ],
-  notificaciones: []
+  notificaciones: [
+    {
+      id: 'n1',
+      data: {
+        id: 'n1',
+        tipo: 'BAJA_FUNCIONARIO',
+        funcionarioId: 'f1',
+        nombre: 'Alguien',
+        cedula: '1234567',
+        solicitante: 'admin',
+        dependencia: 'Rectorado',
+        estado: 'PENDIENTE',
+        motivo: 'renuncia',
+        created_at: '2026-01-01T00:00:00Z'
+      },
+      updated_at: '2026-01-01T00:00:00Z'
+    }
+  ]
 };
 
 describe('smoke por modulo', () => {
@@ -225,6 +242,40 @@ describe('smoke por modulo', () => {
   });
 
   // ── 9. Aprobaciones ─────────────────────────────────────────────────────
+  test('modulo Aprobaciones: una solicitud de funcionario se resuelve sobre el funcionario', async () => {
+    // Regresion: la solicitud de BAJA_FUNCIONARIO pasaba por el camino del
+    // bien, con lo que se cerraba sin borrar a nadie. Este test comprueba las
+    // tres cosas: que la fila muestra los datos del funcionario, que el boton
+    // dice lo que va a hacer, y que al confirmar se borra de /funcionarios.
+    await entrar(ADMIN);
+
+    await app.clickTour('nav-aprobaciones');
+    await app.esperar('Centro de Aprobaciones', 3000);
+
+    assert.ok(app.tiene('1234567'), 'la fila debe mostrar la cedula del funcionario');
+    assert.ok(app.tiene('Alguien'), 'la fila debe mostrar el nombre del funcionario');
+    assert.ok(app.tiene('Aprobar Eliminación'), 'el boton debe decir que se elimina al funcionario');
+
+    await app.click('Aprobar Eliminación');
+    assert.ok(await app.hayDialogo(), 'debe abrirse el dialogo de resolucion');
+    assert.ok(app.tiene('Aprobar Eliminación'), 'el dialogo debe confirmar la eliminacion');
+    assert.ok(app.tiene('se eliminará del padrón'), 'el dialogo debe avisar de lo que va a hacer');
+
+    // Confirmar. El motivo es opcional al aprobar.
+    await app.click('Confirmar Eliminación');
+    await app.esperar('notificada', 3000);
+
+    const borrados = app.llamadas().filter(
+      (c) => c.metodo === 'DELETE' && c.url.includes('/funcionarios')
+    );
+    assert.ok(borrados.length > 0, 'debe borrarse al funcionario de la tabla funcionarios');
+
+    const contraBienes = app.llamadas().filter(
+      (c) => c.metodo === 'DELETE' || c.metodo === 'PATCH'
+    ).filter((c) => c.url.includes('/bens') && c.url.includes('id=eq.undefined'));
+    assert.equal(contraBienes.length, 0, 'no debe escribirse contra un bien con id indefinido');
+  });
+
   test('modulo Aprobaciones: renderiza el centro de aprobaciones', async () => {
     await entrar();
     await app.clickTour('nav-aprobaciones');

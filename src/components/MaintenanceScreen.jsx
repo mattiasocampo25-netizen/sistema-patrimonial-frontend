@@ -46,12 +46,12 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
 
           {/* Información de progreso */}
           {(transcurrido || estimado) && (
-            <div className="mb-6 rounded-2xl bg-white/5 border border-white/10 p-4 sm:p-5 text-left">
+            <div className="mb-6 rounded-card bg-surface-1/5 border border-white/10 p-4 sm:p-5 text-left">
               <div className="flex justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiempo transcurrido</span>
                 <span className="text-[11px] text-slate-300 font-mono">{transcurrido}</span>
               </div>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-surface-1/10 rounded-full overflow-hidden">
                 <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: '60%' }}></div>
               </div>
               {estimado && (
@@ -64,7 +64,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           )}
 
           {mejoras.length > 0 && (
-            <div className="mb-8 rounded-2xl bg-white/5 border border-white/10 p-5 sm:p-6 backdrop-blur-sm text-left">
+            <div className="mb-8 rounded-card bg-surface-1/5 border border-white/10 p-5 sm:p-6 backdrop-blur-sm text-left">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 mb-4">
                 Mejoras en curso
               </p>

@@ -2,7 +2,7 @@
 import React from 'react';
 import FiltroCombo from '../FiltroCombo';
 
-const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2";
+const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
 
 export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsuario, todasDependencias, esDesarrollador, STYLES }) {
     if (!isOpen) return null;
@@ -10,22 +10,22 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
     return (
         <div className={STYLES.modalOverlay}>
           <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
-            <div className="flex justify-between items-center px-6 py-5 border-b border-zinc-100 dark:border-zinc-800/80 shrink-0 z-10">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
                   <i className="fa-solid fa-user-gear text-base"></i>
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+                  <h2 className="text-lg font-bold text-content-1 dark:text-white tracking-tight">
                     {usuarioEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
                   </h2>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Credenciales y nivel de acceso</p>
+                  <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Credenciales y nivel de acceso</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
                 title="Cerrar" aria-label="Cerrar"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">
               
                 <i className="fa-solid fa-xmark text-base"></i>
               </button>
@@ -36,14 +36,14 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                 <div>
                   <label className={LABEL}>Usuario (Login / ID)</label>
                   <div className="relative">
-                    <i className="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-xs"></i>
+                    <i className="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
                     <input
                       type="text"
                       name="username"
                       required
                       defaultValue={usuarioEditing?.username}
                       disabled={!!usuarioEditing}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${usuarioEditing ? 'bg-zinc-100 dark:bg-zinc-900/80 cursor-not-allowed text-zinc-400' : ''}`}
+                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary ${usuarioEditing ? 'bg-surface-3 dark:bg-zinc-900/80 cursor-not-allowed text-content-3' : ''}`}
                       placeholder="Ej. mocampo"
                     />
                   </div>
@@ -52,7 +52,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                 <div>
                   <label className={LABEL}>Nombre Completo</label>
                   <div className="relative">
-                    <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 text-xs"></i>
+                    <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
                     <input
                       type="text"
                       name="nombre"
@@ -94,16 +94,16 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                 </div>
               </div>
 
-              <div className="mx-6 sm:mx-8 mb-5 -mt-1 rounded-2xl bg-blue-500/[0.07] border border-blue-500/20 px-4 py-3 flex items-start gap-2.5">
+              <div className="mx-6 sm:mx-8 mb-5 -mt-1 rounded-card bg-blue-500/[0.07] border border-blue-500/20 px-4 py-3 flex items-start gap-2.5">
                 <i className="fa-solid fa-circle-info text-blue-500 text-xs mt-0.5 shrink-0"></i>
-                <p className="text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-300 font-medium">
+                <p className="text-[11px] leading-relaxed text-content-2 dark:text-content-3 font-medium">
                   El acceso real se crea en Supabase → <strong>Authentication</strong> con el email <strong>usuario@unp.edu.py</strong> y su contraseña. Sin esa cuenta, este perfil no puede entrar aunque exista aquí.
                 </p>
               </div>
 
-              <div className="flex justify-end gap-2 px-6 py-4 border-t border-zinc-100 dark:border-zinc-800/80 shrink-0 z-10">
-                <button type="button" onClick={onClose} className="inline-flex items-center justify-center h-10 px-4 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">Cancelar</button>
-                <button type="submit" className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"><i className="fa-solid fa-check text-xs"></i> Guardar Usuario</button>
+              <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0 z-10">
+                <button type="button" onClick={onClose} className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary">Cancelar</button>
+                <button type="submit" className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary disabled:opacity-50"><i className="fa-solid fa-check text-xs"></i> Guardar Usuario</button>
               </div>
             </form>
           </div>

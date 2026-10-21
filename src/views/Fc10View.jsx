@@ -54,7 +54,7 @@ export default function Fc10View({
   const puedeGestionarFirmas = isAdmin && typeof actualizarEstadoFirma === 'function';
 
   const ESTADOS_FIRMA_OPCIONES = [
-    { valor: 'BORRADOR', label: 'Borrador', icon: 'fa-pen-ruler', color: 'text-zinc-600 dark:text-zinc-400' },
+    { valor: 'BORRADOR', label: 'Borrador', icon: 'fa-pen-ruler', color: 'text-content-2 dark:text-content-3' },
     { valor: 'ESPERA_FIRMA_1', label: 'Espera funcionario', icon: 'fa-user', color: 'text-amber-600 dark:text-amber-400' },
     { valor: 'ESPERA_FIRMA_2', label: 'Espera jefe', icon: 'fa-user-tie', color: 'text-sky-600 dark:text-sky-400' },
     { valor: 'CERRADO', label: 'Firmado (ambas)', icon: 'fa-circle-check', color: 'text-emerald-600 dark:text-emerald-400' }
@@ -79,15 +79,15 @@ export default function Fc10View({
     <div className="flex flex-col flex-1 space-y-6">
       {/* ===== PANEL DE ESTADO DE FIRMAS (solo admin) ===== */}
       {isAdmin && (
-        <div className="bg-white dark:bg-darkbg-card border border-zinc-200/70 dark:border-darkbg-border rounded-3xl shadow-sm p-6 sm:p-8">
+        <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 shadow-sm shadow-blue-500/20">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 shadow-sm shadow-blue-500/20">
                 <i className="fa-solid fa-clipboard-check text-lg"></i>
               </div>
               <div>
-                <h3 className="text-lg font-black text-zinc-900 dark:text-white tracking-tight">Estado de las Firmas FC-10</h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                <h3 className="text-lg font-black text-content-1 dark:text-white tracking-tight">Estado de las Firmas FC-10</h3>
+                <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">
                   Marque manualmente el estado cuando reciba el documento físico o digital devuelto. Solo administrador.
                 </p>
               </div>
@@ -108,13 +108,13 @@ export default function Fc10View({
               const estaCambiando = cambiandoEstado[fc.id];
               const estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
               return (
-                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-2xl border border-zinc-100 dark:border-darkbg-border/50 bg-zinc-50 dark:bg-darkbg-main/50 hover:border-brand-primary/50 hover:shadow-md transition-all duration-200 group">
+                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-card border border-line dark:border-line/50 bg-surface-2 dark:bg-surface-2/50 hover:border-brand-primary/50 hover:shadow-md transition-all duration-200 group">
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-zinc-900 dark:text-white truncate" title={fc.funcionarioNombre || 'Sin responsable'}>
+                      <p className="text-xs font-bold text-content-1 dark:text-white truncate" title={fc.funcionarioNombre || 'Sin responsable'}>
                         {fc.funcionarioNombre || 'Sin responsable'}
                       </p>
-                      <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate flex items-center gap-1.5" title={bien.rotulo || 'S/R'}>
+                      <p className="text-[10px] text-content-3 dark:text-content-3 mt-0.5 truncate flex items-center gap-1.5" title={bien.rotulo || 'S/R'}>
                         <i className="fa-solid fa-tag text-[9px]"></i>{bien.rotulo || 'S/R'}
                       </p>
                     </div>
@@ -123,7 +123,7 @@ export default function Fc10View({
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
                         : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2'
                           ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                          : 'bg-zinc-100 text-zinc-700 dark:bg-white/10 dark:text-zinc-300'
+                          : 'bg-surface-3 text-content-1 dark:bg-surface-1/10 dark:text-content-3'
                     }`}>
                       {estadoActual === 'CERRADO' ? '✓' : estadoActual === 'BORRADOR' ? 'B' : 'P'}
                     </div>
@@ -137,15 +137,15 @@ export default function Fc10View({
                           key={op.valor}
                           onClick={() => !estaCambiando && handleCambiarEstadoFirma(fc, op.valor)}
                           disabled={estaCambiando || !puedeGestionarFirmas}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-xl text-[11px] font-medium transition-all duration-200 ${
+                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium transition-all duration-200 ${
                             seleccionado
                               ? 'bg-brand-primary text-white shadow-sm shadow-brand-primary/30'
-                              : 'bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 border border-transparent hover:border-zinc-200 dark:hover:border-white/10'
+                              : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5 border border-transparent hover:border-line dark:hover:border-white/10'
                           } ${!puedeGestionarFirmas ? 'opacity-60 cursor-not-allowed' : ''}`}
                           title={!puedeGestionarFirmas ? 'Solo el administrador puede cambiar este estado' : `Marcar como ${op.label}`}
                         >
                           <i className={`fa-solid ${op.icon} text-[10px] ${seleccionado ? 'text-white' : op.color}`}></i>
-                          <span className={seleccionado ? 'text-white' : 'text-zinc-700 dark:text-zinc-300'}>{op.label}</span>
+                          <span className={seleccionado ? 'text-white' : 'text-content-1 dark:text-content-3'}>{op.label}</span>
                         </button>
                       );
                     })}
@@ -231,22 +231,22 @@ export default function Fc10View({
           </Toolbar>
         </div>
       </Card>
-      <div className="bg-white dark:bg-darkbg-card p-6 sm:p-8 rounded-2xl border border-zinc-200/80 dark:border-darkbg-border shadow-2xs min-h-[400px]">
+      <div className="bg-surface-1 dark:bg-surface-1 p-6 sm:p-8 rounded-card border border-line/80 dark:border-line shadow-2xs min-h-[400px]">
         {isLoading ? (
           <SkeletonLoader />
         ) : listaVisible.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-zinc-50/50 dark:bg-darkbg-main/50 rounded-2xl border border-dashed border-zinc-300 dark:border-darkbg-border">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-darkbg-main text-zinc-400 mb-4 shadow-2xs">
+          <div className="flex flex-col items-center justify-center py-20 text-center bg-surface-2/50 dark:bg-surface-2/50 rounded-card border border-dashed border-line-strong dark:border-line">
+            <div className="flex h-16 w-16 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-2xs">
               <i className={`fa-solid ${filtroEtapa === 'todas' ? 'fa-folder-open' : 'fa-circle-check'} text-2xl`}></i>
             </div>
             {filtroEtapa === 'todas' ? (
               <>
-                <h3 className="text-base font-black text-zinc-800 dark:text-zinc-200">Sin asignaciones en el ciclo</h3>
-                <p className="text-xs font-medium text-zinc-400 max-w-xs mt-1">No existen actas FC-10 generadas en el periodo seleccionado.</p>
+                <h3 className="text-base font-black text-content-1 dark:text-zinc-200">Sin asignaciones en el ciclo</h3>
+                <p className="text-xs font-medium text-content-3 max-w-xs mt-1">No existen actas FC-10 generadas en el periodo seleccionado.</p>
                 {setActiveTab && (
                   <button
                     onClick={() => setActiveTab('inventario')}
-                    className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-bold bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all cursor-pointer active:scale-95"
+                    className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer active:scale-95"
                   >
                     <i className="fa-solid fa-boxes-stacked text-xs"></i> Asignar desde inventario
                   </button>
@@ -254,17 +254,17 @@ export default function Fc10View({
               </>
             ) : (
               <>
-                <h3 className="text-base font-black text-zinc-800 dark:text-zinc-200">
+                <h3 className="text-base font-black text-content-1 dark:text-zinc-200">
                   Nada en esta etapa
                 </h3>
-                <p className="text-xs font-medium text-zinc-400 max-w-xs mt-1">
+                <p className="text-xs font-medium text-content-3 max-w-xs mt-1">
                   {ETAPAS.find(e => e.id === filtroEtapa)?.label === 'Cerradas'
                     ? 'Ningun acta de este periodo tiene las dos firmas registradas.'
                     : 'Ningun acta espera esta firma en el periodo seleccionado.'}
                 </p>
                 <button
                   onClick={() => setFiltroEtapa('todas')}
-                  className="mt-4 inline-flex items-center gap-2 h-9 px-4 rounded-xl text-[12px] font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/10 transition-all cursor-pointer"
+                  className="mt-4 inline-flex items-center gap-2 h-9 px-4 rounded-control text-[12px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-all cursor-pointer"
                 >
                   <i className="fa-solid fa-arrow-left text-[10px]"></i> Ver todas las actas
                 </button>
@@ -285,14 +285,14 @@ export default function Fc10View({
               const esLegada = esFC10Legado(fc);
               const ponerEnTramite = ponerFC10EnTramite;
               return (
-                <div key={fc.id} className="bg-white dark:bg-white/[0.04] rounded-3xl border border-zinc-200/70 dark:border-white/10 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
+                <div key={fc.id} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden group">
                   <div className={`h-1 w-full ${info.dot}`}></div>
                   <div className="p-5 flex-1 flex flex-col">
                       <div className="flex justify-between items-start gap-2 mb-4">
                           <div className="flex flex-col gap-1.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
                                   {isDevuelto ? (
-                                      <span className="inline-flex w-fit items-center rounded-lg bg-zinc-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:bg-white/10 dark:text-zinc-400">
+                                      <span className="inline-flex w-fit items-center rounded-lg bg-surface-3 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-content-3 dark:bg-surface-1/10 dark:text-content-3">
                                           Devuelto
                                       </span>
                                   ) : (
@@ -302,26 +302,26 @@ export default function Fc10View({
                                       </span>
                                   )}
                               </div>
-                              <span className="text-xs font-medium tabular-nums text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+                              <span className="text-xs font-medium tabular-nums text-content-3 dark:text-content-3 flex items-center gap-1.5">
                                   <i className="fa-regular fa-calendar"></i> {formatDateText(fc.entregadoFecha || fc.fechaGeneracion)}
                               </span>
                           </div>
-                          <div className="flex gap-1 shrink-0 rounded-xl bg-zinc-50 dark:bg-white/5 border border-zinc-200/70 dark:border-white/10 p-1">
-                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-white dark:hover:text-white dark:hover:bg-white/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
-                              <button onClick={() => openFC10Modal(bien, fc)} className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-white dark:hover:text-white dark:hover:bg-white/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                          <div className="flex gap-1 shrink-0 rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 p-1">
+                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
+                              <button onClick={() => openFC10Modal(bien, fc)} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                               {isAdmin && (
-                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
                               )}
                           </div>
                       </div>
                       <div className="mt-1 flex flex-col flex-1">
-                      <h4 className="font-bold text-zinc-900 dark:text-white text-sm tracking-tight truncate" title={fc.funcionarioNombre}>{fc.funcionarioNombre}</h4>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 font-medium truncate">{fc.funcionarioCargo}{fc.funcionarioDoc ? ` · CI ${formatCI(fc.funcionarioDoc)}` : ''}</p>
+                      <h4 className="font-bold text-content-1 dark:text-white text-sm tracking-tight truncate" title={fc.funcionarioNombre}>{fc.funcionarioNombre}</h4>
+                      <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 font-medium truncate">{fc.funcionarioCargo}{fc.funcionarioDoc ? ` · CI ${formatCI(fc.funcionarioDoc)}` : ''}</p>
 
                   {!isDevuelto && (
                     (fc.estadoFirma || pendiente) ? (
                       <div className="mt-4 space-y-1.5" aria-label="Estado de las firmas">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-1.5">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-content-3 dark:text-content-3 mb-1.5">
                           Firmas del acta
                         </p>
                         {[
@@ -329,15 +329,15 @@ export default function Fc10View({
                           { n: 2, puesto: 'Jefe Inmediato', nombre: fc.jefeInmediatoNombre, f: f2 }
                         ].map(({ n, puesto, nombre, f }) => (
                           <div key={n} className="flex items-center gap-2 text-[11px]">
-                            <i className={`fa-solid ${f ? 'fa-circle-check text-emerald-500' : 'fa-circle text-zinc-300 dark:text-zinc-600'} text-[11px] shrink-0`}></i>
-                            <span className="font-semibold text-zinc-600 dark:text-zinc-300 shrink-0">{puesto}:</span>
-                            <span className="truncate text-zinc-500 dark:text-zinc-400">
+                            <i className={`fa-solid ${f ? 'fa-circle-check text-emerald-500' : 'fa-circle text-content-3 dark:text-content-2'} text-[11px] shrink-0`}></i>
+                            <span className="font-semibold text-content-2 dark:text-content-3 shrink-0">{puesto}:</span>
+                            <span className="truncate text-content-3 dark:text-content-3">
                               {f ? (
                                 <span title={`Registrado por ${f.registradoPorNombre || f.registradoPor} · ${new Date(f.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}`}>
                                   {f.nombre || nombre} · firmado el {new Date(f.fecha).toLocaleDateString('es-PY')}
                                 </span>
                               ) : (
-                                <span className="text-zinc-400 dark:text-zinc-500 italic">sin firmar</span>
+                                <span className="text-content-3 dark:text-content-3 italic">sin firmar</span>
                               )}
                             </span>
                           </div>
@@ -347,14 +347,14 @@ export default function Fc10View({
                   )}
 
                   {!isDevuelto && esLegada && ponerEnTramite && (
-                    <div className="mt-4 rounded-xl border border-zinc-300/70 dark:border-white/10 bg-zinc-50 dark:bg-white/[0.03] p-3">
-                      <p className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 leading-snug mb-2.5">
+                    <div className="mt-4 rounded-control border border-line-strong/70 dark:border-white/10 bg-surface-2 dark:bg-surface-1/[0.03] p-3">
+                      <p className="text-[11px] font-semibold text-content-2 dark:text-content-3 leading-snug mb-2.5">
                         Esta acta se creó antes del control de firmas. Si quedó a medio camino, ponela en trámite para registrar las firmas.
                       </p>
                       <button
                         onClick={() => ponerEnTramite(fc)}
                         disabled={poniendoEnTramite === fc.id}
-                        className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-lg bg-zinc-800 dark:bg-white text-white dark:text-zinc-900 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+                        className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-lg bg-zinc-800 dark:bg-surface-1 text-white dark:text-content-1 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
                       >
                         {poniendoEnTramite === fc.id
                           ? <><i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> Activando...</>
@@ -363,7 +363,7 @@ export default function Fc10View({
                     </div>
                   )}
                   {pendiente && (registrarFirmaFC10 || registrarAmbasFirmas) && (
-                    <div className="mt-4 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.08] p-3 space-y-2">
+                    <div className="mt-4 rounded-control border border-emerald-500/25 bg-emerald-500/[0.08] p-3 space-y-2">
                       {registrarAmbasFirmas && (
                         <>
                           <p className="text-[11px] font-semibold text-emerald-900 dark:text-emerald-200 leading-snug">
@@ -387,7 +387,7 @@ export default function Fc10View({
                           onClick={() => registrarFirmaFC10(fc)}
                           disabled={estaFirmando}
                           title={`Registrar solo la firma ${pendiente.orden} de ${pendiente.nombre || pendiente.puesto}`}
-                          className="w-full inline-flex items-center justify-center gap-2 h-8 rounded-lg text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-white/10 hover:bg-zinc-200 dark:hover:bg-white/5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 border border-zinc-200 dark:border-white/10"
+                          className="w-full inline-flex items-center justify-center gap-2 h-8 rounded-lg text-content-1 dark:text-zinc-100 bg-surface-3 dark:bg-surface-1/10 hover:bg-surface-3 dark:hover:bg-surface-1/5 text-[10px] font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer disabled:opacity-60 border border-line dark:border-white/10"
                         >
                           <i className="fa-solid fa-signature text-[10px]"></i>
                           Solo {pendiente.puesto}
@@ -396,11 +396,11 @@ export default function Fc10View({
                     </div>
                   )}
 
-                  <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-white/10">
-                  <p className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 line-clamp-2 leading-relaxed" title={bien.descripcion || 'Descripción no disponible'}>
+                  <div className="mt-4 pt-3 border-t border-line dark:border-white/10">
+                  <p className="text-xs font-semibold text-content-1 dark:text-zinc-200 line-clamp-2 leading-relaxed" title={bien.descripcion || 'Descripción no disponible'}>
                   {bien.descripcion || 'Descripción no disponible'}
                   </p>
-                  <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-1.5 font-semibold tabular-nums">
+                  <p className="text-[11px] text-content-3 dark:text-content-3 mt-1.5 font-semibold tabular-nums">
                   <i className="fa-solid fa-tag mr-1.5"></i>{bien.rotulo || 'S/Rótulo'}
                   </p>
                   </div>

@@ -373,9 +373,9 @@ export function useFuncionarios({
     };  
   
     const renderPaginationFuncionarios = () => (
-      <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-zinc-200 dark:border-darkbg-border shrink-0 bg-white dark:bg-darkbg-card">
-        <span className="text-sm text-zinc-500 font-medium">
-          Mostrando <span className="font-bold text-zinc-900 dark:text-white">
+      <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-line dark:border-line shrink-0 bg-surface-1 dark:bg-surface-1">
+        <span className="text-sm text-content-3 font-medium">
+          Mostrando <span className="font-bold text-content-1 dark:text-white">
             {(currentPaginaFuncionarios - 1) * ITEMS_POR_PAGINA_FUNCS + (funcionariosPurosDependencia.length > 0 ? 1 : 0)} - {Math.min(currentPaginaFuncionarios * ITEMS_POR_PAGINA_FUNCS, funcionariosPurosDependencia.length)}
           </span> de {funcionariosPurosDependencia.length}
         </span>
@@ -383,14 +383,14 @@ export function useFuncionarios({
           <button 
             disabled={currentPaginaFuncionarios <= 1} 
             onClick={() => setCurrentPaginaFuncionarios(prev => prev - 1)} 
-            className="rounded-xl bg-white dark:bg-darkbg-main px-4 py-2 text-xs font-bold text-zinc-700 dark:text-zinc-300 shadow-2xs border border-zinc-200 dark:border-darkbg-border hover:bg-zinc-50 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
+            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
           >
             Anterior
           </button>
           <button 
             disabled={currentPaginaFuncionarios >= totalPagesFuncs || totalPagesFuncs === 0} 
             onClick={() => setCurrentPaginaFuncionarios(prev => prev + 1)} 
-            className="rounded-xl bg-white dark:bg-darkbg-main px-4 py-2 text-xs font-bold text-zinc-700 dark:text-zinc-300 shadow-2xs border border-zinc-200 dark:border-darkbg-border hover:bg-zinc-50 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
+            className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 transition-all cursor-pointer"
           >
             Siguiente
           </button>

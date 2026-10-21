@@ -102,12 +102,12 @@ export default function CommandPalette({
   return (
     <div className="fixed inset-0 z-[400] flex items-start justify-center p-4 pt-[12dvh] bg-zinc-950/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
-        className="w-full max-w-xl rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-2xl overflow-hidden animate-slide-up"
+        className="w-full max-w-xl rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
         role="dialog" aria-label="Búsqueda global"
       >
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
-          <i className="fa-solid fa-magnifying-glass text-zinc-400 text-sm"></i>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-line dark:border-zinc-800">
+          <i className="fa-solid fa-magnifying-glass text-content-3 text-sm"></i>
           <input
             ref={inputRef}
             type="text"
@@ -120,29 +120,29 @@ export default function CommandPalette({
               if (e.key === 'Escape') onClose();
             }}
             placeholder="Buscar bienes, funcionarios o acciones... (Esc para cerrar)"
-            className="flex-1 bg-transparent outline-none text-sm font-medium text-zinc-900 dark:text-white placeholder:text-zinc-400"
+            className="flex-1 bg-transparent outline-none text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3"
           />
-          <kbd className="hidden sm:inline-flex items-center rounded-md border border-zinc-200 dark:border-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">Ctrl K</kbd>
+          <kbd className="hidden sm:inline-flex items-center rounded-md border border-line dark:border-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-content-3">Ctrl K</kbd>
         </div>
         <div className="max-h-[50dvh] overflow-y-auto custom-scrollbar py-2">
           {resultados.length === 0 ? (
-            <p className="px-5 py-8 text-center text-xs font-semibold text-zinc-400">Sin coincidencias. Prueba con rótulo, nombre o apellido.</p>
+            <p className="px-5 py-8 text-center text-xs font-semibold text-content-3">Sin coincidencias. Prueba con rótulo, nombre o apellido.</p>
           ) : (
             resultados.map((r, i) => (
               <button
                 key={`${r.tipo}-${r.titulo}-${i}`}
                 onClick={() => ejecutar(r)}
                 onMouseEnter={() => setSel(i)}
-                className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors cursor-pointer ${i === sel ? 'bg-zinc-100 dark:bg-white/10' : ''}`}
+                className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors cursor-pointer ${i === sel ? 'bg-surface-3 dark:bg-surface-1/10' : ''}`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-white/10 text-zinc-500 dark:text-zinc-300">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-3 dark:text-content-3">
                   <i className={`fa-solid ${r.icon} text-xs`}></i>
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-bold text-zinc-900 dark:text-white truncate">{r.titulo}</span>
-                  <span className="block text-[11px] text-zinc-400 truncate">{r.subtitulo}</span>
+                  <span className="block text-[13px] font-bold text-content-1 dark:text-white truncate">{r.titulo}</span>
+                  <span className="block text-[11px] text-content-3 truncate">{r.subtitulo}</span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-300 dark:text-zinc-600 shrink-0">{r.tipo}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-2 shrink-0">{r.tipo}</span>
               </button>
             ))
           )}

@@ -69,8 +69,8 @@ function ItemNav({ item, activo, onIr, solicitudes, t }) {
       data-tour={`nav-${item.id}`}
       className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${
         activo
-          ? 'bg-white/10 text-white font-bold'
-          : 'text-sidebar-content-2 font-medium hover:bg-white/[0.07] hover:text-sidebar-content'
+          ? 'bg-surface-1/10 text-white font-bold'
+          : 'text-sidebar-content-2 font-medium hover:bg-surface-1/[0.07] hover:text-sidebar-content'
       }`}
     >
       {activo ? (
@@ -97,7 +97,7 @@ function ItemHerramienta({ icono, titulo, onClick, badge }) {
       type="button"
       onClick={onClick}
       title={titulo}
-      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-medium text-sidebar-content-2 hover:bg-white/[0.07] hover:text-sidebar-content transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-medium text-sidebar-content-2 hover:bg-surface-1/[0.07] hover:text-sidebar-content transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <span className="flex items-center justify-center w-6 shrink-0 text-sidebar-content-2 group-hover:text-sidebar-content">
         <i className={`fa-solid ${icono} text-[13px]`} aria-hidden="true" />
@@ -157,7 +157,7 @@ export default function AppSidebar({
         <div className="shrink-0 border-b border-sidebar-line px-5 py-4">
           {appLogo ? (
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-white/10 shadow-card border border-white/10 overflow-hidden p-1.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1/10 shadow-card border border-white/10 overflow-hidden p-1.5">
                 <img src={appLogo} alt="Logo Institucional" className="w-full h-full object-contain" />
               </div>
               <div className="min-w-0 flex-1">

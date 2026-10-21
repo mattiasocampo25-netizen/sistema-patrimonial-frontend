@@ -18,7 +18,7 @@ import { TABLAS_RESTORABLES, ORDEN_RESTAURACION } from '../services/restore';
 
 const Chip = ({ children, tono = 'zinc' }) => {
   const tonos = {
-    zinc: 'bg-zinc-100 dark:bg-white/10 text-zinc-600 dark:text-zinc-300',
+    zinc: 'bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3',
     verde: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
     ambar: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400',
     rojo: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400',
@@ -49,16 +49,16 @@ export default function RestoreBackupModal({ restore }) {
     <div className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-3xl"}>
         {/* Encabezado */}
-        <div className="flex items-start justify-between gap-4 border-b border-zinc-100 dark:border-white/10 px-6 py-5">
+        <div className="flex items-start justify-between gap-4 border-b border-line dark:border-white/10 px-6 py-5">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-400">
               <i className="fa-solid fa-clock-rotate-left"></i>
             </div>
             <div className="min-w-0">
-              <h3 className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+              <h3 className="text-base font-bold tracking-tight text-content-1 dark:text-white">
                 Restaurar copia de seguridad
               </h3>
-              <p className="mt-0.5 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <p className="mt-0.5 text-xs font-medium text-content-3 dark:text-content-3">
                 Lee un archivo .json generado por este sistema y vuelve a escribir sus datos.
               </p>
             </div>
@@ -67,7 +67,7 @@ export default function RestoreBackupModal({ restore }) {
             type="button"
             onClick={cerrarRestore}
             disabled={ejecutando}
-            className="shrink-0 rounded-lg p-2 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-40 dark:hover:bg-white/10 dark:hover:text-zinc-200 cursor-pointer transition-colors"
+            className="shrink-0 rounded-lg p-2 text-content-3 hover:bg-surface-3 hover:text-content-1 disabled:opacity-40 dark:hover:bg-surface-1/10 dark:hover:text-zinc-200 cursor-pointer transition-colors"
             aria-label="Cerrar"
           >
             <i className="fa-solid fa-xmark"></i>
@@ -79,8 +79,8 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* --- PASO 1: archivo --- */}
           <section>
-            <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-white text-[10px] text-white dark:text-zinc-900">1</span>
+            <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-surface-1 text-[10px] text-white dark:text-content-1">1</span>
               Archivo de respaldo
             </label>
             <input
@@ -89,15 +89,15 @@ export default function RestoreBackupModal({ restore }) {
               accept=".json,application/json"
               disabled={ejecutando}
               onChange={(e) => manejarArchivo(e.target.files?.[0])}
-              className="block w-full cursor-pointer rounded-xl border border-zinc-200 bg-zinc-50/50 text-xs font-medium text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 focus:border-brand-primary focus:outline-none disabled:opacity-50"
+              className="block w-full cursor-pointer rounded-control border border-line bg-surface-2/50 text-xs font-medium text-content-1 dark:border-white/10 dark:bg-surface-1/5 dark:text-zinc-200 focus:border-brand-primary focus:outline-none disabled:opacity-50"
             />
             {nombreArchivo && hayAnalisis && (
-              <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200">
-                <i className="fa-solid fa-file-lines text-zinc-400"></i>
+              <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-content-1 dark:text-zinc-200">
+                <i className="fa-solid fa-file-lines text-content-3"></i>
                 <span className="truncate">{nombreArchivo}</span>
                 <Chip tono="verde">{analisis.totalFilas} filas</Chip>
                 {analisis.metadata?.fechaGeneracion && (
-                  <span className="text-[10px] font-medium text-zinc-400">
+                  <span className="text-[10px] font-medium text-content-3">
                     generado el {new Date(analisis.metadata.fechaGeneracion).toLocaleDateString('es-PY')}
                   </span>
                 )}
@@ -107,7 +107,7 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* Avisos del análisis (filas descartadas, respaldo viejo, etc.) */}
           {hayAnalisis && analisis.avisos.length > 0 && (
-            <section className="space-y-1.5 rounded-xl border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-500/25 dark:bg-amber-500/5">
+            <section className="space-y-1.5 rounded-control border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-500/25 dark:bg-amber-500/5">
               {analisis.avisos.map((a, i) => (
                 <p key={i} className={`text-[11px] font-semibold leading-snug ${/CRÍTICO/.test(a) ? 'text-rose-700 dark:text-rose-400' : 'text-amber-800 dark:text-amber-300'}`}>
                   <i className={`fa-solid ${/CRÍTICO/.test(a) ? 'fa-triangle-exclamation' : 'fa-circle-info'} mr-1.5`}></i>
@@ -120,22 +120,22 @@ export default function RestoreBackupModal({ restore }) {
           {/* --- PASO 2: qué va a cambiar --- */}
           {hayAnalisis && (
             <section>
-              <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-white text-[10px] text-white dark:text-zinc-900">2</span>
+              <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">
+                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-surface-1 text-[10px] text-white dark:text-content-1">2</span>
                 Qué va a cambiar
               </label>
 
               {!hayCambios ? (
-                <div className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-white/10 dark:bg-white/5 p-4 text-center">
+                <div className="rounded-control border border-line bg-surface-2 dark:border-white/10 dark:bg-surface-1/5 p-4 text-center">
                   <i className="fa-solid fa-circle-check text-emerald-500 text-xl"></i>
-                  <p className="mt-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200">
+                  <p className="mt-2 text-xs font-semibold text-content-1 dark:text-zinc-200">
                     El respaldo coincide con la base actual. No hay nada que restaurar.
                   </p>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-white/10">
+                <div className="overflow-hidden rounded-control border border-line dark:border-white/10">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-zinc-50 dark:bg-white/5 text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <thead className="bg-surface-2 dark:bg-surface-1/5 text-[10px] uppercase tracking-wider text-content-3 dark:text-content-3">
                       <tr>
                         <th className="px-3 py-2 font-bold">Tabla</th>
                         <th className="px-2 py-2 text-right font-bold">Nuevas</th>
@@ -152,17 +152,17 @@ export default function RestoreBackupModal({ restore }) {
                         const marcada = !!tablasElegidas[clave];
                         return (
                           <tr key={clave} className={marcada ? '' : 'opacity-45'}>
-                            <td className="px-3 py-2 font-semibold text-zinc-800 dark:text-zinc-100">
+                            <td className="px-3 py-2 font-semibold text-content-1 dark:text-zinc-100">
                               {d.etiqueta}
-                              <span className="ml-1 text-[10px] font-medium text-zinc-400">{def?.tabla}</span>
+                              <span className="ml-1 text-[10px] font-medium text-content-3">{def?.tabla}</span>
                             </td>
                             <td className="px-2 py-2 text-right">
-                              {d.nuevas > 0 ? <Chip tono="verde">{d.nuevas}</Chip> : <span className="text-zinc-400">—</span>}
+                              {d.nuevas > 0 ? <Chip tono="verde">{d.nuevas}</Chip> : <span className="text-content-3">—</span>}
                             </td>
                             <td className="px-2 py-2 text-right">
-                              {d.actualizadas > 0 ? <Chip tono="ambar">{d.actualizadas}</Chip> : <span className="text-zinc-400">—</span>}
+                              {d.actualizadas > 0 ? <Chip tono="ambar">{d.actualizadas}</Chip> : <span className="text-content-3">—</span>}
                             </td>
-                            <td className="px-2 py-2 text-right text-zinc-400">{d.sinCambio}</td>
+                            <td className="px-2 py-2 text-right text-content-3">{d.sinCambio}</td>
                             <td className="px-3 py-2">
                               <input
                                 type="checkbox"
@@ -170,7 +170,7 @@ export default function RestoreBackupModal({ restore }) {
                                 disabled={ejecutando || !d.hayCambios}
                                 onChange={() => alternarTabla(clave)}
                                 aria-label={`Restaurar ${d.etiqueta}`}
-                                className="h-4 w-4 cursor-pointer rounded border-zinc-300 text-brand-primary focus:ring-brand-primary disabled:cursor-not-allowed dark:border-white/20 dark:bg-white/10"
+                                className="h-4 w-4 cursor-pointer rounded border-line-strong text-brand-primary focus:ring-brand-primary disabled:cursor-not-allowed dark:border-white/20 dark:bg-surface-1/10"
                               />
                             </td>
                           </tr>
@@ -190,18 +190,18 @@ export default function RestoreBackupModal({ restore }) {
                   .sort((a, b) => b.cambios.length - a.cambios.length)[0];
                 if (!conDetalle) return null;
                 return (
-                  <details className="mt-2 group rounded-xl border border-zinc-200 dark:border-white/10">
-                    <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-bold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/5">
+                  <details className="mt-2 group rounded-control border border-line dark:border-white/10">
+                    <summary className="cursor-pointer list-none px-3 py-2 text-[11px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-2 dark:hover:bg-surface-1/5">
                       <i className="fa-solid fa-chevron-down mr-1.5 text-[9px] transition-transform group-open:rotate-180"></i>
                       Ver cambios de {String(conDetalle?.etiqueta || '').toLowerCase()} ({conDetalle.cambios.length}
                       {conDetalle.cambiosOcultos > 0 ? `+${conDetalle.cambiosOcultos}` : ''})
                     </summary>
-                    <ul className="max-h-56 space-y-1 overflow-y-auto border-t border-zinc-100 px-3 py-2 dark:border-white/5">
+                    <ul className="max-h-56 space-y-1 overflow-y-auto border-t border-line px-3 py-2 dark:border-white/5">
                       {conDetalle.cambios.map((c) => (
-                        <li key={c.pk} className="text-[11px] text-zinc-600 dark:text-zinc-300">
-                          <span className="font-mono font-bold text-zinc-800 dark:text-zinc-100">{c.pk}</span>
-                          <span className="mx-1 text-zinc-400">→</span>
-                          <span className="text-zinc-500 dark:text-zinc-400">{c.campos.join(', ')}</span>
+                        <li key={c.pk} className="text-[11px] text-content-2 dark:text-content-3">
+                          <span className="font-mono font-bold text-content-1 dark:text-zinc-100">{c.pk}</span>
+                          <span className="mx-1 text-content-3">→</span>
+                          <span className="text-content-3 dark:text-content-3">{c.campos.join(', ')}</span>
                         </li>
                       ))}
                     </ul>
@@ -214,28 +214,28 @@ export default function RestoreBackupModal({ restore }) {
           {/* --- PASO 3: modo --- */}
           {hayAnalisis && hayCambios && (
             <section>
-              <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-white text-[10px] text-white dark:text-zinc-900">3</span>
+              <label className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">
+                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-zinc-900 dark:bg-surface-1 text-[10px] text-white dark:text-content-1">3</span>
                 Cómo restaurar
               </label>
               <div className="grid gap-2 sm:grid-cols-2">
-                <label className={`cursor-pointer rounded-xl border p-3 transition-colors ${modo === 'merge' ? 'border-brand-primary bg-brand-primary/5' : 'border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/5'}`}>
+                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'merge' ? 'border-brand-primary bg-brand-primary/5' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="restore-modo" checked={modo === 'merge'} onChange={() => setModo('merge')} disabled={ejecutando}
-                      className="h-4 w-4 cursor-pointer border-zinc-300 text-brand-primary focus:ring-brand-primary" />
-                    <span className="text-xs font-bold text-zinc-800 dark:text-zinc-100">Combinando (recomendado)</span>
+                      className="h-4 w-4 cursor-pointer border-line-strong text-brand-primary focus:ring-brand-primary" />
+                    <span className="text-xs font-bold text-content-1 dark:text-zinc-100">Combinando (recomendado)</span>
                   </div>
-                  <p className="mt-1.5 text-[11px] font-medium leading-snug text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1.5 text-[11px] font-medium leading-snug text-content-3 dark:text-content-3">
                     Lo que viene en el archivo pisa al registro con la misma clave. Lo demás se conserva.
                   </p>
                 </label>
-                <label className={`cursor-pointer rounded-xl border p-3 transition-colors ${modo === 'reemplazar' ? 'border-rose-400 bg-rose-50/60 dark:border-rose-500/40 dark:bg-rose-500/10' : 'border-zinc-200 hover:bg-zinc-50 dark:border-white/10 dark:hover:bg-white/5'}`}>
+                <label className={`cursor-pointer rounded-control border p-3 transition-colors ${modo === 'reemplazar' ? 'border-rose-400 bg-rose-50/60 dark:border-rose-500/40 dark:bg-rose-500/10' : 'border-line hover:bg-surface-2 dark:border-white/10 dark:hover:bg-surface-1/5'}`}>
                   <div className="flex items-center gap-2">
                     <input type="radio" name="restore-modo" checked={modo === 'reemplazar'} onChange={() => setModo('reemplazar')} disabled={ejecutando}
-                      className="h-4 w-4 cursor-pointer border-zinc-300 text-rose-500 focus:ring-rose-500" />
+                      className="h-4 w-4 cursor-pointer border-line-strong text-rose-500 focus:ring-rose-500" />
                     <span className="text-xs font-bold text-rose-700 dark:text-rose-400">Reemplazar todo</span>
                   </div>
-                  <p className="mt-1.5 text-[11px] font-medium leading-snug text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1.5 text-[11px] font-medium leading-snug text-content-3 dark:text-content-3">
                     Borra lo que no está en el archivo. Solo para volver a un estado anterior conocido.
                   </p>
                 </label>
@@ -246,7 +246,7 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* --- Progreso --- */}
           {ejecutando && progreso && (
-            <section className="rounded-xl border border-sky-200 bg-sky-50/60 p-3 dark:border-sky-500/25 dark:bg-sky-500/5">
+            <section className="rounded-control border border-sky-200 bg-sky-50/60 p-3 dark:border-sky-500/25 dark:bg-sky-500/5">
               <div className="flex items-center justify-between text-[11px] font-bold text-sky-800 dark:text-sky-300">
                 <span>{progreso.texto}</span>
                 <span className="font-mono">{progreso.hechas}/{progreso.total}</span>
@@ -262,14 +262,14 @@ export default function RestoreBackupModal({ restore }) {
 
           {/* --- Resultado --- */}
           {resultado && (
-            <section className={`rounded-xl border p-3 ${resultado.errores.length === 0 ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-500/25 dark:bg-emerald-500/5' : 'border-rose-200 bg-rose-50/60 dark:border-rose-500/25 dark:bg-rose-500/5'}`}>
+            <section className={`rounded-control border p-3 ${resultado.errores.length === 0 ? 'border-emerald-200 bg-emerald-50/60 dark:border-emerald-500/25 dark:bg-emerald-500/5' : 'border-rose-200 bg-rose-50/60 dark:border-rose-500/25 dark:bg-rose-500/5'}`}>
               <p className={`text-xs font-bold ${resultado.errores.length === 0 ? 'text-emerald-800 dark:text-emerald-300' : 'text-rose-800 dark:text-rose-300'}`}>
                 <i className={`fa-solid ${resultado.errores.length === 0 ? 'fa-circle-check' : 'fa-triangle-exclamation'} mr-1.5`}></i>
                 {resultado.errores.length === 0 ? 'Restauración completada' : `Restauración con ${resultado.errores.length} problema(s)`}
               </p>
               <ul className="mt-1.5 space-y-0.5">
                 {resultado.tablas.map(t => (
-                  <li key={t.clave} className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300">
+                  <li key={t.clave} className="text-[11px] font-medium text-content-2 dark:text-content-3">
                     <Chip tono={t.ok ? 'verde' : 'rojo'}>{t.ok ? 'OK' : 'Error'}</Chip>{' '}
                     {t.etiqueta}: {t.ok ? `${t.escritas} filas` : t.error}
                   </li>
@@ -285,9 +285,9 @@ export default function RestoreBackupModal({ restore }) {
         </div>
 
         {/* Pie con acciones */}
-        <div className="border-t border-zinc-100 px-6 py-4 dark:border-white/10">
+        <div className="border-t border-line px-6 py-4 dark:border-white/10">
           {ejecutando ? (
-            <p className="text-center text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+            <p className="text-center text-xs font-semibold text-content-3 dark:text-content-3">
               Restaurando… no se puede cancelar a mitad de camino.
             </p>
           ) : resultado ? (
@@ -298,13 +298,13 @@ export default function RestoreBackupModal({ restore }) {
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+              <p className="text-[11px] font-medium text-content-3 dark:text-content-3">
                 {hayAnalisis && hayCambios
-                  ? <>Se escribirán <strong className="font-bold text-zinc-700 dark:text-zinc-200">{totalSeleccionado}</strong> filas en {ORDEN_RESTAURACION.filter(c => tablasElegidas[c]).length} tabla(s).</>
+                  ? <>Se escribirán <strong className="font-bold text-content-1 dark:text-zinc-200">{totalSeleccionado}</strong> filas en {ORDEN_RESTAURACION.filter(c => tablasElegidas[c]).length} tabla(s).</>
                   : 'Elegí un archivo .json para ver qué se va a restaurar.'}
               </p>
               <div className="flex gap-2">
-                <button type="button" onClick={cerrarRestore} className={STYLES.btnPrimary + " !bg-zinc-100 !text-zinc-700 dark:!bg-white/10 dark:!text-zinc-200 hover:!bg-zinc-200 dark:hover:!bg-white/20"}>
+                <button type="button" onClick={cerrarRestore} className={STYLES.btnPrimary + " !bg-surface-3 !text-content-1 dark:!bg-surface-1/10 dark:!text-zinc-200 hover:!bg-surface-3 dark:hover:!bg-surface-1/20"}>
                   Cancelar
                 </button>
                 <button
@@ -346,13 +346,13 @@ function DetallePerdidas({ restore }) {
 
   const totalPerdidas = Object.values(perdidas || {}).reduce((s, v) => s + v.length, 0);
   if (cargando) {
-    return <p className="mt-2 text-[11px] font-medium text-zinc-500 dark:text-zinc-400"><i className="fa-solid fa-spinner fa-spin mr-1.5"></i>Calculando qué se perdería…</p>;
+    return <p className="mt-2 text-[11px] font-medium text-content-3 dark:text-content-3"><i className="fa-solid fa-spinner fa-spin mr-1.5"></i>Calculando qué se perdería…</p>;
   }
   if (totalPerdidas === 0) {
     return <p className="mt-2 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-circle-check mr-1.5"></i>Nada se perdería: el archivo contiene todo lo que hay hoy.</p>;
   }
   return (
-    <div className="mt-2 space-y-1 rounded-xl border border-rose-200 bg-rose-50/60 p-3 dark:border-rose-500/25 dark:bg-rose-500/5">
+    <div className="mt-2 space-y-1 rounded-control border border-rose-200 bg-rose-50/60 p-3 dark:border-rose-500/25 dark:bg-rose-500/5">
       <p className="text-[11px] font-bold text-rose-700 dark:text-rose-400">
         <i className="fa-solid fa-triangle-exclamation mr-1.5"></i>
         Se borrarán {totalPerdidas} registro(s) que no están en el archivo:

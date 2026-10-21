@@ -133,7 +133,16 @@ export async function montarApp({ usuario = null, datos = {}, conTour = false } 
 }
 
 function controlador(raiz, contenedor) {
-  const todos = () => Array.from(contenedor.querySelectorAll('*'));
+  /**
+   * Raiz de busqueda.
+   *
+   * document.body y no solo #root: el primitive <Modal> se monta con
+   * createPortal sobre document.body, asi que los dialogos (y su contenido)
+   * quedan fuera del contenedor de la app. Buscar solo en el contenedor hacia
+   * que el harness no viera los dialogos nuevos.
+   */
+  const raizBusqueda = () => document.body || contenedor;
+  const todos = () => Array.from(raizBusqueda().querySelectorAll('*'));
 
   /**
    * Primer elemento cuyo texto visible incluye el texto buscado.
@@ -169,8 +178,8 @@ function controlador(raiz, contenedor) {
     raiz,
     contenedor,
 
-    /** Texto visible del modulo renderizado. */
-    texto: () => (contenedor.textContent || '').replace(/\s+/g, ' ').trim(),
+    /** Texto visible del modulo renderizado (incluidos los portales). */
+    texto: () => (raizBusqueda().textContent || '').replace(/\s+/g, ' ').trim(),
 
     porTexto,
     todosPorTexto,
@@ -228,7 +237,18 @@ function controlador(raiz, contenedor) {
 
     /** Cantidad de elementos que coinciden. */
     contar(selector) {
-      return contenedor.querySelectorAll(selector).length;
+      return raizBusqueda().querySelectorAll(selector).length;
+    },
+
+    /**
+     * Llamadas hechas a Supabase (url y metodo).
+     *
+     * Sirve para comprobar que una accion ESCRIBIO de verdad y no solo
+     * cambio el estado de la pantalla: un DELETE contra /funcionarios es la
+     * diferencia entre "la interfaz dijo que elimino" y "elimino".
+     */
+    llamadas() {
+      return (globalThis.fetch && globalThis.fetch.__llamadas) || [];
     },
 
     /**
@@ -241,9 +261,12 @@ function controlador(raiz, contenedor) {
     async hayDialogo(ms = 2500) {
       const limite = Date.now() + ms;
       while (Date.now() < limite) {
+        // El <Modal> nuevo usa role="dialog" + z-[400]; los overlays viejos
+        // usan STYLES.modalOverlay, cuyo z-index subio a z-[400].
         if (
-          contenedor.querySelector('[role="dialog"]') !== null ||
-          contenedor.querySelector('.z-\\[300\\]') !== null
+          raizBusqueda().querySelector('[role="dialog"]') !== null ||
+          raizBusqueda().querySelector('.z-\\[300\\]') !== null ||
+          raizBusqueda().querySelector('.z-\\[400\\]') !== null
         ) {
           return true;
         }
@@ -256,7 +279,7 @@ function controlador(raiz, contenedor) {
     async hayToast(ms = 2500) {
       const limite = Date.now() + ms;
       while (Date.now() < limite) {
-        if (contenedor.querySelector('[role="status"]') !== null) return true;
+        if (raizBusqueda().querySelector('[role="status"]') !== null) return true;
         await settle(60);
       }
       return false;
@@ -264,7 +287,7 @@ function controlador(raiz, contenedor) {
 
     /** Escribe en un input por su name. */
     async escribir(name, valor) {
-      const el = contenedor.querySelector(`[name="${name}"]`);
+      const el = raizBusqueda().querySelector(`[name="${name}"]`);
       if (!el) throw new Error('No se encontro el campo ' + name);
       const setter = Object.getOwnPropertyDescriptor(
         window.HTMLInputElement.prototype,

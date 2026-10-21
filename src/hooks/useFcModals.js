@@ -595,13 +595,21 @@ export function useFcModals({
     }
     
     try {
-        let res;
-        if (usuarioEditing) {
-            const updateData = { nombre: userData.nombre, cargo: userData.cargo, dependencia: userData.dependencia };
-            res = await supabase.from('usuarios').update(updateData).eq('username', usuarioEditing.username);
-        } else {
-            res = await supabase.from('usuarios').insert([userData]);
-        }
+        // El guardado va por el RPC admin_guardar_usuario y no con un
+        // insert/update directo. La tabla `usuarios` guarda las contrasenas, asi
+        // que los autenticados solo pueden leer cuatro columnas; el cliente de
+        // Supabase hace un HEAD a la tabla antes de insertar (para conocer las
+        // columnas por defecto) y ese HEAD pedia la tabla entera -> 403
+        // Forbidden y el alta de usuarios fallaba. El RPC hace lo mismo por
+        // dentro (donde si hay permiso), comprueba que quien llama sea
+        // administrador y nunca toca la contrasena (esa vive en Supabase Auth).
+        const { data: guardado, error } = await supabase.rpc('admin_guardar_usuario', {
+            p_username: usuarioEditing ? usuarioEditing.username : (userData.username || ''),
+            p_nombre: userData.nombre,
+            p_cargo: userData.cargo,
+            p_dependencia: userData.dependencia
+        });
+        const res = { error, data: guardado };
         
         if (!res.error) {
             notify(usuarioEditing ? "Usuario actualizado" : "Usuario creado", "success");
@@ -609,7 +617,7 @@ export function useFcModals({
             if (usuarioEditing) {
                 setUsuariosList(prev => prev.map(u => u.username === usuarioEditing.username ? { ...u, nombre: userData.nombre, cargo: userData.cargo, dependencia: userData.dependencia } : u));
             } else {
-                setUsuariosList(prev => [...prev, userData]);
+                setUsuariosList(prev => [...prev, { ...userData, password: undefined }]);
             }
         } else {
             notify(res.error.message || "Error al procesar la solicitud", "error");

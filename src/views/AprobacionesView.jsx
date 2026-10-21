@@ -11,6 +11,7 @@ const ESTADO_INFO = {
 };
 
 export default function AprobacionesView({
+  dependenciaActual,
   solicitudesBaja, bienes,
   openResolucionModal,
  
@@ -44,7 +45,7 @@ export default function AprobacionesView({
         <div className="p-5 sm:p-6">
           <PageHeader
             titulo={'Centro de Aprobaciones'}
-            descripcion={'Gestión y auditoría de solicitudes de baja en <strong className=\'text-content-1 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
+            descripcion={<>Gestión y auditoría de solicitudes de baja en <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong></>}
             icono="fa-check-to-slot"
             contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">

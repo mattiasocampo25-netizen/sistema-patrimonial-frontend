@@ -62,6 +62,11 @@ export default function FiltroCombo({
   const lista = useMemo(() => {
     const base = items.map(o => ({ ...o, norm: normalizeStr(o.label) }));
     const filtrada = q ? base.filter(o => o.norm.includes(q)) : base;
+    // Sin texto de busqueda NO se reordena: el orden de las opciones es el
+    // que tiene sentido (los meses en orden del calendario, las
+    // dependencias en el suyo). Antes se ordenaba por localeCompare y la
+    // lista de meses salia Abril, Agosto, Diciembre, Enero...
+    if (!q) return filtrada.slice(0, 100);
     return filtrada
       .map(o => ({ ...o, score: puntuarOpcion(o.norm, q) }))
       .sort((a, b) => a.score - b.score || a.label.localeCompare(b.label, 'es'))

@@ -4,6 +4,7 @@ import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, T
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
+  dependenciaActual,
   funcionariosPurosDependencia, 
   sincronizarBienesConPadron, handleDownloadTemplateFuncionarios,
   fileInputFuncionariosRef, isAdmin, setIsUbicacionesModalOpen,
@@ -21,7 +22,7 @@ export default function FuncionariosView({
           <div className="p-5 sm:p-6">
             <PageHeader
               titulo={'Plantel de Funcionarios'}
-              descripcion={'Directorio oficial de personal asignado a <strong className=\'text-content-1 dark:text-white font-semibold\'>{dependenciaActual}</strong>'}
+              descripcion={<>Directorio oficial de personal asignado a <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong></>}
               icono="fa-address-book"
               contador={(
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
@@ -129,11 +130,12 @@ export default function FuncionariosView({
                   if (f.esSeparador) {
                       return (
                           <TRow key={`sep-${f.letra}-${idx}`}>
-                              <TD colSpan="4" className="py-2.5 pl-8 pr-4 bg-surface-2/70 dark:bg-surface-1/[0.02] border-y border-line dark:border-white/5">
-                                  <span className="inline-flex items-center justify-center h-6 w-6 rounded-lg bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[11px] font-bold">
-                                      {f.letra}
-                                  </span>
-                              </TD>
+                              <TD colSpan="4" className="pt-5 pb-2 pl-8 pr-4">
+  <div className="flex items-center gap-3" role="rowheader" aria-label={`Grupo ${f.letra}`}>
+    <span className="text-label font-black uppercase tracking-[0.2em] text-content-3 dark:text-content-3">{f.letra}</span>
+    <span className="h-px flex-1 bg-line dark:bg-line/70" />
+  </div>
+</TD>
                           </TRow>
                       );
                   }

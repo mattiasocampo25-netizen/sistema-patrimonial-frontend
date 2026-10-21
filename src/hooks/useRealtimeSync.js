@@ -144,8 +144,18 @@ export function useRealtimeSync({
     // --- FIN DE VALIDACIÓN DE ROL ---
 
     let vencido = false;
-    timeoutId = setTimeout(() => { vencido = true; }, 8000);
-    const sigueVigente = () => !vencido && guardaGen.vigente(turno);
+    // La carga inicial descarga TODO el inventario de la dependencia (miles de
+    // filas). El margen de 8 s estaba pensado para una peticion colgada y se
+    // cumplia en cada primera carga: la descarga se abortaba y el inventario
+    // quedaba vacio. 45 s para la carga completa, 20 s para el delta.
+    const margenMs = isSilent ? 20000 : 45000;
+    timeoutId = setTimeout(() => { vencido = true; }, margenMs);
+    // "Esta carga ya no vale" (arranco otra mas nueva): ahi si no se escribe.
+    const turnoVigente = () => guardaGen.vigente(turno);
+    // "Esta carga tardo demasiado": se avisa, pero los datos que llegaron bien
+    // se usan. Antes las dos cosas eran la misma y se perdian datos ya
+    // descargados.
+    const sigueVigente = () => !vencido && turnoVigente();
 
       const fetchPromise = (async () => {
         // --- BIENES: descarga total solo si hace falta, si no delta por updated_at ---
@@ -191,10 +201,10 @@ export function useRealtimeSync({
           // Si ninguna fila trae sello (datos legacy), el punto de sync es "ahora":
           // desde aquí, toda edición ya sale sellada y entra en el delta.
           await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || ahoraISO(), actualizadoEn: Date.now() });
-          if (!sigueVigente()) return;
+          if (!turnoVigente()) return;
           setBienes(inventarioFinal);
         } else {
-          if (!sigueVigente()) return;
+          if (!turnoVigente()) return;
           setBienes([]);
         }
         } else {
@@ -208,7 +218,7 @@ export function useRealtimeSync({
           const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, cambios || [], dependenciaActual);
           await localforage.setItem(CACHE_BIENES, lista);
           await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: Date.now() });
-          if (!sigueVigente()) return;
+          if (!turnoVigente()) return;
           setBienes(lista);
         }
 
@@ -240,7 +250,7 @@ export function useRealtimeSync({
         };
 
         // Punto único de decisión: si meanwhile arrancó otra carga, esta ya no escribe.
-        if (!sigueVigente()) return;
+        if (!turnoVigente()) return;
 
         setFc10List(parseDirect(resFc10.data));
         setFc11List(parseDirect(resFc11.data));

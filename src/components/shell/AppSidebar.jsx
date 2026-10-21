@@ -69,14 +69,14 @@ function ItemNav({ item, activo, onIr, solicitudes, t }) {
       data-tour={`nav-${item.id}`}
       className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${
         activo
-          ? 'bg-brand-soft text-brand-text font-bold'
-          : 'text-content-2 font-medium hover:bg-surface-2 hover:text-content-1'
+          ? 'bg-white/10 text-white font-bold'
+          : 'text-sidebar-content-2 font-medium hover:bg-white/[0.07] hover:text-sidebar-content'
       }`}
     >
       {activo ? (
         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-pill bg-brand" aria-hidden="true" />
       ) : null}
-      <span className={`flex items-center justify-center w-6 shrink-0 ${activo ? 'text-brand-text' : 'text-content-3 group-hover:text-content-1'}`}>
+      <span className={`flex items-center justify-center w-6 shrink-0 ${activo ? 'text-brand-text' : 'text-sidebar-content-2 group-hover:text-sidebar-content'}`}>
         <i className={`fa-solid ${item.icon} text-[13px]`} aria-hidden="true" />
       </span>
       <span className="flex-1 text-left tracking-tight truncate">{t(item.label)}</span>
@@ -97,9 +97,9 @@ function ItemHerramienta({ icono, titulo, onClick, badge }) {
       type="button"
       onClick={onClick}
       title={titulo}
-      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-medium text-content-2 hover:bg-surface-2 hover:text-content-1 transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-medium text-sidebar-content-2 hover:bg-white/[0.07] hover:text-sidebar-content transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
-      <span className="flex items-center justify-center w-6 shrink-0 text-content-3 group-hover:text-content-1">
+      <span className="flex items-center justify-center w-6 shrink-0 text-sidebar-content-2 group-hover:text-sidebar-content">
         <i className={`fa-solid ${icono} text-[13px]`} aria-hidden="true" />
       </span>
       <span className="flex-1 text-left tracking-tight truncate">{titulo}</span>
@@ -148,23 +148,23 @@ export default function AppSidebar({
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col bg-surface-1 border-r border-line shrink-0 transition-transform duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[264px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-transform duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${
           isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full'
         }`}
         aria-label="Navegación principal"
       >
         {/* Identidad */}
-        <div className="shrink-0 border-b border-line px-5 py-4">
+        <div className="shrink-0 border-b border-sidebar-line px-5 py-4">
           {appLogo ? (
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1 shadow-card border border-line overflow-hidden p-1.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-white/10 shadow-card border border-white/10 overflow-hidden p-1.5">
                 <img src={appLogo} alt="Logo Institucional" className="w-full h-full object-contain" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-body font-black tracking-tight leading-snug text-content-1 truncate">
+                <h2 className="text-body font-black tracking-tight leading-snug text-sidebar-content truncate">
                   Dpto. Bienes Patrimoniales
                 </h2>
-                <p className="text-label font-semibold text-content-3 uppercase tracking-widest mt-0.5 truncate">
+                <p className="text-label font-semibold text-sidebar-content-2 uppercase tracking-widest mt-0.5 truncate">
                   Universidad Nacional de Pilar
                 </p>
               </div>
@@ -197,7 +197,7 @@ export default function AppSidebar({
             if (!visibles.length) return null;
             return (
               <div key={grupo.titulo}>
-                <p className="px-3 pb-1.5 text-label font-bold text-content-3 uppercase tracking-[0.16em]">
+                <p className="px-3 pb-1.5 text-label font-bold text-sidebar-content-2 uppercase tracking-[0.16em]">
                   {grupo.titulo}
                 </p>
                 <div className="space-y-0.5">
@@ -219,8 +219,8 @@ export default function AppSidebar({
 
         {/* Herramientas de administración */}
         {isAdmin ? (
-          <div className="shrink-0 border-t border-line px-3 py-3 space-y-0.5">
-            <p className="px-3 pb-1.5 text-label font-bold text-content-3 uppercase tracking-[0.16em]">
+          <div className="shrink-0 border-t border-sidebar-line px-3 py-3 space-y-0.5">
+            <p className="px-3 pb-1.5 text-label font-bold text-sidebar-content-2 uppercase tracking-[0.16em]">
               Utilidades
             </p>
             <ItemHerramienta

@@ -15,4 +15,6 @@ export { default as Badge, Chip, ChipGroup } from './Badge';
 export { default as EmptyState, Skeleton, SkeletonGroup } from './EmptyState';
 export { default as Modal, Drawer } from './Modal';
 export { default as StatTile, KpiGrid } from './StatTile';
+export { default as Tile } from './Tile';
+export { default as ProgressRing } from './ProgressRing';
 export { Table, THead, TBody, TRow, TH, TD, Pagination } from './Table';

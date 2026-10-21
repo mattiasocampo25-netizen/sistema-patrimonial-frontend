@@ -2,7 +2,9 @@ import React, { useState, useMemo } from 'react';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
-import { Card } from '../components/ui';
+import { Card, Tile } from '../components/ui';
+import { getLogoPorDependencia } from '../utils/helpers';
+import { useResumenDependencias } from '../hooks/useResumenDependencias';
 
 // Vista del panel principal (extraída de App.jsx, Fase 5).
 export default function DashboardView({
@@ -12,7 +14,7 @@ export default function DashboardView({
   setBienEditing, setIsBienModalOpen, fileInputRef, handleExportInventarioCSV,
   setIsBulkQR, setQrTargetBien, setIsQRModalOpen, openFC03Modal,
   setFc10Year, setFc10Month,
-  fc10List, bienes, registrarAmbasFirmas, firmandoId
+  fc10List, bienes, registrarAmbasFirmas, firmandoId, requestDependenciaChange
 }) {
   const actasPorFirmar = useMemo(() => (fc10List || [])
     .filter(fc => !fc.devolucionFecha && pendienteDeFirma(fc))
@@ -110,6 +112,23 @@ export default function DashboardView({
       showProgress: false,
     },
   ];
+
+  // Tiles por dependencia. El resumen (total, buenos, valor) lo calcula el
+  // servidor con el RPC resumen_por_dependencia: traer las 13.673 filas al
+  // navegador para sacar ocho numeros no tiene sentido (egress y row budget).
+  const { resumen: resumenDependencias } = useResumenDependencias();
+  const tilesPorDependencia = useMemo(
+    () =>
+      (resumenDependencias || []).map((r, i) => ({
+        dep: r.dependencia,
+        indice: i,
+        total: Number(r.total) || 0,
+        buenos: Number(r.buenos) || 0,
+        pctBueno: Number(r.total) ? (Number(r.buenos) / Number(r.total)) * 100 : 0,
+        logo: getLogoPorDependencia(r.dependencia, 'webp')
+      })),
+    [resumenDependencias]
+  );
 
   return (
     <div className="space-y-6 sm:space-y-7 pb-16">
@@ -320,6 +339,29 @@ export default function DashboardView({
               ))}
           </div>
       </div>
+      )}
+
+
+      {/* 2b. TILES POR DEPENDENCIA */}
+      {widgets.metricas && tilesPorDependencia.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {tilesPorDependencia.map((t) => (
+            <Tile
+              key={t.dep}
+              titulo={t.dep}
+              subtitulo={t.total.toLocaleString('es-PY') + ' bienes'}
+              estado={t.buenos + ' en buen estado'}
+              porcentaje={t.pctBueno}
+              indice={t.indice}
+              logo={t.logo}
+              onClick={
+                requestDependenciaChange && t.dep !== dependenciaActual
+                  ? () => requestDependenciaChange(t.dep)
+                  : undefined
+              }
+            />
+          ))}
+        </div>
       )}
 
       {/* 3. ACCESOS DIRECTOS */}

@@ -33,6 +33,7 @@
   --color-surface-1: var(--surface-1);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-glass: var(--surface-glass);
 
   /* --- Contenido --- */
   --color-content-1: var(--content-1);
@@ -43,6 +44,12 @@
   /* --- Bordes --- */
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+
+  /* --- Sidebar: oscuro en los dos temas (como en la referencia) --- */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-content: var(--sidebar-content);
+  --color-sidebar-content-2: var(--sidebar-content-2);
+  --color-sidebar-line: var(--sidebar-line);
 
   /* --- Marca --- */
   --color-brand: var(--brand);
@@ -59,6 +66,16 @@
   --color-ok-soft: var(--ok-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+
+  /* --- Paleta pastel para los tiles por dependencia --- */
+  --color-pastel-1: var(--pastel-1);
+  --color-pastel-2: var(--pastel-2);
+  --color-pastel-3: var(--pastel-3);
+  --color-pastel-4: var(--pastel-4);
+  --color-pastel-5: var(--pastel-5);
+  --color-pastel-6: var(--pastel-6);
+  --color-pastel-7: var(--pastel-7);
+  --color-pastel-8: var(--pastel-8);
 
   /* --- Radios: una sola escala para toda la app --- */
   --radius-control: 0.625rem;   /* 10px  botones, inputs, chips */
@@ -93,18 +110,27 @@
 :root {
   color-scheme: light;
 
-  --canvas: #f4f6f8;
+  /* Fondo calido (no gris frio): el tono de la referencia */
+  --canvas: #f3f2ee;
   --surface-1: #ffffff;
-  --surface-2: #f8fafc;
-  --surface-3: #eef2f6;
+  --surface-2: #f8f7f4;
+  --surface-3: #eceae4;
+  /* Superficie "glass": translucida, con desenfoque de fondo */
+  --surface-glass: rgb(255 255 255 / 0.72);
 
-  --content-1: #0f172a;
-  --content-2: #475569;
-  --content-3: #64748b;
+  --content-1: #16181d;
+  --content-2: #4a4f57;
+  --content-3: #6b7280;
   --content-inverse: #ffffff;
 
-  --line: #e2e8f0;
-  --line-strong: #cbd5e1;
+  --line: #e6e3dc;
+  --line-strong: #d3cfc5;
+
+  /* Sidebar oscuro en los dos temas */
+  --sidebar: #14161a;
+  --sidebar-content: #f2f3f5;
+  --sidebar-content-2: #8b9099;
+  --sidebar-line: #24272e;
 
   --brand: #1d4ed8;
   --brand-hover: #1e40af;
@@ -120,6 +146,16 @@
   --info: #0369a1;
   --info-soft: #f0f9ff;
 
+  /* Paleta pastel para los tiles por dependencia */
+  --pastel-1: #d9f2e6;
+  --pastel-2: #fde5d3;
+  --pastel-3: #d6e9fb;
+  --pastel-4: #f7ecd2;
+  --pastel-5: #e7ddfa;
+  --pastel-6: #d9eefb;
+  --pastel-7: #e4f4d4;
+  --pastel-8: #fbdcea;
+
   /* Sombras un poco mas marcadas en claro */
   --shadow-card: 0 1px 2px rgb(15 23 42 / 0.05), 0 1px 3px rgb(15 23 42 / 0.07);
   --shadow-panel: 0 4px 12px rgb(15 23 42 / 0.09), 0 2px 4px rgb(15 23 42 / 0.05);
@@ -129,22 +165,28 @@
 .dark {
   color-scheme: dark;
 
-  --canvas: #0b0f19;
-  --surface-1: #111827;
-  --surface-2: #161f2e;
-  --surface-3: #1e293b;
+  --canvas: #0d0f13;
+  --surface-1: #171a20;
+  --surface-2: #1d2129;
+  --surface-3: #262b34;
+  --surface-glass: rgb(23 26 32 / 0.72);
 
-  --content-1: #f8fafc;
-  --content-2: #cbd5e1;
-  --content-3: #94a3b8;
+  --content-1: #f4f5f7;
+  --content-2: #c3c8d0;
+  --content-3: #8b929c;
   --content-inverse: #0f172a;
 
-  --line: #1f2937;
-  --line-strong: #334155;
+  --line: #262b34;
+  --line-strong: #39404b;
+
+  --sidebar: #0a0c0f;
+  --sidebar-content: #eef0f3;
+  --sidebar-content-2: #868d97;
+  --sidebar-line: #1b1f26;
 
   --brand: #60a5fa;
   --brand-hover: #93c5fd;
-  --brand-soft: #1e3a8a;
+  --brand-soft: #1c2f55;
   --brand-text: #bfdbfe;
 
   --danger: #fb7185;
@@ -155,6 +197,16 @@
   --ok-soft: #022c22;
   --info: #38bdf8;
   --info-soft: #082f49;
+
+  /* Pasteles apagados para el modo oscuro */
+  --pastel-1: #16342a;
+  --pastel-2: #3a2617;
+  --pastel-3: #152c47;
+  --pastel-4: #36301a;
+  --pastel-5: #271f3d;
+  --pastel-6: #142e3d;
+  --pastel-7: #1d3319;
+  --pastel-8: #3a1f2b;
 
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-panel: 0 4px 12px rgb(0 0 0 / 0.5);

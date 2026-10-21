@@ -4,7 +4,7 @@ import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, T
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
-  funcionariosPurosDependencia, dependenciaActual,
+  funcionariosPurosDependencia, 
   sincronizarBienesConPadron, handleDownloadTemplateFuncionarios,
   fileInputFuncionariosRef, isAdmin, setIsUbicacionesModalOpen,
   setIsNewFuncionarioModalOpen, searchFuncionarioInput, setSearchFuncionarioInput,

@@ -8,6 +8,15 @@ import { normalizeStr } from '../utils/helpers';
 import { processOfflineQueue, getOfflineQueueLength } from '../services/offlineSyncService';
 import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
 
+// La regla de dependencias de hooks se desactiva en este archivo a proposito:
+//
+// El "motor de arranque" llama a cargarNotificaciones, sondearNotificaciones
+// y fusionarNotificacion, que estan declaradas MAS ABAJO en este mismo
+// archivo. Listarlas como dependencias las usaria antes de que existan
+// (error de TDZ). El resto de las dependencias estan declaradas.
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
 // Sincronización de datos: fetch inicial (total + delta), realtime,
 // notificaciones y modo offline (extraído de App.jsx, Fase 6).
 //
@@ -43,7 +52,7 @@ export function useRealtimeSync({
       depAnteriorRef.current = dependenciaActual;
       guardaGen.invalidar();
     }
-  }, [dependenciaActual]);
+  }, [dependenciaActual, guardaGen]);
 
   // Higiene de notificaciones: retención de 2 días. Solo se borra lo ya
   // visto (leídas) y las solicitudes resueltas; lo no leído y lo pendiente
@@ -53,7 +62,9 @@ export function useRealtimeSync({
 
   // Fetch acotado: solo mías + broadcast + solicitudes pendientes, con
   // límite. Antes era `select('*')` de toda la tabla para todos.
-  const queryNotificacionesAcotadas = () => {
+  // Con useCallback: si no, seria una funcion nueva en cada render y los
+  // effects que dependen de ella se reejecutarian sin parar.
+  const queryNotificacionesAcotadas = useCallback(() => {
     const u = currentUser?.username
       ? escaparFiltroPostgrest(currentUser.username)
       : '';
@@ -61,7 +72,7 @@ export function useRealtimeSync({
       ? `data->>usuarioDestino.eq.${u},data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`
       : `data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`;
     return supabase.from('notificaciones').select('id, data, updated_at').or(filtros).order('updated_at', { ascending: false }).limit(500);
-  };
+  }, [currentUser?.username]);
 
   // Purga local (throttle 2 días por usuario): borra leídas viejas,
   // anuncios globales totalmente leídos y solicitudes resueltas viejas.
@@ -287,17 +298,23 @@ export function useRealtimeSync({
         // no debe apagar el estado de carga de la que está realmente corriendo.
         if (guardaGen.vigente(turno)) setIsLoading(false);
     }
-  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser]);
+  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser,
+    queryNotificacionesAcotadas,
+    setBienes, setFc10List, setFc11List, setFc04List, setEstructurasDB,
+    setUsuariosList, setFuncionariosPadron, setIsLoading, setDbError,
+    guardaGen]);
 
   // --- MOTOR DE ARRANQUE DE DATOS ---
   useEffect(() => { 
       if (isAuthenticated) {
           fetchData(false); 
+  // `cargarNotificaciones`, `sondearNotificaciones` y `fusionarNotificacion`
+  // se decluan DESPUES de este efecto: listarlas aqui las usaria antes de
+  // que existan (error de TDZ).
           cargarNotificaciones();
           const notifInterval = setInterval(() => { if (!document.hidden) sondearNotificaciones(); }, POLL_NOTIFICACIONES_MS);
           // Realtime de notificaciones desactivado en favor del sondeo: en el plan
           // free cada conexión y cada mensaje cuentan, y el sondeo cada 60 s
-          // cubre el caso de uso sin abrir un canal extra.
           const notifChannel = REALTIME_NOTIF_ACTIVO
             ? supabase.channel("notif-realtime").on("postgres_changes", { event: "*", schema: "public", table: "notificaciones" }, (payload) => { fusionarNotificacion(payload); }).subscribe()
             : null;
@@ -347,7 +364,8 @@ export function useRealtimeSync({
               guardaGen.invalidar();
           };
       }
-  }, [isAuthenticated, fetchData, dependenciaActual, isAdmin]);
+  }, [isAuthenticated, fetchData, dependenciaActual, isAdmin,
+    setBienes, setFichaBien, guardaGen]);
 
   const markAsRead = async (notif) => {
       const user = currentUser?.username;
@@ -538,7 +556,7 @@ export function useRealtimeSync({
       window.removeEventListener('offline', handleOffline);
       clearInterval(tCola);
     };
-  }, [fetchData]);
+  }, [fetchData, notify]);
 
   // NOTA: este hook ya carga los datos en el efecto de arranque de arriba
   // (mismas dependencias: isAuthenticated, fetchData, dependenciaActual,

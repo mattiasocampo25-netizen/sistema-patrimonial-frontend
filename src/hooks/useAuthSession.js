@@ -228,7 +228,7 @@ useEffect(() => {
     } catch {}
   })();
   return () => { vivo = false; };
-}, [mantenimiento?.en_mantenimiento]);
+}, [mantenimiento?.en_mantenimiento, esDesarrollador, currentUser]);
 
 const saveMantenimiento = async (data) => {
   setIsSavingMant(true);

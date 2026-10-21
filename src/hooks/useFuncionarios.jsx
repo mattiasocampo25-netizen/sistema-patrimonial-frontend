@@ -18,7 +18,7 @@ export const ITEMS_POR_PAGINA_FUNCS = 20;
 // - setPendingCSVImport: staging del CSV de bienes (vive en App, se comparte).
 export function useFuncionarios({
   funcionariosPadron, setFuncionariosPadron, dependenciaActual,
-  bienes, setBienes, fc10List, currentUser, isAdmin,
+  bienes, setBienes, fc10List, _currentUser, isAdmin,
   notify, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
   setPendingCSVImport
 }) {
@@ -246,7 +246,7 @@ export function useFuncionarios({
                 nombre: nombreCSV,   
                 cargo: cargoCSV,   
                 dependencia: dependenciaActual,  
-                esActualizacion: !!huerfanoExistente   
+                _esActualizacion: !!huerfanoExistente   
             };  
     
             if (isDuplicateDB || isDuplicateBatch) {  
@@ -289,7 +289,7 @@ export function useFuncionarios({
             setFuncionariosPadron(prev => [...prev, nuevoFunc]);  
             notify("Funcionario registrado exitosamente", "success");  
             setIsNewFuncionarioModalOpen(false);  
-        } catch (err) {  
+        } catch {  
             notify("Error al registrar el funcionario en la base de datos.", "error");  
         }  
     };  
@@ -299,12 +299,12 @@ export function useFuncionarios({
       setIsProcessing({ active: true, text: 'Sincronizando funcionarios...' });  
         
       try {  
-          const porActualizar = pendingFuncionariosToImport.filter(f => f.esActualizacion);  
-          const porInsertar = pendingFuncionariosToImport.filter(f => !f.esActualizacion);  
+          const porActualizar = pendingFuncionariosToImport.filter(f => f._esActualizacion);  
+          const porInsertar = pendingFuncionariosToImport.filter(f => !f._esActualizacion);  
     
           if (porInsertar.length > 0) {  
-              // Limpiamos el objeto para quitar 'esActualizacion' antes de insertar  
-              const payloadInsert = porInsertar.map(({ esActualizacion, ...rest }) => rest);  
+              // Limpiamos el objeto para quitar '_esActualizacion' antes de insertar  
+              const payloadInsert = porInsertar.map(({ _esActualizacion, ...rest }) => rest);  
               const { error: errIns } = await supabase.from('funcionarios').insert(payloadInsert);  
               if (errIns) throw errIns;  
           }  
@@ -322,7 +322,7 @@ export function useFuncionarios({
               porActualizar.forEach(act => {  
                   lista = lista.map(f => f.id === act.id ? { ...f, cedula: act.cedula, cargo: act.cargo, nombre: act.nombre } : f);  
               });  
-              const nuevos = porInsertar.map(({ esActualizacion, ...rest }) => rest);  
+              const nuevos = porInsertar.map(({ _esActualizacion, ...rest }) => rest);  
               return [...nuevos, ...lista];  
           });  
           notify(`¡Éxito! Procesados ${pendingFuncionariosToImport.length} registros (${porActualizar.length} actualizados).`, "success");  
@@ -367,7 +367,7 @@ export function useFuncionarios({
           setFuncionariosPadron(prev => prev.map(f => f.id === funcionarioToEdit.id ? { ...f, nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion } : f));  
           notify("Funcionario actualizado exitosamente", "success");  
           setIsFuncionarioModalOpen(false);  
-      } catch (err) {  
+      } catch {  
           notify("Error al actualizar el funcionario", "error");  
       }  
     };  

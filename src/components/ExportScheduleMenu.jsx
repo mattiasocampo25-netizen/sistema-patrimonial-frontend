@@ -97,7 +97,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
 
             {/* Generar ahora */}
             <button
-              onClick={() => { setAbierto(false); onEjecutarAhora && onEjecutarAhora(); }}
+              onClick={() => { setAbierto(false); if (onEjecutarAhora) onEjecutarAhora(); }}
               disabled={disabled}
               className="w-full mt-2 h-9 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-xs font-bold hover:bg-zinc-700 dark:hover:bg-surface-3 motion active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
             >

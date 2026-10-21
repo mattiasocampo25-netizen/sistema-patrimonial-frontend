@@ -43,8 +43,20 @@ const InventarioView = lazyConReintento(() => import('./views/InventarioView'));
 import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
 import ErrorView from './views/ErrorView';
-import KioskBar, { BotonPantallaCompleta, parseIdleSegundos } from './components/KioskBar';
+import KioskBar, { BotonPantallaCompleta } from './components/KioskBar';
+import { parseIdleSegundos } from './utils/kiosk';
 import { obtenerProgramacion, guardarProgramacion, tocaEjecutar, construirCSVInventario, nombreArchivoInventario, descargarYArchivar } from './services/exportSchedule';
+
+// La regla de dependencias de hooks se desactiva en este archivo a proposito:
+//
+// - El efecto del teclado usa setIsBienModalOpen y setBienEditing, que
+//   vienen de un hook declarado mas abajo en el archivo: listarlos los
+//   usaria antes de que existan (error de TDZ).
+// - El efecto de la exportacion programada usa ejecutarExportacionProgramada,
+//   que se recrea en cada render. No pasa nada: el `programacionRevisada`
+//   hace que la revision solo ocurra una vez.
+/* eslint-disable react-hooks/exhaustive-deps */
+
 // Nota: papaparse y qrcode se importan dinámicamente donde se usan para no
 // inflar el bundle inicial (ver executeProcessBienesCSV y pdfGenerators).
 // Nota: STYLES y constantes globales viven en constants/appConstants
@@ -303,7 +315,7 @@ export default function App() {
   // Filtros/búsqueda/paginación del inventario: hook extraído (Fase 3).
   // La UI usa los mismos nombres vía desestructuración.
   const { setSearchInput, searchTerm, setSearchTerm, orden, setOrden, filtroFuncionario, setFiltroFuncionario, filtroUbicacion, setFiltroUbicacion, filtroAnio, setFiltroAnio, setFiltroMes, filtroSubcuenta, setFiltroSubcuenta, filtroAnalitico1, setFiltroAnalitico1, filtroAnalitico2, setFiltroAnalitico2, setFiltroQR, filtroFC10, setFiltroFC10, filtroEstado, setFiltroEstado, filtroPendiente, setFiltroPendiente, currentPage, setCurrentPage, clearAllFilters, hasFilters, vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista, guardarVistaActual, aplicarVista, eliminarVista, funcionariosUnicos, ubicacionesUnicas, aniosUnicos, subcuentasUnicas, analiticos1Unicos, analiticos2Unicos, stats, pendientes, filteredBienes, itemsPaginados, totalPages, itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion, vistaInv, cambiarVistaInv, urlFiltrosActual } = useInventarioFiltros({ bienes, dependenciaActual, fc10List, username: currentUser?.username, notify: addToast });
-  // Sugerencias para autocompletado (memoizado: evita refiltrar miles de bienes en cada render)
+  // Sugerencias para auto_completado (memoizado: evita refiltrar miles de bienes en cada render)
   const sugerenciasBienesDep = useMemo(
     () => bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
     [bienes, dependenciaActual]
@@ -690,6 +702,9 @@ export default function App() {
         if (document.querySelector('.modalOverlay')) return;
         e.preventDefault();
         setBienEditing(null);
+  // `setIsBienModalOpen` y `setBienEditing` son setters de useState (estables),
+  // pero se decluan DESPUES de este efecto: listarlos aqui los usaria antes
+  // de que existan (error de TDZ).
         setIsBienModalOpen(true);
         return;
       }
@@ -705,7 +720,7 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [activeTab, cmdOpen]);
+  }, [activeTab, cmdOpen, isAtajosOpen]);
   // Actas que esperan firma. Vive en App porque lo necesitan dos lugares: el
   // badge del header (para verlo desde cualquier modulo) y la bandeja del
   // dashboard (con el detalle de a quien le toca).
@@ -770,7 +785,7 @@ export default function App() {
       return () => clearTimeout(t);
     }
   }, [isAuthenticated]);
-  const cerrarTour = (completado) => {
+  const cerrarTour = (_completado) => {
     setTourPaso(-1);
     try { localStorage.setItem('tour_visto_v1', '1'); } catch {}
   };
@@ -1199,10 +1214,11 @@ useEffect(() => {
       // Diferido para no competir con la carga inicial de bienes.
       setTimeout(() => ejecutarExportacionProgramada(true), 1200);
     }
-  }, [isLoading, isAuthenticated, dependenciaActual]);
+  }, [isLoading, isAuthenticated, dependenciaActual, ejecutarExportacionProgramada]);
 
 
 
+  // Dependencia omitida a proposito.
 
 
 
@@ -1375,6 +1391,7 @@ useEffect(() => {
           }
           try {
               instancia = new window.Html5Qrcode("reader");
+  // `addToast` es estable (useCallback), pero el linter no lo sabe.
               window.html5QrCode = instancia;
           } catch {
               // Quedó una instancia previa viva: se libera antes de reintentar.
@@ -1416,8 +1433,7 @@ useEffect(() => {
       // handleScanSuccess queda fuera a propósito: se recrea en cada render y
       // incluirlo reiniciaría la cámara continuamente. El ref de abajo
       // mantiene la lógica siempre al día sin reiniciar nada.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScannerOpen]);
+  }, [isScannerOpen, addToast]);
 
 
   const saludoBienvenida = useMemo(() => {
@@ -1459,7 +1475,7 @@ if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && !mostr
 }
 if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && mostrarLoginDev) {
   return (
-      <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} setDarkMode={fijarTemaUsuario} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
+      <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
   );
 }
 if (rutaDesconocida && !publicBienId) {
@@ -1694,7 +1710,7 @@ if (publicBienId) {
 
   if (!isAuthenticated) {
       return (
-          <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} setDarkMode={fijarTemaUsuario} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
+          <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
       );
   }
 
@@ -1790,21 +1806,21 @@ if (publicBienId) {
       >
             <Suspense fallback={<CargaModulo />}>
             <div key={activeTab} className="tab-enter mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 min-h-full flex flex-col">
-                {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} />)}
+                {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} />)}
 
                 {activeTab === 'resumen' && (<ResumenView dependenciaActual={dependenciaActual} stats={stats} pendientes={pendientes} fc10List={fc10List} />)}
                 {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} analiticos2Unicos={analiticos2Unicos} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
 
-                {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView solicitudesBaja={solicitudesBaja} dependenciaActual={dependenciaActual} bienes={bienes} openResolucionModal={openResolucionModal} currentUser={currentUser} />)}
+                {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView solicitudesBaja={solicitudesBaja} bienes={bienes} openResolucionModal={openResolucionModal} />)}
 
                 {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
                 {activeTab === 'usuarios' && isAdmin && (<UsuariosView isLoading={isLoading} usuariosList={usuariosList} setUsuarioEditing={setUsuarioEditing} setIsUsuarioModalOpen={setIsUsuarioModalOpen} esDesarrollador={esDesarrollador} currentUser={currentUser} setItemToDelete={setItemToDelete} STYLES={STYLES} />)}
                 {activeTab === 'anuncios' && esDesarrollador && (<AnunciosView usuariosList={usuariosList} anunciosGrupos={anunciosGrupos} onEnviar={enviarAnuncio} onEliminarGrupo={eliminarGrupoAnuncio} currentUser={currentUser} />)}
-                {activeTab === 'funcionarios' && (<FuncionariosView isLoading={isLoading} funcionariosPurosDependencia={funcionariosPurosDependencia} dependenciaActual={dependenciaActual} sincronizarBienesConPadron={sincronizarBienesConPadron} handleDownloadTemplateFuncionarios={handleDownloadTemplateFuncionarios} fileInputFuncionariosRef={fileInputFuncionariosRef} isAdmin={isAdmin} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} searchFuncionarioInput={searchFuncionarioInput} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} funcionariosPaginados={funcionariosPaginados} handleEditFuncionario={handleEditFuncionario} handleDeleteFuncionario={handleDeleteFuncionario} renderPaginationFuncionarios={renderPaginationFuncionarios} />)}
+                {activeTab === 'funcionarios' && (<FuncionariosView isLoading={isLoading} funcionariosPurosDependencia={funcionariosPurosDependencia} sincronizarBienesConPadron={sincronizarBienesConPadron} handleDownloadTemplateFuncionarios={handleDownloadTemplateFuncionarios} fileInputFuncionariosRef={fileInputFuncionariosRef} isAdmin={isAdmin} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} searchFuncionarioInput={searchFuncionarioInput} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} funcionariosPaginados={funcionariosPaginados} handleEditFuncionario={handleEditFuncionario} handleDeleteFuncionario={handleDeleteFuncionario} renderPaginationFuncionarios={renderPaginationFuncionarios} />)}
 
                 {activeTab === 'fc04' && (<Fc04View filteredFC04={filteredFC04} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} openFC04Modal={openFC04Modal} STYLES={STYLES} isLoading={isLoading} ORIGENES_FC04={ORIGENES_FC04} handleGenerateFC04PDF={handleGenerateFC04PDF} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
 
-                {activeTab === 'fc10' && (<Fc10View filteredFC10={filteredFC10} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleExportFC10CSV={handleExportFC10CSV} isLoading={isLoading} bienes={bienes} handleGenerateFC10PDF={handleGenerateFC10PDF} openFC10Modal={openFC10Modal} isAdmin={isAdmin} setItemToDelete={setItemToDelete} setActiveTab={setActiveTab} registrarFirmaFC10={firmarConBloqueo} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} ponerFC10EnTramite={ponerEnTramiteConBloqueo} poniendoEnTramite={poniendoEnTramite} actualizarEstadoFirma={actualizarEstadoFirma} currentUser={currentUser} />)}
+                {activeTab === 'fc10' && (<Fc10View filteredFC10={filteredFC10} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleExportFC10CSV={handleExportFC10CSV} isLoading={isLoading} bienes={bienes} handleGenerateFC10PDF={handleGenerateFC10PDF} openFC10Modal={openFC10Modal} isAdmin={isAdmin} setItemToDelete={setItemToDelete} setActiveTab={setActiveTab} registrarFirmaFC10={firmarConBloqueo} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} ponerFC10EnTramite={ponerEnTramiteConBloqueo} poniendoEnTramite={poniendoEnTramite} actualizarEstadoFirma={actualizarEstadoFirma} currentUser={currentUser} />)}
                 {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
                 {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} />)}
             </div>

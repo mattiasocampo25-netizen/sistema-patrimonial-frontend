@@ -11,9 +11,9 @@ const ESTADO_INFO = {
 };
 
 export default function AprobacionesView({
-  solicitudesBaja, dependenciaActual, bienes,
-  resolverSolicitudFuncionario, openResolucionModal,
-  currentUser, isAdmin
+  solicitudesBaja, bienes,
+  openResolucionModal,
+ 
 }) {
   const [filtroEstado, setFiltroEstado] = useState('todos');
 

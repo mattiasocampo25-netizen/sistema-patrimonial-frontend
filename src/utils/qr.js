@@ -7,7 +7,7 @@ export const extraerCodigoQR = (decodedText) => {
     try {
       const parsedUrl = new URL(targetId);
       targetId = parsedUrl.searchParams.get('id') || parsedUrl.searchParams.get('bienId') || targetId;
-    } catch (e) {}
+    } catch {}
   } else if (/CTA:|DIGO:/i.test(targetId)) {
     // Etiquetas físicas del tipo "CTA:UNP SIGEP DIGO:1045": el código del bien
     // va DESPUÉS del último "DIGO:".

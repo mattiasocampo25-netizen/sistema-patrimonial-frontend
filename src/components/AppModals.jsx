@@ -161,7 +161,7 @@ export default function AppModals({
   confirmBackupModal,
   setConfirmBackupModal,
   handleExportBackupGeneral,
-  restore,
+  
   pendingCSVImport,
   setPendingCSVImport,
   fileInputRef,
@@ -465,13 +465,10 @@ export default function AppModals({
         <BienModal 
             setIsBienModalOpen={setIsBienModalOpen}
             bienEditing={bienEditing}
-            setBienEditing={setBienEditing}
             bienFormRef={bienFormRef}
             saveBien={saveBien}
             isSaving={isSaving}
-            formatCurrency={formatCurrency}
             ESTADOS_CONSERVACION={ESTADOS_CONSERVACION}
-            funcionariosConDatos={funcionariosConDatos}
             ubicacionesUnicas={ubicacionesUnicas}
             STYLES={STYLES}
             funcionariosPadron={padronDep}
@@ -545,7 +542,6 @@ export default function AppModals({
             dependenciaActual={dependenciaActual}
             onVerPadron={verPadronDependencia}
             ubicacionesList={ubicacionesList}
-            conteosUbicacion={conteosUbicacion}
             funcionarios={funcionariosPadron}
             onGuardarUbicacion={guardarUbicacion}
             onEliminarUbicacion={eliminarUbicacion}

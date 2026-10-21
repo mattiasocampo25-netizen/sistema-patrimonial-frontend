@@ -13,7 +13,7 @@ export default function DependenciasModal({
   isOpen, onClose, dependencias, detectadas, conteos,
   onSave, onDelete, onFusionar, isSaving,
   dependenciaActual, onVerPadron,
-  ubicacionesList, conteosUbicacion, funcionarios,
+  ubicacionesList, funcionarios,
   onGuardarUbicacion, onEliminarUbicacion, onAsignarFuncionario,
   STYLES
 }) {
@@ -42,7 +42,7 @@ export default function DependenciasModal({
       setSelId(actual ? actual.id : (dependencias[0]?.id || null));
       setSelDetectada(null);
     }
-  }, [isOpen]);
+  }, [isOpen, dependencias, dependenciaActual]);
 
   const q = useMemo(() => normalizeStr(busqueda), [busqueda]);
   const qfBusca = useMemo(() => normalizeStr(buscaFunc), [buscaFunc]);

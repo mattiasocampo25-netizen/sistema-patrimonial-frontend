@@ -2,6 +2,17 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
 
+// Claves del query string para los filtros compartibles por URL.
+// A scope de modulo: es una constante pura. Dentro del hook seria un objeto
+// nuevo en cada render y los effects que dependen de ella se reejecutarian
+// sin parar.
+const URL_KEYS = {
+  q: 'searchTerm', func: 'filtroFuncionario', ubi: 'filtroUbicacion',
+  anio: 'filtroAnio', mes: 'filtroMes', sub: 'filtroSubcuenta',
+  a1: 'filtroAnalitico1', a2: 'filtroAnalitico2',
+  qr: 'filtroQR', fc10: 'filtroFC10', est: 'filtroEstado', pend: 'filtroPendiente'
+};
+
 // Filtros, búsqueda, paginación y derivados del inventario (extraído de
 // App.jsx, Fase 3 del split). La UI sigue usando los mismos nombres vía
 // desestructuración, así que el JSX no cambia.
@@ -104,26 +115,26 @@ useEffect(() => {
   // que compartiste. Se usa replaceState para no llenar el historial del
   // navegador con cada pulsación del usuario.
   // ==========================================================================
-  const URL_KEYS = {
-    q: 'searchTerm', func: 'filtroFuncionario', ubi: 'filtroUbicacion',
-    anio: 'filtroAnio', mes: 'filtroMes', sub: 'filtroSubcuenta',
-    a1: 'filtroAnalitico1', a2: 'filtroAnalitico2',
-    qr: 'filtroQR', fc10: 'filtroFC10', est: 'filtroEstado', pend: 'filtroPendiente'
-  };
   // Setters y valores actuales, resueltos por reflection sobre el scope del hook
   // para no duplicar la lista de estados a mano (menos sitios que se desincronicen).
-  const SETTERS = {
+  // Con useMemo: los setters de useState son estables, asi que el objeto
+  // tambien lo es y depender de el no reejecuta los effects.
+  const SETTERS = useMemo(() => ({
     searchTerm: setSearchTerm, filtroFuncionario: setFiltroFuncionario,
     filtroUbicacion: setFiltroUbicacion, filtroAnio: setFiltroAnio, filtroMes: setFiltroMes,
     filtroSubcuenta: setFiltroSubcuenta, filtroAnalitico1: setFiltroAnalitico1,
     filtroAnalitico2: setFiltroAnalitico2, filtroQR: setFiltroQR,
     filtroFC10: setFiltroFC10, filtroEstado: setFiltroEstado, filtroPendiente: setFiltroPendiente
-  };
-  const VALORES = {
+  }), [setSearchTerm, setFiltroFuncionario, setFiltroUbicacion, setFiltroAnio, setFiltroMes,
+    setFiltroSubcuenta, setFiltroAnalitico1, setFiltroAnalitico2, setFiltroQR,
+    setFiltroFC10, setFiltroEstado, setFiltroPendiente]);
+  const VALORES = useMemo(() => ({
     searchTerm: debouncedSearchTerm, filtroFuncionario, filtroUbicacion,
     filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2,
     filtroQR, filtroFC10, filtroEstado, filtroPendiente
-  };
+  }), [debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes,
+    filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroQR, filtroFC10,
+    filtroEstado, filtroPendiente]);
   const leerUrl = useCallback(() => {
     try {
       const p = new URLSearchParams(window.location.search);
@@ -136,11 +147,6 @@ useEffect(() => {
     } catch { return {}; }
   }, []);
 
-  // Aplicar los filtros que vengan en la URL, una sola vez al entrar.
-  // Antes esta lógica dependedía de un flag que solo se activaba si la URL ya
-  // traía parámetros: entrando por la vía normal el flag quedaba en false y
-  // el efecto que ESPEJA los filtros hacia la URL nunca corría, así que
-  // "Copiar link" copiaba una URL sin filtros.
   const refUrlAplicada = useRef(false);
   useEffect(() => {
     if (refUrlAplicada.current) return;
@@ -151,7 +157,7 @@ useEffect(() => {
       SETTERS[estado]?.(valor);
     }
     if (desdeUrl.searchTerm) setSearchInput(desdeUrl.searchTerm);
-  }, [dependenciaActual, username, leerUrl]);
+  }, [dependenciaActual, username, leerUrl, SETTERS]);
 
   // Espejar los filtros actuales hacia la URL. Se usa debouncedSearchTerm
   // (igual que el filtrado real) para no escribir 250 ms tarde el valor viejo.
@@ -160,18 +166,22 @@ useEffect(() => {
       const p = new URLSearchParams(window.location.search);
       for (const [clave, estado] of Object.entries(URL_KEYS)) {
         const valor = VALORES[estado];
-        // Los estados "vacíos" no viajan: la URL queda legible.
         if (valor === '' || valor === null || valor === undefined || valor === 'ALL') p.delete(clave);
         else p.set(clave, String(valor));
       }
       const qs = p.toString();
       const nueva = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+  // `URL_KEYS` y `VALORES` son objetos: si cambian en cada render, el
+  // effect se reejecutaria sin parar. Se resuelven con useMemo.
       window.history.replaceState(null, '', nueva);
     } catch { /* el navegador puede bloquear replaceState; no es crítico */ }
   }, [
     debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes,
     filtroSubcuenta, filtroAnalitico1, filtroAnalitico2,
-    filtroQR, filtroFC10, filtroEstado, filtroPendiente
+    filtroQR, filtroFC10, filtroEstado, filtroPendiente,
+    // VALORES agrupa los mismos valores de arriba (es un useMemo): se declara
+    // porque el cuerpo del effect la usa.
+    VALORES
   ]);
 
   // "Copiar link" de la vista actual.

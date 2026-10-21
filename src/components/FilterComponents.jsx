@@ -1,4 +1,5 @@
 import React from 'react';
+import { aniosDisponibles } from '../utils/filtros';
 import FiltroCombo from './FiltroCombo';
 
 const MESES = [
@@ -11,10 +12,6 @@ const MESES = [
 // Años disponibles: 5 años hacia atrás (histórico) y 1 hacia adelante
 // (presupuesto del año siguiente). Antes la lista estaba fija en 2024-2030, así
 // que en 2027 ya no se podían filtrar periodos viejos ni el siguiente.
-export const aniosDisponibles = () => {
-  const actual = new Date().getFullYear();
-  return Array.from({ length: 7 }, (_, i) => String(actual - 5 + i));
-};
 
 /**
  * Selector de periodo (Año y Mes) para las cabeceras de FC-04 / FC-10 / FC-11.

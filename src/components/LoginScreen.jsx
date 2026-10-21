@@ -13,7 +13,7 @@ export default function LoginScreen({
   setShowPassword,
   loginError,
   darkMode,
-  setDarkMode,
+  
   appLogo,
   toasts,
   isProcessing = false,

@@ -47,7 +47,7 @@ export default function Modal({
     (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
-        onCerrar && onCerrar();
+        if (onCerrar) onCerrar();
         return;
       }
       if (e.key !== 'Tab' || !panelRef.current) return;
@@ -97,7 +97,7 @@ export default function Modal({
     <div
       className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       onMouseDown={(e) => {
-        if (cerrarAlPulsarFuera && e.target === e.currentTarget) onCerrar && onCerrar();
+        if (cerrarAlPulsarFuera && e.target === e.currentTarget && onCerrar) onCerrar();
       }}
     >
       <div

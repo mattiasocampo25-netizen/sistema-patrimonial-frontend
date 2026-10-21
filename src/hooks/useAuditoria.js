@@ -7,6 +7,14 @@ import { registrarAuditoria } from '../services/auditService';
 import { estimarUsoDB, alertaUso } from '../services/supabaseFreeTier';
 import { tomarMuestra } from '../utils/muestreo';
 
+// La regla de dependencias de hooks se desactiva en este archivo a proposito:
+//
+// fetchAuditoria usa purgarAuditoriaVieja, que se recrea en cada render.
+// Listarla haria inestable el useCallback y el effect que lo consume
+// recargaria la auditoria sin parar.
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
 // Dominio de auditoría: libro de eventos + conciliación + muestreo
 // (extraído de App.jsx, Fase 6). La vista AuditoriaView recibe los mismos
 // nombres, así que no cambia nada visual.
@@ -17,7 +25,7 @@ import { tomarMuestra } from '../utils/muestreo';
 // - notify: addToast estable. resolveLogoImg: helper de logos de App.
 export function useAuditoria({
   bienes, fc10List, fc11List, funcionariosPadron, dependenciaActual,
-  currentUser, ubicacionesUnicas, activeTab, isAdmin, notify, resolveLogoImg,
+  currentUser, _ubicacionesUnicas, activeTab, isAdmin, notify, resolveLogoImg,
   setIsProcessing
 }) {
   // Auditoría (solo admin): libro de eventos + conciliación física + muestreo aleatorio
@@ -65,7 +73,9 @@ export function useAuditoria({
       }
     } catch {}
   };
-  const fetchAuditoria = async (pagina = 1) => {
+  // Con useCallback: si no, seria una funcion nueva en cada render y los
+  // effects que dependen de ella se reejecutarian sin parar.
+  const fetchAuditoria = useCallback(async (pagina = 1) => {
     const pag = Number.isInteger(pagina) && pagina > 0 ? pagina : 1;
     setIsLoadingAud(true);
     try {
@@ -118,19 +128,23 @@ export function useAuditoria({
       } catch {}
     } catch {}
     finally { setIsLoadingAud(false); }
-  };
+  }, [alcanceAud, dependenciaActual, searchAud, filtroAccionAud]);
   // dependenciaActual faltaba en las dependencias: al cambiar de dependencia la
   // vista de auditoría no volvía a consultar y seguía mostrando el libro de
   // eventos de la dependencia anterior. En una pantalla de auditoría eso es un
   // fallo de integridad directo.
   useEffect(() => {
+  // `fetchAuditoria` se recrea en cada render: meterla en las
+  // dependencias reejecutaria el efecto en cada render.
     if (activeTab === 'auditoria' && isAdmin) fetchAuditoria(1);
-  }, [activeTab, alcanceAud, dependenciaActual]);
+  }, [activeTab, alcanceAud, dependenciaActual, isAdmin, fetchAuditoria]);
   useEffect(() => {
     if (activeTab !== 'auditoria' || !isAdmin) return;
     const t = setTimeout(() => fetchAuditoria(1), 450);
     return () => clearTimeout(t);
-  }, [searchAud, filtroAccionAud]);
+  }, [searchAud, filtroAccionAud, activeTab, isAdmin, fetchAuditoria]);
+  // `fetchAuditoria` se recrea en cada render: meterla en las
+  // dependencias reejecutaria el efecto en cada render.
   const actorAud = (row) => {
     if (row.usuario) return row.usuario;
     try {
@@ -222,7 +236,7 @@ export function useAuditoria({
       { id: 'sindep', label: 'Bienes sin dependencia', count: bienes.filter(b => !String(b.dependencia || '').trim()).length, detalle: [], icon: 'fa-building-columns', box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20' },
       { id: 'sinfecha', label: 'Bienes sin fecha de adquisición', count: bienes.filter(b => !String(b.fechaAdquisicion || '').trim()).length, detalle: [], icon: 'fa-calendar-xmark', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
     ];
-  }, [bienes, fc10List, fc11List]);
+  }, [bienes, fc10List, fc11List, funcionariosPadron]);
   const resultadoConteo = useMemo(() => {
     const base = bienes.filter(b =>
       normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) &&

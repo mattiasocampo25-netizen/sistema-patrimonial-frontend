@@ -7,13 +7,13 @@ import FiltroCombo from './FiltroCombo';
 export default function BienModal({
     setIsBienModalOpen,
     bienEditing,
-    setBienEditing,
+    
     bienFormRef,
     saveBien,
     isSaving,
-    formatCurrency,
+    
     ESTADOS_CONSERVACION,
-    funcionariosConDatos,
+    
     ubicacionesUnicas,
     funcionariosPadron = [],
     ubicaciones = [],

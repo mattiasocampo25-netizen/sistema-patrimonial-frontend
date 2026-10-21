@@ -28,15 +28,15 @@ const normRotulo = (v) => String(v ?? '').trim().toLowerCase();
 // - Cross-hooks: agregarCodigoConteo (auditoría), cargarNotificaciones (sync).
 // - Registrar auditoría y sellos se importan directo.
 export function useFcModals({
-  notify, setIsProcessing, appLogo,
-  bienes, setBienes, filteredBienes, fc10List, fc11List, fc04List,
-  dependenciaActual, funcionariosConDatos,
+  notify, setIsProcessing, _appLogo,
+  bienes, setBienes, filteredBienes, fc10List, _fc11List, _fc04List,
+  dependenciaActual, _funcionariosConDatos,
   currentUser, isAdmin, esDesarrollador,
-  clearAllFilters, setSearchTerm, setSearchInput, setActiveTab, setCurrentPage,
+  clearAllFilters, setSearchTerm, setSearchInput, setActiveTab, _setCurrentPage,
   agregarCodigoConteo, cargarNotificaciones,
   setIsScannerOpen, setDependenciaActual, setNotificaciones, setFc10List,
   setFc11List, setFc04List, setFuncionariosPadron, setUsuariosList,
-  itemToDelete, setItemToDelete, motivoSolicitudBaja, setMotivoSolicitudBaja, setPendingCSVImport,
+  itemToDelete, setItemToDelete, motivoSolicitudBaja, setMotivoSolicitudBaja, _setPendingCSVImport,
   funcionariosPadron, notificaciones, estructurasDB, setEstructurasDB,
   setFichaBien, setEventosAuditFicha,
   resolveLogoImg: _resolveLogoImg,
@@ -221,7 +221,7 @@ export function useFcModals({
             body: tableRows, rowPageBreak: 'avoid',
             styles: { fontSize: 6, cellPadding: 1, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15 }, 
             headStyles: { fillColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', textColor: [0,0,0], lineWidth: 0.3 }, 
-            didDrawPage: function(data) {
+            didDrawPage: function(_data) {
                 doc.addImage(logoImg, 'PNG', 12, 6, 18, 18); 
                 doc.setFont("helvetica", "bold"); doc.setFontSize(12); 
                 doc.text("UNIVERSIDAD NACIONAL DE PILAR", pageWidth / 2, 11, { align: 'center' }); 

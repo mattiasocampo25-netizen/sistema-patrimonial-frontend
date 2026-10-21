@@ -45,7 +45,7 @@ export default function QRModal({
     return () => {
       isMounted = false;
     };
-  }, [isOpen, bien, isBulk, previewType]);
+  }, [isOpen, bien, isBulk, previewType, onDownloadSimpleQR, onDownloadLabel]);
 
   if (!isOpen) return null;
 

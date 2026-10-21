@@ -10,7 +10,7 @@ import { useResumenDependencias } from '../hooks/useResumenDependencias';
 export default function DashboardView({
   currentUser, dependenciaActual, saludoBienvenida, stats, pendientes, isLoading,
   timeStats, clearAllFilters, setActiveTab,
-  setFiltroQR, setFiltroFC10, setFiltroPendiente, setFiltroAnio, setFiltroMes, setCurrentPage,
+  setFiltroQR, setFiltroFC10, setFiltroPendiente, setFiltroAnio, setCurrentPage,
   setBienEditing, setIsBienModalOpen, fileInputRef, handleExportInventarioCSV,
   setIsBulkQR, setQrTargetBien, setIsQRModalOpen, openFC03Modal,
   setFc10Year, setFc10Month,

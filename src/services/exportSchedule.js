@@ -148,7 +148,7 @@ const FECHA_TXT = (v) => {
   return s;
 };
 
-export const construirCSVInventario = (bienes, dependenciaActual) => {
+export const construirCSVInventario = (bienes, _dependenciaActual) => {
   let csv = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
   (bienes || []).forEach(b => {
     const row = [

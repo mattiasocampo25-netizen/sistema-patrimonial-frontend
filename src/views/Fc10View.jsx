@@ -11,7 +11,7 @@ import { ESTADOS_FC10, ESTADO_INFO, estadoInicialFC10, pendienteDeFirma, esFC10L
 // Vista de actas de responsabilidad FC-10 (extraída de App.jsx, Fase 4).
 export default function Fc10View({
   filteredFC10, fc10Year, setFc10Year, fc10Month, setFc10Month,
-  STYLES, setIsConsolidatedFC10ModalOpen, handleExportFC10CSV,
+  setIsConsolidatedFC10ModalOpen, handleExportFC10CSV,
   isLoading, bienes, handleGenerateFC10PDF, openFC10Modal,
   isAdmin, setItemToDelete, setActiveTab, registrarFirmaFC10, registrarAmbasFirmas, firmandoId,
   ponerFC10EnTramite, poniendoEnTramite,

@@ -28,11 +28,13 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
 
   useEffect(() => {
     if (!step) return;
+  // `step` es `pasos[paso]`: cambia con `paso`, que ya es dependencia. Se
+  // listan los dos por si `pasos` cambiara sin que cambiara `paso`.
     if (step.tab) irTab(step.tab);
     setRect(null);
     const t = setTimeout(medir, 220);
     return () => clearTimeout(t);
-  }, [paso]);
+  }, [paso, step, medir, irTab]);
 
   // Reposicionar al mover scroll o redimensionar
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [paso, pasos.length]);
+  }, [paso, pasos.length, onClose, setPaso]);
 
   if (!step) return null;
   const ultimo = paso === pasos.length - 1;

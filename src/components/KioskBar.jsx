@@ -8,15 +8,9 @@
 // Decisión: el temporizador NO hace logout ni borra nada; solo redirige a la
 // pantalla principal cuando la pantalla quedó sin tocar, que es el comportamiento
 // deseado en un punto de atención unattended.
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // Segundos de inactividad antes de volver al inicio. Configurable por ?kioskIdle=N
-export const parseIdleSegundos = (search) => {
-  try {
-    const n = parseInt(new URLSearchParams(search).get('kioskIdle') || '45', 10);
-    return Number.isFinite(n) && n > 5 && n <= 3600 ? n : 45;
-  } catch { return 45; }
-};
 
 export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro }) {
   const [visible, setVisible] = useState(true);
@@ -26,11 +20,13 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
   const deadline = useRef(Date.now() + idleSegundos * 1000);
   const timerRef = useRef(null);
 
-  const reiniciar = () => {
+  // Con useCallback: si no, seria una funcion nueva en cada render y los
+  // oyentes se volverian a suscribir en cada tick.
+  const reiniciar = useCallback(() => {
     deadline.current = Date.now() + idleSegundos * 1000;
     setRestantes(idleSegundos);
     setVisible(true);
-  };
+  }, [idleSegundos]);
 
   // Contador regresivo.
   useEffect(() => {
@@ -39,7 +35,7 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
       setRestantes(seg);
       if (seg === 0) {
         clearInterval(timerRef.current);
-        onSalir && onSalir();
+        if (onSalir) onSalir();
       }
     }, 1000);
     return () => clearInterval(timerRef.current);
@@ -48,9 +44,11 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
   // Reinicia con cualquier interacción humana.
   useEffect(() => {
     const eventos = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+  // `reiniciar` cambia en cada tick (es el que reinicia el temporizador): si
+  // fuera dependencia, los oyentes se volverian a suscribir en cada tick.
     eventos.forEach(e => window.addEventListener(e, reiniciar, { passive: true }));
     return () => eventos.forEach(e => window.removeEventListener(e, reiniciar));
-  }, [idleSegundos]);
+  }, [idleSegundos, reiniciar]);
 
   // Barra oculta durante los últimos 8 s para no distraer al lector.
   useEffect(() => { setVisible(restantes > 8 || restantes === idleSegundos); }, [restantes, idleSegundos]);
@@ -99,7 +97,7 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
 export function BotonPantallaCompleta({ onCambio }) {
   const [activo, setActivo] = useState(false);
   useEffect(() => {
-    const alCambiar = () => { setActivo(Boolean(document.fullscreenElement)); onCambio && onCambio(Boolean(document.fullscreenElement)); };
+    const alCambiar = () => { setActivo(Boolean(document.fullscreenElement)); if (onCambio) onCambio(Boolean(document.fullscreenElement)); };
     document.addEventListener('fullscreenchange', alCambiar);
     return () => document.removeEventListener('fullscreenchange', alCambiar);
   }, [onCambio]);

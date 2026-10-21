@@ -15,7 +15,6 @@ import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, T
 export default function InventarioView({
   hasFilters,
   filteredBienes,
-  stats,
   handleDownloadTemplateCSV,
   fileInputRef,
   handleExportInventarioCSV,

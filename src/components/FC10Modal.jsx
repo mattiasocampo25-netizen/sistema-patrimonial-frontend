@@ -6,6 +6,16 @@ import SelectorPersona from './SelectorPersona';
 import Dialogo from './ui/Dialogo';
 import { FC10_ORGANOS, FC10_UNIDADES, opcionesCatalogoFC10, organoDeUnidad } from '../constants/fc10Catalogo';
 
+// La regla de dependencias de hooks se desactiva en este archivo a proposito:
+//
+// Los dos effects de aqui inicializan el formulario UNA vez (al abrir el
+// modal) y leen valores que vienen de props. Si se declararan como
+// dependencias, los effects se reejecutarian en cada cambio del
+// formulario y volverian a escribir el estado: el usuario no podria
+// editar. El "montado" ya se controla con un ref (orgMontadoRef).
+/* eslint-disable react-hooks/exhaustive-deps */
+
+
 export default function FC10Modal({ setIsFC10ModalOpen, fc10TargetBien, fc10Editing, saveFC10, STYLES, formatCurrency, funcionariosConDatos, dependenciaActual, estructurasDB, dependenciasList }) {
     const esNuevoFC = !fc10Editing;
     const { borrador: borradorFC, hayBorrador: hayBorradorFC, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc10_nuevo', esNuevoFC);
@@ -127,7 +137,6 @@ const valorOrgExplicito = (campo) => {
         setDependenciaCod(valorOrgBase('dependenciaCod'));
         setArea(valorOrgBase('area'));
         setAreaCod(valorOrgBase('areaCod'));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formKeyFC]);
 
     // Al cambiar un nivel se limpian los que cuelgan de él (cascada).
@@ -244,7 +253,6 @@ const valorOrgExplicito = (campo) => {
         if (match && (match.doc || match.cargo)) {
             setFuncData({ nombre: funcData.nombre, doc: match.doc || '', cargo: match.cargo || '' });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     if (!fc10TargetBien) return null; 

@@ -65,7 +65,7 @@ export function CardFooter({ className = '', children, ...resto }) {
 export function CardInteractive({ className = '', children, ...resto }) {
   return (
     <div
-      className={`transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 ${className}`}
+      className={`transition-[background-color,border-color,transform,box-shadow] duration-[var(--dur-base)] hover:bg-surface-2 ${className}`}
       {...resto}
     >
       {children}

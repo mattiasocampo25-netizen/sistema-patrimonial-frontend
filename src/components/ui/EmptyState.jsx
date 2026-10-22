@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from './Button';
 
 /**
  * EmptyState — estado vacío de un módulo.
@@ -20,9 +21,11 @@ const ICONOS = {
 export default function EmptyState({
   tipo = 'vacio',
   icono,
+  icon,
   titulo,
   descripcion,
   accion,
+  accionLabel,
   onAccion,
   className = ''
 }) {
@@ -31,13 +34,13 @@ export default function EmptyState({
   return (
     <div
       role={esError ? 'alert' : 'status'}
-      className={`flex flex-col items-center justify-center text-center py-14 px-6 rounded-card border border-dashed ${ esError ? 'border-danger/40 bg-danger-soft' : 'border-line bg-surface-2' } ${className}`}
+      className={`flex flex-col items-center justify-center text-center py-14 px-6 rounded-card border border-dashed animate-scale-in ${ esError ? 'border-danger/40 bg-danger-soft' : 'border-line bg-surface-2' } ${className}`}
     >
       <span
         className={`flex h-14 w-14 items-center justify-center rounded-panel mb-4 ${ esError ? 'bg-danger/10 text-danger' : 'bg-surface-3 text-content-3' }`}
         aria-hidden="true"
       >
-        <i className={`fa-solid ${icono || ICONOS[tipo] || ICONOS.vacio} text-xl`} />
+        <i className={`fa-solid ${icono || icon || ICONOS[tipo] || ICONOS.vacio} text-xl`} />
       </span>
 
       <p className="text-title font-bold text-content-1">{titulo}</p>
@@ -45,14 +48,10 @@ export default function EmptyState({
         <p className="text-body text-content-2 mt-1.5 max-w-md leading-relaxed">{descripcion}</p>
       ) : null}
 
-      {accion && onAccion ? (
-        <button
-          type="button"
-          onClick={onAccion}
-          className="mt-5 inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-body font-semibold bg-brand text-content-inverse hover:bg-brand-hover transition-colors"
-        >
-          {accion}
-        </button>
+      {(accion || accionLabel) && onAccion ? (
+        <Button variante={esError ? 'primary' : 'secondary'} onClick={onAccion} className="mt-5">
+          {accion || accionLabel}
+        </Button>
       ) : null}
     </div>
   );

@@ -51,10 +51,10 @@ export default function DashboardView({
       valor: stats.totalItems,
       sublabel: 'Total en ' + dependenciaActual,
       icon: 'fa-boxes-stacked',
-      iconBg: 'bg-zinc-900 dark:bg-zinc-800',
-      iconColor: 'text-white dark:text-zinc-200',
-      border: 'border-line/80 dark:border-white/20',
-      hoverBorder: 'hover:border-line-strong dark:hover:border-white/30',
+      iconBg: 'bg-brand-soft',
+      iconColor: 'text-brand-text',
+      border: 'border-line',
+      hoverBorder: 'hover:border-line-strong',
       ring: 'focus-visible:ring-brand',
       numero: <AnimatedNumber value={stats.totalItems} />,
       onClick: () => { clearAllFilters(); setActiveTab('inventario'); },
@@ -69,8 +69,8 @@ export default function DashboardView({
       icon: 'fa-qrcode',
       iconBg: 'bg-violet-500/10 backdrop-blur border border-violet-500/25',
       iconColor: 'text-violet-600 dark:text-violet-300',
-      border: 'border-line/80 dark:border-white/20',
-      hoverBorder: 'hover:border-line-strong dark:hover:border-white/30',
+      border: 'border-line',
+      hoverBorder: 'hover:border-line-strong',
       ring: 'focus-visible:ring-brand',
       numero: <><AnimatedNumber value={stats.withQR} /><span className="text-base text-content-3 font-semibold"> / {Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>,
       onClick: () => irInventario(() => setFiltroQR('YES')),
@@ -137,7 +137,7 @@ export default function DashboardView({
       <Card className="p-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-xl sm:text-2xl shadow-md shadow-zinc-900/25 dep-accent-ring">
+          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-card bg-brand-soft text-brand-text font-bold text-xl sm:text-2xl shadow-card dep-accent-ring">
             {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="min-w-0">
@@ -162,12 +162,12 @@ export default function DashboardView({
             {menuWidgets && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuWidgets(false)}></div>
-                <div className="absolute right-0 z-50 mt-1.5 w-52 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl p-1.5 animate-pop">
+                <div className="absolute right-0 z-50 mt-1.5 w-52 rounded-card border border-line bg-surface-1 shadow-pop p-1.5 animate-pop">
                   <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
                   {WIDGETS.map(([k, label]) => (
                     <button
                       key={k} onClick={() => alternarWidget(k)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                     >
                       <span className={'flex h-4 w-4 items-center justify-center rounded border' + (widgets[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
                         <i className="fa-solid fa-check text-[9px]"></i>
@@ -195,13 +195,13 @@ export default function DashboardView({
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
       {widgets.metricas && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2" data-tour="dash-stats">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" data-tour="dash-stats">
         {METRIC_CARDS.map((card) => (
           <button
             key={card.id}
             onClick={card.onClick}
             title={card.label}
-            className={`group relative text-left bg-surface-1 dark:bg-surface-1 rounded-control border ${card.border} p-2 sm:p-2.5 shadow-sm hover:shadow-sm hover:-translate-y-0 focus-visible:ring-2 ${card.ring} outline-none motion duration-[var(--dur-base)] cursor-pointer`}
+            className={`group relative text-left bg-surface-1 rounded-card border ${card.border} p-4 sm:p-5 shadow-card hover:shadow-panel hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-[transform,box-shadow,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] cursor-pointer`}
           >
             <div className="flex items-center justify-between gap-1 mb-1.5">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${card.iconBg} shadow-xs`}>
@@ -209,13 +209,13 @@ export default function DashboardView({
               </div>
               <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-3 group-hover:text-content-3 dark:group-hover:text-content-3 group-hover:translate-x-0 motion"></i>
             </div>
-            <p className="text-xl sm:text-2xl font-black text-content-1 dark:text-white tracking-tight tabular-nums leading-snug">
+            <p className="text-2xl sm:text-3xl font-black text-content-1 tracking-tight tabular-nums leading-snug">
               {isLoading ? '…' : card.numero}
             </p>
-            <p className="text-[10px] font-bold text-content-3 dark:text-content-3 mt-1 uppercase tracking-[0.12em]">
+            <p className="text-label font-bold text-content-2 mt-1.5 uppercase tracking-[0.1em]">
               {card.label}
             </p>
-            <p className={`text-[10px] font-medium ${card.subColor} mt-1 truncate`}>
+            <p className={`text-label font-medium ${card.subColor || 'text-content-3'} mt-1 truncate`}>
               {card.sublabel}
             </p>
             {card.showProgress && (
@@ -260,7 +260,7 @@ export default function DashboardView({
             </button>
           </div>
 
-          <div className="divide-y divide-zinc-100 dark:divide-white/5">
+          <div className="divide-y divide-line">
             {actasPorFirmar.slice(0, 5).map(({ fc, bien, pendiente }) => (
               <div key={fc.id} className="flex items-center gap-2.5 px-5 sm:px-6 py-3 hover:bg-amber-500/[0.02] transition-colors">
                 <button
@@ -369,7 +369,7 @@ export default function DashboardView({
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm p-5 sm:p-6">
           <p className="px-2 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3">Accesos directos</p>
           <div className="flex flex-wrap items-center gap-2">
-              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-card bg-zinc-900 hover:bg-zinc-800 dark:bg-surface-1 dark:hover:bg-surface-3 text-white dark:text-content-1 font-black text-[13px] motion shadow-lg shadow-zinc-900/25 active:scale-95 cursor-pointer">
+              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
                   <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
               </button>
               <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1.5"></span>

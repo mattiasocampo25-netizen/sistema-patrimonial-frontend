@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
 
@@ -51,11 +51,30 @@ export default function AppShell({
   // Contenido
   errorBanner
 }) {
+  const [sidebarCompacta, setSidebarCompacta] = useState(() => {
+    try { return localStorage.getItem('sidebar_compacta_v1') === '1'; } catch { return false; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('sidebar_compacta_v1', sidebarCompacta ? '1' : '0'); } catch { /* almacenamiento opcional */ }
+  }, [sidebarCompacta]);
+
+  useEffect(() => {
+    if (!isSidebarOpen) return undefined;
+    const cerrarConEscape = (event) => {
+      if (event.key === 'Escape') setIsSidebarOpen(false);
+    };
+    window.addEventListener('keydown', cerrarConEscape);
+    return () => window.removeEventListener('keydown', cerrarConEscape);
+  }, [isSidebarOpen, setIsSidebarOpen]);
+
   return (
     <div className="flex h-dvh overflow-hidden bg-canvas text-content-1">
       <AppSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        compacta={sidebarCompacta}
+        onToggleCompacta={() => setSidebarCompacta((actual) => !actual)}
         appLogo={appLogo}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -73,6 +92,7 @@ export default function AppShell({
         {errorBanner ? errorBanner : null}
 
         <AppTopbar
+          isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           setActiveTab={setActiveTab}
           setIsScannerOpen={setIsScannerOpen}

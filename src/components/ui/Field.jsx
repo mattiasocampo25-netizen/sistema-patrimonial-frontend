@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React, { Children, cloneElement, isValidElement, useId } from 'react';
 
 /**
  * Field — campo de formulario con etiqueta, ayuda y error.
@@ -11,8 +11,17 @@ import React, { useId } from 'react';
 /** Envoltorio: etiqueta, control, ayuda y error. */
 export function Field({ label, hint, error, requerido, htmlFor, className = '', children }) {
   const id = useId();
-  const controlId = htmlFor || id;
+  const hijoUnico = Children.count(children) === 1 ? Children.only(children) : null;
+  const controlId = htmlFor || (isValidElement(hijoUnico) ? hijoUnico.props.id : null) || id;
   const descId = error ? `${controlId}-error` : hint ? `${controlId}-hint` : undefined;
+  const control = isValidElement(hijoUnico) && hijoUnico.type !== React.Fragment
+    ? cloneElement(hijoUnico, {
+        id: hijoUnico.props.id || controlId,
+        'aria-describedby': [hijoUnico.props['aria-describedby'], descId].filter(Boolean).join(' ') || undefined,
+        'aria-invalid': error ? 'true' : hijoUnico.props['aria-invalid'],
+        'aria-required': requerido || undefined
+      })
+    : children;
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
@@ -25,7 +34,7 @@ export function Field({ label, hint, error, requerido, htmlFor, className = '', 
         </label>
       ) : null}
 
-      {children}
+      {control}
 
       {error ? (
         <p id={descId} role="alert" className="text-label font-medium text-danger flex items-center gap-1.5">
@@ -86,7 +95,7 @@ export function Select({ className = '', error, children, ...resto }) {
 }
 
 /** Campo de busqueda con icono y botón de limpiar. */
-export function SearchInput({ valor = '', onChange, placeholder = 'Buscar…', className = '', ...resto }) {
+export function SearchInput({ valor = '', onChange, placeholder = 'Buscar…', ariaLabel, className = '', ...resto }) {
   return (
     <div className={`relative ${className}`}>
       <i
@@ -98,6 +107,7 @@ export function SearchInput({ valor = '', onChange, placeholder = 'Buscar…', c
         value={valor}
         onChange={(e) => onChange && onChange(e.target.value)}
         placeholder={placeholder}
+        aria-label={ariaLabel || placeholder}
         className={`${CAMPOS} h-10 pl-9 ${valor ? 'pr-9' : ''}`}
         {...resto}
       />

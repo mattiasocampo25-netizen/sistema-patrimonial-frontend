@@ -1,6 +1,6 @@
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 
 // Vista de autorizaciones de traslado FC-11 (extraída de App.jsx, Fase 4).
 export default function Fc11View({
@@ -34,13 +34,7 @@ export default function Fc11View({
       </Card>
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] p-5 sm:p-6 rounded-panel border border-line/70 dark:border-white/10 shadow-sm min-h-[400px]">
         {isLoading ? ( <SkeletonLoader /> ) : filteredFC11.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-surface-2/50 dark:bg-surface-2/50 rounded-card border border-dashed border-line-strong dark:border-line">
-            <div className="flex h-16 w-16 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-2xs">
-              <i className="fa-solid fa-boxes-packing text-2xl"></i>
-            </div>
-            <h3 className="text-base font-black text-content-1 dark:text-zinc-200">Sin traslados registrados</h3>
-            <p className="text-xs font-medium text-content-3 max-w-xs mt-1">No existen expedientes FC-11 procesados en el periodo seleccionado.</p>
-          </div>
+          <EmptyState tipo="vacio" icono="fa-truck-fast" titulo="Sin traslados registrados" descripcion="No existen expedientes FC-11 procesados en el periodo seleccionado." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredFC11.map(fc => {

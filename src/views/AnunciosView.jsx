@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Button, Card, Field, Input, PageHeader, Textarea, Toolbar } from '../components/ui';
 
 // Módulo Anuncios (solo desarrollador): envía avisos a todos los usuarios
 // o a uno específico. Diseño con tarjetas elegantes, banners visuales,
@@ -93,33 +93,31 @@ export default function AnunciosView({
         <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white flex items-center gap-2">
           <i className="fa-solid fa-paper-plane text-brand-text"></i> Nuevo anuncio
         </h3>
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Título</label>
-          <input
+        <Field label="Título" requerido>
+          <Input
             type="text" value={titulo} onChange={(e) => { setTitulo(e.target.value); try { localStorage.setItem('anuncio_borrador_titulo', e.target.value); } catch {} }} maxLength={120}
-            placeholder="Ej: Mantenimiento programado este sábado"
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 h-11 px-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion shadow-sm"
+            placeholder="Ej: Mantenimiento programado este sábado" className="h-11"
           />
-        </div>
-        <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Mensaje</label>
-          <textarea
-            rows={3} value={mensaje} onChange={(e) => { setMensaje(e.target.value); try { localStorage.setItem('anuncio_borrador_mensaje', e.target.value); } catch {} }} maxLength={1000}
-            placeholder="Detalle del aviso que verán en la campana de notificaciones..."
-            className="w-full rounded-control border border-line dark:border-line bg-surface-1 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none shadow-sm"
+        </Field>
+        <Field label="Mensaje" requerido hint={`${mensaje.length}/1000 caracteres`}>
+          <Textarea
+            rows={4} value={mensaje} onChange={(e) => { setMensaje(e.target.value); try { localStorage.setItem('anuncio_borrador_mensaje', e.target.value); } catch {} }} maxLength={1000}
+            placeholder="Detalle del aviso que verán en la campana de notificaciones..." className="resize-y"
           />
-        </div>
+        </Field>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <div className="flex gap-2">
             <button
               type="button" onClick={() => setDestino('TODOS')}
-              className={`flex-1 h-11 rounded-control text-[13px] font-bold border motion cursor-pointer shadow-sm ${destino === 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
+              aria-pressed={destino === 'TODOS'}
+              className={`flex-1 h-11 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino === 'TODOS' ? 'bg-brand text-content-inverse border-brand hover:bg-brand-hover' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
             >
               <i className="fa-solid fa-users mr-2 text-xs"></i>Todos ({usuariosList.length})
             </button>
             <button
               type="button" onClick={() => setDestino(usuariosOrdenados.find(u => u.username !== currentUser?.username)?.username || '')}
-              className={`flex-1 h-11 rounded-control text-[13px] font-bold border motion cursor-pointer shadow-sm ${destino !== 'TODOS' ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 border-zinc-900 dark:border-white hover:bg-zinc-800 dark:hover:bg-surface-3' : 'text-content-2 dark:text-content-3 border-line dark:border-line hover:border-zinc-400 dark:hover:border-white/20'}`}
+              aria-pressed={destino !== 'TODOS'}
+              className={`flex-1 h-11 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino !== 'TODOS' ? 'bg-brand text-content-inverse border-brand hover:bg-brand-hover' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
             >
               <i className="fa-solid fa-user mr-2 text-xs"></i>Específico
             </button>
@@ -135,13 +133,9 @@ export default function AnunciosView({
           )}
         </div>
         <div className="flex justify-end pt-1">
-          <button
-            type="button" onClick={handleEnviar} disabled={!puedeEnviar || enviando}
-            className="inline-flex items-center gap-2 px-5 h-11 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 text-[13px] font-black hover:bg-zinc-800 dark:hover:bg-surface-3 motion active:scale-95 cursor-pointer disabled:opacity-50 shadow-lg shadow-zinc-900/25 dark:shadow-white/10 hover:shadow-xl"
-          >
-            <i className={`fa-solid ${enviando ? 'fa-circle-notch fa-spin' : 'fa-paper-plane'} text-xs`}></i>
-            {enviando ? 'Enviando...' : `Enviar a ${cantDest} usuario${cantDest === 1 ? '' : 's'}`}
-          </button>
+          <Button variante="primary" tamano="lg" icono={enviando ? undefined : 'fa-paper-plane'} cargando={enviando} disabled={!puedeEnviar || enviando} onClick={handleEnviar}>
+            {enviando ? 'Enviando…' : `Enviar a ${cantDest} usuario${cantDest === 1 ? '' : 's'}`}
+          </Button>
         </div>
       </div>
 

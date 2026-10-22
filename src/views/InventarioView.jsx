@@ -256,7 +256,7 @@ export default function InventarioView({
   
         <button 
           onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} 
-          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-zinc-900 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-zinc-100 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
+          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-brand hover:bg-brand-hover text-content-inverse text-[13px] font-bold shadow-sm transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 outline-none"
         >
           <i className="fa-solid fa-plus text-xs"></i>
           <span className="whitespace-nowrap">{t('inv.anadir')}</span>
@@ -268,7 +268,7 @@ export default function InventarioView({
   </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
-  <div className="bg-surface-1 dark:bg-zinc-900/40 p-4 sm:p-5 rounded-panel border border-line/70 dark:border-zinc-700/30 shadow-sm space-y-4">
+  <div className="bg-surface-1 p-4 sm:p-5 rounded-panel border border-line shadow-sm space-y-4">
 
     {/* Campo de Búsqueda Principal */}
     <div className="relative w-full">
@@ -284,7 +284,7 @@ export default function InventarioView({
         onFocus={() => setShowHistorial(true)}
         onBlur={() => setTimeout(() => setShowHistorial(false), 150)}
         onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) { guardarReciente(searchTerm); setShowHistorial(false); } }}
-        className="w-full rounded-card border border-line dark:border-zinc-800 bg-surface-1 dark:bg-zinc-900 py-3 pl-11 pr-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-zinc-900 dark:focus:border-zinc-500 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/5 outline-none transition-all"
+        className="w-full rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
       />
       {showHistorial && !searchTerm && recientes.length > 0 && (
         <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">

@@ -95,7 +95,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in-fast"
       onMouseDown={(e) => {
         if (cerrarAlPulsarFuera && e.target === e.currentTarget && onCerrar) onCerrar();
       }}
@@ -107,7 +107,7 @@ export default function Modal({
         aria-label={typeof titulo === 'string' ? titulo : undefined}
         tabIndex={-1}
         onKeyDown={onTecla}
-        className={`w-full ${TAMANOS[tamano] || TAMANOS.md} bg-surface-1 text-content-1 rounded-t-panel sm:rounded-panel border border-line shadow-pop flex flex-col max-h-[92dvh] outline-none ${className}`}
+        className={`w-full ${TAMANOS[tamano] || TAMANOS.md} bg-surface-1 text-content-1 rounded-t-panel sm:rounded-panel border border-line shadow-pop flex flex-col max-h-[92dvh] outline-none animate-scale-in ${className}`}
       >
         {(titulo || onCerrar) && (
           <div className="flex items-start justify-between gap-4 px-5 sm:px-6 py-4 border-b border-line shrink-0">
@@ -127,7 +127,7 @@ export default function Modal({
                 type="button"
                 onClick={onCerrar}
                 aria-label={etiquetaCerrar}
-                className="h-8 w-8 shrink-0 rounded-control flex items-center justify-center text-content-3 hover:bg-surface-3 hover:text-content-1 transition-colors"
+                className="h-8 w-8 shrink-0 rounded-control flex items-center justify-center text-content-3 hover:bg-surface-3 hover:text-content-1 transition-[background-color,color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
               >
                 <i className="fa-solid fa-xmark text-xs" aria-hidden="true" />
               </button>

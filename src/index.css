@@ -308,6 +308,7 @@ select:focus {
 
 /* Utilidades de animación */
 .animate-fade-in { animation: app-fade-in 0.45s ease both; }
+.animate-fade-in-fast { animation: app-fade-in var(--dur-base) ease both; }
 .animate-slide-up { animation: app-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-fade-up { animation: app-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-scale-in { animation: app-scale-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -341,6 +342,7 @@ select:focus {
   content: '';
   position: absolute;
   inset: 0;
+  pointer-events: none;
   transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
   animation: app-shimmer 1.6s ease-in-out infinite;
@@ -523,6 +525,7 @@ html.font-lg { font-size: 18px; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
+  .animate-fade-in-fast,
   .animate-slide-up,
   .animate-fade-up,
   .animate-scale-in,

@@ -1,6 +1,6 @@
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
-import { Card, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
 
 // Vista del registro mensual FC-04 (extraída de App.jsx, Fase 4).
 export default function Fc04View({
@@ -36,13 +36,7 @@ export default function Fc04View({
 
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] p-5 sm:p-6 rounded-panel border border-line/70 dark:border-white/10 shadow-sm min-h-[400px]">
         {isLoading ? ( <SkeletonLoader /> ) : filteredFC04.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-surface-2/50 dark:bg-surface-2/50 rounded-card border border-dashed border-line-strong dark:border-line">
-              <div className="flex h-16 w-16 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-2xs">
-                <i className="fa-solid fa-folder-open text-2xl"></i>
-              </div>
-              <h3 className="text-base font-black text-content-1 dark:text-zinc-200">Sin expedientes registrados</h3>
-              <p className="text-xs font-medium text-content-3 max-w-xs mt-1">No existen formularios FC-04 generados en el ciclo seleccionado.</p>
-          </div>
+          <EmptyState tipo="busqueda" icono="fa-folder-open" titulo="Sin expedientes registrados" descripcion="No existen formularios FC-04 generados en el ciclo seleccionado." />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredFC04.map(fc => {

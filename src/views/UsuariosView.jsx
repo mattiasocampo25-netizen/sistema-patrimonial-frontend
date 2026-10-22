@@ -1,6 +1,6 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Badge, Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
   esDesarrollador, currentUser, setItemToDelete, STYLES, isLoading
@@ -36,7 +36,7 @@ export default function UsuariosView({
       ) : (
       <div className="flex-1 bg-surface-1 dark:bg-surface-1/[0.04] border border-line/70 dark:border-white/10 rounded-panel flex flex-col overflow-hidden relative">
           <div className="flex-1 overflow-auto custom-scrollbar">
-            <Table sinContenedor minWidth={false} className="min-w-full text-left">
+            <Table sinContenedor minWidth={false} className="min-w-[560px] text-left">
               <THead>
                 <TRow className="text-[11px] font-bold text-content-2 dark:text-content-3 uppercase tracking-wider">
                   <TH className="py-3.5 pl-6 pr-4 w-1/3">Usuario y Nombre</TH>
@@ -60,10 +60,10 @@ export default function UsuariosView({
                       </TD>
                       <TD className="px-4 py-3 align-middle">
                           {u.cargo === 'desarrollador'
-                              ? <span className="inline-flex items-center gap-1.5 rounded-md bg-violet-500/10 px-2 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300 ring-1 ring-inset ring-violet-500/20 shadow-sm"><i className="fa-solid fa-code text-[10px]"></i> Desarrollador</span>
+                              ? <Badge tono="brand" icono="fa-code">Desarrollador</Badge>
                               : u.cargo === 'admin'
-                              ? <span className="inline-flex items-center gap-1.5 rounded-md bg-indigo-50 px-2 py-1 text-[11px] font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-600/20 dark:bg-indigo-900/20 dark:text-indigo-400 shadow-sm"><i className="fa-solid fa-shield-halved text-[10px]"></i> Administrador</span>
-                              : <span className="inline-flex items-center gap-1.5 rounded-md bg-surface-3 px-2 py-1 text-[11px] font-semibold text-content-2 ring-1 ring-inset ring-zinc-500/20 dark:bg-zinc-800 dark:text-content-3 shadow-sm"><i className="fa-solid fa-user text-[10px]"></i> Funcionario</span>
+                              ? <Badge tono="info" icono="fa-shield-halved">Administrador</Badge>
+                              : <Badge icono="fa-user">Funcionario</Badge>
                           }
                       </TD>
                       <TD className="relative py-3 pl-4 pr-6 align-middle text-right">

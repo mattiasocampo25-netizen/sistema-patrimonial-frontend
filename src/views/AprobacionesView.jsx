@@ -60,7 +60,8 @@ export default function AprobacionesView({
               <button
                 key={et.id}
                 onClick={() => setFiltroEstado(et.id)}
-                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-control text-[11px] font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ filtroEstado === et.id ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1' : 'bg-surface-3 dark:bg-surface-1/5 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10' }`}
+                aria-pressed={filtroEstado === et.id}
+                className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-control text-label font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.98] ${ filtroEstado === et.id ? 'bg-brand text-content-inverse border-brand shadow-sm' : 'bg-surface-2 border-line text-content-2 hover:bg-surface-3 hover:border-line-strong' }`}
               >
                 {et.label}
                 <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-content-3 dark:text-content-3'}`}>{et.n}</span>

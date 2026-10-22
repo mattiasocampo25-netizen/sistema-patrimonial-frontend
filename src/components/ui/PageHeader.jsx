@@ -27,7 +27,7 @@ export default function PageHeader({
 }) {
   return (
     <header
-      className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6 ${className}`}
+      className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6 animate-fade-up ${className}`}
     >
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {icono ? (
@@ -53,7 +53,7 @@ export default function PageHeader({
 
       {acciones ? (
         // flex-wrap + min-w-0: si no entran, bajan de línea en vez de salirse.
-        <div className="flex flex-wrap items-center gap-2 shrink-0 lg:justify-end">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 lg:w-auto lg:shrink-0 lg:justify-end">
           {acciones}
         </div>
       ) : null}
@@ -68,7 +68,7 @@ export default function PageHeader({
 export function Toolbar({ className = '', children, ...resto }) {
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 ${className}`}
+      className={`flex flex-wrap items-center gap-2 sm:gap-2.5 ${className}`}
       {...resto}
     >
       {children}

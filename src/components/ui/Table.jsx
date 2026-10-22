@@ -5,7 +5,7 @@ import React from 'react';
  *
  * Hoy hay 8 tablas escritas cada una a su medida. Esta da lo comun:
  * cabecera pegajosa, celda truncada con tooltip, y las clases de la tabla
- * ("anim-rows", "min-w-[900px]", scroll horizontal) en un solo lugar.
+ * ("anim-rows", el ancho mínimo configurable y el scroll horizontal) en un solo lugar.
  */
 
 export function Table({
@@ -20,7 +20,7 @@ export function Table({
 }) {
   const tabla = (
     <table
-      className={`w-full text-left border-collapse ${minWidth ? 'min-w-[900px]' : ''} ${className}`}
+      className={`w-full text-left border-collapse ${className}`}
       style={minWidth ? { minWidth: typeof minWidth === 'number' ? `${minWidth}px` : minWidth } : undefined}
       {...resto}
     >
@@ -51,7 +51,7 @@ export function THead({ className = '', children, ...resto }) {
 export function TRow({ className = '', children, ...resto }) {
   return (
     <tr
-      className={`border-b border-line/60 transition-colors duration-[var(--dur-fast)] hover:bg-surface-2 ${className}`}
+      className={`border-b border-line/60 transition-[background-color,color] duration-[var(--dur-fast)] hover:bg-surface-2 ${className}`}
       {...resto}
     >
       {children}
@@ -112,7 +112,7 @@ export function Pagination({ pagina, totalPaginas, totalElementos, porPagina, on
           onClick={() => onCambioPagina && onCambioPagina(pagina - 1)}
           disabled={pagina <= 1}
           aria-label="Pagina anterior"
-          className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
+          className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-[background-color,color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           <i className="fa-solid fa-chevron-left text-[0.7em]" aria-hidden="true" />
         </button>
@@ -126,7 +126,7 @@ export function Pagination({ pagina, totalPaginas, totalElementos, porPagina, on
           onClick={() => onCambioPagina && onCambioPagina(pagina + 1)}
           disabled={pagina >= totalPaginas}
           aria-label="Pagina siguiente"
-          className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
+          className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-[background-color,color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           <i className="fa-solid fa-chevron-right text-[0.7em]" aria-hidden="true" />
         </button>

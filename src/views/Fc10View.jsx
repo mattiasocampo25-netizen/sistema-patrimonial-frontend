@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import {
-  Card, PageHeader, Toolbar, ToolbarDivider,
+  Card, EmptyState, PageHeader, Toolbar, ToolbarDivider,
   Button, Badge, Chip, ChipGroup
 } from '../components/ui';
 import { formatDateText, formatCI } from '../utils/helpers';
@@ -225,42 +225,18 @@ export default function Fc10View({
         {isLoading ? (
           <SkeletonLoader />
         ) : listaVisible.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center bg-surface-2/50 dark:bg-surface-2/50 rounded-card border border-dashed border-line-strong dark:border-line">
-            <div className="flex h-16 w-16 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-2xs">
-              <i className={`fa-solid ${filtroEtapa === 'todas' ? 'fa-folder-open' : 'fa-circle-check'} text-2xl`}></i>
-            </div>
-            {filtroEtapa === 'todas' ? (
-              <>
-                <h3 className="text-base font-black text-content-1 dark:text-zinc-200">Sin asignaciones en el ciclo</h3>
-                <p className="text-xs font-medium text-content-3 max-w-xs mt-1">No existen actas FC-10 generadas en el periodo seleccionado.</p>
-                {setActiveTab && (
-                  <button
-                    onClick={() => setActiveTab('inventario')}
-                    className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer active:scale-95"
-                  >
-                    <i className="fa-solid fa-boxes-stacked text-xs"></i> Asignar desde inventario
-                  </button>
-                )}
-              </>
-            ) : (
-              <>
-                <h3 className="text-base font-black text-content-1 dark:text-zinc-200">
-                  Nada en esta etapa
-                </h3>
-                <p className="text-xs font-medium text-content-3 max-w-xs mt-1">
-                  {ETAPAS.find(e => e.id === filtroEtapa)?.label === 'Cerradas'
-                    ? 'Ningun acta de este periodo tiene las dos firmas registradas.'
-                    : 'Ningun acta espera esta firma en el periodo seleccionado.'}
-                </p>
-                <button
-                  onClick={() => setFiltroEtapa('todas')}
-                  className="mt-4 inline-flex items-center gap-2 h-9 px-4 rounded-control text-[12px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer"
-                >
-                  <i className="fa-solid fa-arrow-left text-[10px]"></i> Ver todas las actas
-                </button>
-              </>
-            )}
-          </div>
+          <EmptyState
+            tipo={filtroEtapa === 'todas' ? 'vacio' : 'filtro'}
+            icono={filtroEtapa === 'todas' ? 'fa-folder-open' : 'fa-circle-check'}
+            titulo={filtroEtapa === 'todas' ? 'Sin asignaciones en el ciclo' : 'Nada en esta etapa'}
+            descripcion={filtroEtapa === 'todas'
+              ? 'No existen actas FC-10 generadas en el periodo seleccionado.'
+              : ETAPAS.find(e => e.id === filtroEtapa)?.label === 'Cerradas'
+                ? 'Ningún acta de este periodo tiene las dos firmas registradas.'
+                : 'Ningún acta espera esta firma en el periodo seleccionado.'}
+            accion={filtroEtapa === 'todas' ? (setActiveTab ? 'Asignar desde inventario' : undefined) : 'Ver todas las actas'}
+            onAccion={filtroEtapa === 'todas' ? (setActiveTab ? () => setActiveTab('inventario') : undefined) : () => setFiltroEtapa('todas')}
+          />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {listaVisible.map(fc => {

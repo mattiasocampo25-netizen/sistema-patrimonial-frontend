@@ -116,7 +116,7 @@ export function ButtonGroup({ className = '', children, ...resto }) {
   return (
     <div
       role="group"
-      className={`inline-flex items-center rounded-control border border-line bg-surface-1 p-0.5 ${className}`}
+      className={`inline-flex items-center rounded-control border border-line bg-surface-2 p-0.5 shadow-sm ${className}`}
       {...resto}
     >
       {children}

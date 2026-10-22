@@ -22,6 +22,7 @@ import { IconButton } from '../ui';
  */
 
 export default function AppTopbar({
+  isSidebarOpen,
   setIsSidebarOpen,
   setActiveTab,
   setIsScannerOpen,
@@ -93,7 +94,9 @@ export default function AppTopbar({
           <button
             type="button"
             onClick={() => setIsSidebarOpen(true)}
-            className="lg:hidden h-10 w-10 shrink-0 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-2 transition-colors"
+            aria-controls="sidebar-navigation"
+            aria-expanded={!!isSidebarOpen}
+            className="lg:hidden h-10 w-10 shrink-0 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-2 transition-[color,background-color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             title="Abrir menú"
             aria-label="Abrir menú"
           >

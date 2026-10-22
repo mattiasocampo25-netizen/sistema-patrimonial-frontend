@@ -5,12 +5,12 @@ import path from 'node:path';
 
 // Version del sistema.
 //
-// La version que ve el usuario sale de `app_config.ultima_version` (la base),
+// La versión que ve el usuario sale de `app_config.ultima_version` (la base),
 // que es la que publica `npm run aviso:cerrar -- --version X`. Esa constante
 // se sincroniza sola con los `package.json` de los dos repositorios y con
 // `APP_VERSION` del frontend.
 //
-// Estas pruebas son el guard: cuando la version se subia a mano en un solo
+// Estas pruebas son el guard: cuando la versión se subia a mano en un solo
 // lado, la app mostraba "v2.11.0" en el pie y en la ayuda mientras el
 // changelog decia "v2.13.0".
 //
@@ -27,23 +27,23 @@ const versionDeHelpers = () => {
   return m[1];
 };
 
-describe('version del sistema', () => {
-  it('APP_VERSION coincide con la version de frontend/package.json', () => {
+describe('versión del sistema', () => {
+  it('APP_VERSION coincide con la versión de frontend/package.json', () => {
     const pkg = leerPkg('package.json');
     assert.equal(
       versionDeHelpers(),
       pkg.version,
-      'APP_VERSION y package.json estan desincronizados. ' +
+      'APP_VERSION y package.json están desincronizados. ' +
       'Se actualizan con: npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version X'
     );
   });
 
-  it('la version tiene forma de version semantica', () => {
+  it('la versión tiene forma de versión semantica', () => {
     const v = leerPkg('package.json').version;
-    assert.match(v, /^\d+\.\d+\.\d+$/, 'la version deberia ser X.Y.Z, no "' + v + '"');
+    assert.match(v, /^\d+\.\d+\.\d+$/, 'la versión debería ser X.Y.Z, no "' + v + '"');
   });
 
-  it('ningun archivo del frontend vuelve a traer la version en un literal suelto', () => {
+  it('ningun archivo del frontend vuelve a traer la versión en un literal suelto', () => {
     // Busca "v2.x.y" escrito a mano fuera de helpers.js: esas son las que se
     // desincronizan sin que nadie se entere.
     const carpeta = path.join(RAIZ, 'src');

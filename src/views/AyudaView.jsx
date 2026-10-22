@@ -146,7 +146,7 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
         {/* Columna izquierda: sección activa */}
         <div className="lg:col-span-5 flex flex-col">
@@ -216,7 +216,7 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
 
         {/* Columna derecha: contacto y recursos rápidos */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
+          <div className={`${STYLES.card} p-6 sm:p-8 self-start w-full`}>
             <h3 className="text-base font-bold text-content-1 dark:text-white mb-4 flex items-center gap-2">
               <i className="fa-solid fa-envelope text-brand-text"></i> Contacto y Soporte
             </h3>

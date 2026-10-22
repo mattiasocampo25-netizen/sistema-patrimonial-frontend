@@ -189,12 +189,16 @@ export default function AppSidebar({
           ) : (
             <div className={`flex items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
               {/* El logotipo acompaña el tono del sidebar en ambos temas. */}
-              <img
-                src={LOGO_SISTEMA}
-                alt="Universidad Nacional de Pilar"
-                className={`${compacta ? 'h-8 max-w-[150px] object-contain object-left lg:max-w-[44px]' : 'h-9 max-w-[150px] object-contain object-left'} w-auto`}
-                onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }}
-              />
+              {compacta ? (
+                <span className="hidden lg:flex h-10 w-10 items-center justify-center rounded-control border border-sidebar-line bg-surface-1/10 text-sm font-black tracking-tight text-sidebar-content" aria-label="Universidad Nacional de Pilar" title="Universidad Nacional de Pilar">UNP</span>
+              ) : (
+                <img
+                  src={LOGO_SISTEMA}
+                  alt="Universidad Nacional de Pilar"
+                  className="h-9 w-auto max-w-[150px] object-contain object-left"
+                  onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }}
+                />
+              )}
               {!compacta ? <div className="flex-1" /> : null}
             </div>
           )}

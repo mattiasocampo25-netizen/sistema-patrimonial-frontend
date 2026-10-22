@@ -105,8 +105,8 @@ export default function AnunciosView({
             placeholder="Detalle del aviso que verán en la campana de notificaciones..." className="resize-y"
           />
         </Field>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div className="flex gap-2">
+        <div className="space-y-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               type="button" onClick={() => setDestino('TODOS')}
               aria-pressed={destino === 'TODOS'}
@@ -123,6 +123,7 @@ export default function AnunciosView({
             </button>
           </div>
           {destino !== 'TODOS' && (
+            <div className="w-full">
             <FiltroCombo
               valor={destino}
               opciones={usuariosOrdenados.map(u => ({ label: `${u.nombre || u.username} (@${u.username})`, value: u.username }))}
@@ -130,6 +131,7 @@ export default function AnunciosView({
               etiquetaTodos="Elegir usuario..."
               titulo="Destinatario del anuncio"
             />
+            </div>
           )}
         </div>
         <div className="flex justify-end pt-1">

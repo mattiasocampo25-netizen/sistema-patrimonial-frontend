@@ -72,7 +72,7 @@ export default function AprobacionesView({
         </div>
       </Card>
 
-      <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm overflow-hidden flex-1 min-h-[400px]">
+      <div className={`bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm overflow-hidden ${listaFiltrada.length ? 'flex-1 min-h-[400px]' : ''}`}>
         <div className="overflow-x-auto custom-scrollbar">
           <Table sinContenedor minWidth={false} className="w-full text-left border-collapse min-w-[700px]">
             <THead>
@@ -182,6 +182,7 @@ export default function AprobacionesView({
                       icon="fa-check-double"
                       titulo="Bandeja de aprobaciones al día"
                       descripcion="No hay solicitudes pendientes con el filtro seleccionado."
+                      className="py-8 sm:py-10"
                     />
                   </TD>
                 </TRow>

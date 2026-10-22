@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { normalizeStr } from '../utils/helpers';
 import { puntuarOpcion } from '../utils/busqueda';
 
@@ -25,13 +26,37 @@ export default function FiltroCombo({
   const cajaRef = useRef(null);
   const botonRef = useRef(null);
   const inputRef = useRef(null);
+  const popupRef = useRef(null);
+  const [popupStyle, setPopupStyle] = useState(null);
   const mensajeErrorId = name ? `${name}-filtro-error` : undefined;
 
   useEffect(() => {
     if (!abierto) return;
-    const cerrar = (e) => { if (cajaRef.current && !cajaRef.current.contains(e.target)) setAbierto(false); };
+    const cerrar = (e) => {
+      if (!cajaRef.current?.contains(e.target) && !popupRef.current?.contains(e.target)) setAbierto(false);
+    };
     document.addEventListener('mousedown', cerrar);
     return () => document.removeEventListener('mousedown', cerrar);
+  }, [abierto]);
+
+  useLayoutEffect(() => {
+    if (!abierto) { setPopupStyle(null); return; }
+    const posicionar = () => {
+      const rect = botonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const margen = 8;
+      const ancho = Math.min(Math.max(rect.width, 260), window.innerWidth - margen * 2);
+      const izquierda = Math.min(Math.max(margen, rect.left), window.innerWidth - ancho - margen);
+      const abajo = window.innerHeight - rect.bottom - margen;
+      const arriba = rect.top - margen;
+      const desplegarAbajo = abajo >= 190 || abajo >= arriba;
+      const alto = Math.max(120, Math.min(320, (desplegarAbajo ? abajo : arriba) - 6));
+      setPopupStyle({ position: 'fixed', left: izquierda, width: ancho, maxWidth: `calc(100vw - ${margen * 2}px)`, maxHeight: alto, top: desplegarAbajo ? rect.bottom + 6 : undefined, bottom: desplegarAbajo ? undefined : window.innerHeight - rect.top + 6, zIndex: 1000 });
+    };
+    posicionar();
+    window.addEventListener('resize', posicionar);
+    window.addEventListener('scroll', posicionar, true);
+    return () => { window.removeEventListener('resize', posicionar); window.removeEventListener('scroll', posicionar, true); };
   }, [abierto]);
 
   const valorActual = valor !== undefined && valor !== null ? valor : interno;
@@ -148,8 +173,8 @@ export default function FiltroCombo({
           {errorMsg || 'Este campo es obligatorio.'}
         </p>
       )}
-      {abierto && (
-        <div className="absolute left-0 w-auto min-w-[260px] z-50 mt-1.5 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
+      {abierto && popupStyle && createPortal(
+        <div ref={popupRef} style={popupStyle} className="rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
           <div className="relative border-b border-line dark:border-white/10">
             <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
             <input
@@ -165,7 +190,7 @@ export default function FiltroCombo({
               className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal"
             />
           </div>
-          <div className="max-h-56 overflow-y-auto custom-scrollbar py-1">
+          <div style={{ maxHeight: Math.max(72, popupStyle.maxHeight - 44) }} className="overflow-y-auto custom-scrollbar py-1">
             <button
               type="button"
               onClick={() => elegir('')}
@@ -199,7 +224,7 @@ export default function FiltroCombo({
               </p>
             )}
           </div>
-        </div>
+        </div>, document.body
       )}
     </div>
   );

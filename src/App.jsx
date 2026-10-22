@@ -102,7 +102,7 @@ export default function App() {
   const [publicDescExpandida, setPublicDescExpandida] = useState(false);
   const { toasts, addToast, quitarToast } = useToasts();
   // Sesión y autenticación: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const { isAuthenticated, currentUser, setCurrentUser, isAdmin, esDesarrollador, loginUser, setLoginUser, loginPass, setLoginPass, showPassword, setShowPassword, loginError, isProcessing, setIsProcessing, dependenciaActual, setDependenciaActual, showLogoutConfirm, setShowLogoutConfirm, mantenimiento, isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant, mostrarLoginDev, setMostrarLoginDev, mantBypass, handleLogin, handleLogout, saveMantenimiento } = useAuthSession({ notify: addToast });
+  const { isAuthenticated, currentUser, setCurrentUser, isAdmin, esDesarrollador, loginUser, setLoginUser, loginPass, setLoginPass, showPassword, setShowPassword, loginError, isProcessing, setIsProcessing, dependenciaActual, setDependenciaActual, showLogoutConfirm, setShowLogoutConfirm, mantenimiento, versionApp, isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant, mostrarLoginDev, setMostrarLoginDev, mantBypass, handleLogin, handleLogout, saveMantenimiento } = useAuthSession({ notify: addToast });
   const [appLogo, _setAppLogo] = useState(() => localStorage.getItem('logoOficial'));
   
   
@@ -1475,7 +1475,7 @@ if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && !mostr
 }
 if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && mostrarLoginDev) {
   return (
-      <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
+      <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} version={versionApp} />
   );
 }
 if (rutaDesconocida && !publicBienId) {
@@ -1710,7 +1710,7 @@ if (publicBienId) {
 
   if (!isAuthenticated) {
       return (
-          <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} />
+          <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} version={versionApp} />
       );
   }
 
@@ -1822,7 +1822,7 @@ if (publicBienId) {
 
                 {activeTab === 'fc10' && (<Fc10View filteredFC10={filteredFC10} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleExportFC10CSV={handleExportFC10CSV} isLoading={isLoading} bienes={bienes} handleGenerateFC10PDF={handleGenerateFC10PDF} openFC10Modal={openFC10Modal} isAdmin={isAdmin} setItemToDelete={setItemToDelete} setActiveTab={setActiveTab} registrarFirmaFC10={firmarConBloqueo} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} ponerFC10EnTramite={ponerEnTramiteConBloqueo} poniendoEnTramite={poniendoEnTramite} actualizarEstadoFirma={actualizarEstadoFirma} currentUser={currentUser} />)}
                 {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
-                {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} />)}
+                {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} version={versionApp} />)}
             </div>
             </Suspense>
       </AppShell>

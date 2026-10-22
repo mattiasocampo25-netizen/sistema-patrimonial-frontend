@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import { INACTIVITY_LIMIT_MS } from '../constants/appConstants';
 import { leerUsuarioLocal, sesionMarcadaLocal } from '../utils/sesionLocal';
 import { normalizarEntradaAcceso, validarPassword, construirSesion } from '../utils/authInput';
+import { APP_VERSION } from '../utils/helpers';
 
 // Sesión y autenticación (extraído de App.jsx, Fase 6).
 // Autosuficiente a propósito: incluye dependenciaActual, isProcessing y
@@ -249,6 +250,15 @@ const saveMantenimiento = async (data) => {
   }
 };
 
+  // Version visible del sistema.
+  //
+  // La fuente de verdad es `app_config.ultima_version` (la base), que es la
+  // que publica el script de aviso en cada despliegue. `APP_VERSION` queda
+  // como respaldo para cuando la configuracion todavia no cargo.
+  const versionApp = (typeof mantenimiento?.ultima_version === 'string' && mantenimiento.ultima_version.trim())
+    ? mantenimiento.ultima_version.trim()
+    : APP_VERSION;
+
   return {
     isAuthenticated, setIsAuthenticated, currentUser, setCurrentUser,
     isAdmin, esDesarrollador,
@@ -258,6 +268,7 @@ const saveMantenimiento = async (data) => {
     dependenciaActual, setDependenciaActual,
     showLogoutConfirm, setShowLogoutConfirm,
     mantenimiento, setMantenimiento,
+    versionApp,
     isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant,
     mostrarLoginDev, setMostrarLoginDev, mantBypass,
     handleLogin, handleLogout, saveMantenimiento

@@ -44,8 +44,17 @@ export const normalizeStr = (str) =>
     .toUpperCase()
     .replace(/\s+/g, ' ');
 
-// Versión visible del sistema (mostrar en esquinas; subir en cada lote de mejoras)
-export const APP_VERSION = '2.11.0';
+// Versión de RESBALDO del sistema.
+//
+// La versión que ve el usuario sale de `app_config.ultima_version` (la base):
+// esa es la fuente de verdad y la que el script `aviso-mantenimiento.js`
+// publica en cada despliegue. Esta constante solo se usa si la configuración
+// todavía no cargó (por ejemplo, sin red), y el script la mantiene
+// actualizada junto con los `package.json` de los dos repositorios.
+//
+// OJO: no cambiar la version a mano. Se cambia con:
+//   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
+export const APP_VERSION = '2.13.1';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.

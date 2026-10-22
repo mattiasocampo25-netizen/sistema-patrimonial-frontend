@@ -13,11 +13,14 @@ export default function LoginScreen({
   setShowPassword,
   loginError,
   darkMode,
-  
+
   appLogo,
   toasts,
   isProcessing = false,
-  quitarToast = () => {}
+  quitarToast = () => {},
+  // Version que muestra el pie. Viene de `app_config` (la fuente de verdad);
+  // `APP_VERSION` queda como respaldo si la configuracion no llego.
+  version = APP_VERSION
 }) {
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
@@ -173,7 +176,7 @@ export default function LoginScreen({
             </form>
 
             <p className="mt-8 text-center text-label font-medium tracking-tight uppercase text-content-3">
-              © {new Date().getFullYear()} Universidad Nacional de Pilar · v{APP_VERSION}
+              © {new Date().getFullYear()} Universidad Nacional de Pilar · v{version}
             </p>
           </div>
         </div>

@@ -7,7 +7,7 @@ import { Card, PageHeader, Toolbar } from '../components/ui';
 
 // Vista de ayuda/Soporte y Normativa.
 // Contenido estático + tour guiado + FAQ accordion ampliado.
-export default function AyudaView({ setTourPaso, STYLES }) {
+export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }) {
   const [busquedaFaq, setBusquedaFaq] = useState('');
   const [seccionActiva, setSeccionActiva] = useState('faq');
 
@@ -241,7 +241,7 @@ export default function AyudaView({ setTourPaso, STYLES }) {
               </div>
               <div className="pt-4 border-t border-line dark:border-line/60">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 mb-2">Versión del sistema</p>
-                <p className="text-sm text-content-2 dark:text-content-3">v{APP_VERSION} · Entorno de producción</p>
+                <p className="text-sm text-content-2 dark:text-content-3">v{version} · Entorno de producción</p>
               </div>
             </div>
           </div>

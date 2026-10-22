@@ -6,13 +6,19 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
     ? config.mejoras
     : String(config?.mejoras || '').split('\n').map(s => s.trim()).filter(Boolean);
 
+  // La version sale de `app_config` (la fuente de verdad). `APP_VERSION` queda
+  // como respaldo si la configuracion todavia no llego.
+  const version = (typeof config?.ultima_version === 'string' && config.ultima_version.trim())
+    ? config.ultima_version.trim()
+    : APP_VERSION;
+
   const _fechaInicio = config?.fechaInicio || new Date().toISOString();
   const transcurrido = config?.transcurrido || '';
   const estimado = config?.estimado || '';
 
   return (
     <div className="min-h-dvh flex flex-col w-full bg-[#0b0f19] font-sans antialiased relative overflow-hidden selection:bg-brand/30">
-      <span className="absolute bottom-4 right-5 z-10 text-[10px] font-semibold text-content-3">v{APP_VERSION}</span>
+      <span className="absolute bottom-4 right-5 z-10 text-[10px] font-semibold text-content-3">v{version}</span>
       {/* Fondo decorativo */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-blue-900/20 blur-[100px]"></div>

@@ -169,38 +169,227 @@ export async function aplanarImagen(dataUrl) {
  *   - la accion /OpenAction automatica de jsPDF,
  *   - las fuentes estandar declaradas pero no usadas.
  *
- * Trabaja sobre los bytes: el catalogo y el diccionario /Font no van
- * comprimidos, asi que se pueden editar sin romper nada.
+ * Trabaja sobre los bytes CRUDOS del ArrayBuffer: los patrones que se
+ * buscan (/OpenAction, /Font, /F1, etc.) son puro ASCII, asi que se pueden
+ * localizar y reemplazar por espacios del mismo largo sin tocar el resto del
+ * archivo. Nunca se decodifica el archivo completo como latin1, porque eso
+ * corromperia los streams comprimidos (imagenes, fuentes embebidas, objetos
+ * FlateDecode) y haria que Acrobat detecte el PDF como corrupto o dañado.
  */
 export function sanearPDF(arrayBuffer) {
   try {
-    let txt = new TextDecoder('latin1').decode(new Uint8Array(arrayBuffer));
+    const bytes = new Uint8Array(arrayBuffer);
 
-    // Las fuentes que usa el contenido: se calculan ANTES de tocar nada.
-    const usadas = new Set();
-    for (const m of txt.matchAll(/\/(F\d+)\s+[\d.]+\s+Tf/g)) usadas.add(m[1]);
+    // Los patrones que buscamos son ASCII puro, asi que se buscan como bytes.
+    const patOpenAction = new TextEncoder().encode('/OpenAction [');
 
-    // 1) La accion automatica al abrir.
-    //    Se sustituye por ESPACIOS del mismo numero de bytes: el PDF pierde
-    //    la accion, pero el archivo no cambia de tamano y la tabla xref
-    //    sigue siendo valida. (Borrarla dejaba los desplazamientos
-    //    desfasados y Acrobat avisaba de un error en la pagina.)
-    txt = txt.replace(/\/OpenAction\s*\[[^\]]*\]/g, (m) => ' '.repeat(m.length));
+    // ---------------------------------------------------------------
+    // 1) Quitar /OpenAction [...] (accion automatica al abrir).
+    //    Se reemplaza por ESPACIOS del mismo largo: el PDF conserva su
+    //    tamano y la tabla xref sigue siendo valida.
+    // ---------------------------------------------------------------
+    let resultado = quitarPatronConEspacios(bytes, patOpenAction);
 
-    // 2) Las fuentes declaradas en /Font que no usa el contenido: igual,
-    //    con espacios.
-    txt = txt.replace(/\/Font\s*<<([^>]*?)>>/g, (todo, cuerpo) => {
-      const limpio = cuerpo.replace(/\/(F\d+)\s+\d+\s+0\s+R/g, (m, f) => (usadas.has(f) ? m : ' '.repeat(m.length)));
-      return '/Font <<' + limpio + '>>';
-    });
+    // ---------------------------------------------------------------
+    // 2) Quitar fuentes declaradas en /Font que NO se usan en el contenido.
+    //    Todo el trabajo se hace sobre Uint8Array: nunca se decodifica el
+    //    archivo completo como texto, con lo que no se tocan los bytes
+    //    no-ASCII de streams comprimidos, imagenes ni fuentes embebidas.
+    // ---------------------------------------------------------------
+    const usadas = fuentesUsadasBytes(resultado);
+    resultado = limpiarFuentesNoUsadasBytes(resultado, usadas);
 
-    const salida = new Uint8Array(txt.length);
-    for (let i = 0; i < txt.length; i++) salida[i] = txt.charCodeAt(i) & 0xff;
-    return salida.buffer;
+    return resultado.buffer;
   } catch (e) {
     console.warn('No se pudo sanear el PDF:', e?.message || e);
     return arrayBuffer;
   }
+}
+
+/**
+ * Busca un patron ASCII en los bytes y lo reemplaza por espacios del mismo
+ * largo. Devuelve un Uint8Array nuevo (no muta el original).
+ */
+function quitarPatronConEspacios(datos, patron) {
+  const haystack = datos;
+  const n = haystack.length;
+  const m = patron.length;
+  const out = new Uint8Array(n);
+  out.set(haystack);
+  let i = 0;
+  while (i <= n - m) {
+    let coincide = true;
+    for (let j = 0; j < m; j++) {
+      if (haystack[i + j] !== patron[j]) { coincide = false; break; }
+    }
+    if (coincide) {
+      // Buscar el cierre ']' del OpenAction
+      let fin = i + m;
+      while (fin < n && haystack[fin] !== 0x5d) fin++; // 0x5d = ']'
+      if (fin < n) {
+        for (let k = i; k <= fin; k++) out[k] = 0x20; // espacio
+        i = fin + 1;
+      } else {
+        i++;
+      }
+    } else {
+      i++;
+    }
+  }
+  return out;
+}
+
+/**
+ * Busca la primera ocurrencia de un patron de bytes a partir de 'desde'.
+ * Devuelve el indice o -1.
+ */
+function indexOfBytes(haystack, patron, desde = 0) {
+  const n = haystack.length;
+  const m = patron.length;
+  for (let i = desde; i <= n - m; i++) {
+    let coincide = true;
+    for (let j = 0; j < m; j++) {
+      if (haystack[i + j] !== patron[j]) { coincide = false; break; }
+    }
+    if (coincide) return i;
+  }
+  return -1;
+}
+
+/**
+ * Lee un entero ASCII desde la posicion 'pos' hasta encontrar un byte no
+ * digito. Devuelve { valor, nuevaPos }.
+ */
+function leerEnteroAscii(datos, pos) {
+  let valor = 0;
+  let p = pos;
+  while (p < datos.length && datos[p] >= 0x30 && datos[p] <= 0x39) {
+    valor = valor * 10 + (datos[p] - 0x30);
+    p++;
+  }
+  return { valor, pos: p };
+}
+
+/**
+ * Salta espacios en blanco ASCII (0x20, 0x09, 0x0a, 0x0d, 0x00).
+ */
+function saltarEspacios(datos, pos) {
+  while (pos < datos.length) {
+    const b = datos[pos];
+    if (b === 0x20 || b === 0x09 || b === 0x0a || b === 0x0d || b === 0x00) pos++;
+    else break;
+  }
+  return pos;
+}
+
+/**
+ * Devuelve el conjunto de nombres de fuentes (p. ej. 'F1', 'F2') que
+ * aparecen en el contenido del PDF como operadores de texto (Fn ... Tf).
+ * Escanea sobre bytes sin decodificar el archivo completo.
+ */
+function fuentesUsadasBytes(datos) {
+  const usadas = new Set();
+  const patSlashF = new TextEncoder().encode('/F');
+  const patTf = new TextEncoder().encode('Tf');
+  let i = 0;
+  const n = datos.length;
+  while (i < n) {
+    // Buscar '/F'
+    const idxSlashF = indexOfBytes(datos, patSlashF, i);
+    if (idxSlashF === -1) break;
+    i = idxSlashF + patSlashF.length;
+
+    // Leer el nombre de la fuente: F seguido de digitos
+    let nombreFin = i;
+    while (nombreFin < n && datos[nombreFin] >= 0x30 && datos[nombreFin] <= 0x39) nombreFin++;
+    if (nombreFin === i) { i++; continue; } // no hubo digitos despues de F
+    const nombre = 'F' + new TextDecoder('ascii').decode(datos.subarray(i, nombreFin));
+    i = nombreFin;
+
+    // Saltar espacios
+    i = saltarEspacios(datos, i);
+
+    // Leer el tamaño de fuente (numero)
+    const { valor, pos: posDespuesNum } = leerEnteroAscii(datos, i);
+    i = posDespuesNum;
+
+    // Saltar espacios
+    i = saltarEspacios(datos, i);
+
+    // Verificar que venga 'Tf'
+    const idxTf = indexOfBytes(datos, patTf, i);
+    if (idxTf === i) { // Tf empieza justo aqui
+      usadas.add(nombre);
+      i = idxTf + patTf.length;
+    } else {
+      i = idxSlashF + 1; // avanzar para no buclear
+    }
+  }
+  return usadas;
+}
+
+/**
+ * Dentro de cada diccionario /Font << ... >>, reemplaza por espacios las
+ * entradas de fuentes que NO se usan en el contenido. Trabaja sobre bytes.
+ */
+function limpiarFuentesNoUsadasBytes(datos, usadas) {
+  const out = new Uint8Array(datos);
+  out.set(datos);
+  const patFontOpen = new TextEncoder().encode('/Font <<');
+  const patFontClose = new TextEncoder().encode('>>');
+  const patSlashF = new TextEncoder().encode('/F');
+  const patRef = new TextEncoder().encode(' 0 R');
+
+  let i = 0;
+  const n = datos.length;
+  while (i < n) {
+    const idxOpen = indexOfBytes(datos, patFontOpen, i);
+    if (idxOpen === -1) break;
+    let p = idxOpen + patFontOpen.length;
+
+    // Buscar el cierre '>>' de este diccionario
+    let idxClose = indexOfBytes(datos, patFontClose, p);
+    if (idxClose === -1) break;
+
+    // Dentro de [p, idxClose) buscar entradas /Fn N 0 R
+    let j = p;
+    while (j < idxClose) {
+      const idxF = indexOfBytes(datos, patSlashF, j);
+      if (idxF === -1 || idxF >= idxClose) break;
+
+      // Leer nombre Fn
+      let nombreFin = idxF + patSlashF.length;
+      while (nombreFin < idxClose && datos[nombreFin] >= 0x30 && datos[nombreFin] <= 0x39) nombreFin++;
+      if (nombreFin === idxF + patSlashF.length) { j = idxF + 1; continue; }
+      const nombre = 'F' + new TextDecoder('ascii').decode(datos.subarray(idxF + patSlashF.length, nombreFin));
+
+      // Saltar espacios
+      let k = saltarEspacios(datos, nombreFin);
+
+      // Leer numero de objeto
+      const { pos: posDespuesNum } = leerEnteroAscii(datos, k);
+      k = posDespuesNum;
+
+      // Saltar espacios
+      k = saltarEspacios(datos, k);
+
+      // Verificar '0 R'
+      const idx0R = indexOfBytes(datos, patRef, k);
+      if (idx0R === k) {
+        // Entrada completa: /Fn N 0 R
+        if (!usadas.has(nombre)) {
+          // Reemplazar por espacios del mismo largo
+          const largo = idx0R + patRef.length - idxF;
+          for (let x = idxF; x < idx0R + patRef.length; x++) out[x] = 0x20;
+        }
+        j = idx0R + patRef.length;
+      } else {
+        j = idxF + 1;
+      }
+    }
+    i = idxClose + patFontClose.length;
+  }
+  return out;
 }
 
 /**

@@ -6,19 +6,39 @@ import { aplanarImagen } from './pdfSanear';
 // Sanea texto con mojibake por doble codificación UTF-8 (p. ej. "NÂ°" en vez
 // de "N°", "Ã±" en vez de "ñ"). Viene de datos ya guardados así (importación
 // CSV), así que se corrige en la capa de render sin tocar la base.
+//
+// El mapa cubre las secuencias más comunes de UTF-8 interpretado como latin1
+// y luego re-encodeado como UTF-8 (doble codificación). Se aplican de mayor
+// a menor longitud para evitar reemplazos parciales incorrectos.
+const MAPA_MOJIBAKE = [
+    // Secuencias de 3 caracteres (doble codificación de caracteres con tilde)
+    ['ÃƒÂ¡', 'á'], ['ÃƒÂ©', 'é'], ['ÃƒÂ­', 'í'], ['ÃƒÂ³', 'ó'], ['ÃƒÂº', 'ú'], ['ÃƒÂ¼', 'ü'],
+    ['ÃƒÂ', 'Á'], ['ÃƒÂ', 'É'], ['ÃƒÂ', 'Í'], ['ÃƒÂ', 'Ó'], ['ÃƒÂ', 'Ú'],
+    ['Ã‚Â°', '°'], ['Ã‚Â¡', '¡'], ['Ã‚Â¿', '¿'],
+    // Secuencias de 2 caracteres (doble codificación simple)
+    ['Â°', '°'], ['Â¡', '¡'], ['Â¿', '¿'], ['Â«', '«'], ['Â»', '»'],
+    ['Ã±', 'ñ'], ['Ã‘', 'Ñ'],
+    ['Ã¡', 'á'], ['Ã©', 'é'], ['Ã­', 'í'], ['Ã³', 'ó'], ['Ãº', 'ú'], ['Ã¼', 'ü'],
+    ['Ã', 'Á'], ['Ã', 'É'], ['Ã', 'Í'], ['Ã', 'Ó'], ['Ã', 'Ú'],
+    ['â€œ', '"'], ['â€', '"'], ['â€˜', "'"], ['â€™', "'"], ['â€“', '–'], ['â€”', '—'],
+    ['Ã‚', 'Â'], ['Ã¢', 'â'], ['Ã£', 'ã'], ['Ã¤', 'ä'], ['Ã¥', 'å'],
+    ['Ã¦', 'æ'], ['Ã§', 'ç'], ['Ã¨', 'è'], ['Ã©', 'é'], ['Ãª', 'ê'], ['Ã«', 'ë'],
+    ['Ã¬', 'ì'], ['Ã­', 'í'], ['Ã®', 'î'], ['Ã¯', 'ï'], ['Ã°', 'ð'], ['Ã±', 'ñ'],
+    ['Ã²', 'ò'], ['Ã³', 'ó'], ['Ã´', 'ô'], ['Ãµ', 'õ'], ['Ã¶', 'ö'], ['Ã¸', 'ø'],
+    ['Ã¹', 'ù'], ['Ãº', 'ú'], ['Ã»', 'û'], ['Ã¼', 'ü'], ['Ã½', 'ý'], ['Ã¾', 'þ'],
+    ['Ã¿', 'ÿ'],
+];
+
 const sanearTextoPDF = (val) => {
     if (val === null || val === undefined) return val;
     const s = String(val);
     if (!s) return s;
-    const mapa = [
-        ['Â°', '°'], ['Â¡', '¡'], ['Â¿', '¿'], ['Â«', '«'], ['Â»', '»'],
-        ['Ã±', 'ñ'], ['Ã‘', 'Ñ'],
-        ['Ã¡', 'á'], ['Ã©', 'é'], ['Ã­', 'í'], ['Ã³', 'ó'], ['Ãº', 'ú'], ['Ã¼', 'ü'],
-        ['ÃÁ', 'Á'], ['ÃÉ', 'É'], ['ÃÍ', 'Í'], ['ÃÓ', 'Ó'], ['ÃÚ', 'Ú'],
-        ['â€œ', '"'], ['â€', '"'], ['â€˜', "'"], ['â€™', "'"], ['â€“', '–'], ['â€”', '—']
-    ];
     let out = s;
-    for (const [mal, bien] of mapa) out = out.split(mal).join(bien);
+    // Ordenar de mayor a menor longitud para evitar reemplazos parciales
+    const ordenado = [...MAPA_MOJIBAKE].sort((a, b) => b[0].length - a[0].length);
+    for (const [mal, bien] of ordenado) {
+        if (out.includes(mal)) out = out.split(mal).join(bien);
+    }
     return out;
 };
 export const buildFC10PDFDoc = async (fcs, bienesAListar) => {

@@ -192,7 +192,7 @@ export default function Fc10View({
                   onClick={handleExportFC10CSV}
                   title={`Exportar actas del año ${fc10Year} a CSV`}
                 >
-                  Exportar ano
+                  Exportar año
                 </Button>
               </>
             }

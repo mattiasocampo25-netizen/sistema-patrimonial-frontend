@@ -175,12 +175,12 @@ export default function InventarioView({
         titulo={'Inventario General'}
         descripcion={'Gestión integral e inventario consolidado de activos de la Universidad'}
         icono="fa-boxes-stacked"
-        contador={(
-          <span className="whitespace-nowrap">
-            {t('inv.anadir')}
-          </span>
-        )}
       />
+      {/* Antes el `contador` de la cabecera mostraba "Añadir Registro", que
+          repetía el botón de la toolbar de abajo (línea ~262) y además no era
+          un contador. El total de bienes ya se ve en la paginación
+          ("Mostrando X de Y"), así que la cabecera queda solo con la
+          identidad del módulo. */}
       <Toolbar className="mt-4">
   
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}

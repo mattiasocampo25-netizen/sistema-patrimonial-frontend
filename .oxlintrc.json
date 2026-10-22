@@ -20,6 +20,7 @@
     "localStorage": "readonly",
     "sessionStorage": "readonly",
     "navigator": "readonly",
+    "Buffer": "readonly",
     "setTimeout": "readonly",
     "setInterval": "readonly",
     "clearTimeout": "readonly",

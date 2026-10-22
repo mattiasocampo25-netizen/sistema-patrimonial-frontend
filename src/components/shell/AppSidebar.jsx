@@ -66,7 +66,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t }) {
       aria-current={activo ? 'page' : undefined}
       title={t(item.label)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-surface-1/10 text-white font-bold' : 'text-sidebar-content-2 font-medium hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
+      className={`group relative flex w-full items-center gap-3 rounded-control px-3 h-10 text-body transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-surface-1/[0.10] text-sidebar-content font-semibold' : 'text-sidebar-content-2 font-normal hover:bg-surface-1/[0.06] hover:text-sidebar-content' }`}
     >
       {activo ? (
         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-pill bg-brand" aria-hidden="true" />
@@ -92,7 +92,7 @@ function ItemHerramienta({ icono, titulo, onClick, badge }) {
       type="button"
       onClick={onClick}
       title={titulo}
-      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-medium text-sidebar-content-2 hover:bg-surface-1/[0.07] hover:text-sidebar-content transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      className="group flex w-full items-center gap-3 rounded-control px-3 h-10 text-body font-normal text-sidebar-content-2 hover:bg-surface-1/[0.06] hover:text-sidebar-content transition-colors duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand"
     >
       <span className="flex items-center justify-center w-6 shrink-0 text-sidebar-content-2 group-hover:text-sidebar-content">
         <i className={`fa-solid ${icono} text-[13px]`} aria-hidden="true" />
@@ -174,10 +174,10 @@ export default function AppSidebar({
                 <img src={appLogo} alt="Logo Institucional" className="w-full h-full object-contain" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-body font-black tracking-tight leading-snug text-sidebar-content truncate">
+                <h2 className="text-body font-bold tracking-tight leading-snug text-sidebar-content truncate">
                   Dpto. Bienes Patrimoniales
                 </h2>
-                <p className="text-label font-semibold text-sidebar-content-2 uppercase tracking-widest mt-0.5 truncate">
+                <p className="text-label font-medium text-sidebar-content-3 uppercase tracking-[0.12em] mt-0.5 truncate">
                   Universidad Nacional de Pilar
                 </p>
               </div>
@@ -202,7 +202,7 @@ export default function AppSidebar({
         {/* Navegación por grupos */}
         <nav
           ref={navRef}
-          className={`flex-1 overflow-y-auto px-3 py-4 space-y-5 custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
+          className={`flex-1 overflow-y-auto px-3 py-4 space-y-4 custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
         >
           {GRUPOS.map((grupo) => {
             if (grupo.soloAdmin && !isAdmin) return null;
@@ -211,7 +211,7 @@ export default function AppSidebar({
             if (!visibles.length) return null;
             return (
               <div key={grupo.titulo}>
-                <p className="px-3 pb-1.5 text-label font-bold text-sidebar-content-2 uppercase tracking-[0.16em]">
+                <p className="px-3 pb-1.5 text-label font-semibold text-sidebar-content-3 uppercase tracking-[0.13em]">
                   {grupo.titulo}
                 </p>
                 <div className="space-y-0.5">
@@ -234,7 +234,7 @@ export default function AppSidebar({
         {/* Herramientas de administración */}
         {isAdmin ? (
           <div className="shrink-0 border-t border-sidebar-line px-3 py-3 space-y-0.5">
-            <p className="px-3 pb-1.5 text-label font-bold text-sidebar-content-2 uppercase tracking-[0.16em]">
+            <p className="px-3 pb-1.5 text-label font-semibold text-sidebar-content-3 uppercase tracking-[0.13em]">
               Utilidades
             </p>
             <ItemHerramienta

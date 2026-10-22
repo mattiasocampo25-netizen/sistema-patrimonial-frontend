@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import {
-  Card, EmptyState, PageHeader, Toolbar, ToolbarDivider,
+  Card, EmptyState, PageHeader, Toolbar,
   Button, Badge, Chip, ChipGroup
 } from '../components/ui';
 import { formatDateText, formatCI } from '../utils/helpers';
@@ -54,10 +54,10 @@ export default function Fc10View({
   const puedeGestionarFirmas = isAdmin && typeof actualizarEstadoFirma === 'function';
 
   const ESTADOS_FIRMA_OPCIONES = [
-    { valor: 'BORRADOR', label: 'Borrador', icon: 'fa-pen-ruler', color: 'text-content-2 dark:text-content-3' },
-    { valor: 'ESPERA_FIRMA_1', label: 'Espera funcionario', icon: 'fa-user', color: 'text-warn dark:text-amber-400' },
-    { valor: 'ESPERA_FIRMA_2', label: 'Espera jefe', icon: 'fa-user-tie', color: 'text-sky-600 dark:text-sky-400' },
-    { valor: 'CERRADO', label: 'Firmado (ambas)', icon: 'fa-circle-check', color: 'text-ok dark:text-emerald-400' }
+    { valor: 'BORRADOR', label: 'Borrador' },
+    { valor: 'ESPERA_FIRMA_1', label: 'Espera firma del funcionario' },
+    { valor: 'ESPERA_FIRMA_2', label: 'Espera firma del jefe' },
+    { valor: 'CERRADO', label: 'Firmada y cerrada' }
   ];
 
   const handleCambiarEstadoFirma = async (fc, nuevoEstado) => {
@@ -77,88 +77,6 @@ export default function Fc10View({
 
   return (
     <div className="flex flex-col flex-1 space-y-6">
-      {/* ===== PANEL DE ESTADO DE FIRMAS (solo admin) ===== */}
-      {isAdmin && (
-        <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm p-6 sm:p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-blue-50 dark:bg-blue-900/10 text-brand dark:text-blue-400 shadow-sm shadow-blue-500/20">
-                <i className="fa-solid fa-clipboard-check text-lg"></i>
-              </div>
-              <div>
-                <h3 className="text-lg font-black text-content-1 dark:text-white tracking-tight">Estado de las Firmas FC-10</h3>
-                <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">
-                  Marque manualmente el estado cuando reciba el documento físico o digital devuelto. Solo administrador.
-                </p>
-              </div>
-            </div>
-            {puedeGestionarFirmas ? (
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-ok-soft dark:bg-emerald-900/20 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/30 shadow-sm shadow-emerald-500/20`}>
-                <i className="fa-solid fa-shield-halved text-[9px]"></i> Modo administrador activo
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold text-danger">Control restringido a administrador</span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(filteredFC10 || []).map(fc => {
-              const bien = bienes.find(b => b.id === fc.bienId) || {};
-              const estadoActual = fc.estadoFirma || (esFC10Legado(fc) ? 'CERRADO' : 'BORRADOR');
-              const estaCambiando = cambiandoEstado[fc.id];
-              const _estadoInfo = ESTADOS_FIRMA_OPCIONES.find(o => o.valor === estadoActual);
-              return (
-                <div key={fc.id} className="flex flex-col gap-3 p-4 rounded-card border border-line dark:border-line/50 bg-surface-2 dark:bg-surface-2/50 hover:border-brand/50 hover:shadow-md motion duration-[var(--dur-base)] group">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-content-1 dark:text-white truncate" title={fc.funcionarioNombre || 'Sin responsable'}>
-                        {fc.funcionarioNombre || 'Sin responsable'}
-                      </p>
-                      <p className="text-[10px] text-content-3 dark:text-content-3 mt-0.5 truncate flex items-center gap-1.5" title={bien.rotulo || 'S/R'}>
-                        <i className="fa-solid fa-tag text-[9px]"></i>{bien.rotulo || 'S/R'}
-                      </p>
-                    </div>
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-black ${ estadoActual === 'CERRADO' ? 'bg-emerald-100 text-ok dark:bg-emerald-900/30 dark:text-emerald-400' : estadoActual === 'ESPERA_FIRMA_1' || estadoActual === 'ESPERA_FIRMA_2' ? 'bg-amber-100 text-warn dark:bg-amber-900/30 dark:text-amber-400' : 'bg-surface-3 text-content-1 dark:bg-surface-1/10 dark:text-content-3' }`}>
-                      {estadoActual === 'CERRADO' ? '✓' : estadoActual === 'BORRADOR' ? 'B' : 'P'}
-                    </div>
-                  </div>
-
-                  <div className="mt-2 space-y-1">
-                    {ESTADOS_FIRMA_OPCIONES.map(op => {
-                      const seleccionado = estadoActual === op.valor;
-                      return (
-                        <button
-                          key={op.valor}
-                          onClick={() => !estaCambiando && handleCambiarEstadoFirma(fc, op.valor)}
-                          disabled={estaCambiando || !puedeGestionarFirmas}
-                          className={`flex items-center gap-2 w-full px-3 py-2 rounded-control text-[11px] font-medium motion duration-[var(--dur-base)] ${ seleccionado ? 'bg-brand text-content-inverse shadow-sm shadow-brand/30' : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5 border border-transparent hover:border-line dark:hover:border-white/10' } ${!puedeGestionarFirmas ? 'opacity-60 cursor-not-allowed' : ''}`}
-                          title={!puedeGestionarFirmas ? 'Solo el administrador puede cambiar este estado' : `Marcar como ${op.label}`}
-                        >
-                          <i className={`fa-solid ${op.icon} text-[10px] ${seleccionado ? 'text-white' : op.color}`}></i>
-                          <span className={seleccionado ? 'text-white' : 'text-content-1 dark:text-content-3'}>{op.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {estaCambiando && (
-                    <div className="mt-2 flex items-center gap-1.5 text-[10px] text-brand-text">
-                      <i className="fa-solid fa-circle-notch fa-spin"></i>
-                      <span>Actualizando…</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          {!puedeGestionarFirmas && (
-            <p className="mt-4 text-[11px] text-danger text-center">
-              <i className="fa-solid fa-triangle-exclamation mr-1.5"></i>
-              Esta sección solo está disponible para el rol Administrador.
-            </p>
-          )}
-        </div>
-      )}
-
       <Card className="p-0">
         <div className="p-5 sm:p-6">
           {/* Cabecera: identidad a la izquierda, acciones a la derecha.
@@ -168,7 +86,7 @@ export default function Fc10View({
               ultimo (Exportar año) se salia de la tarjeta. */}
           <PageHeader
             titulo="Actas de Responsabilidad (FC-10)"
-            descripcion="Delegación y custodia legal de los bienes institucionales"
+            descripcion="Historial de actas entregadas o devueltas en el periodo. Filtrá por etapa para revisar las firmas pendientes."
             icono="fa-file-signature"
             contador={
               conteo.pendientes > 0 ? (
@@ -198,8 +116,10 @@ export default function Fc10View({
             }
           />
 
-          <Toolbar className="mt-4">
-            <ChipGroup>
+          <Toolbar className="mt-5 items-end gap-4">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-content-3">Etapa de firma</span>
+              <ChipGroup>
               {ETAPAS.map((et) => (
                 <Chip
                   key={et.id}
@@ -210,18 +130,19 @@ export default function Fc10View({
                   {et.label}
                 </Chip>
               ))}
-            </ChipGroup>
-            <ToolbarDivider />
+              </ChipGroup>
+            </div>
             <PeriodSelector
               selectedYear={fc10Year}
               setSelectedYear={setFc10Year}
               selectedMonth={fc10Month}
               setSelectedMonth={setFc10Month}
+              descripcion="Mes de entrega o devolución de las actas FC-10"
             />
           </Toolbar>
         </div>
       </Card>
-      <div className="bg-surface-1 dark:bg-surface-1 p-6 sm:p-8 rounded-card border border-line/80 dark:border-line shadow-2xs min-h-[400px]">
+      <div className="bg-surface-1 rounded-card border border-line shadow-card min-h-[280px] p-4 sm:p-6">
         {isLoading ? (
           <SkeletonLoader />
         ) : listaVisible.length === 0 ? (
@@ -230,7 +151,7 @@ export default function Fc10View({
             icono={filtroEtapa === 'todas' ? 'fa-folder-open' : 'fa-circle-check'}
             titulo={filtroEtapa === 'todas' ? 'Sin asignaciones en el ciclo' : 'Nada en esta etapa'}
             descripcion={filtroEtapa === 'todas'
-              ? 'No existen actas FC-10 generadas en el periodo seleccionado.'
+              ? 'No hay actas entregadas ni devueltas durante el periodo seleccionado.'
               : ETAPAS.find(e => e.id === filtroEtapa)?.label === 'Cerradas'
                 ? 'Ningún acta de este periodo tiene las dos firmas registradas.'
                 : 'Ningún acta espera esta firma en el periodo seleccionado.'}
@@ -238,7 +159,7 @@ export default function Fc10View({
             onAccion={filtroEtapa === 'todas' ? (setActiveTab ? () => setActiveTab('inventario') : undefined) : () => setFiltroEtapa('todas')}
           />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             {listaVisible.map(fc => {
               const bien = bienes.find(b=>b.id === fc.bienId) || {};
               const isDevuelto = !!fc.devolucionFecha;
@@ -247,6 +168,7 @@ export default function Fc10View({
               const pendiente = pendienteDeFirma(fc);
               const f1 = fc.firmas?.firma1;
               const f2 = fc.firmas?.firma2;
+              const firmasRegistradas = Number(Boolean(f1)) + Number(Boolean(f2));
               const estaFirmando = firmandoId === fc.id;
               const esLegada = esFC10Legado(fc);
               const ponerEnTramite = ponerFC10EnTramite;
@@ -268,8 +190,9 @@ export default function Fc10View({
                                       </span>
                                   )}
                               </div>
-                              <span className="text-xs font-medium tabular-nums text-content-3 dark:text-content-3 flex items-center gap-1.5">
-                                  <i className="fa-regular fa-calendar"></i> {formatDateText(fc.entregadoFecha || fc.fechaGeneracion)}
+                              <span className="flex flex-col gap-0.5 text-[10px] font-medium tabular-nums text-content-3">
+                                  <span><i className="fa-regular fa-calendar mr-1.5"></i>Entregada: {formatDateText(fc.entregadoFecha || fc.fechaGeneracion)}</span>
+                                  {isDevuelto && <span className="text-warn"><i className="fa-solid fa-rotate-left mr-1.5"></i>Devuelta: {formatDateText(fc.devolucionFecha)}</span>}
                               </span>
                           </div>
                           <div className="flex gap-1 shrink-0 rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 p-1">
@@ -286,24 +209,25 @@ export default function Fc10View({
 
                   {!isDevuelto && (
                     (fc.estadoFirma || pendiente) ? (
-                      <div className="mt-4 space-y-1.5" aria-label="Estado de las firmas">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-content-3 dark:text-content-3 mb-1.5">
-                          Firmas del acta
-                        </p>
+                      <div className="mt-4 rounded-control border border-line bg-surface-2/70 p-3" aria-label="Estado de las firmas">
+                        <div className="mb-2.5 flex items-center justify-between gap-2">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-content-3">Firmas registradas</p>
+                          <Badge tono={firmasRegistradas === 2 ? 'ok' : 'warn'}>{firmasRegistradas}/2</Badge>
+                        </div>
                         {[
-                          { n: 1, puesto: 'Funcionario Responsable', nombre: fc.funcionarioNombre, f: f1 },
-                          { n: 2, puesto: 'Jefe Inmediato', nombre: fc.jefeInmediatoNombre, f: f2 }
+                          { n: 1, puesto: 'Funcionario responsable', nombre: fc.funcionarioNombre, f: f1 },
+                          { n: 2, puesto: 'Jefe inmediato', nombre: fc.jefeInmediatoNombre, f: f2 }
                         ].map(({ n, puesto, nombre, f }) => (
-                          <div key={n} className="flex items-center gap-2 text-[11px]">
-                            <i className={`fa-solid ${f ? 'fa-circle-check text-ok' : 'fa-circle text-content-3 dark:text-content-2'} text-[11px] shrink-0`}></i>
-                            <span className="font-semibold text-content-2 dark:text-content-3 shrink-0">{puesto}:</span>
-                            <span className="truncate text-content-3 dark:text-content-3">
+                          <div key={n} className="flex items-start gap-2.5 py-1 text-[11px]">
+                            <i className={`fa-solid ${f ? 'fa-circle-check text-ok' : 'fa-circle text-content-3'} mt-0.5 text-[11px] shrink-0`}></i>
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-semibold text-content-2">{puesto}</span>
                               {f ? (
-                                <span title={`Registrado por ${f.registradoPorNombre || f.registradoPor} · ${new Date(f.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}`}>
-                                  {f.nombre || nombre} · firmado el {new Date(f.fecha).toLocaleDateString('es-PY')}
+                                <span className="block truncate text-content-3" title={`Registrado por ${f.registradoPorNombre || f.registradoPor} · ${new Date(f.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}`}>
+                                  {f.nombre || nombre} · {new Date(f.fecha).toLocaleDateString('es-PY')}
                                 </span>
                               ) : (
-                                <span className="text-content-3 dark:text-content-3 italic">sin firmar</span>
+                                <span className="block text-content-3 italic">Pendiente</span>
                               )}
                             </span>
                           </div>
@@ -315,7 +239,7 @@ export default function Fc10View({
                   {!isDevuelto && esLegada && ponerEnTramite && (
                     <div className="mt-4 rounded-control border border-line-strong/70 dark:border-white/10 bg-surface-2 dark:bg-surface-1/[0.03] p-3">
                       <p className="text-[11px] font-semibold text-content-2 dark:text-content-3 leading-snug mb-2.5">
-                        Esta acta se creó antes del control de firmas. Si quedó a medio camino, ponela en trámite para registrar las firmas.
+                        Acta anterior al control de firmas. Si aún falta completar el circuito, activá el seguimiento.
                       </p>
                       <button
                         onClick={() => ponerEnTramite(fc)}
@@ -333,7 +257,7 @@ export default function Fc10View({
                       {registrarAmbasFirmas && (
                         <>
                           <p className="text-[11px] font-semibold text-emerald-900 dark:text-emerald-200 leading-snug">
-                            ¿El PDF ya volvió con las <strong>dos firmas</strong>?
+                            ¿El PDF volvió con las dos firmas digitales?
                           </p>
                           <button
                             onClick={() => registrarAmbasFirmas(fc)}
@@ -343,23 +267,47 @@ export default function Fc10View({
                           >
                             {estaFirmando
                               ? <><i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i> Cerrando...</>
-                              : <><i className="fa-solid fa-circle-check text-[11px]"></i> Ya firmaron ambos</>}
+                              : <><i className="fa-solid fa-circle-check text-[11px]"></i> Registrar ambas firmas</>}
                           </button>
-                          <p className="text-[10px] text-ok/80 dark:text-emerald-400/70 text-center">o registralas de a poco:</p>
                         </>
                       )}
                       {registrarFirmaFC10 && (
-                        <button
-                          onClick={() => registrarFirmaFC10(fc)}
-                          disabled={estaFirmando}
-                          title={`Registrar solo la firma ${pendiente.orden} de ${pendiente.nombre || pendiente.puesto}`}
-                          className="w-full inline-flex items-center justify-center gap-2 h-8 rounded-lg text-content-1 dark:text-zinc-100 bg-surface-3 dark:bg-surface-1/10 hover:bg-surface-3 dark:hover:bg-surface-1/5 text-[10px] font-bold uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 border border-line dark:border-white/10"
-                        >
-                          <i className="fa-solid fa-signature text-[10px]"></i>
-                          Solo {pendiente.puesto}
-                        </button>
+                        <details className="rounded-control border border-line bg-surface-1/70 p-2.5">
+                          <summary className="cursor-pointer text-[10px] font-bold text-content-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-sm">
+                            Registrar solo la firma pendiente
+                          </summary>
+                          <p className="mt-2 text-[10px] text-content-3">Firma de {pendiente.puesto}: {pendiente.nombre || 'sin nombre registrado'}</p>
+                          <button
+                            onClick={() => registrarFirmaFC10(fc)}
+                            disabled={estaFirmando}
+                            title={`Registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto}`}
+                            className="mt-2 w-full inline-flex items-center justify-center gap-2 h-9 rounded-control text-body font-semibold text-content-2 bg-surface-2 hover:bg-surface-3 motion active:scale-[0.98] cursor-pointer disabled:opacity-60 border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                          >
+                            <i className="fa-solid fa-signature text-[10px]"></i>
+                            Registrar firma de {pendiente.puesto}
+                          </button>
+                        </details>
                       )}
                     </div>
+                  )}
+
+                  {puedeGestionarFirmas && (
+                    <details className="mt-3 rounded-control border border-line bg-surface-2/50 px-3 py-2.5">
+                      <summary className="cursor-pointer text-[10px] font-bold text-content-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-sm">
+                        Corrección administrativa del estado
+                      </summary>
+                      <label className="mt-2 block text-[10px] font-semibold text-content-2" htmlFor={`estado-firma-${fc.id}`}>Etapa registrada</label>
+                      <select
+                        id={`estado-firma-${fc.id}`}
+                        value={fc.estadoFirma || (esLegada ? 'CERRADO' : 'BORRADOR')}
+                        onChange={(event) => handleCambiarEstadoFirma(fc, event.target.value)}
+                        disabled={Boolean(cambiandoEstado[fc.id])}
+                        className="mt-1.5 h-9 w-full rounded-control border border-line bg-surface-1 px-2.5 text-[11px] font-semibold text-content-1 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:opacity-60"
+                      >
+                        {ESTADOS_FIRMA_OPCIONES.map((op) => <option key={op.valor} value={op.valor}>{op.label}</option>)}
+                      </select>
+                      {cambiandoEstado[fc.id] && <p className="mt-1.5 text-[10px] text-brand-text"><i className="fa-solid fa-circle-notch fa-spin mr-1.5"></i>Guardando estado…</p>}
+                    </details>
                   )}
 
                   <div className="mt-4 pt-3 border-t border-line dark:border-white/10">

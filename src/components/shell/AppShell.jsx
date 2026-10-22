@@ -74,6 +74,7 @@ export default function AppShell({
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         compacta={sidebarCompacta}
+        darkMode={darkMode}
         onToggleCompacta={() => setSidebarCompacta((actual) => !actual)}
         appLogo={appLogo}
         activeTab={activeTab}
@@ -114,7 +115,7 @@ export default function AppShell({
           actasPorFirmarCount={actasPorFirmarCount}
         />
 
-        <main id="contenido" className="flex-1 overflow-y-auto custom-scrollbar">
+        <main id="contenido" className="workspace-main flex-1 overflow-y-auto custom-scrollbar">
           {children}
         </main>
       </div>

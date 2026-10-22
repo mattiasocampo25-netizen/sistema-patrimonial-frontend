@@ -131,10 +131,10 @@ export default function DashboardView({
   );
 
   return (
-    <div className="space-y-6 sm:space-y-7 pb-16">
+    <div className="dashboard-stagger space-y-6 sm:space-y-7 pb-16">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="p-0">
+      <Card className="dashboard-welcome-card p-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6">
         <div className="flex items-center gap-4 min-w-0">
           <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-card bg-brand-soft text-brand-text font-bold text-xl sm:text-2xl shadow-card dep-accent-ring">
@@ -201,7 +201,7 @@ export default function DashboardView({
             key={card.id}
             onClick={card.onClick}
             title={card.label}
-            className={`group relative text-left bg-surface-1 rounded-card border ${card.border} p-4 sm:p-5 shadow-card hover:shadow-panel hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-[transform,box-shadow,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] cursor-pointer`}
+            className={`dashboard-metric-card group relative text-left bg-surface-1 rounded-card border ${card.border} p-4 sm:p-5 shadow-card hover:shadow-panel hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-[transform,box-shadow,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] cursor-pointer`}
           >
             <div className="flex items-center justify-between gap-1 mb-1.5">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${card.iconBg} shadow-xs`}>
@@ -308,8 +308,8 @@ export default function DashboardView({
 
       {/* 2B. BANDEJA DE PENDIENTES */}
       {widgets.pendientes && (
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-6 sm:p-7 shadow-sm" data-tour="dash-pendientes">
-          <div className="flex items-center justify-between gap-3 mb-5">
+      <div className="bg-surface-1 rounded-panel border border-line shadow-card p-4 sm:p-5" data-tour="dash-pendientes">
+          <div className="flex items-center justify-between gap-3 mb-4">
               <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-list-check text-content-3"></i> Atención requerida
               </h2>
@@ -319,19 +319,19 @@ export default function DashboardView({
                   </span>
               )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5">
               {pendientes.map(p => (
                   <button
                       key={p.id}
                       onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
                       title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-card border border-line/70 dark:border-white/10 hover:border-line-strong dark:hover:border-white/20 hover:bg-surface-2 dark:hover:bg-surface-1/[0.05] px-4 py-3.5 text-left motion duration-[var(--dur-base)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
+                      className="group flex items-center gap-3 rounded-card border border-line hover:border-line-strong hover:bg-surface-2 px-3.5 py-3 text-left motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                   >
-                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border` + p.box}>
-                          <i className={`fa-solid ${p.icon} text-sm`}></i>
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-control border` + p.box}>
+                          <i className={`fa-solid ${p.icon} text-xs`}></i>
                       </span>
                       <span className="min-w-0 flex-1">
-                          <span className="block text-xl font-black tabular-nums text-content-1 dark:text-white leading-tight"><AnimatedNumber value={p.count} /></span>
+                          <span className="block text-lg font-black tabular-nums text-content-1 leading-tight"><AnimatedNumber value={p.count} /></span>
                           <span className="block text-[11px] font-semibold text-content-3 dark:text-content-3 truncate">{p.label}</span>
                       </span>
                       <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-2 group-hover:text-content-3 group-hover:translate-x-0.5 motion shrink-0"></i>
@@ -344,24 +344,30 @@ export default function DashboardView({
 
       {/* 2b. TILES POR DEPENDENCIA */}
       {widgets.metricas && tilesPorDependencia.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {tilesPorDependencia.map((t) => (
-            <Tile
-              key={t.dep}
-              titulo={t.dep}
-              subtitulo={t.total.toLocaleString('es-PY') + ' bienes'}
-              estado={t.buenos + ' en buen estado'}
-              porcentaje={t.pctBueno}
-              indice={t.indice}
-              logo={t.logo}
-              onClick={
-                requestDependenciaChange && t.dep !== dependenciaActual
-                  ? () => requestDependenciaChange(t.dep)
-                  : undefined
-              }
-            />
-          ))}
-        </div>
+        <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            <span className="flex items-center gap-2.5"><i className="fa-solid fa-building-columns text-brand-text"></i> Desglose por dependencia</span>
+            <span className="flex items-center gap-2 text-[11px] font-semibold text-content-3"><span>{tilesPorDependencia.length} áreas</span><i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i></span>
+          </summary>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 border-t border-line bg-surface-2/50 p-4">
+            {tilesPorDependencia.map((t) => (
+              <Tile
+                key={t.dep}
+                titulo={t.dep}
+                subtitulo={t.total.toLocaleString('es-PY') + ' bienes'}
+                estado={t.buenos + ' en buen estado'}
+                porcentaje={t.pctBueno}
+                indice={t.indice}
+                logo={t.logo}
+                onClick={
+                  requestDependenciaChange && t.dep !== dependenciaActual
+                    ? () => requestDependenciaChange(t.dep)
+                    : undefined
+                }
+              />
+            ))}
+          </div>
+        </details>
       )}
 
       {/* 3. ACCESOS DIRECTOS */}
@@ -391,6 +397,12 @@ export default function DashboardView({
 
       {/* 4. GRÁFICOS Y TENDENCIAS */}
       {widgets.tendencias && (
+      <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <span className="flex items-center gap-2.5"><i className="fa-solid fa-chart-line text-brand-text"></i> Tendencias y cobertura</span>
+          <i className="fa-solid fa-chevron-down text-content-3 transition-transform group-open:rotate-180"></i>
+        </summary>
+        <div className="border-t border-line bg-surface-2/40 p-4 sm:p-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Estado de Regularización */}
@@ -466,6 +478,8 @@ export default function DashboardView({
         </div>
 
       </div>
+        </div>
+      </details>
       )}
 
     </div>

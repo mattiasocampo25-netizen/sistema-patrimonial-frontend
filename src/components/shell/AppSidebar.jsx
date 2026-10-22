@@ -66,7 +66,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
       aria-current={activo ? 'page' : undefined}
       title={t(item.label)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand hover:translate-x-0.5 ${ activo ? 'bg-surface-1/[0.10] text-sidebar-content font-semibold' : 'text-sidebar-content-2 font-normal hover:bg-surface-1/[0.06] hover:text-sidebar-content' }`}
+      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand hover:translate-x-0.5 ${ activo ? 'bg-brand/10 dark:bg-brand/15 text-sidebar-content font-semibold shadow-[inset_0_0_0_1px_rgb(29_78_216/0.12)] dark:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.07)]' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
       {activo ? (
         <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-pill bg-brand" aria-hidden="true" />
@@ -92,7 +92,7 @@ function ItemHerramienta({ icono, titulo, onClick, badge, compacta }) {
       type="button"
       onClick={onClick}
       title={titulo}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body font-normal text-sidebar-content-2 hover:bg-surface-1/[0.06] hover:text-sidebar-content transition-[color,background-color,transform] duration-[var(--dur-fast)] hover:translate-x-0.5 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body font-normal text-sidebar-content-2 hover:bg-brand/5 dark:hover:bg-surface-1/[0.06] hover:text-sidebar-content transition-[color,background-color,transform] duration-[var(--dur-fast)] hover:translate-x-0.5 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand`}
     >
       <span className="flex items-center justify-center w-6 shrink-0 text-sidebar-content-2 group-hover:text-sidebar-content">
         <i className={`fa-solid ${icono} text-[13px]`} aria-hidden="true" />
@@ -107,6 +107,7 @@ export default function AppSidebar({
   isSidebarOpen,
   setIsSidebarOpen,
   compacta = false,
+  darkMode = false,
   onToggleCompacta,
   appLogo,
   activeTab,
@@ -144,8 +145,8 @@ export default function AppSidebar({
     };
   }, [isSidebarOpen]);
   const { t } = useIdioma();
-  const LOGO_SISTEMA = '/UNP-Site-Logo.webp';
-  const LOGO_SISTEMA_PNG = '/UNP-Site-Logo.png';
+  const LOGO_SISTEMA = darkMode ? '/UNP-Site-Logo.webp' : '/UNP-Site-Logo-negro.webp';
+  const LOGO_SISTEMA_PNG = darkMode ? '/UNP-Site-Logo.png' : '/UNP-Site-Logo-negro.png';
 
   const cerrar = () => setIsSidebarOpen && setIsSidebarOpen(false);
 
@@ -165,7 +166,7 @@ export default function AppSidebar({
       ) : null}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full' }`}
+        className={`sidebar-premium fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full' }`}
         id="sidebar-navigation"
         aria-label="Navegación principal"
       >
@@ -187,10 +188,7 @@ export default function AppSidebar({
             </div>
           ) : (
             <div className={`flex items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
-              {/* El menu lateral es siempre oscuro (bg-sidebar no cambia con
-                  el tema), asi que el logo tiene que ser el BLANCO siempre.
-                  Antes se elegia segun el tema de la aplicacion y en modo
-                  claro salia el logo negro sobre el panel negro. */}
+              {/* El logotipo acompaña el tono del sidebar en ambos temas. */}
               <img
                 src={LOGO_SISTEMA}
                 alt="Universidad Nacional de Pilar"

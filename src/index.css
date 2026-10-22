@@ -118,20 +118,107 @@ body {
   background: #80868b; 
 }
 
-/* El menu lateral es oscuro: la barra de scroll tiene que ser discreta.
-   Con el gris claro del tema claro, sobre el panel oscuro quedaba una linea
-   blanca cruzando el menu. */
+/* Scrollbar del sidebar: gris suave en claro y translucida en oscuro. */
 .bg-sidebar .custom-scrollbar {
-  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+  scrollbar-color: #c6cfda transparent;
 }
 
 .bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgb(255 255 255 / 0.16);
+  background: #c6cfda;
   border-color: transparent;
 }
 
 .bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #aab6c5;
+}
+
+.dark .bg-sidebar .custom-scrollbar {
+  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+}
+
+.dark .bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.16);
+}
+
+.dark .bg-sidebar .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgb(255 255 255 / 0.3);
+}
+
+/* Sidebar institucional con profundidad cromática y brillo de marca sutil. */
+.sidebar-premium {
+  background-color: var(--sidebar);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.055), transparent 48%),
+    linear-gradient(165deg, #ffffff 0%, #f7f9fc 52%, #f1f4f8 100%);
+  border-color: var(--sidebar-line);
+}
+
+.dark .sidebar-premium {
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.2), transparent 48%),
+    linear-gradient(165deg, #172d47 0%, #12243a 48%, #0e1b2c 100%);
+  border-color: rgb(148 163 184 / 0.14);
+}
+
+.workspace-main {
+  background-color: var(--canvas);
+  background-image:
+    radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 5%, transparent), transparent 38%),
+    radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 3%, transparent), transparent 34%);
+}
+
+.dashboard-welcome-card {
+  background-image: radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--brand) 9%, transparent), transparent 42%);
+}
+
+.dashboard-metric-card {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.dashboard-metric-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: inherit;
+  background: var(--brand);
+  opacity: 0;
+  transform: scaleY(0.55);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+}
+
+.dashboard-metric-card:hover::after,
+.dashboard-metric-card:focus-visible::after {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.dashboard-stagger > *,
+.inventory-stagger > * {
+  animation: app-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dashboard-stagger > :nth-child(1), .inventory-stagger > :nth-child(1) { animation-delay: 25ms; }
+.dashboard-stagger > :nth-child(2), .inventory-stagger > :nth-child(2) { animation-delay: 65ms; }
+.dashboard-stagger > :nth-child(3), .inventory-stagger > :nth-child(3) { animation-delay: 105ms; }
+.dashboard-stagger > :nth-child(4), .inventory-stagger > :nth-child(4) { animation-delay: 145ms; }
+.dashboard-stagger > :nth-child(5), .inventory-stagger > :nth-child(5) { animation-delay: 185ms; }
+.dashboard-stagger > :nth-child(n+6), .inventory-stagger > :nth-child(n+6) { animation-delay: 225ms; }
+
+.inventory-selection-bar {
+  background: linear-gradient(105deg, #1746b8 0%, #1d4ed8 55%, #2563eb 100%);
+  box-shadow: 0 8px 22px rgb(29 78 216 / 0.2);
+}
+
+.inventory-item-card {
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.inventory-item-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+  box-shadow: var(--shadow-panel);
 }
 
 /* Difuminado del borde cuando el menu se puede desplazar: sin esto, el
@@ -533,6 +620,8 @@ html.font-lg { font-size: 18px; }
   .animate-shake,
   .animate-pop,
   .tab-enter,
+  .dashboard-stagger > *,
+  .inventory-stagger > *,
   .bell-attention,
   .row-flash,
   .login-kenburns,

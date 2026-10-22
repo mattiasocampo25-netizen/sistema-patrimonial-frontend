@@ -18,30 +18,38 @@ const MESES = [
  * Usa FiltroCombo en vez de <select> nativo: el popup del navegador se dibuja
  * con los colores del sistema y quedaba ilegible sobre la app oscura.
  */
-export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth }) {
+export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año' }) {
+  const nombreMes = MESES.find(m => m.val === String(selectedMonth))?.name || 'Seleccionar mes';
   return (
-    <div className="flex items-center gap-1.5 bg-surface-1 dark:bg-zinc-900/40 p-1.5 rounded-card border border-line/80 dark:border-zinc-700/60 shadow-sm">
-      <FiltroCombo
-        ancho="w-[128px]"
-        compacto
-        valor={selectedMonth}
-        opciones={MESES.map(m => ({ label: m.name, value: m.val }))}
-        onElegir={setSelectedMonth}
-        etiquetaTodos="Mes"
-        titulo="Mes del periodo"
-        className="bg-surface-3 dark:bg-zinc-800 dark:border-zinc-700"
-      />
-      <div className="h-5 w-px bg-surface-3 dark:bg-zinc-700 mx-1"></div>
-      <FiltroCombo
-        ancho="w-[104px]"
-        compacto
-        valor={selectedYear}
-        opciones={aniosDisponibles()}
-        onElegir={setSelectedYear}
-        etiquetaTodos="Año"
-        titulo="Año del periodo"
-        className="bg-surface-3 dark:bg-zinc-800 dark:border-zinc-700"
-      />
+    <div className="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface-2/70 px-3 py-2.5" role="group" aria-label={descripcion}>
+      <div className="min-w-[116px] pb-0.5">
+        <span className="block text-[9px] font-bold uppercase tracking-widest text-content-3">Periodo</span>
+        <span className="block text-xs font-bold text-content-1">{nombreMes} {selectedYear}</span>
+      </div>
+      <div className="flex items-end gap-2">
+        <div className="w-[122px]">
+          <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-content-3">Mes</span>
+          <FiltroCombo
+            compacto
+            valor={selectedMonth}
+            opciones={MESES.map(m => ({ label: m.name, value: m.val }))}
+            onElegir={setSelectedMonth}
+            etiquetaTodos="Mes"
+            titulo="Elegir mes del periodo"
+          />
+        </div>
+        <div className="w-[96px]">
+          <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-content-3">Año</span>
+          <FiltroCombo
+            compacto
+            valor={selectedYear}
+            opciones={aniosDisponibles()}
+            onElegir={setSelectedYear}
+            etiquetaTodos="Año"
+            titulo="Elegir año del periodo"
+          />
+        </div>
+      </div>
     </div>
   );
 }

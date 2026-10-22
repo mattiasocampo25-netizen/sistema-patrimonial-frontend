@@ -166,7 +166,7 @@ export default function InventarioView({
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
   return (
-<div className="space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
+<div className="inventory-view inventory-stagger space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <Card className="p-0">
@@ -465,7 +465,7 @@ export default function InventarioView({
               key={c.id}
               onClick={c.limpiar}
               title={'Quitar filtro: ' + c.label}
-              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 hover:bg-zinc-700 dark:hover:bg-surface-3 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none animate-pop"
+              className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold bg-brand-soft text-brand-text border border-brand/20 hover:border-brand/40 hover:shadow-sm transition-[background-color,border-color,box-shadow,transform] duration-[var(--dur-fast)] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none animate-pop active:scale-[0.97]"
             >
               <span className="max-w-[220px] truncate">{c.label}</span>
               <i className="fa-solid fa-xmark text-[10px]"></i>
@@ -476,19 +476,22 @@ export default function InventarioView({
           <div className="hidden md:flex items-center rounded-control border border-line dark:border-zinc-700/30 overflow-hidden" title="Vista de resultados">
             <button
               onClick={() => cambiarVistaInv('tabla')} title="Vista tabla" aria-label="Vista tabla"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tabla' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
+              aria-pressed={vistaInv === 'tabla'}
+              className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'tabla' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
             >
               <i className="fa-solid fa-table-list text-xs"></i>
             </button>
             <button
               onClick={() => cambiarVistaInv('tarjetas')} title="Vista tarjetas" aria-label="Vista tarjetas"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'tarjetas' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
+              aria-pressed={vistaInv === 'tarjetas'}
+              className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'tarjetas' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
             >
               <i className="fa-solid fa-grip text-xs"></i>
             </button>
             <button
               onClick={() => cambiarVistaInv('kanban')} title="Vista tablero (Kanban por estado)" aria-label="Vista tablero Kanban"
-              className={`flex h-9 w-9 items-center justify-center transition-all cursor-pointer ${vistaInv === 'kanban' ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
+              aria-pressed={vistaInv === 'kanban'}
+              className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'kanban' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
             >
               <i className="fa-solid fa-table-columns text-xs"></i>
             </button>
@@ -508,7 +511,8 @@ export default function InventarioView({
             {[['rotulo', 'Rótulo'], ['valor', 'Valor'], ['fecha', 'Fecha']].map(([campo, label]) => (
               <button
                 key={campo} onClick={() => ciclarOrden(campo)} title={`Ordenar por ${label}`}
-                className={`inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control text-[11px] font-bold transition-all cursor-pointer ${orden?.campo === campo ? 'bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100' : 'text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-zinc-800/20'}`}
+              aria-pressed={orden?.campo === campo}
+              className={`inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control text-[11px] font-bold transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${orden?.campo === campo ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
               >
                 {label} <i className={`fa-solid ${flechaOrden(campo)} text-[9px]`}></i>
               </button>
@@ -561,7 +565,7 @@ export default function InventarioView({
       </div>
                     {/* Barra de acciones en lote */}
                     {seleccionados.length > 0 && (
-                      <div className="flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 rounded-card bg-zinc-900 dark:bg-zinc-900 text-white dark:text-zinc-100 shadow-md animate-pop">
+                      <div className="inventory-selection-bar flex flex-wrap items-center gap-2 px-4 sm:px-5 py-3 rounded-card text-white shadow-md animate-pop">
                         <span className="text-[13px] font-bold tabular-nums">
                           {seleccionados.length} seleccionado{seleccionados.length === 1 ? '' : 's'}{selFueraPagina > 0 ? ` (${selFueraPagina} en otras páginas)` : ''}
                         </span>
@@ -591,7 +595,7 @@ export default function InventarioView({
                     <div className="p-4 sm:p-5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                         {itemsPaginados.map((item) => (
-                          <div key={item.id} className={`relative rounded-card border p-4 shadow-xs card-lift bg-surface-1 dark:bg-zinc-900/30 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
+                          <div key={item.id} className={`inventory-item-card relative rounded-card border p-4 shadow-xs bg-surface-1 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
                               <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
                               <div className="min-w-0 flex-1">

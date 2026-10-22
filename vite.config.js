@@ -12,5 +12,29 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react-vendor',
+              test: /node_modules[\\/](?:react|react-dom|scheduler)(?:[\\/]|$)/,
+              priority: 30,
+            },
+            {
+              name: 'supabase-vendor',
+              test: /node_modules[\\/]@supabase[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules[\\/]/,
+              minSize: 20 * 1024,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
   }
 });

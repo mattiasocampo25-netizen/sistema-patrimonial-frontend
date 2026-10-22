@@ -45,11 +45,8 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
 
-  /* --- Sidebar: oscuro en los dos temas (como en la referencia) ---
-     `content-3` es el tono de los títulos de grupo: van muy por debajo del
-     texto de los items para que la jerarquía se lea sin gritar. Antes los
-     títulos usaban el mismo gris que los items y en negrita, y con doce
-     items encima el menú se leía como una masa uniforme. */
+  /* --- Sidebar: superficie clara/oscura según el tema ---
+     content-3 conserva el tono secundario para separar títulos de grupo. */
   --color-sidebar: var(--sidebar);
   --color-sidebar-content: var(--sidebar-content);
   --color-sidebar-content-2: var(--sidebar-content-2);
@@ -139,16 +136,13 @@
   --line: #e6e3dc;
   --line-strong: #d3cfc5;
 
-  /* Sidebar oscuro en los dos temas.
-     El fondo es un azul-gris profundo, no un gris neutro casi negro: junto a
-     una app clara el contraste se vuelve duro y cansa la vista en sesiones
-     largas. `content-2` es el gris de los items en reposo (legible sin
-     negrita) y `content-3` el de los títulos de grupo (más apagado aún). */
-  --sidebar: #1a1d24;
-  --sidebar-content: #eef0f4;
-  --sidebar-content-2: #9aa1ac;
-  --sidebar-content-3: #6b727e;
-  --sidebar-line: #2b303a;
+  /* En tema claro el menú acompaña la superficie cálida; el azul noche queda
+     reservado para el tema oscuro. Los secundarios mantienen contraste. */
+  --sidebar: #f7f8fb;
+  --sidebar-content: #1c293b;
+  --sidebar-content-2: #46566d;
+  --sidebar-content-3: #627187;
+  --sidebar-line: #e1e6ed;
 
   --brand: #1d4ed8;
   --brand-hover: #1e40af;

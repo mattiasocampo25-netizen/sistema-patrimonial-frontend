@@ -185,6 +185,7 @@ export default function AppModals({
   pendingDependencia,
   clearAllFilters, setSearchTerm, setSearchInput, setCurrentPage,
   openFC03Modal,
+  openFC10Modal,
   fc10List, fc11List,
   modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo, openFichaBien,
   setDarkMode, setIsAtajosOpen,
@@ -513,11 +514,13 @@ export default function AppModals({
             onClose={() => setCmdOpen(false)}
             bienes={bienes}
             funcionarios={funcionariosPadron}
+            fc10List={fc10List}
             dependenciaActual={dependenciaActual}
             irInventario={(rotulo) => { clearAllFilters(); setSearchTerm(rotulo); setSearchInput(rotulo); setCurrentPage(1); setActiveTab('inventario'); }}
             abrirNuevoBien={() => { setBienEditing(null); setIsBienModalOpen(true); }}
             abrirEscaner={() => setIsScannerOpen(true)}
             abrirFC03={() => openFC03Modal()}
+            openFC10Modal={openFC10Modal}
             irTab={irTabGlobal}
             isAdmin={isAdmin}
             esDesarrollador={esDesarrollador}

@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { normalizeStr } from '../utils/helpers';
+import { matchBienSearch, normalizeStr } from '../utils/helpers';
 
 // Paleta de comandos global (Ctrl+K): bienes, funcionarios y acciones.
 export default function CommandPalette({
-  isOpen, onClose, bienes, funcionarios, dependenciaActual,
+  isOpen, onClose, bienes, funcionarios, fc10List = [], dependenciaActual,
   irInventario, abrirNuevoBien, abrirEscaner, abrirFC03, irTab,
+  openFC10Modal,
   isAdmin, esDesarrollador, onToggleTheme, onAbrirAtajos, onAbrirTour,
   onExportCSV, onExportExcel, onRepetirExport, ultimaExportacion
 }) {
   const [query, setQuery] = useState('');
   const [sel, setSel] = useState(0);
   const inputRef = useRef(null);
+  const bienesPorId = useMemo(() => new Map((bienes || []).map(b => [String(b.id), b])), [bienes]);
 
   useEffect(() => {
     if (isOpen) {
@@ -49,20 +51,37 @@ export default function CommandPalette({
     if (dependenciaActual) {
       bienes
         .filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual))
-        .filter(b => match(`${b.rotulo || ''} ${b.descripcion || ''} ${b.funcionario || ''}`))
+        .filter(b => matchBienSearch(b, query))
         .slice(0, 6)
         .forEach(b => out.push({
           tipo: 'Bien', titulo: b.rotulo || 'S/R', subtitulo: String(b.descripcion || '').slice(0, 60),
           icon: 'fa-tag', accion: () => { guardarReciente({ kind: 'bien', ref: b.rotulo || '', titulo: b.rotulo || 'S/R', subtitulo: String(b.descripcion || '').slice(0, 60) }); irInventario(b.rotulo || ''); }
         }));
       funcionarios
-        .filter(f => !dependenciaActual || f.dependencia === dependenciaActual)
-        .filter(f => match(`${f.nombre || ''} ${f.cedula || ''}`))
+        .filter(f => !dependenciaActual || normalizeStr(f.dependencia) === normalizeStr(dependenciaActual))
+        .filter(f => match(`${f.nombre || ''} ${f.cedula || ''} ${f.cargo || ''} ${f.username || ''} ${f.email || ''}`))
         .slice(0, 3)
         .forEach(f => out.push({
           tipo: 'Funcionario', titulo: f.nombre, subtitulo: f.cedula ? `CI ${f.cedula}` : (f.cargo || ''),
           icon: 'fa-user-tie', accion: () => { guardarReciente({ kind: 'func', ref: f.nombre || '', titulo: f.nombre, subtitulo: f.cedula ? `CI ${f.cedula}` : (f.cargo || '') }); irTab('funcionarios', f.nombre || ''); }
         }));
+      (fc10List || [])
+        .filter(fc => !fc.dependencia || normalizeStr(fc.dependencia) === normalizeStr(dependenciaActual))
+        .filter(fc => {
+          const bien = bienesPorId.get(String(fc.bienId)) || fc.bienSnapshot;
+          return match(`${fc.numeroActa || ''} ${fc.id || ''} ${fc.funcionarioNombre || ''} ${fc.funcionarioDoc || ''} ${fc.jefeInmediatoNombre || ''} ${fc.estadoFirma || ''} ${bien?.rotulo || ''} ${bien?.descripcion || ''}`);
+        })
+        .slice(0, 3)
+        .forEach(fc => {
+          const bien = bienesPorId.get(String(fc.bienId)) || fc.bienSnapshot;
+          out.push({
+            tipo: 'Acta FC-10',
+            titulo: fc.numeroActa || fc.id || 'Acta FC-10',
+            subtitulo: [fc.funcionarioNombre, bien?.rotulo, fc.estadoFirma].filter(Boolean).join(' · '),
+            icon: 'fa-file-signature',
+            accion: () => bien && openFC10Modal ? openFC10Modal(bien, fc) : irTab('fc10')
+          });
+        });
     }
     const acciones = [
       { titulo: 'Nuevo registro de bien', subtitulo: 'Inventario', icon: 'fa-plus', accion: abrirNuevoBien },
@@ -88,7 +107,7 @@ export default function CommandPalette({
     ].filter(a => a.accion && (!tokens.length || match(`${a.titulo} ${a.subtitulo}`)));
     acciones.forEach(a => out.push({ tipo: 'Acción', ...a }));
     return out.slice(0, 14);
-  }, [query, bienes, funcionarios, dependenciaActual, irInventario, abrirNuevoBien, abrirEscaner, abrirFC03, irTab, isAdmin, esDesarrollador, onToggleTheme, onAbrirAtajos, onAbrirTour, onExportCSV, onExportExcel, onRepetirExport, ultimaExportacion]);
+  }, [query, bienes, bienesPorId, funcionarios, fc10List, dependenciaActual, irInventario, abrirNuevoBien, abrirEscaner, abrirFC03, irTab, openFC10Modal, isAdmin, esDesarrollador, onToggleTheme, onAbrirAtajos, onAbrirTour, onExportCSV, onExportExcel, onRepetirExport, ultimaExportacion]);
 
   useEffect(() => { setSel(0); }, [query]);
 
@@ -104,18 +123,26 @@ export default function CommandPalette({
       <div
         className="w-full max-w-xl rounded-panel bg-surface-1 border border-line shadow-pop overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
-        role="dialog" aria-label="Búsqueda global"
+        role="dialog" aria-label="Búsqueda global" aria-modal="true"
       >
         <div className="flex items-center gap-3 px-5 py-4 border-b border-line bg-surface-2/60">
           <i className="fa-solid fa-magnifying-glass text-content-3 text-sm"></i>
           <input
             ref={inputRef}
             type="text"
+            role="combobox"
+            aria-label="Buscar bienes, funcionarios, actas y acciones"
+            aria-autocomplete="list"
+            aria-expanded={resultados.length > 0}
+            aria-controls="command-palette-results"
+            aria-activedescendant={resultados[sel] ? `command-result-${sel}` : undefined}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'ArrowDown') { e.preventDefault(); setSel(s => Math.min(s + 1, resultados.length - 1)); }
               if (e.key === 'ArrowUp') { e.preventDefault(); setSel(s => Math.max(s - 1, 0)); }
+              if (e.key === 'Home' && resultados.length) { e.preventDefault(); setSel(0); }
+              if (e.key === 'End' && resultados.length) { e.preventDefault(); setSel(resultados.length - 1); }
               if (e.key === 'Enter' && resultados[sel]) ejecutar(resultados[sel]);
               if (e.key === 'Escape') onClose();
             }}
@@ -124,13 +151,16 @@ export default function CommandPalette({
           />
           <kbd className="hidden sm:inline-flex items-center rounded-md border border-line dark:border-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-content-3">Ctrl K</kbd>
         </div>
-        <div className="max-h-[50dvh] overflow-y-auto custom-scrollbar py-2">
+        <div id="command-palette-results" role="listbox" aria-label="Resultados de búsqueda" className="max-h-[50dvh] overflow-y-auto custom-scrollbar py-2">
           {resultados.length === 0 ? (
             <p className="px-5 py-8 text-center text-xs font-semibold text-content-3">Sin coincidencias. Prueba con rótulo, nombre o apellido.</p>
           ) : (
             resultados.map((r, i) => (
               <button
                 key={`${r.tipo}-${r.titulo}-${i}`}
+                id={`command-result-${i}`}
+                role="option"
+                aria-selected={i === sel}
                 onClick={() => ejecutar(r)}
                 onMouseEnter={() => setSel(i)}
                 className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors cursor-pointer ${i === sel ? 'bg-brand-soft text-brand-text' : 'hover:bg-surface-2'}`}

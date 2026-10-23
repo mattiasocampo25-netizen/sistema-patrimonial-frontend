@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 @theme {
@@ -164,6 +164,8 @@ body {
 }
 
 .workspace-main {
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
   background-color: var(--canvas);
   background-image:
     radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 5%, transparent), transparent 38%),

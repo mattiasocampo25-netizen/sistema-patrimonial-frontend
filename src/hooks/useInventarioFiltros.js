@@ -250,19 +250,37 @@ useEffect(() => {
     });
   }, [username]);
 
+  // Un único conjunto base por dependencia evita filtrar y normalizar toda la
+  // lista de bienes por separado para cada selector y cada métrica.
+  const bienesDependencia = useMemo(
+    () => bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
+    [bienes, dependenciaActual]
+  );
+  const bienesPorId = useMemo(() => new Map(bienes.map(b => [String(b.id), b])), [bienes]);
+  const fc10PorBien = useMemo(() => {
+    const mapa = new Map();
+    (Array.isArray(fc10List) ? fc10List : []).forEach(fc => {
+      if (!fc?.bienId || (fc.dependencia && normalizeStr(fc.dependencia) !== normalizeStr(dependenciaActual))) return;
+      const key = String(fc.bienId);
+      if (!mapa.has(key)) mapa.set(key, []);
+      mapa.get(key).push(fc);
+    });
+    return mapa;
+  }, [fc10List, dependenciaActual]);
+
   const funcionariosUnicos = useMemo(() => {
       const funcMap = new Map();
-      bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && b.funcionario && String(b.funcionario).trim() !== "").forEach(b => {
+      bienesDependencia.filter(b => b.funcionario && String(b.funcionario).trim() !== "").forEach(b => {
           const val = String(b.funcionario).trim();
           const key = normalizeStr(val);
           if(!funcMap.has(key)) funcMap.set(key, val);
       });
       return Array.from(funcMap.values()).sort();
-  }, [bienes, dependenciaActual]);
+  }, [bienesDependencia]);
 
   const ubicacionesUnicas = useMemo(() => {
       const ubiMap = new Map();
-      bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && b.ubicacion && String(b.ubicacion).trim() !== "").forEach(b => {
+      bienesDependencia.filter(b => b.ubicacion && String(b.ubicacion).trim() !== "").forEach(b => {
           const val = String(b.ubicacion).trim();
           const key = normalizeStr(val);
           if(!ubiMap.has(key)) ubiMap.set(key, val);
@@ -273,16 +291,16 @@ useEffect(() => {
           if(!ubiMap.has(key)) ubiMap.set(key, val);
       });
       return Array.from(ubiMap.values()).sort();
-  }, [bienes, fc10List, dependenciaActual]);
+  }, [bienesDependencia, fc10List, dependenciaActual]);
 
-  const aniosUnicos = useMemo(() => { const years = bienes.filter(b => b.dependencia === dependenciaActual && b.fechaAdquisicion).map(b => parseDateInfo(b.fechaAdquisicion).year).filter(y => y && !isNaN(parseInt(y))); return [...new Set(years)].sort((a, b) => b - a); }, [bienes, dependenciaActual]);
+  const aniosUnicos = useMemo(() => { const years = bienesDependencia.filter(b => b.fechaAdquisicion).map(b => parseDateInfo(b.fechaAdquisicion).year).filter(y => y && !isNaN(parseInt(y))); return [...new Set(years)].sort((a, b) => b - a); }, [bienesDependencia]);
 
-  const subcuentasUnicas = useMemo(() => [...new Set(bienes.filter(b => b.dependencia === dependenciaActual && String(b.subcuenta||'').trim() !== '').map(b => String(b.subcuenta).trim()))].sort(), [bienes, dependenciaActual]);
-  const analiticos1Unicos = useMemo(() => [...new Set(bienes.filter(b => b.dependencia === dependenciaActual && String(b.analitico1||'').trim() !== '').map(b => String(b.analitico1).trim()))].sort(), [bienes, dependenciaActual]);
-  const analiticos2Unicos = useMemo(() => [...new Set(bienes.filter(b => b.dependencia === dependenciaActual && String(b.analitico2||'').trim() !== '').map(b => String(b.analitico2).trim()))].sort(), [bienes, dependenciaActual]);
+  const subcuentasUnicas = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.subcuenta || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
+  const analiticos1Unicos = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.analitico1 || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
+  const analiticos2Unicos = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.analitico2 || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
 
   const stats = useMemo(() => {
-      const depBienes = bienes.filter(b => b.dependencia === dependenciaActual && b.estadoConservacion !== 'De Baja');
+      const depBienes = bienesDependencia.filter(b => b.estadoConservacion !== 'De Baja');
       const totalItems = depBienes.length;
       const totalValue = depBienes.reduce((acc, curr) => {
           const valStr = String(curr.valorUnitario || '0').replace(/\./g, '').replace(/,/g, '').replace(/\D/g, '');
@@ -295,7 +313,7 @@ useEffect(() => {
       // además de firmar.
       const fc10Pendientes = (fc10List || []).filter(fc => {
           if (estadoInicialFC10(fc) === ESTADOS_FC10.CERRADO) return false;
-          const b = bienes.find(x => x.id === fc.bienId);
+          const b = bienesPorId.get(String(fc.bienId));
           return b && normalizeStr(b.dependencia) === normalizeStr(dependenciaActual);
       }).length;
       const withQR = depBienes.filter(b => b.hasQR).length;
@@ -306,11 +324,11 @@ useEffect(() => {
       depBienes.forEach(b => { if (b.cuenta) cuentasCounts[b.cuenta] = (cuentasCounts[b.cuenta] || 0) + 1; });
       const topCuentas = Object.entries(cuentasCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
       return { totalItems, totalValue, withFc10, withoutFc10: totalItems - withFc10, fc10Pendientes, withQR, withoutQR: totalItems - withQR, percFC10, percQR, estados, topCuentas };
-  }, [bienes, dependenciaActual, fc10List]);
+  }, [bienesDependencia, bienesPorId, dependenciaActual, fc10List]);
 
   // Bandeja de pendientes: conteos operativos para atención directa (mismo universo que stats: activos)
   const pendientes = useMemo(() => {
-      const base = bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && b.estadoConservacion !== 'De Baja');
+      const base = bienesDependencia.filter(b => b.estadoConservacion !== 'De Baja');
       const anioActual = new Date().getFullYear();
       const ahora = new Date();
       const mesesRestantes = (b) => {
@@ -333,22 +351,15 @@ useEffect(() => {
         { id: 'vidaVencida', label: 'Vida útil vencida', count: base.filter(esVidaVencida).length, icon: 'fa-hourglass-end', box: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
         { id: 'porVencer', label: 'Por vencer (12 m.)', count: base.filter(b => { const r = mesesRestantes(b); return r !== null && r > 0 && r <= 12; }).length, icon: 'fa-hourglass-half', box: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20' },
       ];
-  }, [bienes, dependenciaActual]);
+  }, [bienesDependencia]);
 
   const filteredBienes = useMemo(() => {
     // Los bienes antiguos no siempre tienen el campo funcionario sincronizado.
     // Conservamos los nombres de sus actas FC-10 como índice de búsqueda para
     // que sigan apareciendo al buscar por la persona que figura en el acta.
-    const fc10PorBien = new Map();
-    (Array.isArray(fc10List) ? fc10List : []).forEach(fc => {
-      if (!fc?.bienId || (fc.dependencia && normalizeStr(fc.dependencia) !== normalizeStr(dependenciaActual))) return;
-      const key = String(fc.bienId);
-      if (!fc10PorBien.has(key)) fc10PorBien.set(key, []);
-      fc10PorBien.get(key).push(fc);
-    });
     // Compara ignorando mayúsculas, tildes y espacios extra (antes el ===
     // exacto partía los resultados si el nombre tenía variantes de carga)
-    let filtered = bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual));
+    let filtered = [...bienesDependencia];
     if (filtroFuncionario) filtered = filtered.filter(b => normalizeStr(b.funcionario || '') === normalizeStr(filtroFuncionario));
     if (filtroUbicacion) filtered = filtered.filter(b => normalizeStr(b.ubicacion || '') === normalizeStr(filtroUbicacion));
     if (filtroAnio) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).year === filtroAnio);
@@ -411,7 +422,7 @@ useEffect(() => {
     });
 
     return filtered;
-  }, [bienes, fc10List, dependenciaActual, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroEstado, filtroQR, filtroFC10, filtroPendiente, debouncedSearchTerm, orden]);
+  }, [bienesDependencia, fc10PorBien, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroEstado, filtroQR, filtroFC10, filtroPendiente, debouncedSearchTerm, orden]);
 
   const paginatedBienes = useMemo(() => { const start = (currentPage - 1) * itemsPorPagina; return filteredBienes.slice(start, start + itemsPorPagina); }, [filteredBienes, currentPage, itemsPorPagina]);
   const itemsPaginados = paginatedBienes;

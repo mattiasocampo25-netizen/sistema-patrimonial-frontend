@@ -176,7 +176,26 @@ export function useRealtimeSync({
         let cacheBienes = null;
         try { metaBienes = await localforage.getItem(META_BIENES); } catch {}
         try { cacheBienes = await localforage.getItem(CACHE_BIENES); } catch {}
+        // La carga ya pasó la validación de sesión. Muestra el inventario local
+        // mientras llega la sincronización para evitar una pantalla vacía al
+        // iniciar o al volver a una dependencia conocida.
+        if (Array.isArray(cacheBienes) && cacheBienes.length > 0 && turnoVigente()) setBienes(cacheBienes);
         const descargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes);
+
+        // Inicia las consultas de actas y catálogos junto con la descarga de
+        // bienes. Antes empezaban después de bajar el inventario completo, lo
+        // que sumaba ambas latencias en cada arranque.
+        const escDep = escaparFiltroPostgrest(dependenciaActual);
+        const consultasSecundariasPromise = Promise.all([
+          supabase.from('fc10').select('id, data').eq('data->>dependencia', dependenciaActual),
+          supabase.from('fc11').select('id, data')
+            .or(`data->>dependenciaRemitente.eq.${escDep},data->>dependenciaDestinataria.eq.${escDep}`),
+          supabase.from('fc04').select('id, data').eq('data->>dependencia', dependenciaActual),
+          supabase.from('estructuras').select('id, data'),
+          queryNotificacionesAcotadas(),
+          supabase.from('usuarios').select('username, nombre, cargo, dependencia'),
+          supabase.from('funcionarios').select('*')
+        ]).then(value => ({ value }), error => ({ error }));
 
         if (descargaTotal) {
         let todosLosNuevosBienes = [];
@@ -237,17 +256,9 @@ export function useRealtimeSync({
         // se pedía la tabla COMPLETA (sin filtro) y se filtraba en el cliente,
         // lo que arrastraba los traslados de todas las dependencias — cada fila
         // incluye un snapshot completo del bien — y los mostraba la Ficha 360.
-        const escDep = escaparFiltroPostgrest(dependenciaActual);
-        const [resFc10, resFc11, resFc04, resEstructuras, resAuditoria, resUsuarios, resFuncionarios] = await Promise.all([
-            supabase.from('fc10').select('id, data').eq('data->>dependencia', dependenciaActual),
-            supabase.from('fc11').select('id, data')
-                .or(`data->>dependenciaRemitente.eq.${escDep},data->>dependenciaDestinataria.eq.${escDep}`),
-            supabase.from('fc04').select('id, data').eq('data->>dependencia', dependenciaActual),
-            supabase.from('estructuras').select('id, data'),
-            queryNotificacionesAcotadas(),
-            supabase.from('usuarios').select('username, nombre, cargo, dependencia'),
-            supabase.from('funcionarios').select('*')
-        ]);
+        const consultasSecundarias = await consultasSecundariasPromise;
+        if (consultasSecundarias.error) throw consultasSecundarias.error;
+        const [resFc10, resFc11, resFc04, resEstructuras, resAuditoria, resUsuarios, resFuncionarios] = consultasSecundarias.value;
 
         const parseDirect = (resData) => {
             if (!resData) return [];

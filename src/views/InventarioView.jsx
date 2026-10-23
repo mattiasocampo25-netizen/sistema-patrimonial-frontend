@@ -88,7 +88,8 @@ export default function InventarioView({
   onCopiarLink,
   onExportarProgramado,
   STYLES,
-  isLoading
+  isLoading,
+  hasInventoryData = false
 }) {
   // Densidad y columnas visibles (preferencia local por usuario)
   const [densidad, setDensidad] = useState(() => {
@@ -600,7 +601,7 @@ export default function InventarioView({
                         </button>
                       </div>
                     )}
-                  {isLoading ? (
+                  {isLoading && !hasInventoryData ? (
                     /* Durante la carga inicial se muestra el esqueleto en vez del
                        estado vacío: "Todavía no hay bienes cargados" era falso y
                        alarmaba al usuario mientras los datos aún no llegaban. */

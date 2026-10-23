@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { normalizeStr } from '../utils/helpers';
 import { puntuarOpcion } from '../utils/busqueda';
@@ -28,6 +28,8 @@ export default function FiltroCombo({
   const inputRef = useRef(null);
   const popupRef = useRef(null);
   const [popupStyle, setPopupStyle] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const listboxId = useId();
   const mensajeErrorId = name ? `${name}-filtro-error` : undefined;
 
   useEffect(() => {
@@ -153,11 +155,18 @@ export default function FiltroCombo({
       <button
         ref={botonRef}
         type="button"
-        onClick={() => { if (disabled) return; setTexto(''); setAbierto(v => !v); }}
+        onClick={() => {
+          if (disabled) return;
+          setTexto('');
+          const seleccionado = lista.findIndex(o => String(o.value) === String(valorActual));
+          setActiveIndex(seleccionado >= 0 ? seleccionado + 1 : 0);
+          setAbierto(v => !v);
+        }}
         title={titulo}
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={abierto}
+        aria-controls={abierto ? listboxId : undefined}
         aria-required={required || undefined}
         aria-invalid={error || undefined}
         aria-describedby={error && mensajeErrorId ? mensajeErrorId : undefined}
@@ -181,10 +190,21 @@ export default function FiltroCombo({
               autoFocus
               type="text"
               value={texto}
-              onChange={(e) => setTexto(e.target.value)}
+              aria-label={`Buscar ${titulo || etiquetaTodos || 'opciones'}`}
+              aria-controls={listboxId}
+              aria-activedescendant={`${listboxId}-option-${activeIndex}`}
+              onChange={(e) => { setTexto(e.target.value); setActiveIndex(0); }}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') setAbierto(false);
-                if (e.key === 'Enter' && lista.length > 0) elegir(lista[0].value);
+                if (e.key === 'Escape') { e.preventDefault(); setAbierto(false); botonRef.current?.focus(); }
+                if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex(i => Math.min(lista.length, i + 1)); }
+                if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex(i => Math.max(0, i - 1)); }
+                if (e.key === 'Home') { e.preventDefault(); setActiveIndex(0); }
+                if (e.key === 'End') { e.preventDefault(); setActiveIndex(lista.length); }
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (activeIndex === 0) elegir('');
+                  else if (lista[activeIndex - 1]) elegir(lista[activeIndex - 1].value);
+                }
               }}
               placeholder="Escribe para buscar..."
               className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal"
@@ -192,39 +212,42 @@ export default function FiltroCombo({
           </div>
           {/* Reserva espacio para el buscador y el pie. Antes la lista podía
               ocupar más que el popup y quedar cortada contra el footer del modal. */}
-          <div style={{ maxHeight: Math.max(48, popupStyle.maxHeight - 68) }} className="overflow-y-auto custom-scrollbar py-1">
+          <div id={listboxId} role="listbox" aria-label={titulo || etiquetaTodos || 'Opciones'} style={{ maxHeight: Math.max(48, popupStyle.maxHeight - 68) }} className="overflow-y-auto custom-scrollbar py-1">
             <button
+              id={`${listboxId}-option-0`}
               type="button"
+              tabIndex={-1}
+              role="option"
+              aria-selected={!valorActual}
+              onMouseEnter={() => setActiveIndex(0)}
               onClick={() => elegir('')}
-              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${!valorActual ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-3 dark:text-content-3'}`}
+              className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer ${activeIndex === 0 ? 'bg-brand/10 dark:bg-brand/20' : 'hover:bg-brand/10 dark:hover:bg-brand/20'} ${!valorActual ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-3 dark:text-content-3'}`}
               title={etiquetaTodos}
             >
               <span className="block truncate">{etiquetaTodos}</span>
             </button>
-            {lista.map(o => (
+            {lista.map((o, index) => (
               <button
                 key={o.value}
+                id={`${listboxId}-option-${index + 1}`}
                 type="button"
+                tabIndex={-1}
+                role="option"
+                aria-selected={String(o.value) === String(valorActual)}
+                onMouseEnter={() => setActiveIndex(index + 1)}
                 onClick={() => elegir(o.value)}
                 title={o.label}
-                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer hover:bg-brand/10 dark:hover:bg-brand/20 ${String(o.value) === String(valorActual) ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
+                className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer ${activeIndex === index + 1 ? 'bg-brand/10 dark:bg-brand/20' : 'hover:bg-brand/10 dark:hover:bg-brand/20'} ${String(o.value) === String(valorActual) ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
               >
                 <span className="block truncate" title={o.label}>{o.label}</span>
               </button>
             ))}
-            {lista.length > 0 && (
-              <div className="px-3.5 py-1 text-[10px] font-semibold text-content-3 text-center border-t border-line dark:border-white/10">
-                Pulse sobre una opción para seleccionarla
-              </div>
-            )}
             {lista.length === 0 && (
-              <p className="px-3.5 py-3 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
+              <p role="status" className="px-3.5 py-3 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
             )}
-            {total > 100 && (
-              <p className="px-3.5 py-1.5 text-[10px] font-semibold text-content-3 border-t border-line dark:border-white/10">
-                {total - 100} más… afina la búsqueda.
-              </p>
-            )}
+          </div>
+          <div aria-live="polite" className="border-t border-line px-3.5 py-1.5 text-center text-[10px] font-semibold text-content-3">
+            {total > 100 ? `${total - 100} más; afina la búsqueda.` : `${total} ${total === 1 ? 'opción' : 'opciones'}. Usa ↑ y ↓ para elegir.`}
           </div>
         </div>, document.body
       )}

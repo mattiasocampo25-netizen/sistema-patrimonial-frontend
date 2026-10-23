@@ -5,7 +5,7 @@ import {
   Card, EmptyState, PageHeader, Toolbar,
   Button, Badge, Chip, ChipGroup
 } from '../components/ui';
-import { formatDateText, formatCI } from '../utils/helpers';
+import { formatDateText, formatCI, normalizeStr } from '../utils/helpers';
 import { ESTADOS_FC10, ESTADO_INFO, estadoInicialFC10, pendienteDeFirma, esFC10Legado } from '../utils/fc10Firmas';
 
 // Vista de actas de responsabilidad FC-10 (extraída de App.jsx, Fase 4).
@@ -46,11 +46,11 @@ export default function Fc10View({
     return true;
   };
   const listaVisible = (filteredFC10 || []).filter(coincideEtapa).filter(fc => {
-    const consulta = busqueda.trim().toLocaleLowerCase('es');
+    const consulta = normalizeStr(busqueda);
     if (!consulta) return true;
     const bien = bienes.find(b => b.id === fc.bienId) || {};
     return [fc.funcionarioNombre, fc.funcionarioDoc, fc.id, bien.rotulo, bien.descripcion]
-      .filter(Boolean).some(valor => String(valor).toLocaleLowerCase('es').includes(consulta));
+      .filter(Boolean).some(valor => normalizeStr(valor).includes(consulta));
   });
 
   // =========================================================================
@@ -126,8 +126,8 @@ export default function Fc10View({
 
           <Toolbar className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(410px,0.92fr)]">
             <div className="min-w-0 self-end">
-              <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-content-3">Mostrar actas por firma</span>
-              <ChipGroup className="w-full">
+              <span id="fc10-stage-label" className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-content-3">Mostrar actas por firma</span>
+              <ChipGroup aria-labelledby="fc10-stage-label" className="w-full">
               {ETAPAS.map((et) => (
                 <Chip
                   key={et.id}
@@ -158,12 +158,13 @@ export default function Fc10View({
             <h2 className="text-body font-bold text-content-1">Actas de {nombreMes} {fc10Year}</h2>
             <p className="mt-0.5 text-label text-content-3">El periodo incluye la fecha de entrega o la de devolución.</p>
           </div>
-          <label className="relative w-full sm:w-80">
-            <span className="sr-only">Buscar en el historial FC-10</span>
+          <div className="relative w-full sm:w-80">
+            <label htmlFor="fc10-search" className="sr-only">Buscar en el historial FC-10</label>
             <i className="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true" />
-            <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar funcionario, rótulo o bien…" className="h-10 w-full rounded-control border border-line bg-surface-1 pl-9 pr-3 text-body text-content-1 placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
-          </label>
-          <span className="w-full text-label font-semibold text-content-3 sm:w-auto">{listaVisible.length} {listaVisible.length === 1 ? 'acta' : 'actas'}</span>
+            <input id="fc10-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar funcionario, rótulo o bien…" className="h-10 w-full rounded-control border border-line bg-surface-1 pl-9 pr-10 text-body text-content-1 placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
+            {busqueda && <button type="button" onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda FC-10" className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-control text-content-3 hover:bg-surface-3 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-xmark text-xs" aria-hidden="true" /></button>}
+          </div>
+          <span aria-live="polite" className="w-full text-label font-semibold text-content-3 sm:w-auto">{listaVisible.length} {listaVisible.length === 1 ? 'acta' : 'actas'}</span>
         </div>
       <div className="min-h-[280px] p-4 sm:p-6">
         {isLoading ? (

@@ -29,6 +29,7 @@ export default function InventarioView({
   setIsBienModalOpen,
   searchRef,
   searchTerm,
+  debouncedSearchTerm,
   setSearchTerm,
   setSearchInput,
   setCurrentPage,
@@ -276,11 +277,13 @@ export default function InventarioView({
     <div className="relative w-full">
       <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input
-        type="text"
+        type="search"
         ref={searchRef}
-        title="Buscar (atajo: /)"
+        aria-label="Buscar bienes por rótulo, descripción, responsable o código"
+        autoComplete="off"
+        title="Busca por rótulo, descripción, funcionario, ubicación o código (atajo: /)"
         data-tour="inv-search"
-        placeholder="Buscar por rótulo, descripción, funcionario... Ej: 1045 silla"
+        placeholder="Busca por rótulo, bien, funcionario o código… Ej.: 1045 silla"
         value={searchTerm}
         onChange={(e) => { setSearchTerm(e.target.value); setSearchInput(e.target.value); setCurrentPage(1); }}
         onFocus={() => setShowHistorial(true)}
@@ -313,7 +316,8 @@ export default function InventarioView({
       )}
       {searchTerm && (
         <button
-          onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); }}
+          type="button"
+          onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); searchRef?.current?.focus(); }}
           title="Limpiar búsqueda" aria-label="Limpiar búsqueda"
           className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-3 dark:bg-surface-3/20 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/30 transition-all cursor-pointer"
         >
@@ -321,6 +325,15 @@ export default function InventarioView({
         </button>
       )}
     </div>
+    {searchTerm && (
+      <p role="status" aria-live="polite" className="-mt-2 flex items-center gap-2 px-1 text-xs font-medium text-content-3">
+        {searchTerm !== debouncedSearchTerm ? (
+          <><i className="fa-solid fa-circle-notch fa-spin text-brand" aria-hidden="true" /> Buscando en el inventario…</>
+        ) : (
+          <>{filteredBienes.length.toLocaleString('es-PY')} {filteredBienes.length === 1 ? 'coincidencia en esta vista' : 'coincidencias en esta vista'}</>
+        )}
+      </p>
+    )}
 
     {/* Filtros frecuentes primero; los contables quedan agrupados para reducir ruido. */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">

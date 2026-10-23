@@ -252,7 +252,7 @@ useEffect(() => {
 
   const funcionariosUnicos = useMemo(() => {
       const funcMap = new Map();
-      bienes.filter(b => b.dependencia === dependenciaActual && b.funcionario && String(b.funcionario).trim() !== "").forEach(b => {
+      bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && b.funcionario && String(b.funcionario).trim() !== "").forEach(b => {
           const val = String(b.funcionario).trim();
           const key = normalizeStr(val);
           if(!funcMap.has(key)) funcMap.set(key, val);
@@ -262,7 +262,7 @@ useEffect(() => {
 
   const ubicacionesUnicas = useMemo(() => {
       const ubiMap = new Map();
-      bienes.filter(b => b.dependencia === dependenciaActual && b.ubicacion && String(b.ubicacion).trim() !== "").forEach(b => {
+      bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && b.ubicacion && String(b.ubicacion).trim() !== "").forEach(b => {
           const val = String(b.ubicacion).trim();
           const key = normalizeStr(val);
           if(!ubiMap.has(key)) ubiMap.set(key, val);
@@ -336,6 +336,16 @@ useEffect(() => {
   }, [bienes, dependenciaActual]);
 
   const filteredBienes = useMemo(() => {
+    // Los bienes antiguos no siempre tienen el campo funcionario sincronizado.
+    // Conservamos los nombres de sus actas FC-10 como índice de búsqueda para
+    // que sigan apareciendo al buscar por la persona que figura en el acta.
+    const fc10PorBien = new Map();
+    (Array.isArray(fc10List) ? fc10List : []).forEach(fc => {
+      if (!fc?.bienId || (fc.dependencia && normalizeStr(fc.dependencia) !== normalizeStr(dependenciaActual))) return;
+      const key = String(fc.bienId);
+      if (!fc10PorBien.has(key)) fc10PorBien.set(key, []);
+      fc10PorBien.get(key).push(fc);
+    });
     // Compara ignorando mayúsculas, tildes y espacios extra (antes el ===
     // exacto partía los resultados si el nombre tenía variantes de carga)
     let filtered = bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual));
@@ -375,7 +385,7 @@ useEffect(() => {
     // Búsqueda robusta: tildes, multi-palabra (AND), rótulo sin ceros/guiones, más campos.
     // Usa término con debounce para no filtrar en cada tecla con 1800+ registros.
     if (debouncedSearchTerm && String(debouncedSearchTerm).trim()) {
-      filtered = filtered.filter(b => matchBienSearch(b, debouncedSearchTerm));
+      filtered = filtered.filter(b => matchBienSearch(b, debouncedSearchTerm, fc10PorBien.get(String(b.id))));
     }
 
     filtered.sort((a, b) => {
@@ -401,7 +411,7 @@ useEffect(() => {
     });
 
     return filtered;
-  }, [bienes, dependenciaActual, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroEstado, filtroQR, filtroFC10, filtroPendiente, debouncedSearchTerm, orden]);
+  }, [bienes, fc10List, dependenciaActual, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroEstado, filtroQR, filtroFC10, filtroPendiente, debouncedSearchTerm, orden]);
 
   const paginatedBienes = useMemo(() => { const start = (currentPage - 1) * itemsPorPagina; return filteredBienes.slice(start, start + itemsPorPagina); }, [filteredBienes, currentPage, itemsPorPagina]);
   const itemsPaginados = paginatedBienes;

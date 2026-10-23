@@ -73,7 +73,7 @@ export const repairMojibake = (value) => {
 //
 // OJO: no cambiar la version a mano. Se cambia con:
 //   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
-export const APP_VERSION = '2.13.8';
+export const APP_VERSION = '2.13.9';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.
@@ -146,14 +146,23 @@ export const formatearMiles = (valor) => {
 
 // Búsqueda robusta de bienes: insensible a tildes/mayúsculas, multi-palabra (AND),
 // tolerante a ceros/guiones en rótulos y ampliada a más campos.
-export const matchBienSearch = (bien, query) => {
+export const matchBienSearch = (bien, query, registrosRelacionados = []) => {
   if (!query || !String(query).trim()) return true;
   const b = bien || {};
   const fields = [
-    b.rotulo, b.descripcion, b.cuenta, b.subcuenta, b.analitico1, b.analitico2,
-    b.ubicacion, b.funcionario, b.funcionarioDoc, b.id
+    b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial, b.descripcion,
+    b.cuenta, b.subcuenta, b.analitico1, b.analitico2, b.ubicacion,
+    b.funcionario, b.funcionarioNombre, b.responsable, b.responsableNombre,
+    b.custodio, b.funcionarioDoc, b.cedulaResponsable, b.funcionarioCargo, b.id,
+    ...registrosRelacionados.flatMap(registro => [
+      registro?.funcionarioNombre, registro?.funcionarioDoc, registro?.funcionarioCargo,
+      registro?.jefeInmediatoNombre, registro?.jefeInmediatoDoc
+    ])
   ].map(v => String(v ?? ''));
-  const hayNorm = normalizeStr(fields.join(' '));
+  const fieldsNorm = fields.map(normalizeStr).filter(Boolean);
+  // Algunas cargas históricas guardan códigos con separadores distintos
+  // (p. ej. 2803-01-05-4788 frente a 280301054788).
+  const fieldsCompact = fieldsNorm.map(f => f.replace(/[^A-Z0-9]/g, '')).filter(Boolean);
   const fieldDigits = fields.map(f => {
     const raw = String(f).replace(/\D/g, '');
     return { raw, stripped: raw.replace(/^0+/, '') || (raw ? '0' : '') };
@@ -161,9 +170,13 @@ export const matchBienSearch = (bien, query) => {
   const tokens = normalizeStr(query).split(' ').filter(Boolean);
   if (tokens.length === 0) return true;
   return tokens.every(tok => {
-    if (hayNorm.includes(tok)) return true;
-    const tokRawDigits = String(tok).replace(/\D/g, '');
-    if (!tokRawDigits) return false;
+    if (fieldsNorm.some(field => field.includes(tok))) return true;
+    const compactToken = tok.replace(/[^A-Z0-9]/g, '');
+    if (compactToken && fieldsCompact.some(field => field.includes(compactToken))) return true;
+    const tokRawDigits = tok.replace(/\D/g, '');
+    // Solo compara dígitos si el término de búsqueda contiene exclusivamente
+    // números y separadores; así una palabra con números no da falsos positivos.
+    if (!tokRawDigits || /[^\d\s.,/#_-]/.test(tok)) return false;
     const tokStripped = tokRawDigits.replace(/^0+/, '') || '0';
     return fieldDigits.some(fd => {
       if (!fd.raw) return false;

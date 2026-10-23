@@ -52,9 +52,9 @@ export default function QRModal({
   return (
     <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-md"}>
-        
+
         {/* Cabecera */}
-        <div className="px-7 py-5 border-b border-line dark:border-zinc-800/80 bg-surface-1 dark:bg-zinc-950 flex justify-between items-center gap-4">
+        <div className="px-7 py-5 border-b border-line dark:border-zinc-800/80 bg-surface-1 dark:bg-surface-2 flex justify-between items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white shrink-0">
               <i className="fa-solid fa-qrcode text-lg"></i>
@@ -68,38 +68,38 @@ export default function QRModal({
               </p>
             </div>
           </div>
-          <button 
+          <button
             onClick={onClose}
             title="Cerrar" aria-label="Cerrar"
             className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion cursor-pointer shrink-0">
-          
+
             <i className="fa-solid fa-xmark text-base"></i>
           </button>
         </div>
 
         {/* Cuerpo */}
-        <div className="p-7 space-y-5 bg-surface-1 dark:bg-zinc-950">
-          
+        <div className="p-7 space-y-5 bg-surface-1 dark:bg-surface-2">
+
           {!isBulk ? (
             <>
               {/* Selector de Pestañas: Etiqueta vs QR Simple */}
               <div className="flex rounded-card bg-surface-3 dark:bg-surface-1/5 p-1 border border-line/60 dark:border-white/5">
-                <button 
+                <button
                   onClick={() => setPreviewType('label')}
-                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'label' ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
+                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'label' ? 'bg-surface-1 dark:bg-surface-3 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
                 >
                   Etiqueta Completa
                 </button>
-                <button 
+                <button
                   onClick={() => setPreviewType('simple')}
-                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'simple' ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
+                  className={`flex-1 py-2.5 rounded-control text-xs font-semibold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ previewType === 'simple' ? 'bg-surface-1 dark:bg-surface-3 text-content-1 dark:text-white shadow-xs' : 'text-content-3 hover:text-content-1 dark:hover:text-zinc-200' }`}
                 >
                   Solo Código QR
                 </button>
               </div>
 
               {/* Visor de Previsualización */}
-              <div className="flex flex-col items-center justify-center p-6 bg-surface-3 dark:bg-zinc-900 rounded-card border border-line/80 dark:border-zinc-800 min-h-[240px] relative">
+              <div className="flex flex-col items-center justify-center p-6 bg-surface-3 dark:bg-surface-1 rounded-card border border-line/80 dark:border-zinc-800 min-h-[240px] relative">
                 {isGenerating ? (
                   <div className="flex flex-col items-center justify-center gap-2.5">
                     <i className="fa-solid fa-circle-notch fa-spin text-2xl text-content-3"></i>
@@ -107,9 +107,9 @@ export default function QRModal({
                   </div>
                 ) : previewUrl ? (
                   <div className="p-3 bg-surface-1 rounded-card shadow-sm border border-line/80 flex items-center justify-center">
-                    <img 
-                      src={previewUrl} 
-                      alt="Vista previa del QR" 
+                    <img
+                      src={previewUrl}
+                      alt="Vista previa del QR"
                       className="max-h-[210px] max-w-full object-contain rounded-lg"
                     />
                   </div>
@@ -120,14 +120,14 @@ export default function QRModal({
 
               {/* Botones de Descarga */}
               <div className="pt-2 grid grid-cols-1 gap-2.5">
-                <button 
+                <button
                   onClick={() => onDownloadLabel(bien, false)}
                   className="w-full h-10 px-5 rounded-control bg-zinc-900 hover:bg-zinc-800 dark:bg-surface-1 dark:hover:bg-surface-3 text-white dark:text-content-1 text-[13px] font-bold motion flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   <i className="fa-solid fa-download"></i> Descargar Etiqueta Completa (PNG)
                 </button>
 
-                <button 
+                <button
                   onClick={() => onDownloadSimpleQR(bien, false)}
                   className="w-full h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion border border-line dark:border-zinc-800 flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
@@ -144,13 +144,13 @@ export default function QRModal({
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <button 
+                <button
                   onClick={onBulkLabelZip}
                   className="py-3 px-4 h-10 rounded-control bg-zinc-900 hover:bg-zinc-800 dark:bg-surface-1 dark:hover:bg-surface-3 text-white dark:text-content-1 text-[13px] font-bold motion flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   <i className="fa-solid fa-file-zipper"></i> Descargar Etiquetas ZIP
                 </button>
-                <button 
+                <button
                   onClick={onBulkSimpleZip}
                   className="py-3 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion border border-line dark:border-zinc-800 flex items-center justify-center gap-2 cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >

@@ -46,7 +46,7 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
           {errores.length > 0 && (
             <div className="space-y-2">
               <p className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Filas con errores (Descartadas):</p>
-              <div className="bg-surface-1 dark:bg-zinc-950 border border-rose-200 dark:border-rose-900/40 rounded-card p-4 max-h-40 overflow-y-auto space-y-1">
+              <div className="bg-surface-1 dark:bg-surface-2 border border-rose-200 dark:border-rose-900/40 rounded-card p-4 max-h-40 overflow-y-auto space-y-1">
                 {errores.map((err, idx) => (
                   <div key={idx} className="text-xs text-danger dark:text-rose-400 font-mono tabular-nums">
                     • Fila {err.linea}: {err.motivo}
@@ -60,7 +60,7 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
           {validos.length > 0 && (
             <div className="space-y-2">
               <p className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Vista previa de registros válidos:</p>
-              <div className="bg-surface-1 dark:bg-zinc-950 border border-line dark:border-zinc-800 rounded-card p-4 max-h-40 overflow-y-auto space-y-1">
+              <div className="bg-surface-1 dark:bg-surface-2 border border-line dark:border-zinc-800 rounded-card p-4 max-h-40 overflow-y-auto space-y-1">
                 {validos.slice(0, 10).map((v, idx) => (
                   <div key={idx} className="text-xs text-content-1 dark:text-content-3 font-medium flex justify-between gap-3">
                     <span className="truncate">{v.rotulo || v.cedula} - {v.descripcion || v.nombre}</span>

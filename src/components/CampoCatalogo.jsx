@@ -119,7 +119,7 @@ export default function CampoCatalogo({
                         className={`${STYLES.input} py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${faltaCodigo ? 'border-amber-400/80 dark:border-amber-500/50' : ''}`}
                     />
                     {abierto && listado.length > 0 && (
-                        <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl py-1 animate-pop">
+                        <div ref={listaRef} className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 max-h-60 overflow-y-auto custom-scrollbar rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-1 shadow-2xl py-1 animate-pop">
                             {listado.map((o, i) => (
                                 <button
                                     key={`${o.nombre}-${i}`}
@@ -145,7 +145,7 @@ export default function CampoCatalogo({
                         </div>
                     )}
                     {abierto && listado.length === 0 && (
-                        <div className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-xl px-3.5 py-2.5 animate-pop">
+                        <div className="absolute left-0 w-auto min-w-[260px] top-full z-40 mt-1 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-1 shadow-xl px-3.5 py-2.5 animate-pop">
                             <p className="text-[11px] font-medium text-content-3 dark:text-content-3">
                                 Sin coincidencias — podés escribirlo y cargar el código.
                             </p>

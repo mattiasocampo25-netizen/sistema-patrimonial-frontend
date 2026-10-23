@@ -306,7 +306,7 @@ export default function AuditoriaView({
               <button
                 key={o.id}
                 onClick={() => setAlcanceAud(o.id)}
-                className={`h-8 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer truncate max-w-[160px] ${alcanceAud === o.id ? 'bg-surface-1 dark:bg-zinc-800 text-content-1 dark:text-white shadow-sm' : 'text-content-3 dark:text-content-3 hover:text-content-1 dark:hover:text-zinc-200'}`}
+                className={`h-8 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer truncate max-w-[160px] ${alcanceAud === o.id ? 'bg-surface-1 dark:bg-surface-3 text-content-1 dark:text-white shadow-sm' : 'text-content-3 dark:text-content-3 hover:text-content-1 dark:hover:text-zinc-200'}`}
                 title={o.id === 'dep' ? 'Solo eventos de esta dependencia' : 'Eventos de todas las dependencias'}
               >
                 {o.label}

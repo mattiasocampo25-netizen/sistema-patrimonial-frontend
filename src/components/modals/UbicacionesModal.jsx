@@ -48,7 +48,7 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
               onChange={(e) => setNuevo(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
               placeholder="Nueva ubicación... Ej: Dirección General TIC"
-              className="flex-1 rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 h-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
+              className="flex-1 rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 h-11 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
             />
             <button
               onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim()); setNuevo(''); } }}
@@ -80,7 +80,7 @@ export default function UbicacionesModal({ isOpen, onClose, ubicaciones, conteos
                           if (e.key === 'Enter' && editNombre.trim()) { onSave(u.id, editNombre.trim()); setEditId(null); }
                           if (e.key === 'Escape') setEditId(null);
                         }}
-                        className="flex-1 rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-3 h-9 text-sm font-medium text-content-1 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+                        className="flex-1 rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 px-3 h-9 text-sm font-medium text-content-1 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
                       />
                       <button
                         onClick={() => { if (editNombre.trim()) { onSave(u.id, editNombre.trim()); setEditId(null); } }}

@@ -106,12 +106,12 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
       {!rect && <div className="absolute inset-0 bg-[#050814]/70" onClick={onClose} />}
 
       <div
-        className={`absolute z-10 rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${ esMovil || !rect ? 'inset-x-4 bottom-4' : '' }`}
+        className={`absolute z-10 rounded-panel bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-700 shadow-2xl p-5 animate-slide-up ${ esMovil || !rect ? 'inset-x-4 bottom-4' : '' }`}
         style={esMovil || !rect ? { maxHeight: '70vh', overflowY: 'auto' } : { ...cardStyle, maxHeight: '60vh', overflowY: 'auto' }}
         role="dialog" aria-label={`Paso ${paso + 1} de ${pasos.length}`}
       >
         {caret && !caret.abajo && (
-          <span className="absolute -top-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-zinc-900 border-l border-t border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
+          <span className="absolute -top-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-surface-1 border-l border-t border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
         )}
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-text dark:text-brand mb-1.5">
           Paso {paso + 1} de {pasos.length}
@@ -140,7 +140,7 @@ export default function TourGuiado({ pasos, paso, setPaso, onClose, irTab }) {
           </button>
         </div>
         {caret && caret.abajo && (
-          <span className="absolute -bottom-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-zinc-900 border-r border-b border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
+          <span className="absolute -bottom-[7px] h-3.5 w-3.5 rotate-45 bg-surface-1 dark:bg-surface-1 border-r border-b border-line dark:border-zinc-700" style={{ left: caret.x - 7 }}></span>
         )}
       </div>
     </div>

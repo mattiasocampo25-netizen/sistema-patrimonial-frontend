@@ -190,7 +190,9 @@ export default function FiltroCombo({
               className="w-full h-10 pl-10 pr-3 text-[13px] font-medium outline-none bg-transparent text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal"
             />
           </div>
-          <div style={{ maxHeight: Math.max(72, popupStyle.maxHeight - 44) }} className="overflow-y-auto custom-scrollbar py-1">
+          {/* Reserva espacio para el buscador y el pie. Antes la lista podía
+              ocupar más que el popup y quedar cortada contra el footer del modal. */}
+          <div style={{ maxHeight: Math.max(48, popupStyle.maxHeight - 68) }} className="overflow-y-auto custom-scrollbar py-1">
             <button
               type="button"
               onClick={() => elegir('')}

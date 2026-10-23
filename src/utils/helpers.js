@@ -36,13 +36,32 @@ export const colorPorDependencia = (dependencia) => {
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
   return `hsl(${h}, 65%, 45%)`;
 };
-export const normalizeStr = (str) => 
+export const normalizeStr = (str) =>
   String(str || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .trim()
     .toUpperCase()
     .replace(/\s+/g, ' ');
+
+// Repara texto UTF-8 que fue interpretado como Windows-1252/Latin-1 al
+// importar datos antiguos (por ejemplo, "PedagÃ³gicas"). Solo se aplica al
+// presentar el texto; no cambia los valores guardados ni toca cadenas válidas.
+export const repairMojibake = (value) => {
+  const text = String(value ?? '');
+  if (!/(?:Ã[\u0080-\u00bf]|Â[\u0080-\u00bf]|â[\u0080-\u00bf]{1,2})/.test(text)) return text;
+  try {
+    const bytes = Uint8Array.from(text, (char) => {
+      const code = char.charCodeAt(0);
+      if (code > 0xff) throw new Error('Not a single-byte mojibake sequence');
+      return code;
+    });
+    const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    return decoded.includes('\uFFFD') ? text : decoded;
+  } catch {
+    return text;
+  }
+};
 
 // Versión de RESBALDO del sistema.
 //
@@ -161,19 +180,19 @@ export const decodeText = (buffer) => {
     return text;
 };
 
-export const getPlaceholderLogo = () => { 
-    const canvas = document.createElement('canvas'); 
-    canvas.width = 200; 
-    canvas.height = 200; 
-    const ctx = canvas.getContext('2d'); 
-    ctx.fillStyle = '#ffffff'; 
-    ctx.fillRect(0,0,200,200); 
-    ctx.fillStyle = '#121212'; 
-    ctx.font = 'bold 40px sans-serif'; 
-    ctx.textAlign = 'center'; 
-    ctx.fillText('LOGO', 100, 115); 
-    ctx.lineWidth = 4; 
-    ctx.strokeRect(0,0,200,200); 
+export const getPlaceholderLogo = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,200,200);
+    ctx.fillStyle = '#121212';
+    ctx.font = 'bold 40px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('LOGO', 100, 115);
+    ctx.lineWidth = 4;
+    ctx.strokeRect(0,0,200,200);
     return canvas.toDataURL('image/png');
  };
 export const convertirImagenABase64 = async (url) => {

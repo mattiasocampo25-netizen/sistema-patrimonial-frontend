@@ -41,7 +41,7 @@ export default class ErrorBoundary extends React.Component {
 
     return (
       <div className="min-h-dvh flex items-center justify-center bg-[#0a1c38] px-6 font-sans">
-        <div className="w-full max-w-md rounded-panel bg-surface-1 dark:bg-zinc-900 p-8 sm:p-10 shadow-2xl border border-line dark:border-zinc-800 text-center animate-slide-up">
+        <div className="w-full max-w-md rounded-panel bg-surface-1 dark:bg-surface-1 p-8 sm:p-10 shadow-2xl border border-line dark:border-zinc-800 text-center animate-slide-up">
           <div className="h-14 w-14 rounded-card bg-amber-500/10 text-warn border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
             <i className="fa-solid fa-triangle-exclamation text-xl"></i>
           </div>

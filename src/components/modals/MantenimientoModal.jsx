@@ -41,7 +41,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
           <button
             type="button"
             onClick={() => setActivo(!activo)}
-            className="flex w-full items-center justify-between rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="flex w-full items-center justify-between rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <span className="flex items-center gap-3">
               <span className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${activo ? 'bg-amber-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}>
@@ -60,7 +60,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ej: Estamos mejorando el sistema"
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
             />
           </div>
 
@@ -71,7 +71,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
               placeholder="Ej: El acceso está pausado por trabajos programados..."
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
           </div>
 
@@ -82,7 +82,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               value={mejoras}
               onChange={(e) => setMejoras(e.target.value)}
               placeholder={"Ej:\nNuevo buscador con tildes\nReportes FC más rápidos"}
-              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
+              className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
           </div>
         </div>

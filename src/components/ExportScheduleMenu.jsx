@@ -50,7 +50,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
       {abierto && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setAbierto(false)}></div>
-          <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-xl p-3 animate-pop">
+          <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-1 shadow-xl p-3 animate-pop">
             <p className="px-1 pb-2 text-[10px] font-bold uppercase tracking-widest text-content-3 flex items-center gap-1.5">
               <i className="fa-solid fa-calendar-clock"></i> Exportación programada
             </p>

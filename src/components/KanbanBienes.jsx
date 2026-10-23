@@ -96,7 +96,7 @@ export default function KanbanBienes({ bienes, onMover, onOpenFicha, isAdmin }) 
                     draggable={Boolean(onMover)}
                     onDragStart={() => setDragId(b.id)}
                     onDragEnd={() => { setDragId(null); setColActiva(null); }}
-                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-zinc-900/60 p-2.5 shadow-xs motion ${dragId === b.id ? 'opacity-40' : 'hover:border-brand/40 hover:shadow-sm card-lift'}`}
+                    className={`group rounded-control border border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1/60 p-2.5 shadow-xs motion ${dragId === b.id ? 'opacity-40' : 'hover:border-brand/40 hover:shadow-sm card-lift'}`}
                   >
                     <div className="flex items-start gap-2">
                       {onOpenFicha && (

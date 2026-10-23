@@ -220,7 +220,7 @@ export default function LoginScreen({
             <p className="text-sm text-content-2 dark:text-content-3 font-medium mt-2 leading-relaxed">
               Para restablecer tu contraseña, solicita ayuda al equipo de soporte patrimonial. Incluye tu nombre de usuario para identificar la cuenta.
             </p>
-            <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-zinc-800/50 border border-line dark:border-line text-[11px] font-bold text-content-1 dark:text-content-3">
+            <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-surface-3/50 border border-line dark:border-line text-[11px] font-bold text-content-1 dark:text-content-3">
               <i className="fa-solid fa-envelope mr-2 text-brand-text dark:text-blue-400" aria-hidden="true"></i>
               <a href="mailto:patrimonio@unp.edu.py?subject=Recuperar%20acceso%20al%20sistema" className="text-brand-text underline-offset-2 hover:underline dark:text-brand">patrimonio@unp.edu.py</a>
             </div>

@@ -33,7 +33,7 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                                 type="text"
                                 disabled
                                 value={formatCI(funcionarioToEdit.cedula)}
-                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-3 dark:bg-zinc-950 px-4 py-3 text-sm font-bold tabular-nums text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-3 dark:bg-surface-2 px-4 py-3 text-sm font-bold tabular-nums text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                             />
                         </div>
 
@@ -44,7 +44,7 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                                 name="nombre"
                                 defaultValue={funcionarioToEdit.nombre}
                                 required
-                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
+                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-surface-2 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
                             />
                         </div>
 
@@ -71,7 +71,7 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                                 name="cargo"
                                 defaultValue={funcionarioToEdit.cargo || ''}
                                 placeholder="Ej: Asistente Administrativo"
-                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
+                                className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-surface-2 px-4 py-3 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
                             />
                         </div>
                     </div>

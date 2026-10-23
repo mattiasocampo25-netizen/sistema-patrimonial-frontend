@@ -7,13 +7,13 @@ import FiltroCombo from './FiltroCombo';
 export default function BienModal({
     setIsBienModalOpen,
     bienEditing,
-    
+
     bienFormRef,
     saveBien,
     isSaving,
-    
+
     ESTADOS_CONSERVACION,
-    
+
     ubicacionesUnicas,
     funcionariosPadron = [],
     ubicaciones = [],
@@ -216,7 +216,7 @@ export default function BienModal({
     return (
         <Dialogo className={STYLES.modalOverlay}>
           <div className={STYLES.modalContent + " max-w-4xl overflow-hidden"}>
-            
+
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
               <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ export default function BienModal({
                  <i className="fa-solid fa-xmark text-base"></i>
               </button>
             </div>
-            
+
             {esNuevo && hayBorrador && !restaurado && (
               <div className="mx-8 mt-6 mb-0 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
                 <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
@@ -248,11 +248,11 @@ export default function BienModal({
                 <button type="button" onClick={limpiarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
               </div>
             )}
-            <form key={formKey} ref={bienFormRef} onSubmit={async (e) => { const ok = await saveBien(e, false); if (ok) limpiarBorrador(); }} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-zinc-950">
+            <form key={formKey} ref={bienFormRef} onSubmit={async (e) => { const ok = await saveBien(e, false); if (ok) limpiarBorrador(); }} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
               <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
-                
+
                 {/* 1. IMPUTACIÓN CONTABLE Y RÓTULO */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-zinc-900/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
                   <div className="flex items-center gap-2 mb-4">
                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">1</span>
                      <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Imputación y Código Patrimonial</h3>
@@ -289,7 +289,7 @@ export default function BienModal({
                 </div>
 
                 {/* 2. IDENTIFICACIÓN FÍSICA Y ESTADO */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-zinc-900/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
                   <div className="flex items-center gap-2 mb-4">
                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">2</span>
                      <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Especificaciones del Activo</h3>
@@ -308,7 +308,7 @@ export default function BienModal({
                       placeholder="Escribe y elige una descripción similar para autocompletar cuenta y valores..."
                     ></textarea>
                     {showDescDropdown && sugerenciasDesc.length > 0 && (
-                      <div className="absolute left-0 right-0 top-full mt-1.5 z-30 max-h-56 overflow-y-auto rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl py-1 custom-scrollbar">
+                      <div className="absolute left-0 right-0 top-full mt-1.5 z-30 max-h-56 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-700 shadow-2xl py-1 custom-scrollbar">
                         <p className="px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Coincidencias — clic para autocompletar</p>
                         {sugerenciasDesc.map(b => (
                           <button
@@ -340,7 +340,7 @@ export default function BienModal({
                 </div>
 
                 {/* 3. VALORIZACIÓN Y CONTABILIDAD */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-zinc-900/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
                   <div className="flex items-center gap-2 mb-4">
                      <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">3</span>
                      <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Valor y Fecha de Incorporación</h3>
@@ -366,13 +366,13 @@ export default function BienModal({
                 </div>
 
                 {/* 4. ASIGNACIÓN, CUSTODIA Y UBICACIÓN */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-zinc-900/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
                   <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
                          <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">4</span>
                          <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Custodio y Ubicación</h3>
                       </div>
-                      
+
                       <label className="flex items-center gap-2 text-xs font-semibold text-content-2 dark:text-content-3 cursor-pointer">
                         <input type="checkbox" name="hasQR" defaultChecked={restaurado ? restaurado.hasQR === 'on' : bienEditing?.hasQR} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" />
                         <span>Etiqueta QR Impresa</span>
@@ -382,29 +382,29 @@ export default function BienModal({
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">C.I. Custodio</label>
-                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
+                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
                     </div>
                     <div className="md:col-span-2 relative" ref={custodioDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Custodio Designado (Nombre)</label>
-                        <input 
-                            name="funcionario" 
-                            value={custodioTexto} 
-                            onChange={handleCustodioChange} 
+                        <input
+                            name="funcionario"
+                            value={custodioTexto}
+                            onChange={handleCustodioChange}
                             onFocus={() => setShowCustodioDropdown(true)}
-                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} 
-                            placeholder="Escribe o selecciona custodio..." 
+                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                            placeholder="Escribe o selecciona custodio..."
                             autoComplete="off"
                         />
-                        
+
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && filteredCustodios.length > 0 && (
-                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
                                 {filteredCustodios.map((f) => (
                                     <button
                                         type="button"
                                         key={f.id || f.cedula}
                                         onClick={() => handleSelectCustodio(f)}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-surface-3/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                                     >
                                         <div className="min-w-0 pr-2">
                                             <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-text dark:group-hover:text-blue-400 truncate">
@@ -415,7 +415,7 @@ export default function BienModal({
                                             </p>
                                         </div>
                                         {f.cedula && (
-                                            <span className="shrink-0 text-[10px] font-mono tabular-nums bg-surface-3 dark:bg-zinc-800 text-content-2 dark:text-content-3 px-2 py-0.5 rounded-lg border border-line dark:border-zinc-700">
+                                            <span className="shrink-0 text-[10px] font-mono tabular-nums bg-surface-3 dark:bg-surface-3 text-content-2 dark:text-content-3 px-2 py-0.5 rounded-lg border border-line dark:border-zinc-700">
                                                 {f.cedula}
                                             </span>
                                         )}
@@ -429,32 +429,32 @@ export default function BienModal({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Cargo Funcional</label>
-                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-zinc-900/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
+                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
                     </div>
                     <div className="relative" ref={ubicacionDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Ubicación Operativa</label>
-                        <input 
-                            name="ubicacion" 
-                            value={ubicacionTexto} 
+                        <input
+                            name="ubicacion"
+                            value={ubicacionTexto}
                             onChange={(e) => {
                                 setUbicacionTexto(e.target.value);
                                 setShowUbicacionDropdown(true);
                             }}
                             onFocus={() => setShowUbicacionDropdown(true)}
-                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} 
-                            placeholder="Oficina / Laboratorio..." 
+                            className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                            placeholder="Oficina / Laboratorio..."
                             autoComplete="off"
                         />
 
                         {/* Custom Dropdown Ubicaciones */}
                         {showUbicacionDropdown && filteredUbicaciones.length > 0 && (
-                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
                                 {filteredUbicaciones.map((ub) => (
                                     <button
                                         type="button"
                                         key={ub}
                                         onClick={() => handleSelectUbicacion(ub)}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-zinc-800/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-surface-3/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                                     >
                                         <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-text dark:group-hover:text-blue-400 truncate">
                                             {ub}
@@ -472,27 +472,27 @@ export default function BienModal({
 
               {/* Footer Buttons */}
               <div className="flex justify-end items-center gap-2 px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0 z-10">
-                <button 
-                  type="button" 
-                  onClick={() => setIsBienModalOpen(false)} 
+                <button
+                  type="button"
+                  onClick={() => setIsBienModalOpen(false)}
                   className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                 >
                   Cancelar
                 </button>
 
                 {!esNuevo && (
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       disabled={isSaving}
-                      onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }} 
+                      onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }}
                       className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
                     >
                       + Guardar y Añadir Otro
                     </button>
                 )}
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isSaving}
                   className="inline-flex items-center justify-center h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
                 >

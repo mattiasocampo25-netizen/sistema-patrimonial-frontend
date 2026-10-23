@@ -27,7 +27,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                 onClick={onClose}
                 title="Cerrar" aria-label="Cerrar"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-              
+
                 <i className="fa-solid fa-xmark text-base"></i>
               </button>
             </div>
@@ -44,7 +44,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                       required
                       defaultValue={usuarioEditing?.username}
                       disabled={!!usuarioEditing}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${usuarioEditing ? 'bg-surface-3 dark:bg-zinc-900/80 cursor-not-allowed text-content-3' : ''}`}
+                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${usuarioEditing ? 'bg-surface-3 dark:bg-surface-1/80 cursor-not-allowed text-content-3' : ''}`}
                       placeholder="Ej. mocampo"
                     />
                   </div>

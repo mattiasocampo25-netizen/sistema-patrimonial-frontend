@@ -158,7 +158,7 @@ export default function DependenciasModal({
               <input
                 type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Buscar dependencia, departamento o funcionario..."
-                className="rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 w-64"
+                className="rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 w-64"
               />
             </div>
             <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
@@ -173,7 +173,7 @@ export default function DependenciasModal({
             <input
               type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
               placeholder="Buscar..."
-              className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
           </div>
         </div>
@@ -202,12 +202,12 @@ export default function DependenciasModal({
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   placeholder="Nueva dependencia..."
-                  className="flex-1 min-w-[110px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-zinc-950 px-3 h-9 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 dark:placeholder:text-content-3 outline-none focus:border-brand focus:ring-1 focus:ring-brand"
+                  className="flex-1 min-w-[110px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-surface-2 px-3 h-9 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 dark:placeholder:text-content-3 outline-none focus:border-brand focus:ring-1 focus:ring-brand"
                 />
                 <input
                   type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
                   placeholder="Código"
-                  className="min-w-[56px] max-w-[92px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold text-center text-content-1 dark:text-white outline-none focus:border-brand focus:ring-1 focus:ring-brand"
+                  className="min-w-[56px] max-w-[92px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-surface-2 px-2 h-9 text-[10px] font-mono font-bold text-center text-content-1 dark:text-white outline-none focus:border-brand focus:ring-1 focus:ring-brand"
                 />
                 <button
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
@@ -269,7 +269,7 @@ export default function DependenciasModal({
                             if (e.key === 'Enter' && editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); }
                             if (e.key === 'Escape') setEditandoDep(false);
                           }}
-                          className="rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-3 h-9 text-sm font-bold outline-none focus:border-brand min-w-0"
+                          className="rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 px-3 h-9 text-sm font-bold outline-none focus:border-brand min-w-0"
                         />
                         <input
                           type="text" value={editDepCod}
@@ -279,7 +279,7 @@ export default function DependenciasModal({
                             if (e.key === 'Escape') setEditandoDep(false);
                           }}
                           placeholder="Cód."
-                          className="min-w-[56px] rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand text-center"
+                          className="min-w-[56px] rounded-control border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 px-2 h-9 text-[10px] font-mono font-bold outline-none focus:border-brand text-center"
                         />
                         <button onClick={() => { if (editDepNombre.trim()) { onSave(depSel.id, editDepNombre.trim(), editDepCod.trim()); setEditandoDep(false); } }} title="Guardar" aria-label="Guardar" className="flex h-9 w-9 items-center justify-center rounded-control bg-brand text-content-inverse cursor-pointer shrink-0 transition-colors">
                           <i className="fa-solid fa-check text-xs"></i>
@@ -365,7 +365,7 @@ export default function DependenciasModal({
                     <input
                       type="text" value={buscaFunc} onChange={(e) => setBuscaFunc(e.target.value)}
                       placeholder="Buscar funcionario por nombre o cédula..."
-                      className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-content-3"
+                      className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-content-3"
                     />
                   </div>
                   <div className="max-h-56 overflow-y-auto custom-scrollbar rounded-card border border-line/60 dark:border-white/10 divide-y divide-zinc-100 dark:divide-white/5">
@@ -437,7 +437,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
                 if (e.key === 'Enter' && editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); }
                 if (e.key === 'Escape') onTerminarEditar();
               }}
-              className="flex-1 rounded-lg border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 h-8 text-xs font-medium outline-none focus:border-brand"
+              className="flex-1 rounded-lg border border-line-strong dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 px-2 h-8 text-xs font-medium outline-none focus:border-brand"
             />
             <button onClick={() => { if (editNombre.trim()) { onGuardarUbicacion(u.id, editNombre.trim(), depNombre); onTerminarEditar(); } }} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-content-inverse cursor-pointer shrink-0 transition-colors">
               <i className="fa-solid fa-check text-[10px]"></i>
@@ -511,7 +511,7 @@ function ComboFuncionarios({ candidatos, excluirUbicacion, onElegir, titulo }) {
           Asignar funcionario ({candidatos.filter(f => normalizeStr(f.ubicacion || '') !== normExcluir).length} disponibles)...
         </button>
       ) : (
-        <div className="rounded-lg border border-line-strong dark:border-zinc-600 bg-surface-1 dark:bg-zinc-950 overflow-hidden">
+        <div className="rounded-lg border border-line-strong dark:border-zinc-600 bg-surface-1 dark:bg-surface-2 overflow-hidden">
           <div className="relative">
             <i className="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-content-3 text-[10px] pointer-events-none"></i>
             <input
@@ -577,13 +577,13 @@ function ComboUbicacion({ valor, ubicaciones, onElegir, titulo, compacto }) {
       <button
         onClick={() => { setTexto(''); setAbierto(v => !v); }}
         title={titulo}
-        className="w-full h-8 rounded-lg border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 px-2 text-[11px] font-semibold text-content-2 dark:text-content-3 outline-none cursor-pointer flex items-center gap-1.5 hover:border-line-strong focus-visible:ring-2 focus-visible:ring-brand"
+        className="w-full h-8 rounded-lg border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 px-2 text-[11px] font-semibold text-content-2 dark:text-content-3 outline-none cursor-pointer flex items-center gap-1.5 hover:border-line-strong focus-visible:ring-2 focus-visible:ring-brand"
       >
         <span className="flex-1 min-w-0 truncate text-left">{actual ? actual.nombre : 'Sin ubicación'}</span>
         <i className="fa-solid fa-chevron-down text-[9px] text-content-3 shrink-0"></i>
       </button>
       {abierto && (
-        <div className="absolute right-0 z-30 mt-1 w-56 rounded-control border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-950 shadow-xl overflow-hidden">
+        <div className="absolute right-0 z-30 mt-1 w-56 rounded-control border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-2 shadow-xl overflow-hidden">
           <input
             autoFocus
             type="text" value={texto} onChange={(e) => setTexto(e.target.value)}

@@ -161,7 +161,7 @@ export default function AppModals({
   confirmBackupModal,
   setConfirmBackupModal,
   handleExportBackupGeneral,
-  
+
   pendingCSVImport,
   setPendingCSVImport,
   fileInputRef,
@@ -194,7 +194,7 @@ export default function AppModals({
   return (
     <>
           {isCSVPreviewOpen && (
-              <CSVPreviewModal 
+              <CSVPreviewModal
                   isOpen={isCSVPreviewOpen}
                   onClose={() => setIsCSVPreviewOpen(false)}
                   onConfirm={() => { if (csvPreviewData?.tipo === 'bienes' && csvPreviewData?.file) executeProcessBienesCSV(csvPreviewData.file); else confirmCSVImportFuncionarios(); }}
@@ -203,7 +203,7 @@ export default function AppModals({
               />
           )}
           {/* ... demás modales ... */}
-          <FuncionarioModal 
+          <FuncionarioModal
         isOpen={isFuncionarioModalOpen}
         onClose={() => setIsFuncionarioModalOpen(false)}
         funcionarioToEdit={funcionarioToEdit}
@@ -211,7 +211,7 @@ export default function AppModals({
         ubicaciones={ubicacionesDep}
         STYLES={STYLES}
     />
-          <ScannerModal 
+          <ScannerModal
         isOpen={isScannerOpen}
         onClose={() => {
             setIsScannerOpen(false);
@@ -235,7 +235,7 @@ export default function AppModals({
               STYLES={STYLES}
             />
           )}
-          <QRModal 
+          <QRModal
         isOpen={isQRModalOpen}
         onClose={() => setIsQRModalOpen(false)}
         isBulk={isBulkQR}
@@ -248,9 +248,9 @@ export default function AppModals({
     />
           {isFC03ModalOpen && (
             <Dialogo className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md overflow-hidden border border-line/80 dark:border-zinc-800 shadow-2xl bg-surface-1 dark:bg-zinc-900 animate-slide-up"}>
+              <div className={STYLES.modalContent + " max-w-md overflow-hidden border border-line/80 dark:border-zinc-800 shadow-2xl bg-surface-1 dark:bg-surface-1 animate-slide-up"}>
                 {/* CABECERA LIMPIA */}
-                <div className="relative px-6 sm:px-8 py-6 border-b border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 flex justify-between items-center">
+                <div className="relative px-6 sm:px-8 py-6 border-b border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-surface-1 shrink-0 z-10 flex justify-between items-center">
                   <div className="flex items-center gap-4">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
                        <i className="fa-solid fa-file-pdf text-lg"></i>
@@ -265,7 +265,7 @@ export default function AppModals({
                   </button>
                 </div>
                 {/* CUERPO DEL MODAL */}
-                <div className="p-8 space-y-6 pb-24 bg-surface-1 dark:bg-zinc-900">
+                <div className="p-8 space-y-6 pb-24 bg-surface-1 dark:bg-surface-1">
                     <div className="space-y-2">
                         <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Tipo de Reporte</label>
                         <FiltroCombo
@@ -283,7 +283,7 @@ export default function AppModals({
                             etiquetaTodos="General (Toda la Dependencia)"
                             titulo="Tipo de reporte"
                         />
-                    </div>               
+                    </div>
                     {fc03Config.tipoFiltro === 'ubicacion' && (
                         <div className="space-y-2 animate-fade-in">
                             <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Seleccionar Ubicación</label>
@@ -296,10 +296,10 @@ export default function AppModals({
                                 className="w-full"
                             />
                         </div>
-                    )}               
+                    )}
                     {fc03Config.tipoFiltro === 'funcionario' && (() => {
                         const depFuncionarios = funcionariosPadron.filter(f => f.dependencia === dependenciaActual);
-                        const listadoFiltrado = depFuncionarios.filter(f => 
+                        const listadoFiltrado = depFuncionarios.filter(f =>
                             matchSearchWords(`${f.cedula} ${f.nombre}`, fc03FuncionarioTexto)
                         );
 
@@ -318,7 +318,7 @@ export default function AppModals({
 
                                 <div className="relative">
                                     <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-xs text-content-3 pointer-events-none"></i>
-                                    <input 
+                                    <input
                                         type="text"
                                         value={fc03FuncionarioTexto}
                                         onChange={(e) => {
@@ -331,7 +331,7 @@ export default function AppModals({
                                         }}
                                         onFocus={() => setShowFC03FuncDropdown(true)}
                                         placeholder="Escriba Marta Ocampo, apellido o CI..."
-                                        className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 pl-10 pr-10 py-3.5 text-sm font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner"
+                                        className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-surface-2 pl-10 pr-10 py-3.5 text-sm font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner"
                                     />
                                     {fc03FuncionarioTexto && (
                                         <button
@@ -351,11 +351,11 @@ export default function AppModals({
                                 {/* Dropdown flotante */}
                                 {showFC03FuncDropdown && (
                                     <>
-                                        <div 
-                                            className="fixed inset-0 z-40" 
-                                            onClick={() => setShowFC03FuncDropdown(false)} 
+                                        <div
+                                            className="fixed inset-0 z-40"
+                                            onClick={() => setShowFC03FuncDropdown(false)}
                                         />
-                                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/60 custom-scrollbar">
+                                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/60 custom-scrollbar">
                                             {listadoFiltrado.length === 0 ? (
                                                 <div className="p-4 text-center text-xs font-semibold text-content-3">
                                                     No se encontraron funcionarios coincidentes
@@ -372,7 +372,7 @@ export default function AppModals({
                                                                 setFc03FuncionarioTexto(f.nombre);
                                                                 setShowFC03FuncDropdown(false);
                                                             }}
-                                                            className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${ isSelected ? 'bg-amber-500/10 text-warn dark:text-amber-300 font-bold' : 'text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-zinc-800 font-medium' }`}
+                                                            className={`w-full text-left px-4 py-2.5 flex items-center justify-between text-xs transition-colors cursor-pointer ${ isSelected ? 'bg-amber-500/10 text-warn dark:text-amber-300 font-bold' : 'text-content-1 dark:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-3 font-medium' }`}
                                                         >
                                                             <div className="flex flex-col truncate pr-2">
                                                                 <span className="truncate">{f.nombre}</span>
@@ -393,13 +393,13 @@ export default function AppModals({
                     })()}
                     <div className="space-y-2">
                         <label className="block text-[11px] font-black text-content-3 dark:text-content-3 uppercase tracking-wider">Lugar de Emisión</label>
-                        <input type="text" className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-zinc-950 px-4 py-3.5 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner" value={fc03Config.lugar} onChange={e => setFc03Config({...fc03Config, lugar: e.target.value})} placeholder="Ej: Pilar" />
+                        <input type="text" className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2/50 dark:bg-surface-2 px-4 py-3.5 text-sm font-bold text-content-1 dark:text-white focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner" value={fc03Config.lugar} onChange={e => setFc03Config({...fc03Config, lugar: e.target.value})} placeholder="Ej: Pilar" />
                     </div>
                 </div>
                 {/* BOTONES DE ACCIÓN */}
-                <div className="flex justify-end gap-3 px-6 sm:px-8 py-5 border-t border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-zinc-900 shrink-0 z-10 rounded-b-[24px]">
+                <div className="flex justify-end gap-3 px-6 sm:px-8 py-5 border-t border-line dark:border-zinc-800/80 bg-surface-2/50 dark:bg-surface-1 shrink-0 z-10 rounded-b-[24px]">
                   <button onClick={() => setIsFC03ModalOpen(false)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3/70 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">Cancelar</button>
-                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold motion focus-visible:ring-2 focus-visible:ring-brand/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-content-3 bg-surface-3 dark:bg-zinc-800 dark:text-content-3 cursor-not-allowed opacity-60' : 'text-content-inverse bg-brand hover:bg-brand-hover shadow-md shadow-brand/25 cursor-pointer'}`}>
+                  <button onClick={executeGenerateFC03} disabled={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor} title={fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'Seleccione una ubicación o funcionario para generar el reporte' : 'Generar reporte PDF'} className={`inline-flex items-center justify-center gap-2 h-10 px-5 rounded-control text-[13px] font-bold motion focus-visible:ring-2 focus-visible:ring-brand/40 outline-none ${fc03Config.tipoFiltro !== 'general' && !fc03Config.filtroValor ? 'text-content-3 bg-surface-3 dark:bg-surface-3 dark:text-content-3 cursor-not-allowed opacity-60' : 'text-content-inverse bg-brand hover:bg-brand-hover shadow-md shadow-brand/25 cursor-pointer'}`}>
                     <i className="fa-solid fa-file-pdf text-xs"></i> Generar Documento
                   </button>
                 </div>
@@ -407,7 +407,7 @@ export default function AppModals({
             </Dialogo>
           )}
           {isFC04ModalOpen && (
-              <FC04Modal 
+              <FC04Modal
                   setIsFC04ModalOpen={setIsFC04ModalOpen}
                   fc04Editing={fc04Editing}
                   saveFC04={saveFC04}
@@ -425,7 +425,7 @@ export default function AppModals({
               />
           )}
           {isFC10ModalOpen && (
-              <FC10Modal 
+              <FC10Modal
                   setIsFC10ModalOpen={setIsFC10ModalOpen}
                   fc10TargetBien={fc10TargetBien}
                   fc10Editing={fc10Editing}
@@ -439,7 +439,7 @@ export default function AppModals({
               />
           )}
           {isFC11ModalOpen && (
-              <FC11Modal 
+              <FC11Modal
                   setIsFC11ModalOpen={setIsFC11ModalOpen}
                   fc11TargetBien={fc11TargetBien}
                   fc11Editing={fc11Editing}
@@ -452,7 +452,7 @@ export default function AppModals({
                   STYLES={STYLES}
               />
           )}
-          <UsuarioModal 
+          <UsuarioModal
         isOpen={isUsuarioModalOpen && isAdmin}
         onClose={() => setIsUsuarioModalOpen(false)}
         usuarioEditing={usuarioEditing}
@@ -462,7 +462,7 @@ export default function AppModals({
         STYLES={STYLES}
     />
           {isBienModalOpen && (
-        <BienModal 
+        <BienModal
             setIsBienModalOpen={setIsBienModalOpen}
             bienEditing={bienEditing}
             bienFormRef={bienFormRef}
@@ -567,13 +567,13 @@ export default function AppModals({
             isSaving={isSavingMant}
             STYLES={STYLES}
           />
-          <LogoutModal 
-        isOpen={showLogoutConfirm} 
-        onClose={() => setShowLogoutConfirm(false)} 
-        onConfirm={handleLogout} 
-        STYLES={STYLES} 
+          <LogoutModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        STYLES={STYLES}
     />
-          <ResolucionBajaModal 
+          <ResolucionBajaModal
         resolucionBaja={resolucionBaja}
         setResolucionBaja={setResolucionBaja}
         submitResolucionBaja={submitResolucionBaja}
@@ -631,7 +631,7 @@ export default function AppModals({
         }
             return (
             <Dialogo className={STYLES.modalOverlay}>
-                <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+                <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-surface-1 border border-line dark:border-line shadow-2xl animate-slide-up"}>
 
                     <div className={`mx-auto flex h-12 w-12 items-center justify-center rounded-card mb-4 ${esSolicitud ? 'bg-amber-500/10 text-warn dark:text-amber-400' : 'bg-rose-500/10 text-danger dark:text-rose-400'}`}>
                         <i className={`fa-solid ${esSolicitud ? 'fa-paper-plane' : 'fa-triangle-exclamation'} text-xl`}></i>
@@ -662,7 +662,7 @@ export default function AppModals({
                           value={motivoSolicitudBaja}
                           onChange={(e) => setMotivoSolicitudBaja(e.target.value)}
                           placeholder={esFunc ? 'Ej: Renuncia, traslado definitivo, jubilación...' : 'Ej: Avería irreparable, rotura física, obsolescencia, desuso...'}
-                          className="block w-full rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-zinc-950 p-3.5 text-xs font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-zinc-900 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner resize-none"
+                          className="block w-full rounded-card border border-line dark:border-line bg-surface-2 dark:bg-surface-2 p-3.5 text-xs font-bold text-content-1 dark:text-white placeholder:text-content-3 placeholder:font-normal focus:bg-surface-1 dark:focus:bg-surface-1 focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none motion shadow-inner resize-none"
                         />
                       </div>
                     )}
@@ -690,7 +690,7 @@ export default function AppModals({
           {/* MODAL DE CONFIRMACIÓN DE BACKUP GENERAL */}
           {confirmBackupModal && (
             <Dialogo className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-database text-xl"></i>
                 </div>
@@ -725,14 +725,14 @@ export default function AppModals({
           {/* MODAL DE CONFIRMACIÓN DE IMPORTACIÓN MASIVA CSV */}
           {pendingCSVImport && (
             <Dialogo className={STYLES.modalOverlay}>
-              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
+              <div className={STYLES.modalContent + " max-w-md p-6 sm:p-8 text-center bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl animate-slide-up"}>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white mb-4">
                   <i className="fa-solid fa-file-csv text-xl"></i>
                 </div>
                 <h3 className="text-lg font-bold tracking-tight text-content-1 dark:text-white mb-2">
                   ¿Confirmar Importación Masiva?
                 </h3>
-                <div className="bg-surface-2 dark:bg-zinc-800/50 p-4 rounded-card border border-line/60 dark:border-zinc-700/60 text-left mb-6 space-y-1.5">
+                <div className="bg-surface-2 dark:bg-surface-3/50 p-4 rounded-card border border-line/60 dark:border-zinc-700/60 text-left mb-6 space-y-1.5">
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider">Archivo seleccionado:</p>
                   <p className="text-xs font-mono font-bold text-content-1 dark:text-zinc-200 truncate">{pendingCSVImport.file?.name}</p>
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider pt-1">Destino:</p>
@@ -742,7 +742,7 @@ export default function AppModals({
                   Los registros serán validados para evitar duplicados e incorporados a la base de datos oficial. ¿Desea proceder con la carga?
                 </p>
                 <div className="flex gap-3 justify-end">
-                  <button 
+                  <button
                     onClick={() => {
                       if (fileInputRef.current) fileInputRef.current.value = '';
                       if (fileInputFuncionariosRef.current) fileInputFuncionariosRef.current.value = '';
@@ -809,7 +809,7 @@ export default function AppModals({
                 </div>
             </Dialogo>
           )}
-          <ConsolidadoFC10Modal 
+          <ConsolidadoFC10Modal
         isOpen={isConsolidatedFC10ModalOpen}
         onClose={() => setIsConsolidatedFC10ModalOpen(false)}
         bienes={bienes}
@@ -818,7 +818,7 @@ export default function AppModals({
         handleGenerateConsolidatedFC10PDF={handleGenerateConsolidatedFC10PDF}
         STYLES={STYLES}
     />
-          <NuevoFuncionarioModal 
+          <NuevoFuncionarioModal
         isOpen={isNewFuncionarioModalOpen}
         onClose={() => setIsNewFuncionarioModalOpen(false)}
         onSave={handleSaveManualFuncionario}
@@ -826,7 +826,7 @@ export default function AppModals({
         ubicaciones={ubicacionesDep}
         STYLES={STYLES}
     />
-          <UnsavedChangesModal 
+          <UnsavedChangesModal
             isOpen={showUnsavedChangesModal}
             onConfirmClose={() => {
               setShowUnsavedChangesModal(false);
@@ -837,7 +837,7 @@ export default function AppModals({
             onCancel={() => setShowUnsavedChangesModal(false)}
             STYLES={STYLES}
           />
-          <DependenciaConfirmModal 
+          <DependenciaConfirmModal
               showDependenciaConfirm={showDependenciaConfirm}
               setShowDependenciaConfirm={setShowDependenciaConfirm}
               confirmDependenciaChange={confirmDependenciaChange}

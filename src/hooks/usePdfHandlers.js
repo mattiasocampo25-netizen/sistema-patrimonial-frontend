@@ -565,36 +565,37 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     }
   };
 
-  const handleExportInventarioCSV = () => {
-      if (filteredBienes.length === 0) return notify("No hay bienes para exportar", "warning");
+  const handleExportInventarioCSV = (registros = filteredBienes) => {
+      if (!registros.length) return notify("No hay bienes para exportar", "warning");
       setIsProcessing({ active: true, text: 'Generando Reporte Excel...' });
       setTimeout(() => {
           let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
-          filteredBienes.forEach(b => {
+          const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
+          registros.forEach(b => {
               const row = [
                   b.cuenta || '-', b.subcuenta || '-', b.analitico1 || '-', b.analitico2 || '-',
-                  b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`,
+                  b.rotulo || '-', b.descripcion || '',
                   b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-',
                   formatDateText(b.fechaAdquisicion) || '-', b.valorUnitario || '0',
                   b.estadoConservacion || '-', b.vidaUtil || '-',
                   b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
-              ];
-              csvContent += row.join(';') + "\n";
+              ].map(celda);
+              csvContent += row.join(';') + "\r\n";
           });
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          if (window.saveAs) window.saveAs(blob, `Reporte_Inventario_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+          if (window.saveAs) window.saveAs(blob, `Inventario${registros.length !== filteredBienes.length ? '_Seleccion' : ''}_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
           setIsProcessing({ active: false, text: '' });
           notify("Reporte Excel descargado exitosamente", "success");
       }, 100);
   };
 
-  const handleExportInventarioExcel = () => {
-      if (filteredBienes.length === 0) return notify("No hay bienes para exportar", "warning");
+  const handleExportInventarioExcel = (registros = filteredBienes) => {
+      if (!registros.length) return notify("No hay bienes para exportar", "warning");
       if (!window.XLSX) return notify("Cargando librería Excel, intenta de nuevo...", "warning");
       setIsProcessing({ active: true, text: 'Generando Excel...' });
       setTimeout(() => {
           try {
-              const filas = filteredBienes.map(b => ({
+          const filas = registros.map(b => ({
                   'Cuenta': b.cuenta || '-', 'Subcuenta': b.subcuenta || '-',
                   'Analítico 1': b.analitico1 || '-', 'Analítico 2': b.analitico2 || '-',
                   'Rótulo': b.rotulo || '-', 'Descripción': b.descripcion || '-',

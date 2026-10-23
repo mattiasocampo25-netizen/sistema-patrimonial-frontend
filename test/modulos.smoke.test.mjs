@@ -223,8 +223,8 @@ describe('smoke por modulo', () => {
   test('modulo FC-10: renderiza y abre el consolidado', async () => {
     await entrar();
     await app.clickTour('nav-fc10');
-    await app.esperar('Actas de Responsabilidad', 3000);
-    assert.ok(app.tiene('Actas de Responsabilidad'), 'debe mostrar el modulo FC-10');
+    await app.esperar('Historial de actas (FC-10)', 3000);
+    assert.ok(app.tiene('Historial de actas (FC-10)'), 'debe mostrar el modulo FC-10');
 
     await app.clickSiExiste('FC-10 Consolidado');
     assert.ok(await app.hayDialogo(), 'debe abrir el consolidado');

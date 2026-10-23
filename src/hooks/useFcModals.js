@@ -506,7 +506,15 @@ export function useFcModals({
         let res;
         const payload = conSello({ id: bienData.id, data: bienData });
         if (esEdicion) {
-            res = await supabase.from('bens').update(payload).eq('id', bienData.id);
+            let update = supabase.from('bens').update(payload).eq('id', bienData.id);
+            // Evita sobrescribir silenciosamente una edición más reciente de otro usuario.
+            if (bienEditing.updated_at) update = update.eq('updated_at', bienEditing.updated_at);
+            res = await update.select('id').maybeSingle();
+            if (!res.error && bienEditing.updated_at && !res.data) {
+                const conflicto = new Error('CONFLICTO_BIEN');
+                conflicto.code = 'CONFLICTO_BIEN';
+                throw conflicto;
+            }
         } else {
             res = await supabase.from('bens').insert([payload]);
         }
@@ -567,8 +575,12 @@ export function useFcModals({
         } else {
             notify("Error al guardar en el servidor.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         }
-    } catch {
-        notify("Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
+    } catch (error) {
+        if (error?.code === 'CONFLICTO_BIEN') {
+            notify('Este bien fue actualizado por otra persona. Cierra y vuelve a abrirlo para cargar la versión más reciente.', 'warning');
+        } else {
+            notify("Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
+        }
         return false;
     } finally {
         setIsSaving(false);

@@ -1,4 +1,4 @@
-import { normalizeStr, generateId } from './helpers';
+import { normalizeStr, generateId } from './helpers.js';
 
 // Mapeo de columnas del CSV de bienes (extraído de App.jsx, UI Lote 4).
 // Acepta encabezados con otros nombres, sin tildes o abreviaturas.
@@ -29,6 +29,7 @@ export const mapearFilasBienes = (rows, fields, bienes, dependenciaActual) => {
   const validos = [];
   const duplicados = [];
   const errores = [];
+  const rotulosEnArchivo = new Set();
   (rows || []).forEach((row, idx) => {
     const rotuloCSV = val(row, COL.rotulo);
     if (!rotuloCSV) {
@@ -53,10 +54,12 @@ export const mapearFilasBienes = (rows, fields, bienes, dependenciaActual) => {
       hasQR: false,
       estadoConservacion: 'Muy bueno'
     };
-    const esDuplicado = (bienes || []).some(b =>
-      normalizeStr(b.rotulo) === normalizeStr(rotuloCSV) &&
-      b.dependencia === dependenciaActual
+    const rotuloNormalizado = normalizeStr(rotuloCSV);
+    const esDuplicado = rotulosEnArchivo.has(rotuloNormalizado) || (bienes || []).some(b =>
+      normalizeStr(b.rotulo) === rotuloNormalizado &&
+      normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)
     );
+    rotulosEnArchivo.add(rotuloNormalizado);
     if (esDuplicado) duplicados.push(nuevo);
     else validos.push(nuevo);
   });

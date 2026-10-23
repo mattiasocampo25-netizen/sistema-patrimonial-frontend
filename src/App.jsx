@@ -608,6 +608,48 @@ export default function App() {
     if (lista.length === 0) return addToast('Selecciona al menos un bien.', 'warning');
     handleBulkLabelPNGZip(lista);
   };
+  const exportarSeleccionInventario = (formato) => {
+    const lista = filteredBienes.filter(b => seleccionados.includes(b.id));
+    if (!lista.length) return addToast('Selecciona al menos un bien para exportar.', 'warning');
+    if (formato === 'xlsx') handleExportInventarioExcel(lista);
+    else handleExportInventarioCSV(lista);
+  };
+  const asignarBienesSeleccionados = async ({ ids, funcionario, ubicacion }) => {
+    const objetivo = bienes.filter(b => ids.includes(b.id));
+    if (!objetivo.length || (!funcionario && !ubicacion)) return;
+    setIsProcessing({ active: true, text: `Actualizando ${objetivo.length} bienes...` });
+    const guardados = [];
+    const errores = [];
+    try {
+      for (const bien of objetivo) {
+        const actualizado = {
+          ...bien,
+          ...(funcionario !== undefined ? { funcionario, funcionarioDoc: funcionario ? bien.funcionarioDoc || '' : '', funcionarioCargo: funcionario ? bien.funcionarioCargo || '' : '' } : {}),
+          ...(ubicacion !== undefined ? { ubicacion } : {})
+        };
+        const payload = conSello({ data: actualizado });
+        const { error } = await supabase.from('bens').update(payload).eq('id', bien.id);
+        if (error) errores.push(bien.rotulo || bien.id);
+        else guardados.push({ ...actualizado, updated_at: payload.updated_at });
+      }
+      if (guardados.length) {
+        const guardadosPorId = new Map(guardados.map(b => [b.id, b]));
+        setBienes(prev => prev.map(b => guardadosPorId.get(b.id) || b));
+        await registrarAuditoria({
+          usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+          accion: 'MODIFICACION_MASIVA', entidad: 'BIEN', entidadId: `${guardados.length} bienes`,
+          detalles: { cantidad: guardados.length, ids: guardados.map(b => b.id), funcionario, ubicacion }
+        });
+        limpiarSeleccion();
+      }
+      if (errores.length) addToast(`${guardados.length} actualizados; ${errores.length} no se pudieron guardar.`, 'warning');
+      else addToast(`${guardados.length} bienes actualizados.`, 'success');
+    } catch {
+      addToast('No se pudo completar la asignación masiva.', 'error');
+    } finally {
+      setIsProcessing({ active: false, text: '' });
+    }
+  };
   const bajaMasiva = async (ids) => {
     if (!ids || ids.length === 0) return;
     setIsProcessing({ active: true, text: `Procesando ${ids.length} bienes...` });
@@ -1300,22 +1342,39 @@ useEffect(() => {
 
   const executeProcessBienesCSV = async (file) => {
 
-    setIsProcessing({ active: true, text: 'Procesando Planilla Excel (CSV)...' });
+    setIsProcessing({ active: true, text: 'Leyendo planilla CSV...', pct: 0 });
     setIsCSVPreviewOpen(false);
     if (file) ultimoArchivoBienesRef.current = file;
 
     // papaparse se carga bajo demanda: no entra al bundle inicial.
     const { default: Papa } = await import('papaparse');
+    const filasCSV = [];
+    let camposCSV = [];
+    let ultimaActualizacionProgreso = 0;
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
       encoding: "UTF-8",
-      complete: async (results) => {
-        const { validos: newBienes, duplicados } = mapearFilasBienes(results.data, results.meta.fields, bienes, dependenciaActual);
+      worker: true,
+      step: (results) => {
+        if (!camposCSV.length) camposCSV = results.meta.fields || [];
+        filasCSV.push(results.data);
+        if (filasCSV.length % 150 === 0) {
+          const pct = file.size ? Math.min(95, ((results.meta.cursor || 0) / file.size) * 95) : 0;
+          setIsProcessing({ active: true, text: `Leyendo ${filasCSV.length.toLocaleString('es-PY')} filas...`, pct });
+          ultimaActualizacionProgreso = filasCSV.length;
+        }
+      },
+      complete: async () => {
+        if (filasCSV.length > ultimaActualizacionProgreso) {
+          setIsProcessing({ active: true, text: `Validando ${filasCSV.length.toLocaleString('es-PY')} filas...`, pct: 96 });
+        }
+        const { validos: newBienes, duplicados } = mapearFilasBienes(filasCSV, camposCSV, bienes, dependenciaActual);
         const duplicatesSkipped = duplicados.length;
 
         if (newBienes.length > 0) {
           try {
+            setIsProcessing({ active: true, text: `Guardando ${newBienes.length.toLocaleString('es-PY')} bienes...`, pct: 98 });
             const payload = newBienes.map(b => conSello({ id: b.id, data: b }));
             const { error: errInsert } = await supabase.from('bens').insert(payload);
             // supabase-js NO lanza en error de Postgres/RLS: resuelve con
@@ -1811,7 +1870,7 @@ if (publicBienId) {
                 {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} />)}
 
                 {activeTab === 'resumen' && (<ResumenView dependenciaActual={dependenciaActual} stats={stats} pendientes={pendientes} fc10List={fc10List} />)}
-                {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasInventoryData={bienes.length > 0} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} debouncedSearchTerm={debouncedSearchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} analiticos2Unicos={analiticos2Unicos} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
+                {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasInventoryData={bienes.length > 0} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} debouncedSearchTerm={debouncedSearchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} analiticos2Unicos={analiticos2Unicos} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onAsignarMasivo={asignarBienesSeleccionados} onExportarSeleccion={exportarSeleccionInventario} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
 
                 {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView dependenciaActual={dependenciaActual} solicitudesBaja={solicitudesBaja} bienes={bienes} openResolucionModal={openResolucionModal} />)}
 

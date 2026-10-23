@@ -310,7 +310,7 @@ function fuentesUsadasBytes(datos) {
     i = saltarEspacios(datos, i);
 
     // Leer el tamaño de fuente (numero)
-    const { valor, pos: posDespuesNum } = leerEnteroAscii(datos, i);
+    const { pos: posDespuesNum } = leerEnteroAscii(datos, i);
     i = posDespuesNum;
 
     // Saltar espacios
@@ -338,7 +338,7 @@ function limpiarFuentesNoUsadasBytes(datos, usadas) {
   const patFontOpen = new TextEncoder().encode('/Font <<');
   const patFontClose = new TextEncoder().encode('>>');
   const patSlashF = new TextEncoder().encode('/F');
-  const patRef = new TextEncoder().encode(' 0 R');
+  const patRef = new TextEncoder().encode('0 R');
 
   let i = 0;
   const n = datos.length;
@@ -379,7 +379,6 @@ function limpiarFuentesNoUsadasBytes(datos, usadas) {
         // Entrada completa: /Fn N 0 R
         if (!usadas.has(nombre)) {
           // Reemplazar por espacios del mismo largo
-          const largo = idx0R + patRef.length - idxF;
           for (let x = idxF; x < idx0R + patRef.length; x++) out[x] = 0x20;
         }
         j = idx0R + patRef.length;

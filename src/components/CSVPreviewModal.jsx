@@ -42,6 +42,20 @@ export default function CSVPreviewModal({ isOpen, onClose, onConfirm, data, STYL
             </div>
           </div>
 
+          {duplicados.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[11px] font-bold text-warn dark:text-amber-300 uppercase tracking-wider">Rótulos omitidos por duplicados:</p>
+              <div className="rounded-card border border-amber-200 dark:border-amber-900/40 bg-warn-soft/40 dark:bg-amber-900/10 p-3 max-h-32 overflow-y-auto custom-scrollbar">
+                {duplicados.slice(0, 8).map((bien, idx) => (
+                  <p key={`${bien.rotulo}-${idx}`} className="text-xs text-content-2 dark:text-content-3 py-1 truncate" title={bien.descripcion || bien.rotulo}>
+                    <span className="font-mono font-bold">{bien.rotulo}</span>{bien.descripcion ? ` · ${bien.descripcion}` : ''}
+                  </p>
+                ))}
+                {duplicados.length > 8 && <p className="pt-1 text-[11px] text-content-3">Y {duplicados.length - 8} duplicados más.</p>}
+              </div>
+            </div>
+          )}
+
           {/* Listado de Errores si los hay */}
           {errores.length > 0 && (
             <div className="space-y-2">

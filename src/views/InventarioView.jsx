@@ -83,6 +83,8 @@ export default function InventarioView({
   cambiarVistaInv,
   lastMutatedBienId,
   onBajaMasiva,
+  onAsignarMasivo,
+  onExportarSeleccion,
   onQRLoteSeleccion,
   onMoverEstado,
   onCopiarLink,
@@ -152,6 +154,8 @@ export default function InventarioView({
   const flechaOrden = (campo) => (!orden || orden.campo !== campo) ? 'fa-sort' : (orden.dir === 'asc' ? 'fa-arrow-up-wide-short' : 'fa-arrow-down-wide-short');
   const [comparando, setComparando] = useState(false);
   const [confirmaBajaMasiva, setConfirmaBajaMasiva] = useState(false);
+  const [mostrarAsignacionMasiva, setMostrarAsignacionMasiva] = useState(false);
+  const [asignacionMasiva, setAsignacionMasiva] = useState({ funcionario: '__MANTENER__', ubicacion: '__MANTENER__' });
   const { t } = useIdioma();
   const bienesSeleccionados = itemsPaginados.filter(i => seleccionados.includes(i.id));
   const selFueraPagina = seleccionados.length - bienesSeleccionados.length;
@@ -590,6 +594,12 @@ export default function InventarioView({
                         <button onClick={() => onQRLoteSeleccion && onQRLoteSeleccion()} title="Generar ZIP de etiquetas de la selección" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-qrcode text-[11px]"></i> QRs
                         </button>
+                        <button onClick={() => setMostrarAsignacionMasiva(true)} title="Asignar responsable o ubicación a los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
+                          <i className="fa-solid fa-user-gear text-[11px]"></i> Asignar
+                        </button>
+                        <button onClick={() => onExportarSeleccion?.('csv')} title="Exportar bienes seleccionados a CSV" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
+                          <i className="fa-solid fa-file-csv text-[11px]"></i> Exportar
+                        </button>
                         <button onClick={() => setComparando(true)} disabled={seleccionados.length < 2 || seleccionados.length > 3} title="Comparar 2 o 3 bienes lado a lado" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer disabled:opacity-40">
                           <i className="fa-solid fa-columns-compare text-[11px]"></i> Comparar
                         </button>
@@ -939,6 +949,45 @@ export default function InventarioView({
           onClose={() => setComparando(false)}
           STYLES={STYLES}
         />
+      )}
+      {mostrarAsignacionMasiva && (
+        <Dialogo className={STYLES.modalOverlay} onClick={() => setMostrarAsignacionMasiva(false)}>
+          <div className={STYLES.modalContent + ' max-w-lg !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line'} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Asignación masiva de bienes">
+            <div className="px-6 py-5 border-b border-line dark:border-white/10">
+              <h2 className="text-lg font-bold text-content-1 dark:text-white">Asignar bienes seleccionados</h2>
+              <p className="mt-1 text-sm text-content-3">Se actualizarán {seleccionados.length} bienes. Deja un campo en “Mantener” para no modificarlo.</p>
+            </div>
+            <div className="p-6 grid gap-4">
+              <label className="grid gap-1.5 text-xs font-bold text-content-2">Responsable
+                <select value={asignacionMasiva.funcionario} onChange={e => setAsignacionMasiva(v => ({ ...v, funcionario: e.target.value }))} className="h-11 rounded-control border border-line bg-surface-1 px-3 text-sm font-medium text-content-1 dark:text-white">
+                  <option value="__MANTENER__">Mantener responsable actual</option>
+                  <option value="__SIN_ASIGNACION__">Quitar responsable</option>
+                  {funcionariosUnicos.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </label>
+              <label className="grid gap-1.5 text-xs font-bold text-content-2">Ubicación
+                <select value={asignacionMasiva.ubicacion} onChange={e => setAsignacionMasiva(v => ({ ...v, ubicacion: e.target.value }))} className="h-11 rounded-control border border-line bg-surface-1 px-3 text-sm font-medium text-content-1 dark:text-white">
+                  <option value="__MANTENER__">Mantener ubicación actual</option>
+                  <option value="__SIN_UBICACION__">Quitar ubicación</option>
+                  {ubicacionesUnicas.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-white/10">
+              <button onClick={() => setMostrarAsignacionMasiva(false)} className="h-10 px-4 rounded-control text-sm font-semibold hover:bg-surface-2">Cancelar</button>
+              <button
+                disabled={asignacionMasiva.funcionario === '__MANTENER__' && asignacionMasiva.ubicacion === '__MANTENER__'}
+                onClick={() => {
+                  const funcionario = asignacionMasiva.funcionario === '__MANTENER__' ? undefined : asignacionMasiva.funcionario === '__SIN_ASIGNACION__' ? '' : asignacionMasiva.funcionario;
+                  const ubicacion = asignacionMasiva.ubicacion === '__MANTENER__' ? undefined : asignacionMasiva.ubicacion === '__SIN_UBICACION__' ? '' : asignacionMasiva.ubicacion;
+                  onAsignarMasivo?.({ ids: seleccionados, funcionario, ubicacion });
+                  setMostrarAsignacionMasiva(false);
+                }}
+                className="h-10 px-5 rounded-control bg-brand text-white text-sm font-bold disabled:opacity-45"
+              >Aplicar cambios</button>
+            </div>
+          </div>
+        </Dialogo>
       )}
       {confirmaBajaMasiva && (
         <Dialogo className={STYLES.modalOverlay} onClick={() => setConfirmaBajaMasiva(false)}>

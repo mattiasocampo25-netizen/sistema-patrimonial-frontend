@@ -34,11 +34,19 @@ export function useAuditoria({
   const [isLoadingAud, setIsLoadingAud] = useState(false);
   const [searchAud, setSearchAud] = useState('');
   const [filtroAccionAud, setFiltroAccionAud] = useState('');
-  const [conteoCodigos, setConteoCodigos] = useState([]);
+  const conteoDraftKey = `conteo_auditoria_${normalizeStr(currentUser?.username || 'usuario')}_${normalizeStr(dependenciaActual || 'sin_dependencia')}`;
+  const leerBorradorConteo = () => {
+    try {
+      const guardado = JSON.parse(localStorage.getItem(conteoDraftKey) || '{}');
+      return { codigos: Array.isArray(guardado.codigos) ? guardado.codigos : [], ubicacion: guardado.ubicacion || '' };
+    } catch { return { codigos: [], ubicacion: '' }; }
+  };
+  const [conteoCodigos, setConteoCodigos] = useState(() => leerBorradorConteo().codigos);
   const [conteoInput, setConteoInput] = useState('');
   const [muestraN, setMuestraN] = useState(10);
   const [muestraUbicacion, setMuestraUbicacion] = useState('');
-  const [conteoUbicacion, setConteoUbicacion] = useState('');
+  const [conteoUbicacion, setConteoUbicacion] = useState(() => leerBorradorConteo().ubicacion);
+  const [borradorConteoCargado, setBorradorConteoCargado] = useState(conteoDraftKey);
   const [muestra, setMuestra] = useState([]);
   const [verificadosMuestra, setVerificadosMuestra] = useState({});
   const PAGE_AUD = 50;
@@ -47,6 +55,20 @@ export function useAuditoria({
   const [alcanceAud, setAlcanceAud] = useState('dep');
   const [kpisAud, setKpisAud] = useState({ total: 0, altas: 0, mods: 0, bajas: 0 });
   const [accionesUnicasAud, setAccionesUnicasAud] = useState([]);
+  useEffect(() => {
+    let guardado = {};
+    try { guardado = JSON.parse(localStorage.getItem(conteoDraftKey) || '{}'); } catch { /* borrador dañado: iniciar vacío */ }
+    setConteoCodigos(Array.isArray(guardado.codigos) ? guardado.codigos : []);
+    setConteoUbicacion(guardado.ubicacion || '');
+    setBorradorConteoCargado(conteoDraftKey);
+  }, [conteoDraftKey]);
+  useEffect(() => {
+    if (borradorConteoCargado !== conteoDraftKey) return;
+    try {
+      if (!conteoCodigos.length && !conteoUbicacion) localStorage.removeItem(conteoDraftKey);
+      else localStorage.setItem(conteoDraftKey, JSON.stringify({ codigos: conteoCodigos, ubicacion: conteoUbicacion, guardadoEn: new Date().toISOString() }));
+    } catch { /* guardado local opcional */ }
+  }, [conteoDraftKey, borradorConteoCargado, conteoCodigos, conteoUbicacion]);
   const limpiarBusquedaAud = (texto) => String(texto || '').replace(/[%(),.]/g, ' ').replace(/\s+/g, ' ').trim();
   // Higiene de auditoría: retención de 5 días. Se ejecuta como máximo una
   // vez al día al entrar al libro (solo admin). Borra eventos con fecha

@@ -32,7 +32,7 @@ test('un FC-10 nuevo arranca esperando la firma del funcionario', () => {
   const fc = { ...actaNueva(), estadoFirma: ESTADO_NUEVO_FC10 };
   assert.equal(fc.estadoFirma, ESTADOS_FC10.ESPERA_FIRMA_1);
   const pendiente = pendienteDeFirma(fc);
-  assert.equal(pendiente.puesto, 'Funcionario Responsable');
+  assert.equal(pendiente.puesto, 'Funcionario responsable');
   assert.equal(pendiente.nombre, 'Rossana');
 });
 
@@ -138,7 +138,7 @@ test('registrar ambas no pisa una firma previa', () => {
 test('quien debe firmar se lee del puesto correspondiente', () => {
   const esperandoJefe = { ...actaNueva(), estadoFirma: ESTADOS_FC10.ESPERA_FIRMA_2 };
   const pendiente = pendienteDeFirma(esperandoJefe);
-  assert.equal(pendiente.puesto, 'Jefe Inmediato');
+  assert.equal(pendiente.puesto, 'Jefatura inmediata');
   assert.equal(pendiente.nombre, 'Juan Perez');
   assert.equal(pendiente.orden, 2);
 });

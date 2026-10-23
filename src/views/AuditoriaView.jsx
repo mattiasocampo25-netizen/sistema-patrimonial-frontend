@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
@@ -19,6 +20,7 @@ export default function AuditoriaView({
   filtroAccionAud, setFiltroAccionAud, accionesUnicasAud, auditoriaList,
   actorAud, tonoAccionAud, detalleAudCorto
 }) {
+  const [eventoExpandido, setEventoExpandido] = useState(null);
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
       <Card className="p-0">
@@ -169,6 +171,12 @@ export default function AuditoriaView({
             <i className="fa-solid fa-clipboard-check text-ok"></i> Conciliación física
           </h3>
           <p className="text-xs text-content-3 dark:text-content-3 mb-4">Escanea o escribe rótulos y compara contra el inventario activo del alcance elegido.</p>
+          {conteoCodigos.length > 0 && (
+            <p role="status" className="mb-3 flex items-center gap-2 text-[11px] font-semibold text-ok dark:text-emerald-400">
+              <i className="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i>
+              Borrador guardado en este dispositivo · {conteoCodigos.length} códigos
+            </p>
+          )}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <FiltroCombo
               valor={conteoUbicacion}
@@ -346,8 +354,17 @@ export default function AuditoriaView({
               ) : auditoriaList.length === 0 ? (
                 <TRow><TD colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Sin eventos para los filtros aplicados.</TD></TRow>
               ) : (
-                auditoriaList.map(r => (
-                  <TRow key={r.id} className="hover:bg-surface-2/70 dark:hover:bg-surface-1/[0.03] transition-colors">
+                auditoriaList.map(r => {
+                  let cambios = null;
+                  try {
+                    const mensaje = typeof r.mensaje === 'string' ? JSON.parse(r.mensaje) : r.mensaje;
+                    if (mensaje?.cambios?.anterior && mensaje?.cambios?.nuevo) cambios = mensaje.cambios;
+                  } catch { /* evento histórico sin estructura de cambios */ }
+                  const campos = cambios ? Object.keys(cambios.nuevo).filter(k => JSON.stringify(cambios.nuevo[k]) !== JSON.stringify(cambios.anterior[k])) : [];
+                  const expandido = eventoExpandido === r.id && campos.length > 0;
+                  return (
+                  <React.Fragment key={r.id}>
+                  <TRow className="hover:bg-surface-2/70 dark:hover:bg-surface-1/[0.03] transition-colors">
                     <TD className="py-3 pl-6 pr-4 align-top text-xs tabular-nums text-content-3 dark:text-content-3 whitespace-nowrap">
                       {r.fecha ? new Date(r.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
                     </TD>
@@ -358,9 +375,33 @@ export default function AuditoriaView({
                       </span>
                     </TD>
                     <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">{r.titulo || '-'}</TD>
-                    <TD className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px] truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</TD>
+                    <TD className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px]">
+                      <button type="button" onClick={() => setEventoExpandido(expandido ? null : r.id)} disabled={!campos.length} aria-expanded={expandido} className="max-w-full inline-flex items-center gap-2 text-left truncate disabled:cursor-default enabled:hover:text-brand-text">
+                        <span className="truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</span>
+                        {campos.length > 0 && <i className={`fa-solid ${expandido ? 'fa-chevron-up' : 'fa-chevron-down'} text-[9px] shrink-0`} aria-hidden="true"></i>}
+                      </button>
+                    </TD>
                   </TRow>
-                ))
+                  {expandido && (
+                    <TRow className="bg-surface-2/60 dark:bg-surface-1/[0.04]">
+                      <TD colSpan="5" className="px-6 py-4">
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          {campos.map(campo => (
+                            <div key={campo} className="rounded-control border border-line dark:border-white/10 bg-surface-1 dark:bg-surface-1/5 p-3">
+                              <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-content-3">{campo}</p>
+                              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                                <p className="min-w-0"><span className="block font-bold text-content-3">Antes</span><span className="block break-words text-content-2 dark:text-content-3">{String(cambios.anterior[campo] ?? '—')}</span></p>
+                                <p className="min-w-0"><span className="block font-bold text-content-3">Después</span><span className="block break-words text-content-1 dark:text-white">{String(cambios.nuevo[campo] ?? '—')}</span></p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </TD>
+                    </TRow>
+                  )}
+                  </React.Fragment>
+                  );
+                })
               )}
             </TBody>
           </Table>

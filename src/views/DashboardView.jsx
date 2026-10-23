@@ -14,7 +14,7 @@ export default function DashboardView({
   setBienEditing, setIsBienModalOpen, fileInputRef, handleExportInventarioCSV,
   setIsBulkQR, setQrTargetBien, setIsQRModalOpen, openFC03Modal,
   setFc10Year, setFc10Month,
-  fc10List, bienes, registrarAmbasFirmas, firmandoId, requestDependenciaChange
+  fc10List, bienes, requestDependenciaChange
 }) {
   const actasPorFirmar = useMemo(() => (fc10List || [])
     .filter(fc => !fc.devolucionFecha && pendienteDeFirma(fc))
@@ -247,8 +247,8 @@ export default function DashboardView({
                 </div>
                 <p className="text-[10px] text-content-3 dark:text-content-3 mt-0.5">
                   {actasPorFirmar.length === 1
-                    ? 'Un acta esperando firma.'
-                    : actasPorFirmar.length + ' actas esperando firma.'}
+                    ? 'Una firma pendiente. Revisa el acta antes de registrarla.'
+                    : `${actasPorFirmar.length} actas con una firma pendiente. Revisa el documento en FC-10.`}
                 </p>
               </div>
             </div>
@@ -256,7 +256,7 @@ export default function DashboardView({
               onClick={() => setActiveTab('fc10')}
               className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 motion active:scale-95 cursor-pointer shrink-0"
             >
-              Gestionar →
+              Revisar actas
             </button>
           </div>
 
@@ -275,22 +275,10 @@ export default function DashboardView({
                       {bien?.rotulo || 'Bien sin rótulo'}
                     </span>
                     <span className="block text-[10px] text-content-3 dark:text-content-3 truncate">
-                      {fc.funcionarioNombre || 'Sin responsable'} · Falta firma {pendiente.orden}: {pendiente.puesto}
+                      {fc.funcionarioNombre || 'Sin responsable'} · Falta la firma {pendiente.orden}: {pendiente.puesto}
                     </span>
                   </span>
                 </button>
-                {registrarAmbasFirmas && (
-                  <button
-                    onClick={() => registrarAmbasFirmas(fc)}
-                    disabled={firmandoId === fc.id}
-                    title="Registrar las dos firmas"
-                    className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-                  >
-                    {firmandoId === fc.id
-                      ? <i className="fa-solid fa-circle-notch fa-spin text-[9px]"></i>
-                      : <><i className="fa-solid fa-circle-check text-[9px]"></i> Registrar ambas</>}
-                  </button>
-                )}
               </div>
             ))}
             {actasPorFirmar.length > 5 && (

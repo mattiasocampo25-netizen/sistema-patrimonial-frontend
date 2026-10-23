@@ -18,17 +18,17 @@ const MESES = [
  * Usa FiltroCombo en vez de <select> nativo: el popup del navegador se dibuja
  * con los colores del sistema y quedaba ilegible sobre la app oscura.
  */
-export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año', ayuda }) {
+export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año', ayuda, className = '' }) {
   const nombreMes = MESES.find(m => m.val === String(selectedMonth))?.name || 'Seleccionar mes';
   return (
-    <div className="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface-2/70 px-3 py-2.5" role="group" aria-label={descripcion}>
-      <div className="min-w-[116px] pb-0.5">
+    <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(190px,1.15fr)] items-end gap-3 rounded-panel border border-line bg-surface-2/70 p-3 ${className}`} role="group" aria-label={descripcion}>
+      <div className="min-w-0 pb-0.5">
         <span className="block text-[9px] font-bold uppercase tracking-widest text-content-3">Periodo</span>
         <span className="block text-xs font-bold text-content-1">{nombreMes} {selectedYear}</span>
-        {ayuda && <span className="mt-0.5 block max-w-[180px] text-[10px] leading-tight text-content-3">{ayuda}</span>}
+        {ayuda && <span className="mt-0.5 block text-label leading-relaxed text-content-3">{ayuda}</span>}
       </div>
-      <div className="flex items-end gap-2">
-        <div className="w-[122px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1.4fr)_minmax(78px,0.8fr)] items-end gap-2">
+        <div className="min-w-0">
           <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-content-3">Mes</span>
           <FiltroCombo
             compacto
@@ -39,7 +39,7 @@ export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, s
             titulo="Elegir mes del periodo"
           />
         </div>
-        <div className="w-[96px]">
+        <div className="min-w-0">
           <span className="mb-1 block text-[9px] font-bold uppercase tracking-widest text-content-3">Año</span>
           <FiltroCombo
             compacto

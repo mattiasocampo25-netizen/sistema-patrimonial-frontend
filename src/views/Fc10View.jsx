@@ -124,10 +124,10 @@ export default function Fc10View({
             }
           />
 
-          <Toolbar className="mt-5 items-end gap-4">
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-content-3">Mostrar actas</span>
-              <ChipGroup>
+          <Toolbar className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(410px,0.92fr)]">
+            <div className="min-w-0 self-end">
+              <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-content-3">Mostrar actas por firma</span>
+              <ChipGroup className="w-full">
               {ETAPAS.map((et) => (
                 <Chip
                   key={et.id}
@@ -147,6 +147,7 @@ export default function Fc10View({
               setSelectedMonth={setFc10Month}
               descripcion="Periodo del historial"
               ayuda="Se incluyen actas entregadas o devueltas durante el mes seleccionado."
+              className="w-full self-end"
             />
           </Toolbar>
         </div>

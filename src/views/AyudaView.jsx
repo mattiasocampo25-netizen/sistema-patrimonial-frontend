@@ -15,87 +15,87 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
     {
       category: 'General',
       question: "¿Qué es este sistema y para qué sirve?",
-      answer: "Es la plataforma de Gestión Patrimonial de la Universidad Nacional de Pilar (UNP). Permite llevar el inventario de bienes institucionales, generar actas FC-04 (alta/baja), FC-10 (delegación de custodia) y FC-11 (traslados), con trazabilidad QR y control de firmas."
+      answer: "Es la herramienta de la Universidad Nacional de Pilar para consultar los bienes institucionales y registrar sus altas, responsables, traslados y bajas. También permite generar códigos QR y consultar el historial de cada bien."
     },
     {
       category: 'General',
       question: "¿Quién puede acceder al sistema?",
-      answer: "Solo usuarios con cuenta activa en Supabase Auth y perfil en la tabla `usuarios`. Los roles son: `funcionario` (operación), `admin` (administración) y `dev` (desarrollador/mantenimiento)."
+      answer: "El acceso requiere una cuenta habilitada. Las opciones disponibles dependen del rol asignado: las tareas habituales de inventario, la administración y las herramientas de mantenimiento tienen permisos distintos."
     },
     {
       category: 'Inventario',
       question: "Explicación de la alerta crítica 'Req. Acción'",
-      answer: "Este indicador previene discrepancias en el inventario. Se activa bajo dos escenarios: 1) Ingreso de un nuevo bien sin ubicación física definida. 2) Recepción de un bien trasladado (FC-11) que no ha sido re-asignado legalmente mediante un nuevo FC-10."
+      answer: "La alerta indica que el registro necesita atención para completar o revisar datos del bien. Abre su ficha y comprueba la ubicación, el responsable y las actas asociadas antes de continuar."
     },
     {
       category: 'Inventario',
       question: "Protocolo para exclusión de inventario (Baja)",
-      answer: "La normativa exige generar un expediente FC-04 de cierre, seleccionando 'Baja' como origen. El sistema procesará el descargo contable e inhabilitará el registro. La modificación manual del estado en el inventario solo se admite para correcciones de digitación."
+      answer: "Abre la acción de baja desde el bien y sigue el formulario correspondiente. Si tu rol no permite aprobarla directamente, el sistema enviará una solicitud al centro de aprobaciones."
     },
     {
       category: 'FC-10',
       question: "¿Cómo se controlan las firmas de un acta FC-10?",
-      answer: "El estado de las firmas (sin firmar / firmado) solo lo cambia el administrador manualmente cuando recibe el documento físico o digital devuelto. Desde el panel FC-10 puede marcar el estado como checklist o switch. Solo el rol administrador tiene permiso para modificar este estado."
+      answer: "En Actas · FC-10, filtra por “Falta funcionario” o “Falta jefatura” para encontrar qué firma queda pendiente. Registra una firma cuando recibas el documento correspondiente; usa “Confirmar ambas firmas recibidas” solo si el PDF volvió con las dos firmas."
     },
     {
       category: 'FC-10',
       question: "Autocompletado de la estructura organizacional",
-      answer: "El formulario FC-10 emplea aprendizaje histórico. Al procesar las primeras asignaciones, el sistema mapea la jerarquía (Unidad, Repartición, etc.) permitiendo el despliegue automático en procesos futuros, reduciendo la carga administrativa."
+      answer: "Algunos campos de la unidad organizacional sugieren valores utilizados anteriormente. Revisa cada sugerencia antes de guardar: puede variar según la dependencia y el acta."
     },
     {
       category: 'FC-10',
       question: "¿Qué significa que un acta esté 'cerrada'?",
-      answer: "Significa que ambas firmas (funcionario responsable y jefe inmediato) fueron registradas. El bien pasa a tener `hasFC10 = true` y el acta ya no aparece como pendiente de firma."
+      answer: "El acta se considera cerrada cuando están registradas las firmas del funcionario responsable y de la jefatura inmediata. En la tarjeta del acta puedes revisar quién firmó y cuándo."
     },
     {
       category: 'FC-04',
       question: "Recuperación de registros históricos (Bajas)",
-      answer: "A fines de precisión contable, los ítems dados de baja no participan de las métricas principales. Para auditar este histórico, acceda a 'Directorio Patrimonial' y ejecute el filtro 'Bajas' en el panel de herramientas."
+      answer: "Usa el filtro de estado del inventario para encontrar bienes dados de baja. Si necesitas revisar quién registró el cambio, consulta la ficha y su trazabilidad."
     },
     {
       category: 'FC-04',
       question: "Orígenes permitidos en un FC-04",
-      answer: "Alta, Baja, Traspaso, Compra o Donación. Cada origen determina el tratamiento contable del bien."
+      answer: "El formulario presenta los tipos de movimiento disponibles. Selecciona el que corresponda al documento y completa los datos solicitados antes de generar el acta."
     },
     {
       category: 'QR',
-      question: "Exportación masiva de código de barras (QR)",
-      answer: "A través de la vista de Inventario, puede aplicar segmentaciones por ubicación o custodio. Ejecute el comando 'Lote QRs' para compilar un archivo comprimido (.zip) estructurado para impresión industrial."
+      question: "¿Cómo generar varios códigos QR?",
+      answer: "En Inventario, filtra los bienes que necesitas y selecciónalos. Usa la acción de lote para descargar las etiquetas de esa selección; también puedes generar un QR desde la ficha de un solo bien."
     },
     {
       category: 'QR',
       question: "¿Cómo funciona la consulta pública por QR?",
-      answer: "Cualquier persona con un lector QR puede consultar los datos básicos de un bien sin iniciar sesión. La consulta no expone valores económicos ni datos sensibles del custodio."
+      answer: "El QR abre una ficha pública de consulta del bien. Comprueba que la etiqueta corresponda al bien antes de usar sus datos para una gestión."
     },
     {
       category: 'Respaldos',
       question: "¿Cómo hacer una copia de seguridad?",
-      answer: "Desde el sidebar (Administración > Copia de Seguridad) puede descargar un archivo .json con toda la estructura de la base de datos. El archivo incluye metadatos, versión y checksum SHA-256 para garantizar integridad."
+      answer: "Abre Utilidades en el sidebar y selecciona “Copia de seguridad”. Guarda el archivo descargado en una ubicación institucional autorizada."
     },
     {
       category: 'Respaldos',
       question: "¿Cómo restaurar una copia de seguridad?",
-      answer: "Seleccione el archivo .json generado por el sistema. El backend valida un esquema estricto antes de escribir (tablas, relaciones, claves primarias). Puede previsualizar qué cambiará antes de confirmar. Solo el administrador puede restaurar."
+      answer: "En Utilidades, selecciona “Restaurar respaldo” y elige un archivo generado por el sistema. Revisa la vista previa y confirma solo si corresponde; esta operación requiere permisos de administración."
     },
     {
       category: 'Seguridad',
       question: "¿Cómo se protegen mis datos?",
-      answer: "Contraseñas hasheadas con bcrypt, JWT con expiración de 24h, rate limiting, cabeceras de seguridad (CSP, HSTS, X-Frame-Options), sanitización de inputs y protección contra XSS/CSRF en el frontend."
+      answer: "El sistema limita las opciones según tu cuenta y rol. Evita compartir tus credenciales, cierra sesión al terminar y reporta al soporte cualquier acceso que no reconozcas."
     },
     {
       category: 'Seguridad',
       question: "¿Qué pasa si hay inactividad?",
-      answer: "La sesión se cierra automáticamente tras 15 minutos de inactividad por motivos de seguridad patrimonial."
+      answer: "La sesión puede solicitarte nuevamente el acceso después de un periodo de inactividad. Guarda los cambios antes de dejar el sistema sin uso."
     },
     {
       category: 'Atajos',
       question: "Atajos de teclado",
-      answer: "Ctrl+K abre la búsqueda global, / enfoca el buscador del inventario, N crea un bien nuevo y ? muestra la lista completa de atajos."
+      answer: "Usa Ctrl+K para abrir la búsqueda global, la tecla / para ir al buscador del inventario y ? para consultar la lista completa de atajos."
     },
     {
       category: 'Contacto',
       question: "¿Dónde reportar un fallo o solicitar soporte?",
-      answer: "Contacte al Departamento de Bienes Patrimoniales: patrimonio@unp.edu.py. Para fallos críticos, incluya capturas de pantalla, hora aproximada y el ID del bien afectado si aplica."
+      answer: "Escribe a patrimonio@unp.edu.py. Describe qué estabas intentando hacer, qué ocurrió y cuándo; si afecta a un bien, incluye su rótulo. No envíes contraseñas ni datos personales innecesarios."
     }
   ];
 
@@ -106,8 +106,8 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
 
   const SECCIONES = [
     { id: 'faq', label: 'Preguntas Frecuentes', icon: 'fa-circle-question' },
-    { id: 'procedimiento', label: 'Procedimiento Lógico', icon: 'fa-network-wired' },
-    { id: 'atajos', label: 'Atajos de Teclado', icon: 'fa-keyboard' }
+    { id: 'procedimiento', label: 'Flujo de trabajo', icon: 'fa-network-wired' },
+    { id: 'atajos', label: 'Atajos de teclado', icon: 'fa-keyboard' }
   ];
 
   return (
@@ -116,29 +116,34 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
       <Card className="p-0">
         <div className="p-5 sm:p-6">
           <PageHeader
-            titulo={'Centro de Ayuda y Normativa'}
-            descripcion={'Guía operativa, documentación y preguntas frecuentes del ciclo de vida de los bienes'}
-            icono="fa-circle"
+            titulo="Ayuda y guía de uso"
+            descripcion="Respuestas prácticas para gestionar el inventario, las actas y las firmas."
+            icono="fa-circle-question"
           />
           <Toolbar className="mt-4">
           <button
             onClick={() => setTourPaso(0)}
-            title="Recorrer la guía interactiva"
+            title="Recorrer las funciones principales del sistema"
             className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-inverse bg-brand hover:bg-brand-hover border border-transparent hover:border-line dark:hover:border-white/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none shadow-md shadow-blue-500/25 shrink-0"
           >
-            <i className="fa-solid fa-route"></i> Hacer tour guiado
+            <i className="fa-solid fa-route" aria-hidden="true"></i> Iniciar recorrido
           </button>
           </Toolbar>
         </div>
       </Card>
 
       {/* Navegación de secciones */}
-      <div className="flex gap-1 overflow-x-auto pb-2 hide-scrollbar">
+      <div role="tablist" aria-label="Secciones de ayuda" className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-card border border-line bg-surface-2 p-1 hide-scrollbar">
         {SECCIONES.map(s => (
           <button
             key={s.id}
+            type="button"
+            role="tab"
+            id={`help-tab-${s.id}`}
+            aria-controls={`help-panel-${s.id}`}
             onClick={() => setSeccionActiva(s.id)}
-            className={`flex items-center gap-2 rounded-control px-4 py-2 text-[12px] font-medium motion cursor-pointer ${ seccionActiva === s.id ? 'bg-brand text-content-inverse shadow-sm shadow-blue-500/30' : 'bg-transparent text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/5' }`}
+            aria-selected={seccionActiva === s.id}
+            className={`flex shrink-0 items-center gap-2 rounded-control px-4 py-2.5 text-body font-semibold motion cursor-pointer ${ seccionActiva === s.id ? 'bg-surface-1 text-brand-text shadow-card' : 'bg-transparent text-content-2 hover:bg-surface-1/70 hover:text-content-1' }`}
           >
             <i className={`fa-solid ${s.icon} text-[13px] ${seccionActiva === s.id ? '' : 'opacity-70'}`}></i>
             {s.label}
@@ -146,56 +151,67 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px] xl:gap-6">
 
         {/* Columna izquierda: sección activa */}
-        <div className="lg:col-span-5 flex flex-col">
+        <div role="tabpanel" id={`help-panel-${seccionActiva}`} aria-labelledby={`help-tab-${seccionActiva}`} className="flex min-w-0 flex-col tab-enter">
           {seccionActiva === 'faq' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-circle-question text-brand-text"></i> Preguntas Frecuentes
-              </h2>
-              <div className="relative mb-6">
-                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h2 className="text-title font-bold leading-6 text-content-1 flex items-center gap-2">
+                    <i className="fa-solid fa-circle-question text-brand-text" aria-hidden="true"></i> Preguntas frecuentes
+                  </h2>
+                  <p className="mt-1 text-body text-content-3">Busca por tarea, formulario o palabra clave.</p>
+                </div>
+                <span className="text-label font-semibold text-content-3">{faqsFiltradas.length} {faqsFiltradas.length === 1 ? 'respuesta' : 'respuestas'}</span>
+              </div>
+              <div className="relative mb-4">
+                <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none" aria-hidden="true"></i>
                 <input
-                  type="text"
+                  type="search"
                   value={busquedaFaq}
                   onChange={(e) => setBusquedaFaq(e.target.value)}
-                  placeholder="Buscar en la ayuda..."
-                  className="w-full rounded-card border border-line dark:border-line bg-surface-1 dark:bg-surface-2 py-2.5 pl-10 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 motion"
+                  placeholder="Ej.: buscar una firma pendiente"
+                  aria-label="Buscar en las preguntas frecuentes"
+                  className="w-full rounded-control border border-line bg-surface-1 py-3 pl-10 pr-4 text-body font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15 motion"
                 />
               </div>
-              <div className="space-y-3">
-                {faqsFiltradas.map(f => (
-                  <FaqItem key={f.question} question={f.question} answer={f.answer} categoria={f.categoria} />
-                ))}
-                {faqsFiltradas.length === 0 && (
-                  <p className="text-sm font-semibold text-content-3 text-center py-8">Sin coincidencias en la ayuda.</p>
-                )}
+              {faqsFiltradas.length === 0 && (
+                <div className="mb-4 rounded-card border border-dashed border-line-strong bg-surface-2/60 px-5 py-8 text-center">
+                  <i className="fa-solid fa-magnifying-glass mb-2 text-content-3" aria-hidden="true"></i>
+                  <p className="text-body font-bold text-content-1">No encontramos una respuesta</p>
+                  <p className="mt-1 text-body text-content-3">Prueba con otra palabra o escribe a patrimonio@unp.edu.py.</p>
+                </div>
+              )}
+              <div className="space-y-2.5">
+                {faqsFiltradas.map(f => <FaqItem key={f.question} question={f.question} answer={f.answer} categoria={f.category} />)}
               </div>
             </>
           )}
           {seccionActiva === 'procedimiento' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-network-wired text-brand-text"></i> Procedimiento Lógico
+              <h2 className="text-title font-bold leading-6 text-content-1 flex items-center gap-2 mb-4">
+                <i className="fa-solid fa-network-wired text-brand-text" aria-hidden="true"></i> Flujo de trabajo
               </h2>
+              <p className="mb-4 text-body text-content-3">Consulta qué registro corresponde a cada movimiento del bien.</p>
               <div className={`${STYLES.card} p-6 sm:p-8 relative overflow-hidden flex-1`}>
                 <div className="absolute left-[56px] top-12 bottom-12 w-0.5 bg-surface-3 dark:bg-surface-3 hidden sm:block z-0"></div>
                 <div className="space-y-2 relative z-10">
-                  <WorkflowStep number="1" title="Alta (FC-04)" description="La incorporación inicial exige la creación de un FC-04 de Alta. Esto registra contablemente el ítem en la base de datos principal." icon="fa-arrow-trend-up" color="bg-zinc-500" />
-                  <WorkflowStep number="2" title="Delegación (FC-10)" description="La entrega física requiere el levantamiento de un FC-10 nominal. Este instrumento legal transfiere la responsabilidad civil del objeto." icon="fa-file-signature" color="bg-brand" />
-                  <WorkflowStep number="3" title="Movilidad (FC-11)" description="Toda reubicación entre facultades debe ampararse en un FC-11, el cual extingue automáticamente la responsabilidad del custodio anterior." icon="fa-dolly" color="bg-zinc-600" />
-                  <WorkflowStep number="4" title="Extinción (FC-04)" description="El desuso o rotura definitiva obliga a tramitar un FC-04 de Baja para remover contablemente el valor del patrimonio activo." icon="fa-ban" color="bg-red-500" />
+                  <WorkflowStep number="1" title="Registrar un alta · FC-04" description="Incorpora el bien al inventario y completa los datos de identificación, adquisición y ubicación." icon="fa-arrow-trend-up" color="bg-brand" />
+                  <WorkflowStep number="2" title="Asignar responsable · FC-10" description="Registra a quién se entrega el bien y da seguimiento a las firmas del acta." icon="fa-file-signature" color="bg-brand" />
+                  <WorkflowStep number="3" title="Registrar un traslado · FC-11" description="Documenta el movimiento del bien entre dependencias y revisa los datos de origen y destino." icon="fa-truck-fast" color="bg-info" />
+                  <WorkflowStep number="4" title="Solicitar una baja · FC-04" description="Inicia la baja desde el registro y completa los datos y documentos que solicite el flujo." icon="fa-box-archive" color="bg-danger" />
                 </div>
               </div>
             </>
           )}
           {seccionActiva === 'atajos' && (
             <>
-              <h2 className="text-lg font-bold leading-6 text-content-1 dark:text-white flex items-center gap-2 mb-6">
-                <i className="fa-solid fa-keyboard text-brand-text"></i> Atajos de Teclado
+              <h2 className="text-title font-bold leading-6 text-content-1 flex items-center gap-2 mb-4">
+                <i className="fa-solid fa-keyboard text-brand-text" aria-hidden="true"></i> Atajos de teclado
               </h2>
+              <p className="mb-4 text-body text-content-3">Acciones rápidas para moverte por el sistema.</p>
               <div className={`${STYLES.card} p-6 sm:p-8 flex-1`}>
                 <div className="space-y-3">
                   {SHORTCUTS.map(s => (
@@ -215,8 +231,8 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
         </div>
 
         {/* Columna derecha: contacto y recursos rápidos */}
-        <div className="lg:col-span-7 flex flex-col gap-6">
-          <div className={`${STYLES.card} p-6 sm:p-8 self-start w-full`}>
+        <div className="flex min-w-0 flex-col gap-4 lg:sticky lg:top-5">
+          <div className={`${STYLES.card} p-5 sm:p-6 w-full`}>
             <h3 className="text-base font-bold text-content-1 dark:text-white mb-4 flex items-center gap-2">
               <i className="fa-solid fa-envelope text-brand-text"></i> Contacto y Soporte
             </h3>
@@ -227,7 +243,7 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
                 </div>
                 <div>
                   <p className="font-bold text-content-1 dark:text-white">Soporte patrimonial</p>
-                  <p className="text-xs text-content-3 dark:text-content-3">patrimonio@unp.edu.py</p>
+                  <a href="mailto:patrimonio@unp.edu.py" className="text-body text-brand-text hover:underline dark:text-brand">patrimonio@unp.edu.py</a>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -241,7 +257,7 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
               </div>
               <div className="pt-4 border-t border-line dark:border-line/60">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 mb-2">Versión del sistema</p>
-                <p className="text-sm text-content-2 dark:text-content-3">v{version} · Entorno de producción</p>
+                <p className="text-body text-content-2">v{version} · Universidad Nacional de Pilar</p>
               </div>
             </div>
           </div>

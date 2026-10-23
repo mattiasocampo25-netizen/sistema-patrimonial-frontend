@@ -35,36 +35,44 @@ export default function LoginScreen({
 
   return (
     <div
-      className={`${darkMode ? 'dark' : ''} min-h-dvh flex w-full font-sans antialiased selection:bg-brand/20 relative overflow-hidden bg-canvas text-content-1`}
+      className={`${darkMode ? 'dark' : ''} relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8`}
     >
-
-      {/* Fondo institucional: imagen del Rectorado (siempre visible) */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={rectoradoBg}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a1c38]/20 via-[#0a1c38]/50 to-[#0a1c38]/90 dark:from-[#0a1c38]/40 dark:via-[#0a1c38]/70 dark:to-[#0a1c38]/95"></div>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <span className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand/8 blur-3xl" />
+        <span className="absolute -bottom-40 -right-28 h-[28rem] w-[28rem] rounded-full bg-indigo-400/10 blur-3xl" />
       </div>
 
-      {/* Orbes decorativos sutiles (solo modo claro) */}
-      {!darkMode && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute -top-[10%] left-[10%] -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-blue-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
-          <div className="absolute -bottom-[10%] right-[10%] -translate-x-1/2 translate-y-1/2 w-[40rem] h-[40rem] rounded-full bg-indigo-50/40 blur-[120px]" style={{ filter: 'blur(100px)' }}></div>
-        </div>
-      )}
+      <div className="relative z-10 flex w-full items-center justify-center">
+        <div className="login-card-in grid w-full max-w-md overflow-hidden rounded-panel border border-line bg-surface-1 shadow-pop lg:max-w-5xl lg:grid-cols-[1.05fr_0.95fr]">
+          <aside className="login-hero relative hidden min-h-[640px] flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-12">
+            <img src={rectoradoBg} alt="" loading="lazy" decoding="async" className="login-kenburns absolute inset-0 h-full w-full object-cover object-center" />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-950/65 via-blue-950/65 to-indigo-950/90" />
+            <span className="login-orb-a absolute -right-20 -top-16 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
+            <span className="login-orb-b absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl" />
+            <div className="relative z-10 flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center rounded-card border border-white/20 bg-white/10 p-2 backdrop-blur-sm">
+                {appLogo ? <img src={appLogo} alt="" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-lg" />}
+              </span>
+              <span>
+                <span className="block text-sm font-bold tracking-wide">UNP · Patrimonio</span>
+                <span className="mt-0.5 block text-label font-medium text-white/70">Universidad Nacional de Pilar</span>
+              </span>
+            </div>
+            <div className="relative z-10 max-w-lg">
+              <p className="mb-3 text-label font-bold uppercase tracking-[0.2em] text-blue-200">Gestión institucional</p>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl">Control claro para cada bien.</h1>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Consulta el inventario, registra responsables y sigue cada movimiento desde un mismo lugar.</p>
+              <div className="mt-7 flex flex-wrap gap-2 text-label font-semibold text-white/90">
+                {['Inventario', 'Actas FC-04 · FC-10 · FC-11', 'Trazabilidad QR'].map(etiqueta => <span key={etiqueta} className="rounded-pill border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">{etiqueta}</span>)}
+              </div>
+            </div>
+            <p className="relative z-10 text-label text-white/60">Sistema de Gestión Patrimonial · Universidad Nacional de Pilar</p>
+          </aside>
 
-      {/* Contenido centrado, estilo Google */}
-      <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
-        <div className="w-full max-w-sm login-card-in">
-          <div className={`bg-surface-1/95 backdrop-blur-xl rounded-panel border border-white/70 dark:border-white/10 shadow-pop p-7 sm:p-9 relative flex flex-col text-content-1 ${loginError ? 'animate-shake' : ''}`}>
+          <div className={`relative flex flex-col justify-center p-7 text-content-1 sm:p-10 lg:p-12 ${loginError ? 'animate-shake' : ''}`}>
 
             {/* Logo institucional */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="login-rise login-rise-1 flex items-center gap-2 mb-2">
               {appLogo ? (
                 <img src={appLogo} alt="Logo UNP" className="h-9 w-9 object-contain" />
               ) : (
@@ -75,10 +83,10 @@ export default function LoginScreen({
               <span className="text-sm font-bold tracking-tight text-content-1">UNP <span className="font-medium text-content-3">· Patrimonio</span></span>
             </div>
 
-            <div className="mt-6 mb-8">
+            <div className="login-rise login-rise-2 mt-6 mb-8">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-content-1">Iniciar sesión</h2>
               <p className="text-sm mt-1 text-content-3">
-                Ingresa para continuar al sistema patrimonial.
+                Ingresa con tu cuenta institucional para continuar.
               </p>
             </div>
 
@@ -90,7 +98,7 @@ export default function LoginScreen({
                 </div>
               )}
 
-              <div className="space-y-2 text-left">
+              <div className="login-rise login-rise-3 space-y-2 text-left">
                 <label htmlFor="user" className="block text-label font-semibold uppercase tracking-wider text-content-2">Usuario</label>
                 <div className="relative group">
                   <i className="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-xs text-content-3 group-focus-within:text-brand transition-colors"></i>
@@ -112,7 +120,7 @@ export default function LoginScreen({
                 </div>
               </div>
 
-              <div className="space-y-2 text-left">
+              <div className="login-rise login-rise-3 space-y-2 text-left">
                 <div className="flex justify-between items-center">
                   <label htmlFor="pass" className="block text-label font-semibold uppercase tracking-wider text-content-2">Contraseña</label>
                   <button
@@ -146,6 +154,7 @@ export default function LoginScreen({
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 hover:text-brand-text transition-colors cursor-pointer"
                     title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   >
                     <i className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-xs`}></i>
                   </button>
@@ -162,7 +171,7 @@ export default function LoginScreen({
                 type="submit"
                 disabled={isProcessing}
                 aria-busy={isProcessing || undefined}
-                className="w-full rounded-control bg-brand px-4 py-3.5 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand/20 hover:shadow-brand/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                className="login-rise login-rise-4 w-full rounded-control bg-brand px-4 py-3.5 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand/20 hover:shadow-brand/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
               >
                 {isProcessing ? (
                   <>
@@ -202,18 +211,18 @@ export default function LoginScreen({
 
       {/* MODAL DE RECUPERACIÓN / SOPORTE */}
       {showRecoveryModal && (
-        <Dialogo className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onCerrar={() => setShowRecoveryModal(false)}>
+        <Dialogo className="fixed inset-0 z-[400] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fade-in" onCerrar={() => setShowRecoveryModal(false)}>
           <div className="w-full max-w-sm rounded-panel bg-surface-1 p-7 shadow-pop border border-line text-center text-content-1 animate-slide-up">
             <div className="h-14 w-14 rounded-card bg-blue-500/10 text-brand-text dark:text-brand border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
               <i className="fa-solid fa-headset text-xl"></i>
             </div>
-            <h3 className="text-lg font-bold text-content-1 dark:text-white tracking-tight">Recuperación de Acceso</h3>
+            <h3 className="text-lg font-bold text-content-1 tracking-tight">Recuperar acceso</h3>
             <p className="text-sm text-content-2 dark:text-content-3 font-medium mt-2 leading-relaxed">
-              Por políticas de seguridad patrimonial de la UNP, el restablecimiento de contraseñas es gestionado por el Desarrollador del sistema.
+              Para restablecer tu contraseña, solicita ayuda al equipo de soporte patrimonial. Incluye tu nombre de usuario para identificar la cuenta.
             </p>
             <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-zinc-800/50 border border-line dark:border-line text-[11px] font-bold text-content-1 dark:text-content-3">
-              <i className="fa-solid fa-envelope mr-2 text-brand-text dark:text-blue-400"></i>
-              Contacto: patrimonio@unp.edu.py
+              <i className="fa-solid fa-envelope mr-2 text-brand-text dark:text-blue-400" aria-hidden="true"></i>
+              <a href="mailto:patrimonio@unp.edu.py?subject=Recuperar%20acceso%20al%20sistema" className="text-brand-text underline-offset-2 hover:underline dark:text-brand">patrimonio@unp.edu.py</a>
             </div>
             <button
               onClick={() => setShowRecoveryModal(false)}

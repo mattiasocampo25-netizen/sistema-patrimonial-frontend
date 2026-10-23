@@ -72,8 +72,8 @@ export const ESTADO_SIGUIENTE = {
 
 // Los dos puestos de firma, en el orden en que se firman.
 export const PUESTOS_FIRMA = [
-  { clave: 'firma1', orden: 1, campo: 'funcionarioNombre', puesto: 'Funcionario Responsable' },
-  { clave: 'firma2', orden: 2, campo: 'jefeInmediatoNombre', puesto: 'Jefe Inmediato' }
+  { clave: 'firma1', orden: 1, campo: 'funcionarioNombre', puesto: 'Funcionario responsable' },
+  { clave: 'firma2', orden: 2, campo: 'jefeInmediatoNombre', puesto: 'Jefatura inmediata' }
 ];
 
 /**

@@ -16,6 +16,7 @@ import { useIdioma } from '../../utils/i18n';
 const GRUPOS = [
   {
     titulo: 'Operación',
+    icon: 'fa-chart-pie',
     items: [
       { id: 'dashboard', label: 'nav.dashboard', icon: 'fa-chart-pie' },
       { id: 'resumen', label: 'nav.resumen', icon: 'fa-house-user' },
@@ -25,6 +26,7 @@ const GRUPOS = [
   },
   {
     titulo: 'Documentos',
+    icon: 'fa-folder-open',
     items: [
       { id: 'fc04', label: 'nav.fc04', icon: 'fa-file-invoice' },
       { id: 'fc10', label: 'nav.fc10', icon: 'fa-file-signature' },
@@ -33,6 +35,7 @@ const GRUPOS = [
   },
   {
     titulo: 'Administración',
+    icon: 'fa-sliders',
     soloAdmin: true,
     items: [
       { id: 'aprobaciones', label: 'nav.aprobaciones', icon: 'fa-check-to-slot' },
@@ -42,11 +45,13 @@ const GRUPOS = [
   },
   {
     titulo: 'Avisos',
+    icon: 'fa-bullhorn',
     soloDesarrollador: true,
     items: [{ id: 'anuncios', label: 'nav.anuncios', icon: 'fa-bullhorn' }]
   },
   {
     titulo: 'Ayuda',
+    icon: 'fa-circle-question',
     items: [{ id: 'ayuda', label: 'nav.ayuda', icon: 'fa-circle-question' }]
   }
 ];
@@ -142,6 +147,7 @@ export default function AppSidebar({
   // difumina el borde (arriba y/o abajo) segun lo que haya fuera de vista.
   const navRef = useRef(null);
   const [utilidadesAbiertas, setUtilidadesAbiertas] = useState(true);
+  const [gruposAbiertos, setGruposAbiertos] = useState(() => Object.fromEntries(GRUPOS.map(grupo => [grupo.titulo, true])));
   const [desbordes, setDesbordes] = useState({ arriba: false, abajo: false });
 
   useEffect(() => {
@@ -188,7 +194,7 @@ export default function AppSidebar({
         aria-label="Navegación principal"
       >
         {/* Identidad */}
-        <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[112px] justify-center px-3 pb-12 pt-3' : 'min-h-[76px] px-5 py-4'}`}>
+        <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[88px] justify-center px-2 pb-8 pt-2' : 'min-h-[76px] px-5 py-4'}`}>
           {appLogo ? (
             <div className={`flex min-w-0 items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1/10 shadow-card border border-white/10 overflow-hidden p-1.5">
@@ -247,12 +253,20 @@ export default function AppSidebar({
             const visibles = grupo.items;
             if (!visibles.length) return null;
             return (
-              <div key={grupo.titulo}>
-                <p className={`px-3 pb-1.5 text-label font-semibold text-sidebar-content-3 uppercase tracking-[0.13em] animate-fade-in ${compacta ? 'lg:hidden' : ''}`}>
-                  {grupo.titulo}
-                </p>
-                {compacta ? <div className="mx-auto mb-2 hidden h-px w-8 bg-sidebar-line lg:block" aria-hidden="true" /> : null}
-                <div className="space-y-1">
+              <section key={grupo.titulo} className="space-y-1">
+                <button
+                  type="button"
+                  onClick={() => setGruposAbiertos(actuales => ({ ...actuales, [grupo.titulo]: !actuales[grupo.titulo] }))}
+                  aria-expanded={!!gruposAbiertos[grupo.titulo]}
+                  aria-controls={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                  title={compacta ? grupo.titulo : undefined}
+                  className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                >
+                  <i className={`fa-solid ${grupo.icon} w-5 text-center text-[11px]`} aria-hidden="true" />
+                  <span className={`flex-1 text-left uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>{grupo.titulo}</span>
+                  <i className={`fa-solid fa-chevron-down text-[9px] transition-transform ${gruposAbiertos[grupo.titulo] ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
+                </button>
+                {gruposAbiertos[grupo.titulo] ? <div id={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className={`${compacta ? 'space-y-1' : 'ml-3 border-l border-sidebar-line pl-1.5 space-y-1'} animate-fade-in`}>
                   {visibles.map((item) => (
                     <ItemNav
                       key={item.id}
@@ -264,8 +278,8 @@ export default function AppSidebar({
                       compacta={compacta}
                     />
                   ))}
-                </div>
-              </div>
+                </div> : null}
+              </section>
             );
           })}
         </nav>

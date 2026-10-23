@@ -469,7 +469,7 @@ export default function InventarioView({
           ))}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          <div className="hidden md:flex items-center rounded-control border border-line dark:border-zinc-700/30 overflow-hidden" title="Vista de resultados">
+          <div className="flex items-center rounded-control border border-line dark:border-zinc-700/30 overflow-hidden" title="Vista de resultados">
             <button
               onClick={() => cambiarVistaInv('tabla')} title="Vista tabla" aria-label="Vista tabla"
               aria-pressed={vistaInv === 'tabla'}
@@ -478,7 +478,7 @@ export default function InventarioView({
               <i className="fa-solid fa-table-list text-xs"></i>
             </button>
             <button
-              onClick={() => cambiarVistaInv('tarjetas')} title="Vista tarjetas" aria-label="Vista tarjetas"
+              onClick={() => cambiarVistaInv('tarjetas')} title="Vista compacta de tarjetas" aria-label="Vista compacta de tarjetas"
               aria-pressed={vistaInv === 'tarjetas'}
               className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'tarjetas' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
             >
@@ -490,6 +490,13 @@ export default function InventarioView({
               className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'kanban' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
             >
               <i className="fa-solid fa-table-columns text-xs"></i>
+            </button>
+            <button
+              onClick={() => cambiarVistaInv('galeria')} title="Vista detallada de fichas" aria-label="Vista detallada de fichas"
+              aria-pressed={vistaInv === 'galeria'}
+              className={`flex h-9 w-9 items-center justify-center transition-[color,background-color,transform] duration-[var(--dur-fast)] cursor-pointer ${vistaInv === 'galeria' ? 'bg-brand text-content-inverse shadow-sm' : 'text-content-3 hover:bg-surface-3 hover:text-content-1'}`}
+            >
+              <i className="fa-solid fa-address-card text-xs"></i>
             </button>
           </div>
           {hasFilters && onCopiarLink && (
@@ -587,7 +594,58 @@ export default function InventarioView({
                     <SkeletonLoader />
                   ) : (
                   <div className="bg-surface-1 dark:bg-zinc-900/40 border border-line/70 dark:border-zinc-700/30 rounded-panel shadow-sm overflow-hidden" data-tour="inv-table">
-                    {vistaInv === 'tarjetas' ? (
+                    {vistaInv === 'galeria' ? (
+                    <div className="p-4 sm:p-6">
+                      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+                        <div>
+                          <h2 className="text-title font-bold text-content-1">Fichas de bienes</h2>
+                          <p className="mt-1 text-body text-content-3">Cada ficha reúne responsable, ubicación, estado y accesos frecuentes.</p>
+                        </div>
+                        <span className="text-label font-semibold text-content-3">{filteredBienes.length.toLocaleString('es-PY')} bienes en esta vista</span>
+                      </div>
+                      {itemsPaginados.length ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4">
+                          {itemsPaginados.map(item => {
+                            const estado = (item.estadoConservacion || 'Regular').toLowerCase();
+                            const tonoEstado = estado.includes('muy bueno') || estado.includes('excelente')
+                              ? 'bg-ok-soft text-ok border-ok/25'
+                              : estado.includes('bueno') ? 'bg-info-soft text-info border-info/25' : 'bg-warn-soft text-warn border-warn/25';
+                            return (
+                              <article key={item.id} className={`group rounded-panel border bg-surface-1 p-4 shadow-card transition-[border-color,box-shadow,transform] duration-[var(--dur-base)] hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-panel ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line'}`}>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex min-w-0 items-start gap-3">
+                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text"><i className="fa-solid fa-box" aria-hidden="true" /></span>
+                                    <div className="min-w-0">
+                                      <span className="inline-flex max-w-full truncate rounded-md bg-surface-2 px-2 py-1 font-mono text-label font-bold text-content-2">{item.rotulo || 'Sin rótulo'}</span>
+                                      <h3 className="mt-2 line-clamp-2 text-body font-bold leading-snug text-content-1" title={item.descripcion}>{item.descripcion || 'Sin descripción'}</h3>
+                                    </div>
+                                  </div>
+                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar bien" aria-label={`Seleccionar ${item.rotulo || item.descripcion}`} className="mt-1 h-4 w-4 shrink-0 rounded border-line-strong text-brand-text cursor-pointer" />
+                                </div>
+                                <div className="mt-4 grid grid-cols-1 gap-2 rounded-control bg-surface-2 p-3">
+                                  <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-user-check mt-0.5 w-4 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Responsable</span><span className="block truncate font-semibold text-content-1">{item.funcionario || 'Sin asignar'}</span></span></div>
+                                  <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-location-dot mt-0.5 w-4 shrink-0 text-danger" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Ubicación</span><span className="block truncate font-semibold text-content-1">{item.ubicacion || 'Sin ubicación'}</span></span></div>
+                                </div>
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                  <span className={`rounded-pill border px-2.5 py-1 text-label font-bold ${tonoEstado}`}>{item.estadoConservacion || 'Regular'}</span>
+                                  <span className={`rounded-pill border px-2.5 py-1 text-label font-bold ${item.hasQR ? 'border-brand/20 bg-brand-soft text-brand-text' : 'border-line bg-surface-2 text-content-3'}`}><i className="fa-solid fa-qrcode mr-1" aria-hidden="true" />{item.hasQR ? 'Con QR' : 'Sin QR'}</span>
+                                  <span className={`rounded-pill border px-2.5 py-1 text-label font-bold ${fc10VigentePorBien.has(item.id) ? 'border-ok/25 bg-ok-soft text-ok' : 'border-line bg-surface-2 text-content-3'}`}>{fc10VigentePorBien.has(item.id) ? 'Con FC-10' : 'Sin FC-10'}</span>
+                                </div>
+                                <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-line pt-3">
+                                  <button onClick={() => openFichaBien(item)} title="Abrir ficha y trazabilidad" aria-label="Abrir ficha y trazabilidad" className="inline-flex h-9 items-center gap-2 rounded-control bg-brand px-3 text-label font-bold text-content-inverse hover:bg-brand-hover motion"><i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />Ver ficha</button>
+                                  <button onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} title="Ver o generar QR" aria-label="Ver o generar QR" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-qrcode" aria-hidden="true" /></button>
+                                  <button onClick={() => openFC10Modal(item)} title="Crear o gestionar acta FC-10" aria-label="Crear o gestionar acta FC-10" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-file-signature" aria-hidden="true" /></button>
+                                  <button onClick={() => openFC11Modal(item)} title="Registrar traslado FC-11" aria-label="Registrar traslado FC-11" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-truck-fast" aria-hidden="true" /></button>
+                                  <button onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} title="Editar bien" aria-label="Editar bien" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-pen-to-square" aria-hidden="true" /></button>
+                                  <button onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} title={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} aria-label={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} className="flex h-9 w-9 items-center justify-center rounded-control border border-danger/20 bg-danger-soft text-danger hover:bg-danger/15 motion"><i className="fa-solid fa-trash-can" aria-hidden="true" /></button>
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      ) : <div className="py-8"><EmptyState icon="fa-filter-circle-xmark" titulo="No hay bienes para mostrar" descripcion="Prueba quitando algún filtro o cambia las palabras de búsqueda." accionLabel="Restablecer filtros" onAccion={clearAllFilters} /></div>}
+                    </div>
+                    ) : vistaInv === 'tarjetas' ? (
                     <div className="p-4 sm:p-5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                         {itemsPaginados.map((item) => (

@@ -61,7 +61,7 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
   });
   const [seleccionados, setSeleccionados] = useState([]);
   const [vistaInv, setVistaInv] = useState(() => {
-    try { return localStorage.getItem('inv_vista') || 'tabla'; } catch { return 'tabla'; }
+    try { return localStorage.getItem('inv_vista') || 'galeria'; } catch { return 'galeria'; }
   });
   const cambiarPaginaTam = useCallback((n) => {
     setItemsPorPagina(n);

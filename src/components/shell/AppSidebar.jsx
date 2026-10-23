@@ -141,6 +141,7 @@ export default function AppSidebar({
   // elemento del borde queda cortado a la mitad y no se ve que hay mas: se
   // difumina el borde (arriba y/o abajo) segun lo que haya fuera de vista.
   const navRef = useRef(null);
+  const [utilidadesAbiertas, setUtilidadesAbiertas] = useState(true);
   const [desbordes, setDesbordes] = useState({ arriba: false, abajo: false });
 
   useEffect(() => {
@@ -271,10 +272,13 @@ export default function AppSidebar({
 
         {/* Herramientas de administración */}
         {isAdmin ? (
-          <div className={`shrink-0 border-t border-sidebar-line py-3 space-y-0.5 ${compacta ? 'px-3 lg:px-2' : 'px-3'}`}>
-            <p className={`px-3 pb-1.5 text-label font-semibold text-sidebar-content-3 uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>
-              Utilidades
-            </p>
+          <div className={`shrink-0 border-t border-sidebar-line py-3 ${compacta ? 'px-3 lg:px-2' : 'px-3'}`}>
+            <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={utilidadesAbiertas ? 'Ocultar utilidades' : 'Mostrar utilidades'} className={`group flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-9 rounded-control text-label font-semibold uppercase tracking-[0.13em] text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
+              <i className="fa-solid fa-toolbox w-6 text-center text-[13px]" aria-hidden="true" />
+              <span className={`flex-1 text-left ${compacta ? 'lg:hidden' : ''}`}>Utilidades</span>
+              <i className={`fa-solid fa-chevron-down text-[10px] transition-transform ${utilidadesAbiertas ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
+            </button>
+            {utilidadesAbiertas ? <div id="sidebar-utilities" className="mt-1 space-y-0.5 animate-fade-in">
             <ItemHerramienta
               icono="fa-database"
               titulo="Copia de seguridad"
@@ -316,6 +320,7 @@ export default function AppSidebar({
                 ) : null
               }
             />
+            </div> : null}
           </div>
         ) : null}
 
@@ -326,7 +331,7 @@ export default function AppSidebar({
             </span>
             <span className={`min-w-0 flex-1 ${compacta ? 'lg:hidden' : ''}`}>
               <span className="block truncate text-xs font-bold text-sidebar-content">{currentUser?.nombre || currentUser?.username || 'Usuario'}</span>
-              <span className="block truncate text-[10px] font-medium text-sidebar-content-3">{isAdmin ? 'Administrador' : esDesarrollador ? 'Desarrollador' : 'Usuario del sistema'}</span>
+              <span className="block truncate text-[10px] font-medium text-sidebar-content-3">{esDesarrollador ? 'Desarrollador' : isAdmin ? 'Administrador' : 'Usuario del sistema'}</span>
             </span>
           </div>
         </div>

@@ -360,9 +360,6 @@ export default function AppTopbar({
             {/* Perfil */}
             <div className="flex items-center gap-2 pl-2 ml-1 border-l border-line">
               <div className="hidden xl:flex flex-col text-right leading-tight">
-                <span className="text-body font-bold text-content-1 truncate max-w-[140px]">
-                  {currentUser?.nombre ? currentUser.nombre.split(' ')[0] : 'Usuario'}
-                </span>
                 <span className="text-label font-bold text-content-3 uppercase tracking-[0.14em] mt-0.5">
                   {isAdmin ? (currentUser?.role === 'dev' ? 'Desarrollador' : 'Administrador') : 'Funcionario'}
                 </span>

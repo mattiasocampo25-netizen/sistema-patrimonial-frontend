@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useIdioma } from '../../utils/i18n';
 
 /**
@@ -59,20 +60,28 @@ const GRUPOS = [
  * re-render entre que se busca el boton y se lo pulsa (pasaba con FC-04).
  */
 function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
+  const [tooltip, setTooltip] = useState(null);
+  const ubicarTooltip = (event) => {
+    if (!compacta || window.innerWidth < 1024) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    setTooltip({ left: rect.right + 10, top: rect.top + rect.height / 2 });
+  };
   return (
+    <>
     <button
       type="button"
       onClick={() => onIr(item.id)}
       aria-current={activo ? 'page' : undefined}
-      title={t(item.label)}
+      title={compacta ? t(item.label) : undefined}
+      onMouseEnter={ubicarTooltip}
+      onMouseLeave={() => setTooltip(null)}
+      onFocus={ubicarTooltip}
+      onBlur={() => setTooltip(null)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand hover:translate-x-0.5 ${ activo ? 'bg-brand/10 dark:bg-brand/15 text-sidebar-content font-semibold shadow-[inset_0_0_0_1px_rgb(29_78_216/0.12)] dark:shadow-[inset_0_0_0_1px_rgb(255_255_255/0.07)]' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
+      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
-      {activo ? (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-pill bg-brand" aria-hidden="true" />
-      ) : null}
       <span className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-[var(--dur-fast)] group-hover:scale-110 ${activo ? 'text-brand-text' : 'text-sidebar-content-2 group-hover:text-sidebar-content'}`}>
-        <i className={`fa-solid ${item.icon} text-[13px]`} aria-hidden="true" />
+        <i className={`fa-solid ${item.icon} text-[13px] ${activo ? 'text-white' : ''}`} aria-hidden="true" />
       </span>
       <span className={`flex-1 text-left tracking-tight truncate ${compacta ? 'lg:hidden' : ''}`}>{t(item.label)}</span>
 
@@ -82,6 +91,12 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
         </span>
       ) : null}
     </button>
+    {compacta && tooltip && createPortal(
+      <span aria-hidden="true" style={{ left: tooltip.left, top: tooltip.top, transform: 'translateY(-50%)' }} className="pointer-events-none fixed z-[100] whitespace-nowrap rounded-lg bg-zinc-950 px-3 py-2 text-xs font-semibold text-white shadow-xl animate-fade-in">
+        {t(item.label)}
+      </span>, document.body
+    )}
+    </>
   );
 }
 
@@ -119,7 +134,8 @@ export default function AppSidebar({
   onOpenRestore,
   mantenimiento,
   onOpenMantenimiento,
-  onOpenDependencias
+  onOpenDependencias,
+  currentUser
 }) {
   // El menu se puede desplazar cuando la ventana es baja. Sin avisar, el
   // elemento del borde queda cortado a la mitad y no se ve que hay mas: se
@@ -166,12 +182,12 @@ export default function AppSidebar({
       ) : null}
 
       <aside
-        className={`sidebar-premium fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border-r border-sidebar-line shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0 shadow-panel' : '-translate-x-full' }`}
+        className={`sidebar-premium fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border-r border-sidebar-line shadow-panel shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:my-3 lg:ml-3 lg:rounded-2xl lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0' : '-translate-x-full' }`}
         id="sidebar-navigation"
         aria-label="Navegación principal"
       >
         {/* Identidad */}
-        <div className={`relative flex min-h-[76px] shrink-0 items-center border-b border-sidebar-line ${compacta ? 'justify-center px-3 py-3' : 'px-5 py-4'}`}>
+        <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[112px] justify-center px-3 pb-12 pt-3' : 'min-h-[76px] px-5 py-4'}`}>
           {appLogo ? (
             <div className={`flex min-w-0 items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1/10 shadow-card border border-white/10 overflow-hidden p-1.5">
@@ -189,15 +205,11 @@ export default function AppSidebar({
           ) : (
             <div className={`flex items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
               {/* El logotipo acompaña el tono del sidebar en ambos temas. */}
-              {compacta ? (
+              {compacta ? <>
                 <span className="hidden lg:flex h-10 w-10 items-center justify-center rounded-control border border-sidebar-line bg-surface-1/10 text-sm font-black tracking-tight text-sidebar-content" aria-label="Universidad Nacional de Pilar" title="Universidad Nacional de Pilar">UNP</span>
-              ) : (
-                <img
-                  src={LOGO_SISTEMA}
-                  alt="Universidad Nacional de Pilar"
-                  className="h-9 w-auto max-w-[150px] object-contain object-left"
-                  onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }}
-                />
+                <img src={LOGO_SISTEMA} alt="Universidad Nacional de Pilar" className="h-8 w-auto max-w-[150px] object-contain object-left lg:hidden" onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }} />
+              </> : (
+                <img src={LOGO_SISTEMA} alt="Universidad Nacional de Pilar" className="h-9 w-auto max-w-[150px] object-contain object-left" onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }} />
               )}
               {!compacta ? <div className="flex-1" /> : null}
             </div>
@@ -205,7 +217,7 @@ export default function AppSidebar({
           <button
             type="button"
             onClick={onToggleCompacta}
-            className="absolute right-3 top-1/2 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-control text-sidebar-content-2 transition-colors hover:bg-white/[0.08] hover:text-sidebar-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:inline-flex"
+            className={`absolute hidden h-8 w-8 items-center justify-center rounded-control text-sidebar-content-2 transition-colors hover:bg-brand/10 hover:text-sidebar-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:inline-flex ${compacta ? 'bottom-2 left-1/2 right-auto top-auto -translate-x-1/2 translate-y-0' : 'right-3 top-1/2 -translate-y-1/2'}`}
             title={compacta ? 'Expandir navegación' : 'Contraer navegación'}
             aria-label={compacta ? 'Expandir navegación' : 'Contraer navegación'}
             aria-expanded={!compacta}
@@ -239,7 +251,7 @@ export default function AppSidebar({
                   {grupo.titulo}
                 </p>
                 {compacta ? <div className="mx-auto mb-2 hidden h-px w-8 bg-sidebar-line lg:block" aria-hidden="true" /> : null}
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {visibles.map((item) => (
                     <ItemNav
                       key={item.id}
@@ -306,6 +318,18 @@ export default function AppSidebar({
             />
           </div>
         ) : null}
+
+        <div className={`shrink-0 border-t border-sidebar-line ${compacta ? 'p-3 lg:px-2' : 'p-3.5'} `}>
+          <div className={`flex min-w-0 items-center gap-3 rounded-xl ${compacta ? 'lg:justify-center lg:px-0' : 'px-2 py-1.5'}`}>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-sm font-bold text-white shadow-sm">
+              {(currentUser?.nombre || currentUser?.username || 'U').charAt(0).toUpperCase()}
+            </span>
+            <span className={`min-w-0 flex-1 ${compacta ? 'lg:hidden' : ''}`}>
+              <span className="block truncate text-xs font-bold text-sidebar-content">{currentUser?.nombre || currentUser?.username || 'Usuario'}</span>
+              <span className="block truncate text-[10px] font-medium text-sidebar-content-3">{isAdmin ? 'Administrador' : esDesarrollador ? 'Desarrollador' : 'Usuario del sistema'}</span>
+            </span>
+          </div>
+        </div>
       </aside>
     </>
   );

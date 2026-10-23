@@ -150,9 +150,10 @@ body {
 .sidebar-premium {
   background-color: var(--sidebar);
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.055), transparent 48%),
-    linear-gradient(165deg, #ffffff 0%, #f7f9fc 52%, #f1f4f8 100%);
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.035), transparent 48%),
+    linear-gradient(165deg, #ffffff 0%, #ffffff 62%, #f8faff 100%);
   border-color: var(--sidebar-line);
+  box-shadow: 0 10px 32px rgb(15 23 42 / 0.08), 0 2px 6px rgb(15 23 42 / 0.04);
 }
 
 .dark .sidebar-premium {

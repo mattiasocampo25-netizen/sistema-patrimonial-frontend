@@ -87,6 +87,7 @@ export default function AppShell({
         mantenimiento={mantenimiento}
         onOpenMantenimiento={onOpenMantenimiento}
         onOpenDependencias={onOpenDependencias}
+        currentUser={currentUser}
       />
 
       <div className="flex flex-1 flex-col min-w-0">

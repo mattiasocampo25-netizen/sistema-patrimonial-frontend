@@ -194,7 +194,7 @@ export default function AppSidebar({
         aria-label="Navegación principal"
       >
         {/* Identidad */}
-        <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[88px] justify-center px-2 pb-8 pt-2' : 'min-h-[76px] px-5 py-4'}`}>
+        <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[76px] px-5 py-4 lg:min-h-[100px] lg:flex-col lg:justify-center lg:gap-2 lg:px-2 lg:py-2' : 'min-h-[76px] px-5 py-4'}`}>
           {appLogo ? (
             <div className={`flex min-w-0 items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1/10 shadow-card border border-white/10 overflow-hidden p-1.5">
@@ -224,7 +224,7 @@ export default function AppSidebar({
           <button
             type="button"
             onClick={onToggleCompacta}
-            className={`absolute hidden h-8 w-8 items-center justify-center rounded-control text-sidebar-content-2 transition-colors hover:bg-brand/10 hover:text-sidebar-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:inline-flex ${compacta ? 'bottom-2 left-1/2 right-auto top-auto -translate-x-1/2 translate-y-0' : 'right-3 top-1/2 -translate-y-1/2'}`}
+            className={`absolute hidden h-8 w-8 items-center justify-center rounded-control text-sidebar-content-2 transition-colors hover:bg-brand/10 hover:text-sidebar-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:inline-flex ${compacta ? 'lg:static lg:translate-x-0 lg:translate-y-0' : 'right-3 top-1/2 -translate-y-1/2'}`}
             title={compacta ? 'Expandir navegación' : 'Contraer navegación'}
             aria-label={compacta ? 'Expandir navegación' : 'Contraer navegación'}
             aria-expanded={!compacta}
@@ -242,7 +242,7 @@ export default function AppSidebar({
           </button>
         </div>
 
-        {/* Navegación por grupos */}
+        {/* Navegación principal y utilidades dentro de un único menú desplazable */}
         <nav
           ref={navRef}
           className={`flex-1 overflow-y-auto ${compacta ? 'px-3 py-4 space-y-4 lg:px-2 lg:space-y-3' : 'px-3 py-4 space-y-4'} custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
@@ -282,61 +282,28 @@ export default function AppSidebar({
               </section>
             );
           })}
+          {isAdmin ? (
+            <section className="space-y-1 border-t border-sidebar-line pt-3">
+              <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={compacta ? 'Utilidades' : undefined} className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
+                <i className="fa-solid fa-toolbox w-5 text-center text-[11px]" aria-hidden="true" />
+                <span className={`flex-1 text-left uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>Utilidades</span>
+                <i className={`fa-solid fa-chevron-down text-[9px] transition-transform ${utilidadesAbiertas ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
+              </button>
+              {utilidadesAbiertas ? <div id="sidebar-utilities" className={`${compacta ? 'space-y-1' : 'ml-3 border-l border-sidebar-line pl-1.5 space-y-1'} animate-fade-in`}>
+                <ItemHerramienta icono="fa-database" titulo="Copia de seguridad" compacta={compacta} onClick={() => { onExportBackup?.(); cerrar(); }} />
+                <ItemHerramienta icono="fa-clock-rotate-left" titulo="Restaurar respaldo" compacta={compacta} onClick={() => { onOpenRestore?.(); cerrar(); }} />
+                <ItemHerramienta icono="fa-building-columns" titulo="Dependencias" compacta={compacta} onClick={() => { onOpenDependencias?.(); cerrar(); }} />
+                <ItemHerramienta
+                  icono="fa-screwdriver-wrench"
+                  titulo="Mantenimiento"
+                  compacta={compacta}
+                  onClick={() => { onOpenMantenimiento?.(); cerrar(); }}
+                  badge={mantenimiento?.en_mantenimiento ? <span className="h-2 w-2 rounded-full bg-warn shrink-0" aria-label="Mantenimiento activo" /> : null}
+                />
+              </div> : null}
+            </section>
+          ) : null}
         </nav>
-
-        {/* Herramientas de administración */}
-        {isAdmin ? (
-          <div className={`shrink-0 border-t border-sidebar-line py-3 ${compacta ? 'px-3 lg:px-2' : 'px-3'}`}>
-            <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={utilidadesAbiertas ? 'Ocultar utilidades' : 'Mostrar utilidades'} className={`group flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-9 rounded-control text-label font-semibold uppercase tracking-[0.13em] text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
-              <i className="fa-solid fa-toolbox w-6 text-center text-[13px]" aria-hidden="true" />
-              <span className={`flex-1 text-left ${compacta ? 'lg:hidden' : ''}`}>Utilidades</span>
-              <i className={`fa-solid fa-chevron-down text-[10px] transition-transform ${utilidadesAbiertas ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
-            </button>
-            {utilidadesAbiertas ? <div id="sidebar-utilities" className="mt-1 space-y-0.5 animate-fade-in">
-            <ItemHerramienta
-              icono="fa-database"
-              titulo="Copia de seguridad"
-              compacta={compacta}
-              onClick={() => {
-                if (onExportBackup) onExportBackup();
-                cerrar();
-              }}
-            />
-            <ItemHerramienta
-              icono="fa-clock-rotate-left"
-              titulo="Restaurar respaldo"
-              compacta={compacta}
-              onClick={() => {
-                if (onOpenRestore) onOpenRestore();
-                cerrar();
-              }}
-            />
-            <ItemHerramienta
-              icono="fa-building-columns"
-              titulo="Dependencias"
-              compacta={compacta}
-              onClick={() => {
-                if (onOpenDependencias) onOpenDependencias();
-                cerrar();
-              }}
-            />
-            <ItemHerramienta
-              icono="fa-screwdriver-wrench"
-              titulo="Mantenimiento"
-              compacta={compacta}
-              onClick={() => {
-                if (onOpenMantenimiento) onOpenMantenimiento();
-                cerrar();
-              }}
-              badge={
-                mantenimiento && mantenimiento.en_mantenimiento ? (
-                  <span className="h-2 w-2 rounded-full bg-warn shrink-0" aria-label="Mantenimiento activo" />
-                ) : null
-              }
-            />
-            </div> : null}
-          </div>
-        ) : null}
 
         <div className={`shrink-0 border-t border-sidebar-line ${compacta ? 'p-3 lg:px-2' : 'p-3.5'} `}>
           <div className={`flex min-w-0 items-center gap-3 rounded-xl ${compacta ? 'lg:justify-center lg:px-0' : 'px-2 py-1.5'}`}>

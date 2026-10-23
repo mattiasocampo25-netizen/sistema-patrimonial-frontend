@@ -85,13 +85,13 @@ export default function DashboardView({
       sublabel: stats.fc10Pendientes > 0
         ? stats.fc10Pendientes + ' en firma · ' + Math.max(0, stats.withoutFc10 - stats.fc10Pendientes) + ' sin acta'
         : 'Pendientes de asignación',
-      subColor: stats.fc10Pendientes > 0 ? 'text-warn dark:text-amber-400' : 'text-warn dark:text-amber-400',
+      subColor: 'text-brand-text dark:text-brand',
       icon: 'fa-file-signature',
-      iconBg: 'bg-amber-500 text-white',
-      iconColor: 'text-white',
-      border: 'border-amber-200/80 dark:border-amber-500/35',
-      hoverBorder: 'hover:border-amber-300 dark:hover:border-amber-500/40',
-      ring: 'focus-visible:ring-amber-500',
+      iconBg: 'bg-brand text-content-inverse',
+      iconColor: 'text-content-inverse',
+      border: 'border-brand/20 dark:border-brand/25',
+      hoverBorder: 'hover:border-brand/40 dark:hover:border-brand/45',
+      ring: 'focus-visible:ring-brand',
       numero: <AnimatedNumber value={stats.withoutFc10} />,
       onClick: () => irInventario(() => setFiltroFC10('NO')),
       showProgress: false,
@@ -230,10 +230,10 @@ export default function DashboardView({
 
       {/* 2A. ACTAS POR FIRMAR */}
       {actasPorFirmar.length > 0 && (
-        <div className="bg-surface-1 dark:bg-surface-1/[0.03] rounded-card border border-amber-200/60 dark:border-amber-400/20 shadow-sm overflow-hidden" data-tour="dash-firmas">
-          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-amber-500/[0.05] border-b border-amber-500/20">
+        <div className="bg-surface-1 rounded-card border border-brand/20 shadow-sm overflow-hidden" data-tour="dash-firmas">
+          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-brand/5 border-b border-brand/15">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-amber-500 text-white shadow-xs shadow-amber-500/20">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand text-content-inverse shadow-xs shadow-brand/20">
                 <i className="fa-solid fa-file-signature text-[10px]"></i>
               </span>
               <div className="min-w-0">
@@ -241,7 +241,7 @@ export default function DashboardView({
                   <h2 className="text-sm font-bold text-content-1 dark:text-white tracking-tight">
                     Actas por firmar
                   </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-amber-500 text-white">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-brand text-content-inverse">
                     {actasPorFirmar.length}
                   </span>
                 </div>
@@ -254,7 +254,7 @@ export default function DashboardView({
             </div>
             <button
               onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-black shadow-xs shadow-amber-500/25 motion active:scale-95 cursor-pointer shrink-0"
+              className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-brand hover:bg-brand-hover text-content-inverse text-[11px] font-black shadow-xs shadow-brand/25 motion active:scale-95 cursor-pointer shrink-0"
             >
               Revisar actas
             </button>
@@ -262,12 +262,12 @@ export default function DashboardView({
 
           <div className="divide-y divide-line">
             {actasPorFirmar.slice(0, 5).map(({ fc, bien, pendiente }) => (
-              <div key={fc.id} className="flex items-center gap-2.5 px-5 sm:px-6 py-3 hover:bg-amber-500/[0.02] transition-colors">
+              <div key={fc.id} className="flex items-center gap-2.5 px-5 sm:px-6 py-3 hover:bg-brand/5 transition-colors">
                 <button
                   onClick={() => setActiveTab('fc10')}
                   className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-warn dark:text-amber-400">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-text dark:text-brand">
                     <i className="fa-solid fa-file-signature text-[9px]"></i>
                   </span>
                   <span className="min-w-0 flex-1">
@@ -284,7 +284,7 @@ export default function DashboardView({
             {actasPorFirmar.length > 5 && (
               <button
                 onClick={() => setActiveTab('fc10')}
-                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-warn dark:text-amber-400 hover:bg-amber-500/[0.02] transition-colors cursor-pointer"
+                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-brand-text dark:text-brand hover:bg-brand/5 transition-colors cursor-pointer"
               >
                 Ver las {actasPorFirmar.length} actas en FC-10
               </button>

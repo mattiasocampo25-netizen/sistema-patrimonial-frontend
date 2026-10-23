@@ -141,7 +141,7 @@ export default function AppTopbar({
                 type="button"
                 onClick={() => setActiveTab && setActiveTab('fc10')}
                 title={`${actasPorFirmarCount} actas con firmas pendientes`}
-                className="relative inline-flex items-center gap-2 h-10 px-3 rounded-control bg-warn-soft text-warn border border-warn/25 hover:brightness-95 transition-colors"
+                className="relative inline-flex items-center gap-2 h-10 px-3 rounded-control bg-brand-soft text-brand-text border border-brand/20 hover:bg-brand/10 transition-colors"
               >
                 <i className="fa-solid fa-file-signature text-xs" aria-hidden="true" />
                 <span className="hidden sm:inline text-body font-bold tabular-nums">{actasPorFirmarCount}</span>

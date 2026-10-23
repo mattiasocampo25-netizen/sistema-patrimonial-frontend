@@ -12,8 +12,6 @@ export default function LoginScreen({
   showPassword,
   setShowPassword,
   loginError,
-  darkMode,
-
   appLogo,
   toasts,
   isProcessing = false,
@@ -35,15 +33,15 @@ export default function LoginScreen({
 
   return (
     <div
-      className={`${darkMode ? 'dark' : ''} relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8`}
+      className="dark relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-[#091426] px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <span className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand/8 blur-3xl" />
+        <span className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-400/10 blur-3xl" />
         <span className="absolute -bottom-40 -right-28 h-[28rem] w-[28rem] rounded-full bg-indigo-400/10 blur-3xl" />
       </div>
 
       <div className="relative z-10 flex w-full items-center justify-center">
-        <div className="login-card-in grid w-full max-w-md overflow-hidden rounded-panel border border-line bg-surface-1 shadow-pop lg:max-w-5xl lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="login-card-in grid w-full max-w-md overflow-hidden rounded-panel border border-white/10 bg-[#101f34] shadow-pop shadow-black/40 lg:max-w-5xl lg:grid-cols-[1.05fr_0.95fr]">
           <aside className="login-hero relative hidden min-h-[640px] flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-12">
             <img src={rectoradoBg} alt="" loading="lazy" decoding="async" className="login-kenburns absolute inset-0 h-full w-full object-cover object-center" />
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/65 via-blue-950/65 to-indigo-950/90" />
@@ -69,7 +67,7 @@ export default function LoginScreen({
             <p className="relative z-10 text-label text-white/60">Sistema de Gestión Patrimonial · Universidad Nacional de Pilar</p>
           </aside>
 
-          <div className={`relative flex flex-col justify-center p-7 text-content-1 sm:p-10 lg:p-12 ${loginError ? 'animate-shake' : ''}`}>
+          <div className={`relative flex flex-col justify-center bg-gradient-to-br from-[#101f34] to-[#0c192c] p-7 text-content-1 sm:p-10 lg:p-12 ${loginError ? 'animate-shake' : ''}`}>
 
             {/* Logo institucional */}
             <div className="login-rise login-rise-1 flex items-center gap-2 mb-2">

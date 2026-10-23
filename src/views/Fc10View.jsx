@@ -307,10 +307,10 @@ export default function Fc10View({
                             onClick={() => registrarFirmaFC10(fc)}
                             disabled={estaFirmando}
                             title={`Registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto}`}
-                            className="mt-2 w-full inline-flex items-center justify-center gap-2 h-9 rounded-control text-body font-semibold text-content-2 bg-surface-2 hover:bg-surface-3 motion active:scale-[0.98] cursor-pointer disabled:opacity-60 border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                            className="mt-2 w-full inline-flex min-h-10 items-center justify-center gap-2 rounded-control px-3 py-2 text-body font-semibold leading-tight text-content-2 bg-surface-2 hover:bg-surface-3 motion active:scale-[0.98] cursor-pointer disabled:opacity-60 border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                           >
-                            <i className="fa-solid fa-signature text-[10px]"></i>
-                            Confirmar firma de {pendiente.puesto}
+                            <i className="fa-solid fa-signature shrink-0 text-[10px]"></i>
+                            <span className="min-w-0 text-center">Confirmar firma de {pendiente.puesto}</span>
                           </button>
                         </details>
                       )}

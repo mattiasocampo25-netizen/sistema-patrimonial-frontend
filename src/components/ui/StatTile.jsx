@@ -36,7 +36,7 @@ export default function StatTile({
     <Contenedor
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`flex items-center gap-3 p-4 rounded-card bg-surface-1 border border-line text-left w-full ${ onClick ? 'hover:bg-surface-2 transition-colors duration-[var(--dur-fast)] cursor-pointer' : '' } ${className}`}
+      className={`flex items-center gap-3 p-4 rounded-panel bg-surface-1 border border-line shadow-card text-left w-full ${ onClick ? 'hover:-translate-y-0.5 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
     >
       {icono ? (
         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control ${t.fondo} ${t.icono}`} aria-hidden="true">

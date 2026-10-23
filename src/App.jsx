@@ -1729,16 +1729,18 @@ if (publicBienId) {
           </div>
         )}
         {isOnline && colaOffline > 0 && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-sky-600/90 text-white backdrop-blur-md border border-sky-400/30 motion animate-slide-up">
-            <i className="fa-solid fa-cloud-arrow-up text-base"></i>
-            <span className="flex-1">{ti('off.sinc')} {colaOffline} {colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}...</span>
+          <div role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-info/30 motion animate-slide-up">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-info-soft text-info" aria-hidden="true">
+              <i className="fa-solid fa-cloud-arrow-up text-sm"></i>
+            </div>
+            <span className="flex-1 leading-relaxed">{ti('off.sinc')} {colaOffline} {colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}…</span>
           </div>
         )}
 
         {toasts.map(t => (
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
-          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3.5 px-5 py-4 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-[20px] shadow-2xl text-xs font-bold bg-surface-1/95 dark:bg-zinc-900/95 text-content-1 dark:text-zinc-100 backdrop-blur-xl border border-line/80 dark:border-zinc-800 motion animate-slide-up">
+          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-line motion animate-slide-up">
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${ t.type === 'success' ? 'bg-ok-soft dark:bg-emerald-950/50 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/50' : t.type === 'error' ? 'bg-danger-soft dark:bg-rose-950/50 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/50' : t.type === 'warning' ? 'bg-warn-soft dark:bg-amber-950/50 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/50' : 'bg-blue-50 dark:bg-blue-950/50 text-brand dark:text-blue-400 border border-brand/25 dark:border-blue-900/50' }`}>
               <i className={`fa-solid ${ t.type === 'success' ? 'fa-circle-check text-sm' : t.type === 'error' ? 'fa-circle-exclamation text-sm' : t.type === 'warning' ? 'fa-triangle-exclamation text-sm' : 'fa-circle-info text-sm' }`}></i>
             </div>
@@ -1746,7 +1748,7 @@ if (publicBienId) {
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-control text-[11px] font-black uppercase tracking-wider bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-label font-bold bg-brand text-content-inverse hover:bg-brand-hover motion cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>

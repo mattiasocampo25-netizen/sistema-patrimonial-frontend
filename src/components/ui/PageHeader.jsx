@@ -45,7 +45,7 @@ export default function PageHeader({
             {contador}
           </div>
           {descripcion ? (
-            <p className="text-label text-content-2 mt-1 leading-relaxed">{descripcion}</p>
+            <p className="text-body text-content-2 mt-1 leading-relaxed">{descripcion}</p>
           ) : null}
           {children}
         </div>

@@ -2,16 +2,16 @@
 // Sin lógica ni dependencias: importar libremente desde cualquier módulo.
 
 export const STYLES = {
-    input: "block w-full rounded-control border border-line bg-surface-1 py-3 px-4 text-body text-content-1 shadow-sm placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-2 focus:ring-brand/20 font-medium transition-[border-color,box-shadow,background-color] duration-[var(--dur-fast)] outline-none disabled:bg-surface-2 disabled:text-content-3 disabled:cursor-not-allowed aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/20",
+    input: "block w-full rounded-control border border-line bg-surface-1 py-3 px-4 text-body text-content-1 placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-4 focus:ring-brand/10 font-medium transition-[border-color,box-shadow,background-color] duration-[var(--dur-fast)] outline-none disabled:bg-surface-2 disabled:text-content-3 disabled:cursor-not-allowed aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/15",
     label: "block text-label font-semibold text-content-2 uppercase tracking-wide mb-2",
-    btnPrimary: "inline-flex items-center justify-center gap-2 rounded-control bg-brand px-5 h-10 text-body font-bold text-content-inverse shadow-sm hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100",
+    btnPrimary: "inline-flex items-center justify-center gap-2 rounded-control bg-brand px-5 h-10 text-body font-bold text-content-inverse shadow-sm hover:bg-brand-hover hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100",
     btnSecondary: "inline-flex items-center justify-center gap-2 rounded-control px-4 h-10 text-body font-semibold text-content-2 bg-surface-1 hover:bg-surface-2 border border-line hover:border-line-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-[background-color,border-color,color,transform] duration-[var(--dur-fast)] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed",
-    card: "bg-surface-1 rounded-card border border-line shadow-card transition-[transform,box-shadow,border-color] duration-[var(--dur-base)]",
-    modalOverlay: "fixed inset-0 bg-zinc-900/60 dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-[300] transition-opacity animate-fade-in",
-    modalContent: "bg-surface-1 dark:bg-surface-1 rounded-[24px] shadow-2xl w-full max-h-[90dvh] flex flex-col border border-line dark:border-line overflow-hidden relative animate-slide-up",
-    modalHeader: "flex justify-between items-center px-8 py-6 border-b border-line dark:border-line bg-surface-1 dark:bg-surface-1 shrink-0 z-10",
-    modalBody: "p-8 overflow-y-auto space-y-8 bg-surface-2/30 dark:bg-surface-1 custom-scrollbar",
-    modalFooter: "flex justify-end gap-3 px-8 py-6 border-t border-line dark:border-line bg-surface-1 dark:bg-surface-2 shrink-0 z-10",
+    card: "bg-surface-1 rounded-panel border border-line shadow-card transition-[transform,box-shadow,border-color] duration-[var(--dur-base)]",
+    modalOverlay: "fixed inset-0 bg-slate-950/55 dark:bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 z-[300] transition-opacity animate-fade-in",
+    modalContent: "bg-surface-1 rounded-panel shadow-pop w-full max-h-[90dvh] flex flex-col border border-line overflow-hidden relative animate-slide-up",
+    modalHeader: "flex justify-between items-center gap-4 px-5 sm:px-6 py-4 border-b border-line bg-surface-1 shrink-0 z-10",
+    modalBody: "p-5 sm:p-6 overflow-y-auto space-y-5 bg-surface-1 custom-scrollbar",
+    modalFooter: "flex flex-wrap justify-end gap-2 px-5 sm:px-6 py-4 border-t border-line bg-surface-2 shrink-0 z-10",
     sectionTitle: "text-lg font-black text-content-1 dark:text-white mb-6 flex items-center gap-3 border-b border-line dark:border-line pb-4"
 };
 

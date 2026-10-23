@@ -34,10 +34,10 @@ export default function EmptyState({
   return (
     <div
       role={esError ? 'alert' : 'status'}
-      className={`flex flex-col items-center justify-center text-center py-14 px-6 rounded-card border border-dashed animate-scale-in ${ esError ? 'border-danger/40 bg-danger-soft' : 'border-line bg-surface-2' } ${className}`}
+      className={`flex flex-col items-center justify-center text-center py-12 px-6 rounded-panel border border-dashed animate-scale-in ${ esError ? 'border-danger/40 bg-danger-soft' : 'border-line bg-surface-1' } ${className}`}
     >
       <span
-        className={`flex h-14 w-14 items-center justify-center rounded-panel mb-4 ${ esError ? 'bg-danger/10 text-danger' : 'bg-surface-3 text-content-3' }`}
+        className={`flex h-12 w-12 items-center justify-center rounded-card mb-4 ${ esError ? 'bg-danger/10 text-danger' : 'bg-brand-soft text-brand-text' }`}
         aria-hidden="true"
       >
         <i className={`fa-solid ${icono || icon || ICONOS[tipo] || ICONOS.vacio} text-xl`} />

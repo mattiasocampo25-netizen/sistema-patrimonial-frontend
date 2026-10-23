@@ -17,12 +17,12 @@ html {
      token semantico para que se adapte al tema. Aqui no puede quedar un
      color fijo: --color-brand-primary era #1d4ed8 tambien en modo oscuro. */
   /* Modo oscuro moderno: grises muy oscuros con tono azuláceo */
-  --color-darkbg-main: #0b0f19;
-  --color-darkbg-card: #111827;
-  --color-darkbg-border: #1f2937;
-  --color-darkbg-hover: #374151;
+  --color-darkbg-main: #0b1220;
+  --color-darkbg-card: #111b2b;
+  --color-darkbg-border: #26364c;
+  --color-darkbg-hover: #1e2d43;
   /* Superficies elevadas en modo oscuro */
-  --color-darkbg-surface: #0f172a;
+  --color-darkbg-surface: #162337;
 }
 
 body { 
@@ -159,8 +159,8 @@ body {
 .dark .sidebar-premium {
   background-image:
     radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.2), transparent 48%),
-    linear-gradient(165deg, #172d47 0%, #12243a 48%, #0e1b2c 100%);
-  border-color: rgb(148 163 184 / 0.14);
+    linear-gradient(165deg, #14243b 0%, #101d30 48%, #0e1828 100%);
+  border-color: var(--sidebar-line);
 }
 
 .workspace-main {
@@ -278,15 +278,15 @@ select:-webkit-autofill:focus {
 .dark input:-webkit-autofill:hover, 
 .dark input:-webkit-autofill:focus {
   -webkit-text-fill-color: #ffffff !important;
-  -webkit-box-shadow: 0 0 0px 1000px #18181b inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-1) inset !important;
 }
 
 /* Texto blanco en inputs focos */
 .dark input:focus,
 .dark textarea:focus,
 .dark select:focus {
-  background-color: #18181b !important;
-  color: #ffffff !important;
+  background-color: var(--surface-1) !important;
+  color: var(--content-1) !important;
 }
 
 input:focus,

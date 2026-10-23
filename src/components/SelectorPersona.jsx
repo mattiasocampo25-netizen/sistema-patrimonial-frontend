@@ -87,7 +87,7 @@ export default function SelectorPersona({
       <input type="hidden" value={valor || ''} readOnly />
 
       {abierto && (
-        <div className="absolute left-0 w-auto min-w-[260px] z-[60] mt-1.5 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-zinc-900 shadow-2xl overflow-hidden animate-pop">
+        <div className="absolute left-0 w-auto min-w-[260px] z-[60] mt-1.5 rounded-panel border border-line bg-surface-1 shadow-pop overflow-hidden animate-pop dark:border-line dark:bg-surface-1">
           <div className="relative border-b border-line dark:border-white/10">
             <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
             <input

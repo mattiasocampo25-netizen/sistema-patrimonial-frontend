@@ -100,13 +100,13 @@ export default function CommandPalette({
   };
 
   return (
-    <div className="fixed inset-0 z-[400] flex items-start justify-center p-4 pt-[12dvh] bg-zinc-950/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-[400] flex items-start justify-center p-4 pt-[12dvh] bg-slate-950/60 backdrop-blur-sm animate-fade-in" onClick={onClose}>
       <div
-        className="w-full max-w-xl rounded-panel bg-surface-1 dark:bg-zinc-900 border border-line dark:border-zinc-700 shadow-2xl overflow-hidden animate-slide-up"
+        className="w-full max-w-xl rounded-panel bg-surface-1 border border-line shadow-pop overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
         role="dialog" aria-label="Búsqueda global"
       >
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-line dark:border-zinc-800">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-line bg-surface-2/60">
           <i className="fa-solid fa-magnifying-glass text-content-3 text-sm"></i>
           <input
             ref={inputRef}
@@ -119,7 +119,7 @@ export default function CommandPalette({
               if (e.key === 'Enter' && resultados[sel]) ejecutar(resultados[sel]);
               if (e.key === 'Escape') onClose();
             }}
-            placeholder="Buscar bienes, funcionarios o acciones... (Esc para cerrar)"
+            placeholder="Buscar bienes, funcionarios o acciones…"
             className="flex-1 bg-transparent outline-none text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3"
           />
           <kbd className="hidden sm:inline-flex items-center rounded-md border border-line dark:border-zinc-700 px-1.5 py-0.5 text-[10px] font-bold text-content-3">Ctrl K</kbd>
@@ -133,9 +133,9 @@ export default function CommandPalette({
                 key={`${r.tipo}-${r.titulo}-${i}`}
                 onClick={() => ejecutar(r)}
                 onMouseEnter={() => setSel(i)}
-                className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors cursor-pointer ${i === sel ? 'bg-surface-3 dark:bg-surface-1/10' : ''}`}
+                className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors cursor-pointer ${i === sel ? 'bg-brand-soft text-brand-text' : 'hover:bg-surface-2'}`}
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-3 dark:text-content-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-surface-3 text-content-3">
                   <i className={`fa-solid ${r.icon} text-xs`}></i>
                 </span>
                 <span className="min-w-0 flex-1">

@@ -19,7 +19,7 @@ import React from 'react';
 
 const VARIANTES = {
   primary:
-    'bg-brand text-content-inverse shadow-sm hover:bg-brand-hover active:bg-brand-hover' +
+    'bg-brand text-content-inverse shadow-sm hover:bg-brand-hover hover:shadow-md active:bg-brand-hover' +
     'focus-visible:outline-brand disabled:bg-brand/40 disabled:shadow-none',
   secondary:
     'bg-surface-1 text-content-1 border border-line hover:bg-surface-2 hover:border-line-strong ' +
@@ -62,7 +62,7 @@ export default function Button({
 }) {
   const base =
     'inline-flex items-center justify-center font-semibold whitespace-nowrap ' +
-    'transition-[background-color,border-color,color,transform,box-shadow] duration-[var(--dur-fast)] ' +
+    'transition-[background-color,border-color,color,transform,box-shadow] duration-[var(--dur-base)] ' +
     'ease-[var(--ease-standard)] active:scale-[0.98] ' +
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ' +
     'disabled:cursor-not-allowed disabled:active:scale-100';

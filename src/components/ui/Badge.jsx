@@ -17,7 +17,7 @@ const TONOS = {
 export default function Badge({ tono = 'neutral', icono, children, className = '', ...resto }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-pill text-label font-semibold border whitespace-nowrap ${TONOS[tono] || TONOS.neutral} ${className}`}
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-pill text-label font-semibold border whitespace-nowrap ${TONOS[tono] || TONOS.neutral} ${className}`}
       {...resto}
     >
       {icono ? <i className={`fa-solid ${icono} text-[0.85em]`} aria-hidden="true" /> : null}

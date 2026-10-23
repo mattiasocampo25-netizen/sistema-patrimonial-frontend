@@ -12,7 +12,7 @@ import React from 'react';
 export function Card({ className = '', children, como: Tag = 'div', ...resto }) {
   return (
     <Tag
-      className={`bg-surface-1 border border-line rounded-card shadow-card ${className}`}
+      className={`bg-surface-1 border border-line rounded-panel shadow-card ${className}`}
       {...resto}
     >
       {children}
@@ -35,7 +35,7 @@ export function CardHeader({ titulo, descripcion, acciones, icono, className = '
             <h2 className="text-title font-bold text-content-1 tracking-tight truncate">{titulo}</h2>
           ) : null}
           {descripcion ? (
-            <p className="text-label text-content-2 mt-0.5">{descripcion}</p>
+            <p className="text-body text-content-2 mt-0.5 leading-relaxed">{descripcion}</p>
           ) : null}
           {children}
         </div>

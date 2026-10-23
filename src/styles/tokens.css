@@ -88,9 +88,9 @@
   --color-pastel-8: var(--pastel-8);
 
   /* --- Radios: una sola escala para toda la app --- */
-  --radius-control: 0.625rem;   /* 10px  botones, inputs, chips */
-  --radius-card: 1rem;          /* 16px  tarjetas */
-  --radius-panel: 1.25rem;      /* 20px  modales, paneles grandes */
+  --radius-control: 0.75rem;    /* 12px botones, inputs, chips */
+  --radius-card: 1rem;          /* 16px tarjetas interiores */
+  --radius-panel: 1.25rem;      /* 20px paneles, modales y secciones */
   --radius-pill: 9999px;        /* badges, avatares */
 
   /* --- Sombras: tres niveles de elevación --- */
@@ -121,10 +121,10 @@
   color-scheme: light;
 
   /* Fondo calido (no gris frio): el tono de la referencia */
-  --canvas: #f3f2ee;
+  --canvas: #f3f6fb;
   --surface-1: #ffffff;
-  --surface-2: #f8f7f4;
-  --surface-3: #eceae4;
+  --surface-2: #f7f9fc;
+  --surface-3: #edf1f7;
   /* Superficie "glass": translucida, con desenfoque de fondo */
   --surface-glass: rgb(255 255 255 / 0.72);
 
@@ -133,21 +133,21 @@
   --content-3: #6b7280;
   --content-inverse: #ffffff;
 
-  --line: #e6e3dc;
-  --line-strong: #d3cfc5;
+  --line: #e3e8f0;
+  --line-strong: #cbd5e1;
 
   /* En tema claro el menú acompaña la superficie cálida; el azul noche queda
      reservado para el tema oscuro. Los secundarios mantienen contraste. */
-  --sidebar: #f7f8fb;
-  --sidebar-content: #1c293b;
+  --sidebar: #f8faff;
+  --sidebar-content: #17243a;
   --sidebar-content-2: #46566d;
-  --sidebar-content-3: #627187;
-  --sidebar-line: #e1e6ed;
+  --sidebar-content-3: #738198;
+  --sidebar-line: #e5eaf2;
 
-  --brand: #1d4ed8;
-  --brand-hover: #1e40af;
-  --brand-soft: #eff6ff;
-  --brand-text: #1e40af;
+  --brand: #2457d6;
+  --brand-hover: #1b46b8;
+  --brand-soft: #edf3ff;
+  --brand-text: #214dbd;
 
   --danger: #e11d48;
   --danger-soft: #fff1f2;
@@ -169,18 +169,18 @@
   --pastel-8: #fbdcea;
 
   /* Sombras un poco mas marcadas en claro */
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.05), 0 1px 3px rgb(15 23 42 / 0.07);
-  --shadow-panel: 0 4px 12px rgb(15 23 42 / 0.09), 0 2px 4px rgb(15 23 42 / 0.05);
-  --shadow-pop: 0 12px 32px rgb(15 23 42 / 0.16), 0 4px 8px rgb(15 23 42 / 0.07);
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.035), 0 3px 10px rgb(15 23 42 / 0.035);
+  --shadow-panel: 0 8px 24px rgb(15 23 42 / 0.075), 0 2px 5px rgb(15 23 42 / 0.035);
+  --shadow-pop: 0 18px 48px rgb(15 23 42 / 0.2), 0 5px 12px rgb(15 23 42 / 0.06);
 }
 
 .dark {
   color-scheme: dark;
 
-  --canvas: #0d0f13;
-  --surface-1: #171a20;
-  --surface-2: #1d2129;
-  --surface-3: #262b34;
+  --canvas: #0b1220;
+  --surface-1: #111b2b;
+  --surface-2: #162337;
+  --surface-3: #1e2d43;
   --surface-glass: rgb(23 26 32 / 0.72);
 
   --content-1: #f4f5f7;
@@ -188,19 +188,19 @@
   --content-3: #8b929c;
   --content-inverse: #0f172a;
 
-  --line: #262b34;
-  --line-strong: #39404b;
+  --line: #26364c;
+  --line-strong: #3a4b63;
 
-  --sidebar: #12151b;
-  --sidebar-content: #e9ecf1;
-  --sidebar-content-2: #969daa;
-  --sidebar-content-3: #666d7a;
-  --sidebar-line: #232833;
+  --sidebar: #0e1828;
+  --sidebar-content: #edf3fc;
+  --sidebar-content-2: #a6b4c8;
+  --sidebar-content-3: #718198;
+  --sidebar-line: #22334b;
 
-  --brand: #60a5fa;
-  --brand-hover: #93c5fd;
-  --brand-soft: #1c2f55;
-  --brand-text: #bfdbfe;
+  --brand: #6ea8ff;
+  --brand-hover: #91bdff;
+  --brand-soft: #172f50;
+  --brand-text: #b8d5ff;
 
   --danger: #fb7185;
   --danger-soft: #4c0519;

@@ -61,7 +61,7 @@ export default function LoginScreen({
       {/* Contenido centrado, estilo Google */}
       <div className="relative z-10 flex h-dvh w-full items-center justify-center p-6">
         <div className="w-full max-w-sm login-card-in">
-          <div className={`bg-surface-1 rounded-panel border border-line shadow-pop p-8 sm:p-10 relative flex flex-col text-content-1 ${loginError ? 'animate-shake' : ''}`}>
+          <div className={`bg-surface-1/95 backdrop-blur-xl rounded-panel border border-white/70 dark:border-white/10 shadow-pop p-7 sm:p-9 relative flex flex-col text-content-1 ${loginError ? 'animate-shake' : ''}`}>
 
             {/* Logo institucional */}
             <div className="flex items-center gap-2 mb-2">
@@ -72,13 +72,13 @@ export default function LoginScreen({
                   <i className="fa-solid fa-university text-base"></i>
                 </div>
               )}
-              <span className="text-sm font-bold tracking-tight text-brand-text">UNP · Patrimonio</span>
+              <span className="text-sm font-bold tracking-tight text-content-1">UNP <span className="font-medium text-content-3">· Patrimonio</span></span>
             </div>
 
             <div className="mt-6 mb-8">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-content-1">Iniciar sesión</h2>
               <p className="text-sm mt-1 text-content-3">
-                Acceso al Sistema de Gestión Patrimonial
+                Ingresa para continuar al sistema patrimonial.
               </p>
             </div>
 
@@ -86,12 +86,12 @@ export default function LoginScreen({
               {loginError && (
                 <div id="login-error" role="alert" className="rounded-control bg-danger-soft p-4 text-sm text-danger font-medium flex items-center gap-3 border border-danger/25 animate-slide-up shadow-sm">
                   <i className="fa-solid fa-circle-exclamation text-base text-danger shrink-0" aria-hidden="true"></i>
-                  <span>Credenciales inválidas. Verifique su usuario y contraseña.</span>
+                  <span>No pudimos iniciar sesión. Revisa tu usuario y contraseña.</span>
                 </div>
               )}
 
               <div className="space-y-2 text-left">
-                <label htmlFor="user" className="block text-label font-semibold uppercase tracking-wider text-content-2">Usuario (ID)</label>
+                <label htmlFor="user" className="block text-label font-semibold uppercase tracking-wider text-content-2">Usuario</label>
                 <div className="relative group">
                   <i className="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-xs text-content-3 group-focus-within:text-brand transition-colors"></i>
                   <input
@@ -107,7 +107,7 @@ export default function LoginScreen({
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
                     className="block w-full rounded-control border border-line bg-surface-2 pl-10 pr-4 py-3.5 text-body font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-2 focus:ring-brand/20 motion disabled:opacity-60 outline-none"
-                    placeholder="ej. admin"
+                    placeholder="Escribe tu usuario"
                   />
                 </div>
               </div>
@@ -120,7 +120,7 @@ export default function LoginScreen({
                     onClick={() => setShowRecoveryModal(true)}
                     className="text-xs font-semibold text-brand-text dark:text-brand hover:underline cursor-pointer"
                   >
-                    ¿Olvidó su clave?
+                    ¿Olvidaste tu contraseña?
                   </button>
                 </div>
                 <div className="relative group">
@@ -175,7 +175,7 @@ export default function LoginScreen({
               </button>
             </form>
 
-            <p className="mt-8 text-center text-label font-medium tracking-tight uppercase text-content-3">
+            <p className="mt-7 border-t border-line pt-5 text-center text-label font-medium tracking-tight text-content-3">
               © {new Date().getFullYear()} Universidad Nacional de Pilar · v{version}
             </p>
           </div>
@@ -191,7 +191,7 @@ export default function LoginScreen({
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
-                className="shrink-0 px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-darkbg-hover dark:text-content-1 dark:hover:bg-surface-1 motion cursor-pointer active:scale-95"
+                className="shrink-0 px-3 py-1.5 rounded-control text-label font-bold bg-brand text-content-inverse hover:bg-brand-hover motion cursor-pointer active:scale-95"
               >
                 {t.action.label}
               </button>

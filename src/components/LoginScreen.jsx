@@ -43,13 +43,13 @@ export default function LoginScreen({
       <div className="relative z-10 flex w-full items-center justify-center">
         <div className="login-card-in grid w-full max-w-md overflow-hidden rounded-panel border border-white/10 bg-[#101f34] shadow-pop shadow-black/40 lg:max-w-5xl lg:grid-cols-[1.05fr_0.95fr]">
           <aside className="login-hero relative hidden min-h-[640px] flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-12">
-            <img src={rectoradoBg} alt="" loading="lazy" decoding="async" className="login-kenburns absolute inset-0 h-full w-full object-cover object-center" />
+            <img src={rectoradoBg} alt="Rectorado de la Universidad Nacional de Pilar" loading="lazy" decoding="async" width="1200" height="800" className="login-kenburns absolute inset-0 h-full w-full object-cover object-center" />
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/65 via-blue-950/65 to-indigo-950/90" />
             <span className="login-orb-a absolute -right-20 -top-16 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
             <span className="login-orb-b absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl" />
             <div className="relative z-10 flex items-center gap-3">
               <span className="flex h-12 w-12 items-center justify-center rounded-card border border-white/20 bg-white/10 p-2 backdrop-blur-sm">
-                {appLogo ? <img src={appLogo} alt="" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-lg" />}
+                {appLogo ? <img src={appLogo} alt="Logo UNP Patrimonio" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-lg" />}
               </span>
               <span>
                 <span className="block text-sm font-bold tracking-wide">UNP · Patrimonio</span>
@@ -58,8 +58,9 @@ export default function LoginScreen({
             </div>
             <div className="relative z-10 max-w-lg">
               <p className="mb-3 text-label font-bold uppercase tracking-[0.2em] text-blue-200">Gestión institucional</p>
-              <h1 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl">Control claro para cada bien.</h1>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Consulta el inventario, registra responsables y sigue cada movimiento desde un mismo lugar.</p>
+              <h2 className="text-xl font-bold text-blue-100 mb-2">Universidad Nacional de Pilar</h2>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl">Sistema de Gestión Patrimonial UNP</h1>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Plataforma institucional para el control del patrimonio de la UNP. Administra el inventario de bienes, registra responsables, genera actas FC-04, FC-10 y FC-11, y haz trazabilidad por código QR desde un mismo lugar.</p>
               <div className="mt-7 flex flex-wrap gap-2 text-label font-semibold text-white/90">
                 {['Inventario', 'Actas FC-04 · FC-10 · FC-11', 'Trazabilidad QR'].map(etiqueta => <span key={etiqueta} className="rounded-pill border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">{etiqueta}</span>)}
               </div>
@@ -183,7 +184,7 @@ export default function LoginScreen({
             </form>
 
             <p className="mt-7 border-t border-line pt-5 text-center text-label font-medium tracking-tight text-content-3">
-              © {new Date().getFullYear()} Universidad Nacional de Pilar · v{version}
+              <a href="/ayuda" className="text-brand underline-offset-2 hover:underline">Centro de Ayuda</a> · © {new Date().getFullYear()} Universidad Nacional de Pilar · v{version}
             </p>
           </div>
         </div>

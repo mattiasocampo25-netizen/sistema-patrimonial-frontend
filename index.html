@@ -4,7 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Sistema de Gestión Patrimonial UNP</title>
+  <title>Sistema de Gestión Patrimonial UNP - Universidad Nacional de Pilar</title>
+  <meta name="description" content="Sistema de Gestión Patrimonial UNP de la Universidad Nacional de Pilar. Controla el inventario de bienes, actas FC-04, FC-10 y FC-11, trazabilidad QR y responsables desde una misma plataforma institucional.">
+  <link rel="canonical" href="https://sistema-patrimonial.unp.edu.py/">
+  <!-- Open Graph / Redes sociales -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sistema-patrimonial.unp.edu.py/">
+  <meta property="og:title" content="Sistema de Gestión Patrimonial UNP - Universidad Nacional de Pilar">
+  <meta property="og:description" content="Sistema de Gestión Patrimonial UNP de la Universidad Nacional de Pilar. Controla el inventario de bienes, actas FC-04, FC-10 y FC-11, trazabilidad QR y responsables.">
+  <meta property="og:image" content="/icon-192.png">
+  <meta property="og:site_name" content="Sistema de Gestión Patrimonial UNP">
+  <meta property="og:locale" content="es_PY">
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sistema de Gestión Patrimonial UNP - Universidad Nacional de Pilar">
+  <meta name="twitter:description" content="Sistema de Gestión Patrimonial UNP de la Universidad Nacional de Pilar. Controla el inventario de bienes, actas FC-04, FC-10 y FC-11, trazabilidad QR y responsables.">
+  <meta name="twitter:image" content="/icon-192.png">
   
   <!-- Logo de la UNP en la pestaña -->
   <link rel="icon" type="image/x-icon" href="/UNP-Logo.ico">
@@ -35,10 +50,46 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js" integrity="sha384-PlRSzpewlarQuj5alIadXwjNUX+2eNMKwr0f07ShWYLy8B6TjEbm7ZlcN/ScSbwy" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" integrity="sha384-c9d8RFSL+u3exBOJ4Yp3HUJXS4znl9f+z66d1y54ig+ea249SpqR+w1wyvXz/lk+" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Datos estructurados Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Sistema de Gestión Patrimonial UNP",
+    "alternateName": "SIGEP UNP",
+    "url": "https://sistema-patrimonial.unp.edu.py/",
+    "logo": "/icon-192.png",
+    "description": "Sistema de Gestión Patrimonial de la Universidad Nacional de Pilar. Control de inventario de bienes, actas FC-04, FC-10 y FC-11, trazabilidad QR y responsables.",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Pilar",
+      "addressCountry": "PY"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "patrimonio@unp.edu.py",
+      "contactType": "soporte",
+      "availableLanguage": "es"
+    }
+  }
+  </script>
 </head>
 <body class="text-zinc-800 dark:text-zinc-200 transition-colors duration-300 antialiased">
   <!-- Contenedor principal de React -->
   <div id="root"></div>
+
+  <!-- Contenido alternativo para rastreadores y usuarios sin JavaScript -->
+  <noscript>
+    <div class="seo-noscript">
+      <h1>Sistema de Gestión Patrimonial UNP - Universidad Nacional de Pilar</h1>
+      <h2>Control institucional del patrimonio universitario</h2>
+      <p>Plataforma institucional para el control del patrimonio de la Universidad Nacional de Pilar (UNP). Permite administrar el inventario de bienes, registrar responsables y seguir cada movimiento desde un mismo lugar.</p>
+      <p>El sistema ofrece módulos de inventario, dashboard de métricas, gestión de funcionarios, actas FC-04, FC-10 y FC-11, trazabilidad por código QR de cada activo, auditoría de cambios y escáner QR para consulta rápida de bienes desde dispositivos móviles.</p>
+      <p>Dirección: Pilar, Paraguay. Contacto: patrimonio@unp.edu.py</p>
+      <p><a href="https://sistema-patrimonial.unp.edu.py/">Ir a la Plataforma Principal</a></p>
+    </div>
+  </noscript>
   
   <!-- Punto de entrada modular de React con Vite -->
   <script type="module" src="/src/main.jsx"></script>

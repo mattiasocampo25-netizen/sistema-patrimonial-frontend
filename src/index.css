@@ -56,12 +56,12 @@ body {
 } 
 
 .dark ::-webkit-scrollbar-thumb { 
-  background: #5f6368; 
+  background: #536984;
   border-color: transparent;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover { 
-  background: #80868b; 
+  background: #7289a5;
 }
 
 /* Ocultar scrollbar */
@@ -108,16 +108,16 @@ body {
 }
 
 .dark .custom-scrollbar { 
-  scrollbar-color: #5f6368 transparent; 
+  scrollbar-color: #536984 transparent;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb { 
-  background: #5f6368; 
+  background: #536984;
   border-color: transparent; 
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
-  background: #80868b; 
+  background: #7289a5;
 }
 
 /* Scrollbar del sidebar: gris suave en claro y translucida en oscuro. */
@@ -211,15 +211,15 @@ body {
 
 .dashboard-stagger > *,
 .inventory-stagger > * {
-  animation: app-fade-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: app-fade-up var(--dur-slow) var(--ease-out) both;
 }
 
-.dashboard-stagger > :nth-child(1), .inventory-stagger > :nth-child(1) { animation-delay: 25ms; }
-.dashboard-stagger > :nth-child(2), .inventory-stagger > :nth-child(2) { animation-delay: 65ms; }
-.dashboard-stagger > :nth-child(3), .inventory-stagger > :nth-child(3) { animation-delay: 105ms; }
-.dashboard-stagger > :nth-child(4), .inventory-stagger > :nth-child(4) { animation-delay: 145ms; }
-.dashboard-stagger > :nth-child(5), .inventory-stagger > :nth-child(5) { animation-delay: 185ms; }
-.dashboard-stagger > :nth-child(n+6), .inventory-stagger > :nth-child(n+6) { animation-delay: 225ms; }
+.dashboard-stagger > :nth-child(1), .inventory-stagger > :nth-child(1) { animation-delay: 15ms; }
+.dashboard-stagger > :nth-child(2), .inventory-stagger > :nth-child(2) { animation-delay: 35ms; }
+.dashboard-stagger > :nth-child(3), .inventory-stagger > :nth-child(3) { animation-delay: 55ms; }
+.dashboard-stagger > :nth-child(4), .inventory-stagger > :nth-child(4) { animation-delay: 75ms; }
+.dashboard-stagger > :nth-child(5), .inventory-stagger > :nth-child(5) { animation-delay: 95ms; }
+.dashboard-stagger > :nth-child(n+6), .inventory-stagger > :nth-child(n+6) { animation-delay: 110ms; }
 
 .inventory-selection-bar {
   background: linear-gradient(105deg, #1746b8 0%, #1d4ed8 55%, #2563eb 100%);
@@ -409,14 +409,14 @@ select:focus {
 }
 
 /* Utilidades de animación */
-.animate-fade-in { animation: app-fade-in 0.45s ease both; }
+.animate-fade-in { animation: app-fade-in var(--dur-slow) var(--ease-standard) both; }
 .animate-fade-in-fast { animation: app-fade-in var(--dur-base) ease both; }
-.animate-slide-up { animation: app-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-fade-up { animation: app-fade-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-scale-in { animation: app-scale-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.login-card-in { animation: app-login-card 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.animate-shake { animation: app-shake 0.45s ease both; }
-.animate-pop { animation: app-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-slide-up { animation: app-slide-up var(--dur-slow) var(--ease-out) both; }
+.animate-fade-up { animation: app-fade-up var(--dur-slow) var(--ease-out) both; }
+.animate-scale-in { animation: app-scale-in var(--dur-base) var(--ease-out) both; }
+.login-card-in { animation: app-login-card 0.42s var(--ease-out) both; }
+.animate-shake { animation: app-shake var(--dur-slow) var(--ease-standard) both; }
+.animate-pop { animation: app-pop var(--dur-base) var(--ease-out) both; }
 
 /* Pistas de compositor para evitar parpadeos */
 .login-kenburns,
@@ -454,17 +454,17 @@ select:focus {
 }
 
 /* Entrada escalonada de filas de tablas */
-.anim-rows tbody tr { animation: app-row-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
-.anim-rows tbody tr:nth-child(1) { animation-delay: 0.02s; }
-.anim-rows tbody tr:nth-child(2) { animation-delay: 0.05s; }
-.anim-rows tbody tr:nth-child(3) { animation-delay: 0.08s; }
-.anim-rows tbody tr:nth-child(4) { animation-delay: 0.11s; }
-.anim-rows tbody tr:nth-child(5) { animation-delay: 0.14s; }
-.anim-rows tbody tr:nth-child(6) { animation-delay: 0.17s; }
-.anim-rows tbody tr:nth-child(7) { animation-delay: 0.20s; }
-.anim-rows tbody tr:nth-child(8) { animation-delay: 0.23s; }
-.anim-rows tbody tr:nth-child(9) { animation-delay: 0.26s; }
-.anim-rows tbody tr:nth-child(n+10) { animation-delay: 0.29s; }
+.anim-rows tbody tr { animation: app-row-in var(--dur-slow) var(--ease-out) both; }
+.anim-rows tbody tr:nth-child(1) { animation-delay: 10ms; }
+.anim-rows tbody tr:nth-child(2) { animation-delay: 25ms; }
+.anim-rows tbody tr:nth-child(3) { animation-delay: 40ms; }
+.anim-rows tbody tr:nth-child(4) { animation-delay: 55ms; }
+.anim-rows tbody tr:nth-child(5) { animation-delay: 70ms; }
+.anim-rows tbody tr:nth-child(6) { animation-delay: 85ms; }
+.anim-rows tbody tr:nth-child(7) { animation-delay: 100ms; }
+.anim-rows tbody tr:nth-child(8) { animation-delay: 115ms; }
+.anim-rows tbody tr:nth-child(9) { animation-delay: 130ms; }
+.anim-rows tbody tr:nth-child(n+10) { animation-delay: 145ms; }
 
 /* Bottom-sheet en móvil */
 @media (max-width: 640px) {
@@ -499,10 +499,10 @@ select:focus {
 .tab-enter { animation: app-tab-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Micro-interacciones */
-.btn-press { transition: transform 0.12s ease; }
+.btn-press { transition: transform var(--dur-fast) var(--ease-standard); }
 .btn-press:active { transform: scale(0.94); }
-.bell-attention { animation: app-bell-ring 0.7s ease both; transform-origin: top center; }
-.card-lift { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.bell-attention { animation: app-bell-ring var(--dur-slow) var(--ease-standard) both; transform-origin: top center; }
+.card-lift { transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
 .card-lift:hover { transform: translateY(-2px); }
 .row-flash { animation: app-row-flash 2.4s ease-out both; }
 .check-pop { animation: app-check-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
@@ -624,6 +624,8 @@ html.font-lg { font-size: 18px; }
   animation: none !important;
   transition: none !important;
 }
+.reduce-motion { scroll-behavior: auto !important; }
+.reduce-motion .login-rise { opacity: 1 !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,

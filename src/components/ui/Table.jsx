@@ -37,10 +37,10 @@ export function Table({
   );
 }
 
-export function THead({ className = '', children, ...resto }) {
+export function THead({ className = '', children, sticky = true, ...resto }) {
   return (
     <thead
-      className={`sticky top-0 z-10 bg-surface-2/95 backdrop-blur-md border-b border-line text-label font-bold text-content-2 uppercase tracking-wide ${className}`}
+      className={`${sticky ? 'sticky top-0 z-10 bg-surface-2/95 backdrop-blur-md' : 'bg-surface-2'} border-b border-line text-label font-bold text-content-2 uppercase tracking-wide ${className}`}
       {...resto}
     >
       {children}

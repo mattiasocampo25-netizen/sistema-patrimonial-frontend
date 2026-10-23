@@ -547,7 +547,7 @@ export default function InventarioView({
             title={compacto ? 'Vista cómoda' : 'Vista compacta'}
             className="flex h-9 w-9 items-center justify-center rounded-control border border-line dark:border-zinc-700/30 text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
           >
-            <i className={'fa-solid text-xs' + (compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right')}></i>
+            <i className={`fa-solid text-xs ${compacto ? 'fa-arrows-up-down' : 'fa-arrows-up-down-left-right'}`} aria-hidden="true"></i>
           </button>
           <div className="relative">
             <button
@@ -721,7 +721,7 @@ export default function InventarioView({
                     <div className="overflow-x-auto custom-scrollbar">
                       <Table sinContenedor minWidth={false} className="anim-rows w-full text-left border-collapse min-w-[900px]">
 
-                                                  <THead>
+                                                  <THead sticky={false}>
                           <TRow className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
                             <TH className="py-4 pl-4 sm:pl-5 pr-1 w-[40px] align-middle">
                               <input

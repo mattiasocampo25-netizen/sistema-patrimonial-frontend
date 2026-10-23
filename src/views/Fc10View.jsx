@@ -138,6 +138,7 @@ export default function Fc10View({
               selectedMonth={fc10Month}
               setSelectedMonth={setFc10Month}
               descripcion="Mes de entrega o devolución de las actas FC-10"
+              ayuda="Incluye actas entregadas o devueltas en este mes."
             />
           </Toolbar>
         </div>
@@ -204,8 +205,11 @@ export default function Fc10View({
                           </div>
                       </div>
                       <div className="mt-1 flex flex-col flex-1">
-                      <h4 className="font-bold text-content-1 dark:text-white text-sm tracking-tight truncate" title={fc.funcionarioNombre}>{fc.funcionarioNombre}</h4>
+                      <h4 className="font-bold text-content-1 dark:text-white text-sm tracking-tight truncate" title={fc.funcionarioNombre}>{fc.funcionarioNombre || 'Sin responsable'}</h4>
                       <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 font-medium truncate">{fc.funcionarioCargo}{fc.funcionarioDoc ? ` · CI ${formatCI(fc.funcionarioDoc)}` : ''}</p>
+                      <p className="mt-2 rounded-lg bg-surface-2 px-2.5 py-1.5 text-[11px] font-semibold text-content-2 truncate" title={bien.descripcion || bien.rotulo || 'Bien sin rótulo'}>
+                        <i className="fa-solid fa-box mr-1.5 text-content-3" aria-hidden="true"></i>{bien.rotulo || 'Bien sin rótulo'}
+                      </p>
 
                   {!isDevuelto && (
                     (fc.estadoFirma || pendiente) ? (

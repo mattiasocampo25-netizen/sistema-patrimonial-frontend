@@ -27,6 +27,8 @@ html {
 
 body { 
   font-family: 'Open Sans', 'Inter', system-ui, sans-serif; 
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   background-color: var(--canvas, #f3f2ee); 
   margin: 0; 
   padding: 0; 
@@ -174,6 +176,18 @@ body {
 .dashboard-metric-card {
   isolation: isolate;
   overflow: hidden;
+}
+
+/* Superficies interactivas: foco visible coherente y filas de lectura cómodas. */
+.dashboard-metric-card:focus-visible,
+.inventory-item-card:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+::selection {
+  color: #fff;
+  background: color-mix(in srgb, var(--brand) 82%, #111827);
 }
 
 .dashboard-metric-card::after {

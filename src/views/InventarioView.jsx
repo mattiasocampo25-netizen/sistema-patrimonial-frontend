@@ -112,6 +112,8 @@ export default function InventarioView({
   };
   const [menuCols, setMenuCols] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
+  const [mostrarFiltrosAvanzados, setMostrarFiltrosAvanzados] = useState(false);
+  const filtrosAvanzadosActivos = [filtroSubcuenta, filtroAnalitico1, filtroAnalitico2].filter(Boolean).length;
   const [recientes, setRecientes] = useState(() => { try { return JSON.parse(localStorage.getItem('inv_recientes') || '[]'); } catch { return []; } });
   const guardarReciente = (texto) => {
     const v = String(texto || '').trim();
@@ -320,7 +322,7 @@ export default function InventarioView({
       )}
     </div>
 
-    {/* Rejilla de Filtros Secundarios (4 Columnas Equilibradas) */}
+    {/* Filtros frecuentes primero; los contables quedan agrupados para reducir ruido. */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
 
       {/* Responsables */}
@@ -350,31 +352,13 @@ export default function InventarioView({
         titulo="Filtrar por año"
       />
 
-      {/* Subcuenta */}
+      {/* Estado */}
       <FiltroCombo
-        valor={filtroSubcuenta}
-        opciones={subcuentasUnicas}
-        onElegir={(v) => { setFiltroSubcuenta(v); setCurrentPage(1); }}
-        etiquetaTodos="Subcuenta: Todas"
-        titulo="Filtrar por subcuenta"
-      />
-
-      {/* Analítico 1 */}
-      <FiltroCombo
-        valor={filtroAnalitico1}
-        opciones={analiticos1Unicos}
-        onElegir={(v) => { setFiltroAnalitico1(v); setCurrentPage(1); }}
-        etiquetaTodos="Analítico 1: Todos"
-        titulo="Filtrar por analítico 1"
-      />
-
-      {/* Analítico 2 */}
-      <FiltroCombo
-        valor={filtroAnalitico2}
-        opciones={analiticos2Unicos}
-        onElegir={(v) => { setFiltroAnalitico2(v); setCurrentPage(1); }}
-        etiquetaTodos="Analítico 2: Todos"
-        titulo="Filtrar por analítico 2"
+        valor={filtroEstado === 'ALL' ? '' : filtroEstado}
+        opciones={ESTADOS_CONSERVACION}
+        onElegir={(v) => { setFiltroEstado(v || 'ALL'); setCurrentPage(1); }}
+        etiquetaTodos="Estado: Todos"
+        titulo="Filtrar por estado de conservación"
       />
 
       {/* FC-10 */}
@@ -386,15 +370,27 @@ export default function InventarioView({
         titulo="Filtrar por FC-10"
       />
 
-      {/* Estado */}
-      <FiltroCombo
-        valor={filtroEstado === 'ALL' ? '' : filtroEstado}
-        opciones={ESTADOS_CONSERVACION}
-        onElegir={(v) => { setFiltroEstado(v || 'ALL'); setCurrentPage(1); }}
-        etiquetaTodos="Estado: Todos"
-        titulo="Filtrar por estado de conservación"
-      />
+    </div>
 
+    <div>
+      <button
+        type="button"
+        aria-expanded={mostrarFiltrosAvanzados}
+        onClick={() => setMostrarFiltrosAvanzados(v => !v)}
+        className="inline-flex items-center gap-2 rounded-control px-2.5 py-2 text-xs font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
+      >
+        <i className={`fa-solid fa-sliders text-brand-text`} aria-hidden="true"></i>
+        Más filtros
+        <span className="rounded-full bg-surface-3 px-1.5 py-0.5 text-[10px] tabular-nums text-content-3">{filtrosAvanzadosActivos ? `${filtrosAvanzadosActivos} activos · 3` : '3'}</span>
+        <i className={`fa-solid fa-chevron-down text-[10px] transition-transform ${mostrarFiltrosAvanzados ? 'rotate-180' : ''}`} aria-hidden="true"></i>
+      </button>
+      {mostrarFiltrosAvanzados && (
+        <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 animate-fade-in">
+          <FiltroCombo valor={filtroSubcuenta} opciones={subcuentasUnicas} onElegir={(v) => { setFiltroSubcuenta(v); setCurrentPage(1); }} etiquetaTodos="Subcuenta: Todas" titulo="Filtrar por subcuenta" />
+          <FiltroCombo valor={filtroAnalitico1} opciones={analiticos1Unicos} onElegir={(v) => { setFiltroAnalitico1(v); setCurrentPage(1); }} etiquetaTodos="Analítico 1: Todos" titulo="Filtrar por analítico 1" />
+          <FiltroCombo valor={filtroAnalitico2} opciones={analiticos2Unicos} onElegir={(v) => { setFiltroAnalitico2(v); setCurrentPage(1); }} etiquetaTodos="Analítico 2: Todos" titulo="Filtrar por analítico 2" />
+        </div>
+      )}
     </div>
 
     {/* Vistas guardadas + Restablecer */}

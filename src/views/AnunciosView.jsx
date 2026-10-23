@@ -68,9 +68,9 @@ export default function AnunciosView({
               </span>
             )}
           />
-          <Toolbar className="mt-4">
+          <Toolbar className="mt-4 w-full">
   
-          <div className="flex gap-3 sm:gap-6">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
             <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalEnviados > 0 ? 'bg-ok-soft dark:bg-emerald-900/10 border-ok/25 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
               <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Total enviados</div>
               <div className="text-xl font-black text-content-1 dark:text-white">{totalEnviados}</div>

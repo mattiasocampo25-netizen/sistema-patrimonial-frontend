@@ -51,7 +51,7 @@ export function THead({ className = '', children, ...resto }) {
 export function TRow({ className = '', children, ...resto }) {
   return (
     <tr
-      className={`border-b border-line/60 transition-[background-color,color] duration-[var(--dur-fast)] hover:bg-surface-2 ${className}`}
+      className={`border-b border-line/60 transition-[background-color,color] duration-[var(--dur-fast)] even:bg-surface-2/35 hover:bg-brand/5 ${className}`}
       {...resto}
     >
       {children}

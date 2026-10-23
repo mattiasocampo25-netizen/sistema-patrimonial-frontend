@@ -32,7 +32,7 @@ export default function PageHeader({
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {icono ? (
           <span
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-2 text-content-1 border border-line"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text border border-brand/10 shadow-xs"
             aria-hidden="true"
           >
             <i className={`fa-solid ${icono}`} />
@@ -41,7 +41,7 @@ export default function PageHeader({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-title font-bold text-content-1 tracking-tight truncate">{titulo}</h1>
+            <h1 className="text-title font-bold text-content-1 tracking-tight leading-tight">{titulo}</h1>
             {contador}
           </div>
           {descripcion ? (

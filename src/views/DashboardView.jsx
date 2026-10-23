@@ -271,12 +271,11 @@ export default function DashboardView({
                     <i className="fa-solid fa-file-signature text-[9px]"></i>
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-bold text-content-1 dark:text-white truncate">
-                      {bien?.rotulo || 'S/R'}
-                      <span className="font-semibold text-content-3 dark:text-content-3"> · {pendiente.nombre || pendiente.puesto}</span>
+                    <span className="block text-xs font-bold text-content-1 dark:text-white truncate" title={bien?.descripcion || bien?.rotulo || 'Bien sin rótulo'}>
+                      {bien?.rotulo || 'Bien sin rótulo'}
                     </span>
                     <span className="block text-[10px] text-content-3 dark:text-content-3 truncate">
-                      Falta firma {pendiente.orden}: {pendiente.puesto}
+                      {fc.funcionarioNombre || 'Sin responsable'} · Falta firma {pendiente.orden}: {pendiente.puesto}
                     </span>
                   </span>
                 </button>
@@ -285,11 +284,11 @@ export default function DashboardView({
                     onClick={() => registrarAmbasFirmas(fc)}
                     disabled={firmandoId === fc.id}
                     title="Registrar las dos firmas"
-                    className="shrink-0 inline-flex items-center gap-1 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60"
+                    className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
                   >
                     {firmandoId === fc.id
                       ? <i className="fa-solid fa-circle-notch fa-spin text-[9px]"></i>
-                      : <><i className="fa-solid fa-circle-check text-[9px]"></i> Firmaron ambos</>}
+                      : <><i className="fa-solid fa-circle-check text-[9px]"></i> Registrar ambas</>}
                   </button>
                 )}
               </div>

@@ -18,13 +18,14 @@ const MESES = [
  * Usa FiltroCombo en vez de <select> nativo: el popup del navegador se dibuja
  * con los colores del sistema y quedaba ilegible sobre la app oscura.
  */
-export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año' }) {
+export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año', ayuda }) {
   const nombreMes = MESES.find(m => m.val === String(selectedMonth))?.name || 'Seleccionar mes';
   return (
     <div className="flex flex-wrap items-end gap-3 rounded-card border border-line bg-surface-2/70 px-3 py-2.5" role="group" aria-label={descripcion}>
       <div className="min-w-[116px] pb-0.5">
         <span className="block text-[9px] font-bold uppercase tracking-widest text-content-3">Periodo</span>
         <span className="block text-xs font-bold text-content-1">{nombreMes} {selectedYear}</span>
+        {ayuda && <span className="mt-0.5 block max-w-[180px] text-[10px] leading-tight text-content-3">{ayuda}</span>}
       </div>
       <div className="flex items-end gap-2">
         <div className="w-[122px]">

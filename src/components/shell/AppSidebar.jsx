@@ -83,7 +83,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
       onFocus={ubicarTooltip}
       onBlur={() => setTooltip(null)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
+      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
       <span className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-[var(--dur-fast)] group-hover:scale-110 ${activo ? 'text-brand-text' : 'text-sidebar-content-2 group-hover:text-sidebar-content'}`}>
         <i className={`fa-solid ${item.icon} text-[13px] ${activo ? 'text-white' : ''}`} aria-hidden="true" />
@@ -112,7 +112,7 @@ function ItemHerramienta({ icono, titulo, onClick, badge, compacta }) {
       type="button"
       onClick={onClick}
       title={titulo}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 text-body font-normal text-sidebar-content-2 hover:bg-brand/5 dark:hover:bg-surface-1/[0.06] hover:text-sidebar-content transition-[color,background-color,transform] duration-[var(--dur-fast)] hover:translate-x-0.5 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body font-normal text-sidebar-content-2 hover:bg-brand/5 dark:hover:bg-surface-1/[0.06] hover:text-sidebar-content transition-[color,background-color,transform] duration-[var(--dur-fast)] hover:translate-x-0.5 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand`}
     >
       <span className="flex items-center justify-center w-6 shrink-0 text-sidebar-content-2 group-hover:text-sidebar-content">
         <i className={`fa-solid ${icono} text-[13px]`} aria-hidden="true" />
@@ -260,7 +260,7 @@ export default function AppSidebar({
                   aria-expanded={!!gruposAbiertos[grupo.titulo]}
                   aria-controls={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                   title={compacta ? grupo.titulo : undefined}
-                  className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                  className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                 >
                   <i className={`fa-solid ${grupo.icon} w-5 text-center text-[11px]`} aria-hidden="true" />
                   <span className={`flex-1 text-left uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>{grupo.titulo}</span>
@@ -284,7 +284,7 @@ export default function AppSidebar({
           })}
           {isAdmin ? (
             <section className="space-y-1 border-t border-sidebar-line pt-3">
-              <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={compacta ? 'Utilidades' : undefined} className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
+              <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={compacta ? 'Utilidades' : undefined} className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
                 <i className="fa-solid fa-toolbox w-5 text-center text-[11px]" aria-hidden="true" />
                 <span className={`flex-1 text-left uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>Utilidades</span>
                 <i className={`fa-solid fa-chevron-down text-[9px] transition-transform ${utilidadesAbiertas ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />

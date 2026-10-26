@@ -47,7 +47,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
             {config?.titulo || 'Estamos mejorando el sistema'}
           </h1>
           <p className="text-sm text-slate-300/90 leading-relaxed mt-1 max-w-md mx-auto mb-8">
-            {config?.mensaje || 'El acceso está pausado temporalmente mientras se aplican mejoras de seguridad y rendimiento. Por favor, intente nuevamente en unos minutos.'}
+            {config?.mensaje || 'El sistema está pausado por unos minutos mientras aplicamos mejoras. Vuelve pronto.'}
           </p>
 
           {/* Información de progreso */}
@@ -72,7 +72,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           {mejoras.length > 0 && (
             <div className="mb-8 rounded-card bg-surface-1/5 border border-white/10 p-5 sm:p-6 backdrop-blur-sm text-left">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 mb-4">
-                Mejoras en curso
+                Novedades en este momento
               </p>
               <ul className="space-y-3">
                 {mejoras.map((m, i) => (
@@ -88,7 +88,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           )}
 
           <p className="text-xs text-content-3 mb-8">
-            Contacto: <span className="font-bold text-slate-300">patrimonio@unp.edu.py</span>
+            ¿Necesitas ayuda? Escríbenos a <span className="font-bold text-slate-300">patrimonio@unp.edu.py</span>
           </p>
           {onAccesoDesarrollador && (
             <button
@@ -108,7 +108,7 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           Universidad Nacional de Pilar · Dpto. Bienes Patrimoniales
         </p>
         <p className="text-[11px] font-bold text-content-3 mt-1">
-          Desarrollador del Sistema: Matias Ocampo
+          Sistema de Gestión Patrimonial v{version}
         </p>
       </footer>
     </div>

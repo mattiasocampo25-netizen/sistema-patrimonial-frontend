@@ -21,15 +21,12 @@ export default function LoginScreen({
   version = APP_VERSION
 }) {
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
+  const [showAyudaModal, setShowAyudaModal] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
 
   const detectarCaps = (e) => {
     try { setCapsLock(!!(e.getModifierState && e.getModifierState('CapsLock'))); } catch { /* noop */ }
   };
-
-  // Los colores salen de los tokens (styles/tokens.css), igual que en el
-  // resto de la aplicacion. Antes este archivo traia los suyos y el login
-  // se veía como un sistema aparte.
 
   return (
     <div
@@ -47,7 +44,7 @@ export default function LoginScreen({
             <div className="absolute inset-0 bg-gradient-to-br from-slate-950/65 via-blue-950/65 to-indigo-950/90" />
             <span className="login-orb-a absolute -right-20 -top-16 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl" />
             <span className="login-orb-b absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-indigo-300/20 blur-3xl" />
-            <div className="relative z-10 flex items-center gap-3">
+            <div className="relative z-10 flex items-center gap-3 mb-8">
               <span className="flex h-12 w-12 items-center justify-center rounded-card border border-white/20 bg-white/10 p-2 backdrop-blur-sm">
                 {appLogo ? <img src={appLogo} alt="Logo UNP Patrimonio" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-lg" />}
               </span>
@@ -57,15 +54,15 @@ export default function LoginScreen({
               </span>
             </div>
             <div className="relative z-10 max-w-lg">
-              <p className="mb-3 text-label font-bold uppercase tracking-[0.2em] text-blue-200">Gestión institucional</p>
-              <h2 className="text-xl font-bold text-blue-100 mb-2">Universidad Nacional de Pilar</h2>
-              <h1 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl">Sistema de Gestión Patrimonial UNP</h1>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80">Plataforma institucional para el control del patrimonio de la UNP. Administra el inventario de bienes, registra responsables, genera actas FC-04, FC-10 y FC-11, y haz trazabilidad por código QR desde un mismo lugar.</p>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight xl:text-4xl text-white mb-4">Sistema de Gestión Patrimonial UNP</h1>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/80 mb-6">
+                Controla el inventario de bienes, registra responsables y genera actas FC-04, FC-10 y FC-11 desde un mismo lugar.
+              </p>
               <div className="mt-7 flex flex-wrap gap-2 text-label font-semibold text-white/90">
                 {['Inventario', 'Actas FC-04 · FC-10 · FC-11', 'Trazabilidad QR'].map(etiqueta => <span key={etiqueta} className="rounded-pill border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">{etiqueta}</span>)}
               </div>
             </div>
-            <p className="relative z-10 text-label text-white/60">Sistema de Gestión Patrimonial · Universidad Nacional de Pilar</p>
+            <p className="relative z-10 mt-auto text-label text-white/60">Universidad Nacional de Pilar · Dpto. Bienes Patrimoniales</p>
           </aside>
 
           <div className={`relative flex flex-col justify-center bg-gradient-to-br from-[#101f34] to-[#0c192c] p-7 text-content-1 sm:p-10 lg:p-12 ${loginError ? 'animate-shake' : ''}`}>
@@ -183,9 +180,21 @@ export default function LoginScreen({
               </button>
             </form>
 
-            <p className="mt-7 border-t border-line pt-5 text-center text-label font-medium tracking-tight text-content-3">
-              <a href="/ayuda" className="text-brand underline-offset-2 hover:underline">Centro de Ayuda</a> · © {new Date().getFullYear()} Universidad Nacional de Pilar · v{version}
-            </p>
+            <div className="mt-7 border-t border-line pt-5">
+              <div className="flex items-center justify-center gap-4 text-center">
+                <button
+                  onClick={() => setShowAyudaModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-control text-[13px] font-semibold text-brand-text hover:bg-brand/10 transition-colors cursor-pointer border border-brand/20 motion"
+                >
+                  <i className="fa-solid fa-circle-question text-[12px]"></i>
+                  Centro de Ayuda
+                </button>
+                <span className="w-px h-4 bg-white/20"></span>
+                <span className="text-label font-medium tracking-tight text-content-3">
+                  © {new Date().getFullYear()} UNP · v{version}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -219,7 +228,7 @@ export default function LoginScreen({
             <p className="text-sm text-content-2 dark:text-content-3 font-medium mt-2 leading-relaxed">
               Para restablecer tu contraseña, solicita ayuda al equipo de soporte patrimonial. Incluye tu nombre de usuario para identificar la cuenta.
             </p>
-            <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-surface-3/50 border border-line dark:border-line text-[11px] font-bold text-content-1 dark:text-content-3">
+            <div className="mt-4 p-4 rounded-card bg-surface-2 dark:bg-surface-3/50 border border-line text-[11px] font-bold text-content-1 dark:text-content-3">
               <i className="fa-solid fa-envelope mr-2 text-brand-text dark:text-blue-400" aria-hidden="true"></i>
               <a href="mailto:patrimonio@unp.edu.py?subject=Recuperar%20acceso%20al%20sistema" className="text-brand-text underline-offset-2 hover:underline dark:text-brand">patrimonio@unp.edu.py</a>
             </div>
@@ -229,6 +238,54 @@ export default function LoginScreen({
             >
               Entendido
             </button>
+          </div>
+        </Dialogo>
+      )}
+
+      {/* MODAL CENTRO DE AYUDA */}
+      {showAyudaModal && (
+        <Dialogo className="fixed inset-0 z-[400] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fade-in" onCerrar={() => setShowAyudaModal(false)}>
+          <div className="w-full max-w-md rounded-panel bg-surface-1 p-7 shadow-pop border border-line text-content-1 animate-slide-up">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-control bg-brand-soft text-brand-text flex items-center justify-center">
+                <i className="fa-solid fa-circle-question"></i>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-content-1 tracking-tight">Centro de Ayuda</h3>
+                <p className="text-sm text-content-2">Respuestas prácticas para usar el sistema.</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 p-3 rounded-control bg-surface-2 hover:bg-surface-3 cursor-pointer transition-colors motion" onClick={() => { window.location.href = '/ayuda'; setShowAyudaModal(false); }}>
+                <i className="fa-solid fa-book-open mt-0.5 text-brand-text shrink-0"></i>
+                <div>
+                  <p className="text-body font-semibold text-content-1">Guía de uso del sistema</p>
+                  <p className="text-[11px] text-content-3">Inventario, actas, firmas y trazabilidad QR</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-control bg-surface-2 hover:bg-surface-3 cursor-pointer transition-colors motion" onClick={() => { setShowRecoveryModal(true); setShowAyudaModal(false); }}>
+                <i className="fa-solid fa-headset mt-0.5 text-brand-text shrink-0"></i>
+                <div>
+                  <p className="text-body font-semibold text-content-1">Soporte técnico</p>
+                  <p className="text-[11px] text-content-3">Escríbenos a patrimonio@unp.edu.py</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 rounded-control bg-surface-2 hover:bg-surface-3 cursor-pointer transition-colors motion" onClick={() => { setShowAyudaModal(false); }}>
+                <i className="fa-solid fa-keyboard mt-0.5 text-brand-text shrink-0"></i>
+                <div>
+                  <p className="text-body font-semibold text-content-1">Atajos de teclado</p>
+                  <p className="text-[11px] text-content-3">Ctrl+K para búsqueda global, / para inventario, ? para atajos</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 pt-4 border-t border-line">
+              <button
+                onClick={() => setShowAyudaModal(false)}
+                className="w-full py-3 rounded-control bg-brand text-content-inverse font-bold motion cursor-pointer hover:bg-brand-hover active:scale-[0.98]"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </Dialogo>
       )}

@@ -150,10 +150,19 @@ body {
 .sidebar-premium {
   background-color: var(--sidebar);
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.035), transparent 48%),
-    linear-gradient(165deg, #ffffff 0%, #ffffff 62%, #f8faff 100%);
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.06), transparent 50%),
+    linear-gradient(165deg, #ffffff 0%, #ffffff 70%, #f8faff 100%);
   border-color: var(--sidebar-line);
-  box-shadow: 0 10px 32px rgb(15 23 42 / 0.08), 0 2px 6px rgb(15 23 42 / 0.04);
+  box-shadow: 0 16px 48px rgb(15 23 42 / 0.1), 0 6px 16px rgb(15 23 42 / 0.05);
+  border-width: 1px;
+}
+
+.dark .sidebar-premium {
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.25), transparent 48%),
+    linear-gradient(165deg, #14243b 0%, #101d30 48%, #0e1828 100%);
+  border-color: var(--sidebar-line);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.4), 0 6px 16px rgb(0 0 0 / 0.2);
 }
 
 .dark .sidebar-premium {
@@ -170,37 +179,93 @@ body {
   scroll-padding-block: 1rem;
   background-color: var(--canvas);
   background-image:
-    radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 4%, transparent), transparent 38%),
-    radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 2%, transparent), transparent 34%);
+    radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 3%, transparent), transparent 40%),
+    radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 2%, transparent), transparent 36%);
 }
 
-/* Mejoras globales de interfaz */
+/* Mejoras globales de interfaz premium */
 @layer components {
   /* Tarjetas y paneles con sombra suave */
   .rounded-card, .rounded-panel {
     box-shadow: var(--shadow-card);
+    transition: box-shadow var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  }
+
+  .rounded-card:hover, .rounded-panel:hover {
+    box-shadow: var(--shadow-panel);
   }
 
   /* Botones con mejor feedback visual */
   button:not(:disabled):active {
-    transform: scale(0.98);
+    transform: scale(0.97);
   }
 
   /* Inputs con mejor feedback */
   input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 12%, transparent);
   }
 
   /* Mejora de scrollbars */
   .custom-scrollbar::-webkit-scrollbar-thumb {
     transition: background-color 0.2s ease;
+    border-radius: 9999px;
   }
 
   /* Mejora de transiciones globales */
   .motion {
     transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  }
+
+  /* Mejora de botones primarios */
+  .bg-brand {
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 25%, transparent);
+  }
+
+  .bg-brand:hover {
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  /* Mejora de tarjetas en hover */
+  .card-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-panel);
+  }
+
+  /* Mejora de modales */
+  .rounded-panel {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Mejora de badges */
+  .rounded-pill {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Mejora de inputs */
+  input, select, textarea {
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+
+  /* Mejora de tablas */
+  table th {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+  }
+
+  /* Mejora de filas de tabla en hover */
+  tbody tr:hover {
+    background-color: var(--surface-2);
+  }
+
+  /* Mejora de focus visible */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
   }
 }
 

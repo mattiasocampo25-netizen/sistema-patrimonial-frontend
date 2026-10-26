@@ -88,7 +88,7 @@ export default function AppTopbar({
 
   return (
     <>
-      <header className="sticky top-0 z-[120] shrink-0 bg-surface-1/90 backdrop-blur-xl border-b border-line">
+      <header className="sticky top-0 z-[120] shrink-0 bg-surface-1/95 backdrop-blur-xl border-b border-line shadow-sm">
         <div className="flex h-16 items-center gap-2 sm:gap-3 px-3 sm:px-5">
           {/* Menu (solo movil) */}
           <button

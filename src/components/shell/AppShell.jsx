@@ -90,7 +90,7 @@ export default function AppShell({
         currentUser={currentUser}
       />
 
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex flex-1 flex-col min-w-0 gap-0">
         {errorBanner ? errorBanner : null}
 
         <AppTopbar
@@ -116,7 +116,7 @@ export default function AppShell({
           actasPorFirmarCount={actasPorFirmarCount}
         />
 
-        <main id="contenido" className="workspace-main flex-1 overflow-y-auto custom-scrollbar">
+        <main id="contenido" className="workspace-main flex-1 overflow-y-auto custom-scrollbar rounded-tl-panel rounded-tr-panel lg:rounded-tl-none lg:rounded-tr-none">
           {children}
         </main>
       </div>

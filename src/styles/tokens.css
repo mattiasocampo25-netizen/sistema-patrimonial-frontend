@@ -4,27 +4,6 @@
  * Este archivo es la única fuente de verdad de color, radio, sombra, tipografía
  * y movimiento. Todo lo demás (componentes en src/components/ui) consume estos
  * tokens; si un valor no está acá, es que no debería estar hardcodeado.
- *
- * El modo oscuro NO se logra con parches: cada token tiene su valor claro y su
- * valor oscuro, y las utilidades que genera Tailwind los resuelven solos.
- * Por eso el `@theme inline`: las utilidades emitted apuntan a la variable CSS
- * (--surface-1), que cambia con la clase `dark` del <html>.
- *
- * ── Superficies (de fondo a frente) ────────────────────────────────────────
- *   canvas   fondo de la aplicación
- *   surface-1  tarjetas y paneles
- *   surface-2  zonas secundarias dentro de una tarjeta
- *   surface-3  hover / elevado
- *
- * ── Contenido (texto e iconos) ───────────────────────────────────────────
- *   content-1  texto principal
- *   content-2  texto secundario
- *   content-3  texto terciario (metadatos, pie de tabla)
- *   content-inverse  texto sobre fondo de marca
- *
- * ── Estados ───────────────────────────────────────────────────────────────
- *   danger / warn / ok / info, cada uno con su variante "-soft" (fondo suave)
- *   para badges, avisos y filas.
  * ========================================================================== */
 
 @theme inline {
@@ -45,8 +24,7 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
 
-  /* --- Sidebar: superficie clara/oscura según el tema ---
-     content-3 conserva el tono secundario para separar títulos de grupo. */
+  /* --- Sidebar --- */
   --color-sidebar: var(--sidebar);
   --color-sidebar-content: var(--sidebar-content);
   --color-sidebar-content-2: var(--sidebar-content-2);
@@ -59,10 +37,7 @@
   --color-brand-soft: var(--brand-soft);
   --color-brand-text: var(--brand-text);
 
-  /* Alias historicos. Antes eran colores fijos (--color-brand-primary:
-     #1d4ed8) y por eso en modo oscuro eran azul oscuro sobre fondo oscuro:
-     ilegibles, y el anillo de foco tampoco se veia. Ahora apuntan a los
-     tokens semanticos y se adaptan al tema. */
+  /* Alias historicos */
   --color-brand-primary: var(--brand);
   --color-brand-accent: var(--brand);
   --color-brand-light: var(--brand-soft);
@@ -77,7 +52,7 @@
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
 
-  /* --- Paleta pastel para los tiles por dependencia --- */
+  /* --- Paleta pastel --- */
   --color-pastel-1: var(--pastel-1);
   --color-pastel-2: var(--pastel-2);
   --color-pastel-3: var(--pastel-3);
@@ -88,17 +63,17 @@
   --color-pastel-8: var(--pastel-8);
 
   /* --- Radios: una sola escala para toda la app --- */
-  --radius-control: 0.75rem;    /* 12px botones, inputs, chips */
-  --radius-card: 1rem;          /* 16px tarjetas interiores */
-  --radius-panel: 1.25rem;      /* 20px paneles, modales y secciones */
-  --radius-pill: 9999px;        /* badges, avatares */
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --radius-panel: 1.25rem;
+  --radius-pill: 9999px;
 
   /* --- Sombras: tres niveles de elevación --- */
   --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
   --shadow-panel: 0 4px 12px rgb(15 23 42 / 0.08), 0 2px 4px rgb(15 23 42 / 0.04);
   --shadow-pop: 0 12px 32px rgb(15 23 42 / 0.14), 0 4px 8px rgb(15 23 42 / 0.06);
 
-  /* --- Movimiento: duraciones y curvas --- */
+  /* --- Movimiento --- */
   --dur-fast: 120ms;
   --dur-base: 200ms;
   --dur-slow: 320ms;
@@ -106,11 +81,11 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* --- Tipografía: una escala semántica para la interfaz --- */
-  --text-label: 0.6875rem;   /* 11px  etiquetas de campo, sobretitulos */
-  --text-body: 0.8125rem;    /* 13px  texto de formulario y tablas */
-  --text-title: 1.0625rem;   /* 17px  titulo de vista */
-  --text-display: 1.375rem;   /* 22px  numeros grandes, titulos de panel */
+  /* --- Tipografía --- */
+  --text-label: 0.6875rem;
+  --text-body: 0.8125rem;
+  --text-title: 1.0625rem;
+  --text-display: 1.375rem;
 }
 
 /* ============================================================================
@@ -120,24 +95,22 @@
 :root {
   color-scheme: light;
 
-  /* Fondo calido (no gris frio): el tono de la referencia */
-  --canvas: #f3f6fb;
+  /* Fondo cálido */
+  --canvas: #f0f2f7;
   --surface-1: #ffffff;
   --surface-2: #f7f9fc;
   --surface-3: #edf1f7;
-  /* Superficie "glass": translucida, con desenfoque de fondo */
-  --surface-glass: rgb(255 255 255 / 0.72);
+  --surface-glass: rgb(255 255 255 / 0.78);
 
-  --content-1: #16181d;
-  --content-2: #3d424a;
-  --content-3: #5a626c;
+  --content-1: #111827;
+  --content-2: #374151;
+  --content-3: #6b7280;
   --content-inverse: #ffffff;
 
-  --line: #e3e8f0;
+  --line: #e2e8f0;
   --line-strong: #cbd5e1;
 
-  /* En tema claro el menú acompaña la superficie cálida; el azul noche queda
-     reservado para el tema oscuro. Los secundarios mantienen contraste. */
+  /* Sidebar */
   --sidebar: #f8faff;
   --sidebar-content: #17243a;
   --sidebar-content-2: #46566d;
@@ -158,7 +131,7 @@
   --info: #0369a1;
   --info-soft: #f0f9ff;
 
-  /* Paleta pastel para los tiles por dependencia */
+  /* Paleta pastel */
   --pastel-1: #d9f2e6;
   --pastel-2: #fde5d3;
   --pastel-3: #d6e9fb;
@@ -168,9 +141,9 @@
   --pastel-7: #e4f4d4;
   --pastel-8: #fbdcea;
 
-  /* Sombras un poco mas marcadas en claro */
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.035), 0 3px 10px rgb(15 23 42 / 0.035);
-  --shadow-panel: 0 8px 24px rgb(15 23 42 / 0.075), 0 2px 5px rgb(15 23 42 / 0.035);
+  /* Sombras */
+  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.05), 0 2px 8px rgb(15 23 42 / 0.04);
+  --shadow-panel: 0 6px 20px rgb(15 23 42 / 0.08), 0 2px 6px rgb(15 23 42 / 0.04);
   --shadow-pop: 0 18px 48px rgb(15 23 42 / 0.2), 0 5px 12px rgb(15 23 42 / 0.06);
 }
 
@@ -211,7 +184,6 @@
   --info: #38bdf8;
   --info-soft: #082f49;
 
-  /* Pasteles apagados para el modo oscuro */
   --pastel-1: #16342a;
   --pastel-2: #3a2617;
   --pastel-3: #152c47;
@@ -226,19 +198,6 @@
   --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.6);
 }
 
-/* ============================================================================
- * Movimiento: una sola transicion para toda la app.
- *
- * La clase `motion` sustituye a `transition-all`. Antes cada archivo
- * elegia su propia duracion (150 ms por defecto de Tailwind, o un
- * `duration-300` pegado al lado) y la curva era siempre la misma: el mismo
- * hover se sentia distinto en cada modulo. Aqui las tres cosas salen de los
- * tokens: que propiedades se animan, cuanto y con que curva.
- *
- * Se queda en `components` a proposito: las utilidades de Tailwind van
- * despues, asi que un `duration-*` explicito sigue mandando sobre el
- * valor por defecto.
- * ========================================================================== */
 @layer components {
   .motion {
     transition-property: color, background-color, border-color, text-decoration-color,
@@ -248,9 +207,6 @@
   }
 }
 
-/* ============================================================================
- * Foco visible, una sola vez para toda la app.
- * ========================================================================== */
 @layer base {
   :where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
     outline: 2px solid var(--brand);
@@ -258,7 +214,6 @@
     border-radius: var(--radius-control);
   }
 
-  /* Si el usuario pide menos movimiento, se respeta en TODO (CSS y JS). */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

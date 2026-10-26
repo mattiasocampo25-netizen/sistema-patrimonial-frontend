@@ -150,19 +150,19 @@ body {
 .sidebar-premium {
   background-color: var(--sidebar);
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.06), transparent 50%),
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.08), transparent 50%),
     linear-gradient(165deg, #ffffff 0%, #ffffff 70%, #f8faff 100%);
   border-color: var(--sidebar-line);
-  box-shadow: 0 16px 48px rgb(15 23 42 / 0.1), 0 6px 16px rgb(15 23 42 / 0.05);
+  box-shadow: 0 20px 60px rgb(15 23 42 / 0.12), 0 8px 20px rgb(15 23 42 / 0.06);
   border-width: 1px;
 }
 
 .dark .sidebar-premium {
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.25), transparent 48%),
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.3), transparent 48%),
     linear-gradient(165deg, #14243b 0%, #101d30 48%, #0e1828 100%);
   border-color: var(--sidebar-line);
-  box-shadow: 0 16px 48px rgb(0 0 0 / 0.4), 0 6px 16px rgb(0 0 0 / 0.2);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.25);
 }
 
 .dark .sidebar-premium {
@@ -179,8 +179,9 @@ body {
   scroll-padding-block: 1rem;
   background-color: var(--canvas);
   background-image:
-    radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 3%, transparent), transparent 40%),
-    radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 2%, transparent), transparent 36%);
+    radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 2.5%, transparent), transparent 40%),
+    radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 1.5%, transparent), transparent 36%);
+  border-radius: var(--radius-panel);
 }
 
 /* Mejoras globales de interfaz premium */

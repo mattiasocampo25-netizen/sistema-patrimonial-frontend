@@ -116,7 +116,7 @@ export default function AppShell({
           actasPorFirmarCount={actasPorFirmarCount}
         />
 
-        <main id="contenido" className="workspace-main flex-1 overflow-y-auto custom-scrollbar lg:rounded-3xl lg:m-4 lg:shadow-panel">
+        <main id="contenido" className="workspace-main flex-1 overflow-y-auto custom-scrollbar lg:rounded-[24px] lg:m-4 lg:shadow-panel lg:border lg:border-line/50">
           {children}
         </main>
       </div>

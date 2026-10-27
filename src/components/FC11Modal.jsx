@@ -15,7 +15,7 @@ export default function FC11Modal({
     STYLES
 }) {
     const esNuevoFC = !fc11Editing;
-    const { borrador: borradorFC, hayBorrador: hayBorradorFC, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc11_nuevo', esNuevoFC);
+    const { borrador: borradorFC, hayBorrador: hayBorradorFC, estadoGuardado, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc11_nuevo', esNuevoFC);
     const [restauradoFC, setRestauradoFC] = useState(null);
     const [formKeyFC, setFormKeyFC] = useState(0);
     const defectoFC = (campo, fb) => (restauradoFC && restauradoFC[campo] !== undefined && restauradoFC[campo] !== null ? restauradoFC[campo] : fb);
@@ -77,6 +77,7 @@ export default function FC11Modal({
                   </div>
                 )}<form key={formKeyFC} onSubmit={async (e) => { const ok = await saveFC11(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
                     <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
+                        {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
                         
                         {/* BARRA DE PROGRESO WIZARD */}
                         <div className="flex gap-2">

@@ -35,7 +35,7 @@ export default function BienModal({
     // Estado para autocompletado de descripción (aprende de bienes existentes)
     // esNuevo por id: un duplicado llega como objeto sin id y es un alta nueva.
     const esNuevo = !bienEditing?.id;
-    const { borrador, hayBorrador, guardarBorrador, limpiarBorrador } = useDraft('borrador_bien_nuevo', esNuevo);
+    const { borrador, hayBorrador, estadoGuardado, guardarBorrador, limpiarBorrador } = useDraft('borrador_bien_nuevo', esNuevo);
     const [restaurado, setRestaurado] = useState(null);
     const [formKey, setFormKey] = useState(0);
     const [rotuloError, setRotuloError] = useState('');
@@ -249,6 +249,7 @@ export default function BienModal({
             )}
             <form key={formKey} ref={bienFormRef} onSubmit={async (e) => { const ok = await saveBien(e, false); if (ok) limpiarBorrador(); }} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
               <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
+                {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
 
                 {/* 1. IMPUTACIÓN CONTABLE Y RÓTULO */}
                 <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">

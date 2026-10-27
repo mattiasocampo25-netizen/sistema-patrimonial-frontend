@@ -235,7 +235,7 @@ export default function App() {
           }
         } else if (m) detalle = String(m);
       } catch { detalle = String(row.mensaje || ''); }
-      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle });
+      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle, usuario: row.usuario || '' });
     });
     return ev.sort((x, y) => String(y.fecha || '').localeCompare(String(x.fecha || '')));
   }, [fichaBien, eventosAuditFicha, fc10List, fc11List]);

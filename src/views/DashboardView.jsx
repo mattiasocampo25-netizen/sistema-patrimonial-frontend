@@ -142,6 +142,20 @@ export default function DashboardView({
     });
   };
   const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias'], ['agenda', 'Agenda']];
+  const ACCESOS = [
+    ['nuevo', 'Nuevo registro'], ['importar', 'Importar CSV'], ['exportar', 'Exportar CSV'],
+    ['qr', 'Lote de QRs'], ['fc03', 'Reporte FC-03'],
+  ];
+  const [accesosVisibles, setAccesosVisibles] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('dash_accesos') || 'null') || ACCESOS.map(([id]) => id); }
+    catch { return ACCESOS.map(([id]) => id); }
+  });
+  const [menuAccesos, setMenuAccesos] = useState(false);
+  const alternarAcceso = (id) => setAccesosVisibles((prev) => {
+    const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
+    try { localStorage.setItem('dash_accesos', JSON.stringify(next)); } catch {}
+    return next;
+  });
 
   // Tarjetas de métrica con diseño consistente y simétrico.
   // Un solo sistema de tonos (StatTile): el estado se comunica con el tono
@@ -420,24 +434,37 @@ export default function DashboardView({
       {/* 3. ACCESOS DIRECTOS */}
       {widgets.accesos && (
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm p-5 sm:p-6">
-          <p className="px-2 pb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3">Accesos directos</p>
+          <div className="mb-3 flex items-center justify-between gap-3 px-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3">Accesos directos</p>
+            <div className="relative">
+              <button type="button" aria-expanded={menuAccesos} onClick={() => setMenuAccesos((v) => !v)} className="rounded-control px-2.5 py-1.5 text-label font-semibold text-content-3 hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <i className="fa-solid fa-sliders mr-1.5" aria-hidden="true" />Personalizar
+              </button>
+              {menuAccesos && <div className="absolute right-0 z-30 mt-2 w-56 rounded-card border border-line bg-surface-1 p-2 shadow-pop" role="group" aria-label="Personalizar accesos directos">
+                {ACCESOS.map(([id, label]) => <label key={id} className="flex cursor-pointer items-center gap-2 rounded-control px-2.5 py-2 text-label font-medium text-content-1 hover:bg-surface-2">
+                  <input type="checkbox" checked={accesosVisibles.includes(id)} onChange={() => alternarAcceso(id)} className="h-4 w-4 accent-[var(--brand-primary)]" />{label}
+                </label>)}
+                <button type="button" onClick={() => setMenuAccesos(false)} className="mt-1 w-full rounded-control px-2 py-1.5 text-right text-label font-bold text-brand-text hover:bg-surface-2">Listo</button>
+              </div>}
+            </div>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
-              <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
+              {accesosVisibles.includes('nuevo') && <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
                   <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
-              </button>
-              <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1.5"></span>
-              <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              </button>}
+              {accesosVisibles.includes('importar') && <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i> Importar
-              </button>
-              <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              </button>}
+              {accesosVisibles.includes('exportar') && <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-export text-sky-600 dark:text-sky-400"></i> Exportar
-              </button>
-              <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              </button>}
+              {accesosVisibles.includes('qr') && <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-qrcode text-violet-600 dark:text-violet-400"></i> Lote QRs
-              </button>
-              <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
+              </button>}
+              {accesosVisibles.includes('fc03') && <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-print text-warn dark:text-amber-400"></i> FC-03
-              </button>
+              </button>}
+              {accesosVisibles.length === 0 && <p className="px-3 py-2 text-label text-content-3">No hay accesos visibles. Usa “Personalizar” para agregar alguno.</p>}
           </div>
       </div>
       )}

@@ -17,26 +17,32 @@ export function useDraft(clave, activo) {
   };
 
   const [borrador, setBorrador] = useState(leer);
+  const [estadoGuardado, setEstadoGuardado] = useState('');
 
   const guardar = useCallback((obj) => {
     if (!activo) return;
     try {
       if (!obj || Object.values(obj).every(v => v === '' || v === undefined || v === null)) {
         localStorage.removeItem(clave);
+        setEstadoGuardado('');
         return;
       }
       localStorage.setItem(clave, JSON.stringify(obj));
-    } catch {}
+      setEstadoGuardado('Borrador guardado en este dispositivo');
+    } catch {
+      setEstadoGuardado('No se pudo guardar el borrador');
+    }
   }, [activo, clave]);
 
   const limpiar = useCallback(() => {
     try { localStorage.removeItem(clave); } catch {}
     setBorrador(null);
+    setEstadoGuardado('');
   }, [clave]);
 
   const hay = borrador && Object.values(borrador).some(v => v !== '' && v !== undefined && v !== null);
 
-  return { borrador, hayBorrador: !!hay, guardarBorrador: guardar, limpiarBorrador: limpiar };
+  return { borrador, hayBorrador: !!hay, estadoGuardado, guardarBorrador: guardar, limpiarBorrador: limpiar };
 }
 
 // Serializa un <form> a objeto plano (para guardar borrador al escribir).

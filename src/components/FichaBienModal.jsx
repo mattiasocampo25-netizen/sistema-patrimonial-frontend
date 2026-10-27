@@ -1,6 +1,7 @@
 import Dialogo from './ui/Dialogo';
 import React, { useState } from 'react';
 import { Button, IconButton, Badge } from './ui';
+import { camposIncompletos } from '../utils/dataCompleteness';
 
 const TIPO_TONO = {
   alta: 'ok',
@@ -23,6 +24,7 @@ const TIPO_ICONO = {
 export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
   if (!isOpen || !bien) return null;
+  const incompletos = camposIncompletos(bien);
   const Dato = ({ label, value }) => (
     <div className="rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/60 dark:border-white/10 px-3 py-2.5">
       <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">{label}</p>
@@ -60,6 +62,17 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+          {incompletos.length > 0 && (
+            <section aria-label="Datos incompletos del bien" className="rounded-card border border-warn/25 bg-warn-soft px-4 py-3.5">
+              <div className="flex items-start gap-3">
+                <i className="fa-solid fa-circle-exclamation mt-0.5 text-warn" aria-hidden="true" />
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold text-warn">Faltan {incompletos.length} datos por completar</h3>
+                  <p className="mt-1 text-label leading-relaxed text-content-2">{incompletos.join(' · ')}</p>
+                </div>
+              </div>
+            </section>
+          )}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <Dato label="Cuenta" value={[bien.cuenta, bien.subcuenta, bien.analitico1, bien.analitico2].filter(Boolean).join('.')} />
             <Dato label="Adquisición" value={bien.fechaAdquisicion ? formatDateText(bien.fechaAdquisicion) : null} />
@@ -140,6 +153,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                           </span>
                         </div>
                         {ev.detalle && <p className="text-xs text-content-3 dark:text-content-3 mt-2 leading-relaxed pl-[38px]">{ev.detalle}</p>}
+                        {ev.usuario && <p className="text-[10px] font-semibold text-content-3 mt-2 pl-[38px]">Registrado por {ev.usuario}</p>}
                       </div>
                     </li>
                   );

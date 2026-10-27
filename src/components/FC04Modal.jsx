@@ -13,7 +13,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
     const safeItems = fc04Items || [];
     const safeOrigenes = ORIGENES_FC04 || [];
     const esNuevoFC = !fc04Editing;
-    const { borrador: borradorFC, hayBorrador: hayBorradorFC, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc04_nuevo', esNuevoFC);
+    const { borrador: borradorFC, hayBorrador: hayBorradorFC, estadoGuardado, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc04_nuevo', esNuevoFC);
     const [restauradoFC, setRestauradoFC] = useState(null);
     const [formKeyFC, setFormKeyFC] = useState(0);
     const defectoFC = (campo, fb) => (restauradoFC && restauradoFC[campo] !== undefined && restauradoFC[campo] !== null ? restauradoFC[campo] : fb);
@@ -52,6 +52,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                 )}
                 <form key={formKeyFC} onSubmit={async (e) => { const ok = await saveFC04(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} className="flex flex-col h-full overflow-hidden">
                     <div className={STYLES.modalBody}>
+                        {estadoGuardado && <p role="status" className="mb-4 text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-2">
                             <div><label className={LABEL}>Mes</label><FiltroCombo name="mes" required valor={defectoFC('mes', (fc04Editing?.mes || fc10Month))} opciones={Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'))} etiquetaTodos="Mes" titulo="Mes del periodo" compacto /></div>
                             <div><label className={LABEL}>Año</label><FiltroCombo name="anio" required valor={defectoFC('anio', (fc04Editing?.anio || fc10Year))} opciones={Array.from({ length: 10 }, (_, i) => String(new Date().getFullYear() - 5 + i))} etiquetaTodos="Año" titulo="Año del periodo" compacto /></div>

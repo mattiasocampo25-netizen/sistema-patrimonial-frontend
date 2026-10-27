@@ -15,13 +15,13 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
   const estimado = config?.estimado || '';
 
   return (
-    <div className="min-h-dvh flex flex-col w-full bg-[#0a0f1a] font-sans antialiased relative overflow-hidden selection:bg-brand/30">
+    <div className="min-h-dvh flex flex-col w-full bg-canvas font-sans antialiased relative overflow-hidden selection:bg-brand/30">
       <span className="absolute bottom-4 right-5 z-10 text-xs font-semibold text-content-3">v{version}</span>
       {/* Fondo decorativo premium */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-blue-900/25 blur-[100px]"></div>
-        <div className="absolute top-1/3 -right-40 h-80 w-80 rounded-full bg-indigo-900/25 blur-[100px]"></div>
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-blue-800/15 blur-[80px]"></div>
+        <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-brand/10 blur-[100px]"></div>
+        <div className="absolute top-1/3 -right-40 h-80 w-80 rounded-full bg-brand/10 blur-[100px]"></div>
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-brand/10 blur-[80px]"></div>
       </div>
 
       <main className="relative z-10 flex-1 flex items-center justify-center px-6 py-10">
@@ -34,35 +34,35 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
           />
 
           {/* Estado del mantenimiento con indicador animado */}
-          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.18em] bg-amber-900/25 text-amber-400 border border-amber-900/40 mb-8 backdrop-blur-sm shadow-lg">
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.18em] bg-warn-soft text-warn border border-warn/25 mb-8 backdrop-blur-sm shadow-lg">
             <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-70"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warn opacity-70"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-warn"></span>
             </span>
             Sistema en mantenimiento
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl font-black text-content-1 dark:text-white tracking-tight mb-4">
             {config?.titulo || 'Estamos mejorando el sistema'}
           </h1>
-          <p className="text-base text-slate-300/90 leading-relaxed mt-2 max-w-md mx-auto mb-10">
+          <p className="text-base text-content-1 leading-relaxed mt-2 max-w-md mx-auto mb-10">
             {config?.mensaje || 'El sistema está pausado por unos minutos mientras aplicamos mejoras. Vuelve pronto.'}
           </p>
 
           {/* Información de progreso */}
           {(transcurrido || estimado) && (
-            <div className="mb-8 rounded-3xl bg-white/5 border border-white/10 p-6 text-left backdrop-blur-sm">
+            <div className="mb-8 rounded-panel bg-surface-1 border border-line p-6 text-left backdrop-blur-sm">
               <div className="flex justify-between mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-content-3">Tiempo transcurrido</span>
-                <span className="text-sm text-slate-300 font-mono">{transcurrido}</span>
+                <span className="text-sm text-content-1 font-mono">{transcurrido}</span>
               </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full motion duration-[var(--dur-slow)]" style={{ width: '60%' }}></div>
+              <div className="h-2 bg-surface-3 rounded-full overflow-hidden">
+                <div className="h-full bg-brand rounded-full motion duration-[var(--dur-slow)]" style={{ width: '60%' }}></div>
               </div>
               {estimado && (
                 <div className="mt-3 flex justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-content-3">Tiempo estimado restante</span>
-                  <span className="text-sm text-slate-300 font-mono">{estimado}</span>
+                  <span className="text-sm text-content-1 font-mono">{estimado}</span>
                 </div>
               )}
             </div>

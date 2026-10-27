@@ -97,15 +97,16 @@ export default function Button({
 
 /** Botón de una sola icono. Requiere `titulo` para tener nombre accesible. */
 export function IconButton({ titulo, icono, tamano = 'md', variante = 'ghost', className = '', ...resto }) {
+  const esPeligro = variante === 'danger';
   return (
     <Button
-      variante={variante}
+      variante={esPeligro ? 'ghost' : variante}
       tamano={tamano}
       soloIcono
       icono={icono}
       title={titulo}
       aria-label={titulo}
-      className={className}
+      className={`${esPeligro ? 'text-danger bg-danger-soft hover:bg-danger/10 hover:text-danger' : ''} ${className}`}
       {...resto}
     />
   );

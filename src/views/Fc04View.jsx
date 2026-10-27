@@ -1,6 +1,6 @@
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
-import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Button, IconButton } from '../components/ui';
 
 // Vista del registro mensual FC-04 (extraída de App.jsx, Fase 4).
 export default function Fc04View({
@@ -23,12 +23,11 @@ export default function Fc04View({
             )}
           />
           <Toolbar className="mt-4">
-  
           <div className="flex flex-wrap gap-2 items-center">
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
-            <button onClick={() => openFC04Modal(null)} className={STYLES.btnPrimary}>
-                <i className="fa-solid fa-plus text-xs"></i> Redactar Planilla
-            </button>
+            <Button variante="primary" tamano="md" icono="fa-plus" onClick={() => openFC04Modal(null)}>
+              Redactar Planilla
+            </Button>
           </div>
           </Toolbar>
         </div>
@@ -55,10 +54,10 @@ export default function Fc04View({
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <button onClick={()=>handleGenerateFC04PDF(fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:bg-darkbg-hover transition cursor-pointer" title="Imprimir PDF" aria-label="Imprimir PDF"><i className="fa-solid fa-print text-xs"></i></button>
-                      <button onClick={()=>openFC04Modal(fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-text hover:bg-brand-soft dark:hover:bg-brand/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                      <IconButton titulo="Imprimir PDF" icono="fa-print" variante="ghost" tamano="sm" onClick={()=>handleGenerateFC04PDF(fc)} />
+                      <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={()=>openFC04Modal(fc)} />
                       {isAdmin && (
-                          <button onClick={()=>setItemToDelete({type:'fc04', id:fc.id, item: fc})} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition cursor-pointer"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                        <IconButton titulo="Eliminar" icono="fa-trash-can" variante="danger" tamano="sm" onClick={()=>setItemToDelete({type:'fc04', id:fc.id, item: fc})} />
                       )}
                     </div>
                   </div>

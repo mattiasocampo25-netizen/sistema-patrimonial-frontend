@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
+import { Button, IconButton } from './ui';
 import FiltroCombo from './FiltroCombo';
 
 const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
 const INPUT_FOCUS = " focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand";
-const BTN_PRIMARY = "inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer disabled:opacity-50";
-const BTN_SECONDARY = "inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer disabled:opacity-50";
-const BTN_SECONDARY_SM = "inline-flex items-center justify-center gap-2 h-8 px-3 rounded-control text-xs font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion cursor-pointer";
 
 export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, fc10Month, fc10Year, ORIGENES_FC04, fc04SinMovimiento, setFc04SinMovimiento, handleAddFC04Item, fc04Items, handleFC04ItemChange, handleRemoveFC04Item, STYLES }) {
     
@@ -37,15 +35,19 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                             {fc04Editing ? 'Editar Registro FC-04' : 'Nuevo Registro FC-04'}
                         </h2>
                     </div>
-                    <button type="button" title="Cerrar" aria-label="Cerrar" onClick={() => setIsFC04ModalOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-colors cursor-pointer shrink-0"><i className="fa-solid fa-xmark text-base"></i></button>
+                    <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setIsFC04ModalOpen(false)} />
                 </div>
                 
                 {esNuevoFC && hayBorradorFC && !restauradoFC && (
-                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                    <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
-                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar.</p>
-                    <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
-                    <button type="button" onClick={limpiarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
+                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-warn-soft border border-warn/25 px-4 py-3 animate-fade-in">
+                    <i className="fa-solid fa-history text-warn dark:text-warn text-sm"></i>
+                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-warn">Tienes un borrador sin guardar.</p>
+                    <Button variante="subtle" tamano="sm" icono="fa-rotate-right" onClick={continuarBorradorFC}>
+                      Continuar
+                    </Button>
+                    <Button variante="ghost" tamano="sm" onClick={limpiarBorradorFC}>
+                      Descartar
+                    </Button>
                   </div>
                 )}
                 <form key={formKeyFC} onSubmit={async (e) => { const ok = await saveFC04(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} className="flex flex-col h-full overflow-hidden">
@@ -65,9 +67,9 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                             <div className="border border-line dark:border-line rounded-control overflow-hidden shadow-sm">
                                 <div className="flex justify-between items-center p-4 bg-surface-2 dark:bg-surface-2 border-b border-line dark:border-line">
                                     <h3 className="text-sm font-semibold text-content-1 dark:text-zinc-200">Bienes Involucrados</h3>
-                                    <button type="button" onClick={handleAddFC04Item} className={BTN_SECONDARY_SM}>
-                                        <i className="fa-solid fa-plus"></i> Agregar Fila
-                                    </button>
+                                    <Button variante="subtle" tamano="sm" icono="fa-plus" onClick={handleAddFC04Item}>
+                                      Agregar Fila
+                                    </Button>
                                 </div>
                                 <div className="overflow-x-auto custom-scrollbar">
                                     <table className="w-full text-left min-w-[900px]">
@@ -91,7 +93,7 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs"} value={item.rotulo || ''} onChange={e => handleFC04ItemChange(item.id, 'rotulo', e.target.value)} /></td>
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs"} value={item.descripcion || ''} onChange={e => handleFC04ItemChange(item.id, 'descripcion', e.target.value)} /></td>
                                                     <td className="p-1.5"><input required className={STYLES.input + INPUT_FOCUS + " !py-2 !text-xs text-right font-mono font-bold tabular-nums"} value={item.valorUnitario || ''} onChange={e => handleFC04ItemChange(item.id, 'valorUnitario', e.target.value)} /></td>
-                                                    <td className="p-1.5 text-center"><button type="button" onClick={()=>handleRemoveFC04Item(item.id)} className="text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-surface-1/10 p-2 rounded-control transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-trash-can"></i></button></td>
+                                                    <td className="p-1.5 text-center"><IconButton titulo="Eliminar fila" icono="fa-trash-can" variante="danger" tamano="xs" onClick={()=>handleRemoveFC04Item(item.id)} /></td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -102,8 +104,10 @@ export default function FC04Modal({ setIsFC04ModalOpen, fc04Editing, saveFC04, f
                     </div>
                     
                     <div className={STYLES.modalFooter}>
-                        <button type="button" onClick={() => setIsFC04ModalOpen(false)} className={BTN_SECONDARY}>Cancelar</button>
-                        <button type="submit" className={BTN_PRIMARY}><i className="fa-solid fa-floppy-disk"></i> Guardar Expediente FC-04</button>
+                        <Button variante="ghost" tamano="md" onClick={() => setIsFC04ModalOpen(false)}>
+                          Cancelar
+                        </Button>
+                        <Button variante="primary" tamano="md" type="submit" cargando={false}><i className="fa-solid fa-floppy-disk mr-2"></i> Guardar Expediente FC-04</Button>
                     </div>
                 </form>
             </div>

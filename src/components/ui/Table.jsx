@@ -70,11 +70,11 @@ export function TH({ className = '', children, ...resto }) {
 }
 
 export function TD({ className = '', children, mono = false, truncate = false, ...resto }) {
-  // Sin align-middle: el inventario alinea sus celdas arriba y eso tiene que
-  // ganarle al valor del sistema.
+  // Padding vertical simétrico con el encabezado (py-3). El inventario puede
+  // forzar alineación arriba con `align-top` si lo necesita.
   return (
     <td
-      className={`px-3 py-2 text-body text-content-1 ${mono ? 'font-mono tabular-nums' : ''} ${ truncate ? 'max-w-0 truncate' : '' } ${className}`}
+      className={`px-3 py-3 text-body text-content-1 ${mono ? 'font-mono tabular-nums' : ''} ${ truncate ? 'max-w-0 truncate' : '' } ${className}`}
       {...resto}
     >
       {children}
@@ -93,43 +93,46 @@ export function TBody({ className = '', children, ...resto }) {
 }
 
 /** Paginación. Reemplaza a las 3 implementaciones distintas que hay. */
-export function Pagination({ pagina, totalPaginas, totalElementos, porPagina, onCambioPagina, className = '' }) {
-  if (!totalPaginas || totalPaginas < 1) return null;
-  const desde = (pagina - 1) * porPagina + 1;
+export function Pagination({ pagina, totalPaginas, totalElementos, porPagina, onCambioPagina, herramientas, etiquetas = {}, className = '' }) {
+  const paginas = Math.max(0, totalPaginas || 0);
+  const desde = totalElementos > 0 ? (pagina - 1) * porPagina + 1 : 0;
   const hasta = Math.min(pagina * porPagina, totalElementos);
 
   return (
     <div className={`flex flex-wrap items-center justify-between gap-3 ${className}`}>
       <p className="text-label text-content-3">
-        Mostrando <span className="tabular-nums font-semibold text-content-2">{desde}</span>–
-        <span className="tabular-nums font-semibold text-content-2">{hasta}</span> de{' '}
+        {etiquetas.mostrando || 'Mostrando'} <span className="tabular-nums font-semibold text-content-2">{desde}</span>–
+        <span className="tabular-nums font-semibold text-content-2">{hasta}</span> {etiquetas.de || 'de'}{' '}
         <span className="tabular-nums font-semibold text-content-2">{totalElementos}</span>
       </p>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
+        {herramientas}
+        <div className="flex items-center gap-1">
         <button
           type="button"
           onClick={() => onCambioPagina && onCambioPagina(pagina - 1)}
-          disabled={pagina <= 1}
-          aria-label="Pagina anterior"
+          disabled={pagina <= 1 || paginas < 1}
+          aria-label={etiquetas.anterior || 'Página anterior'}
           className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-[background-color,color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           <i className="fa-solid fa-chevron-left text-[0.7em]" aria-hidden="true" />
         </button>
 
         <span className="text-label text-content-2 px-2 tabular-nums">
-          {pagina} / {totalPaginas}
+          {pagina} / {paginas}
         </span>
 
         <button
           type="button"
           onClick={() => onCambioPagina && onCambioPagina(pagina + 1)}
-          disabled={pagina >= totalPaginas}
-          aria-label="Pagina siguiente"
+          disabled={pagina >= paginas || paginas < 1}
+          aria-label={etiquetas.siguiente || 'Página siguiente'}
           className="h-8 w-8 rounded-control flex items-center justify-center text-content-2 hover:bg-surface-3 disabled:opacity-35 disabled:cursor-not-allowed transition-[background-color,color,transform] duration-[var(--dur-fast)] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
         >
           <i className="fa-solid fa-chevron-right text-[0.7em]" aria-hidden="true" />
         </button>
+        </div>
       </div>
     </div>
   );

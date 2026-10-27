@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, StatTile } from '../components/ui';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -37,29 +37,19 @@ export default function AuditoriaView({
           />
           <Toolbar className="mt-4">
           <div className="flex flex-wrap items-center gap-2">
-          <button onClick={() => fetchAuditoria(1)} title="Recargar libro de auditoría" className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">
-            <i className={`fa-solid fa-rotate ${isLoadingAud ? 'fa-spin' : ''}`}></i> Actualizar
-          </button>
+          <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Recargar libro de auditoría">
+            {isLoadingAud ? 'Actualizando…' : 'Actualizar'}
+          </Button>
           </div>
           </Toolbar>
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4" data-tour="aud-kpis">
-        {[
-          { label: 'Eventos (30 días)', valor: kpisAud.total, icon: 'fa-bolt', box: 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 shadow-sm shadow-zinc-900/20' },
-          { label: 'Altas registradas', valor: kpisAud.altas, icon: 'fa-plus', box: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20 shadow-sm shadow-emerald-500/20' },
-          { label: 'Modificaciones', valor: kpisAud.mods, icon: 'fa-pen-to-square', box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border border-zinc-500/20 shadow-sm shadow-zinc-500/20' },
-          { label: 'Bajas y eliminaciones', valor: kpisAud.bajas, icon: 'fa-flag', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border border-rose-500/20 shadow-sm shadow-rose-500/20' },
-        ].map(k => (
-          <div key={k.label} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div className={`flex h-11 w-11 items-center justify-center rounded-card mb-4 ${k.box}`}>
-              <i className={`fa-solid ${k.icon} text-lg`}></i>
-            </div>
-            <p className="text-3xl sm:text-4xl font-black tabular-nums text-content-1 dark:text-white tracking-tight">{k.valor}</p>
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3 mt-1">{k.label}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-tour="aud-kpis">
+        <StatTile etiqueta="Eventos (30 días)" valor={kpisAud.total} icono="fa-bolt" tono="brand" animado />
+        <StatTile etiqueta="Altas registradas" valor={kpisAud.altas} icono="fa-plus" tono="ok" animado />
+        <StatTile etiqueta="Modificaciones" valor={kpisAud.mods} icono="fa-pen-to-square" tono="neutral" animado />
+        <StatTile etiqueta="Bajas y eliminaciones" valor={kpisAud.bajas} icono="fa-flag" tono="danger" animado />
       </div>
 
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">

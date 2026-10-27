@@ -1,20 +1,28 @@
 import Dialogo from './ui/Dialogo';
 import React, { useState } from 'react';
+import { Button, IconButton, Badge } from './ui';
 
-const TIPO_STYLE = {
-  alta: { box: 'bg-emerald-500/10 text-ok dark:text-emerald-400 border-emerald-500/20', icon: 'fa-plus', dot: 'bg-emerald-500' },
-  asignacion: { box: 'bg-blue-500/10 text-brand dark:text-blue-400 border-blue-500/20', icon: 'fa-file-signature', dot: 'bg-blue-500' },
-  traslado: { box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20', icon: 'fa-truck-fast', dot: 'bg-amber-500' },
-  modificacion: { box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20', icon: 'fa-pen-to-square', dot: 'bg-zinc-400' },
-  baja: { box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20', icon: 'fa-flag', dot: 'bg-rose-500' },
-  otro: { box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20', icon: 'fa-circle-info', dot: 'bg-violet-500' },
+const TIPO_TONO = {
+  alta: 'ok',
+  asignacion: 'brand',
+  traslado: 'warn',
+  modificacion: 'neutral',
+  baja: 'danger',
+  otro: 'info',
+};
+
+const TIPO_ICONO = {
+  alta: 'fa-plus',
+  asignacion: 'fa-file-signature',
+  traslado: 'fa-truck-fast',
+  modificacion: 'fa-pen-to-square',
+  baja: 'fa-flag',
+  otro: 'fa-circle-info',
 };
 
 export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
   if (!isOpen || !bien) return null;
-  const st = TIPO_STYLE.otro;
-
   const Dato = ({ label, value }) => (
     <div className="rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/60 dark:border-white/10 px-3 py-2.5">
       <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">{label}</p>
@@ -27,7 +35,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
       <div className={STYLES.modalContent + " max-w-2xl"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-2 dark:bg-surface-1/5 text-content-1 dark:text-content-1">
               <i className="fa-solid fa-id-card text-lg"></i>
             </div>
             <div className="min-w-0 flex-1">
@@ -36,9 +44,9 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                   {bien.rotulo || 'S/R'}
                 </h2>
                 {bien.estadoConservacion && (
-                  <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${ bien.estadoConservacion === 'De Baja' ? 'bg-rose-500/10 text-danger dark:text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-ok dark:text-emerald-400 border border-emerald-500/20' }`}>
+                  <Badge tono={bien.estadoConservacion === 'De Baja' ? 'danger' : 'ok'} icono={bien.estadoConservacion === 'De Baja' ? 'fa-triangle-exclamation' : 'fa-check'}>
                     {bien.estadoConservacion}
-                  </span>
+                  </Badge>
                 )}
               </div>
               <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 truncate" title={bien.descripcion}>{bien.descripcion || 'Sin descripción'}</p>
@@ -48,9 +56,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               <p className="text-base font-black tabular-nums text-content-1 dark:text-white">Gs. {formatCurrency(bien.valorUnitario || '0')}</p>
             </div>
           </div>
-          <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-            <i className="fa-solid fa-xmark text-base"></i>
-          </button>
+          <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={onClose} />
         </div>
 
         <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
@@ -69,7 +75,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                 Evidencia fotográfica · {(bien.fotos || []).length}/5
               </p>
               <label
-                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3'}`}
+                className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-brand text-content-inverse hover:bg-brand-hover dark:bg-brand dark:hover:bg-brand-hover shadow-sm'}`}
                 title="Tomar o subir foto del estado físico"
               >
                 <i className={`fa-solid ${subiendoFoto ? 'fa-circle-notch fa-spin' : 'fa-camera'}`}></i>
@@ -89,17 +95,17 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {(bien.fotos || []).map((f, i) => (
                   <div key={f.url || i} className="relative group/foto rounded-control overflow-hidden border border-line dark:border-zinc-800 bg-surface-3 dark:bg-surface-1/5 aspect-square">
-                    <button onClick={() => setFotoAmpliada(f.url)} className="w-full h-full cursor-pointer" title="Ampliar foto">
-                      <img src={f.url} alt={`Foto ${i + 1} del bien`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                    </button>
+                    <IconButton titulo="Ampliar foto" icono="fa-expand" variante="ghost" tamano="sm" onClick={() => setFotoAmpliada(f.url)} className="w-full h-full absolute inset-0 bg-surface-1/30 dark:bg-white/5" />
+                    <img src={f.url} alt={`Foto ${i + 1} del bien`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     {esAdmin && (
-                      <button
+                      <IconButton
+                        titulo="Eliminar foto"
+                        icono="fa-xmark"
+                        variante="danger"
+                        tamano="xs"
                         onClick={() => onEliminarFoto(f)}
-                        title="Eliminar foto" aria-label="Eliminar foto"
-                        className="absolute top-1 right-1 h-6 w-6 items-center justify-center rounded-lg bg-zinc-950/70 text-white hidden group-hover/foto:flex hover:bg-rose-600 transition-colors cursor-pointer"
-                      >
-                        <i className="fa-solid fa-xmark text-[10px]"></i>
-                      </button>
+                        className="absolute top-1 right-1 h-6 w-6 hidden group-hover/foto:flex"
+                      />
                     )}
                   </div>
                 ))}
@@ -119,16 +125,16 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
             ) : (
               <ol className="relative ml-2 border-l-2 border-line dark:border-white/10">
                 {eventos.map((ev, i) => {
-                  const s = TIPO_STYLE[ev.tipo] || st;
+                  const tono = TIPO_TONO[ev.tipo] || TIPO_TONO.otro;
+                  const icono = TIPO_ICONO[ev.tipo] || TIPO_ICONO.otro;
                   return (
                     <li key={i} className="relative pl-6 pb-5 last:pb-1">
-                      <span className={`absolute -left-[7px] top-2 h-3 w-3 rounded-full ${s.dot} ring-4 ring-white dark:ring-zinc-900`}></span>
+                      <span className={`absolute -left-[7px] top-2 h-3 w-3 rounded-full bg-surface-3 dark:bg-surface-1/5 ring-4 ring-white dark:ring-zinc-900`}></span>
                       <div className="rounded-card border border-line dark:border-white/10 bg-surface-2/60 dark:bg-surface-1/[0.03] px-3.5 py-3 hover:border-line dark:hover:border-white/20 transition-colors">
                         <div className="flex items-center gap-2.5">
-                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${s.box}`}>
-                            <i className={`fa-solid ${s.icon} text-[11px]`}></i>
-                          </span>
-                          <p className="text-[13px] font-bold text-content-1 dark:text-white leading-tight flex-1 min-w-0 truncate" title={ev.titulo}>{ev.titulo}</p>
+                          <Badge tono={tono} icono={icono} className="shrink-0">
+                            {ev.titulo}
+                          </Badge>
                           <span className="shrink-0 text-[10px] font-bold tabular-nums uppercase tracking-wider text-content-3 dark:text-content-3 bg-surface-1 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 rounded-lg px-2 py-0.5">
                             {ev.fechaFmt || ev.fecha || ''}
                           </span>
@@ -145,25 +151,19 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
 
         <div className="flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
           {onVerEnInventario && (
-            <button onClick={() => onVerEnInventario(bien)} className="h-10 px-5 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none">
-              <i className="fa-solid fa-boxes-stacked mr-1.5 text-xs"></i>Ver en inventario
-            </button>
+            <Button variante="subtle" tamano="md" icono="fa-boxes-stacked" onClick={() => onVerEnInventario(bien)}>
+              Ver en inventario
+            </Button>
           )}
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <Button variante="primary" tamano="md" onClick={onClose}>
             Cerrar
-          </button>
+          </Button>
         </div>
       </div>
       {fotoAmpliada && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-zinc-950/90 backdrop-blur-sm animate-fade-in" onClick={() => setFotoAmpliada(null)}>
-          <img src={fotoAmpliada} alt="Foto ampliada del bien" className="max-h-[90dvh] max-w-full rounded-card shadow-2xl object-contain" />
-          <button
-            onClick={() => setFotoAmpliada(null)}
-            title="Cerrar" aria-label="Cerrar"
-            className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-control bg-surface-1/10 text-white hover:bg-surface-1/20 transition-colors cursor-pointer"
-          >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-surface-1/90 backdrop-blur-xl animate-fade-in" onClick={() => setFotoAmpliada(null)}>
+          <img src={fotoAmpliada} alt="Foto ampliada del bien" className="max-h-[90dvh] max-w-full rounded-panel shadow-2xl object-contain" />
+          <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setFotoAmpliada(null)} className="absolute top-4 right-4 bg-surface-1 text-content-1 border border-line shadow-lg" />
         </div>
       )}
     </Dialogo>

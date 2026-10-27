@@ -9,10 +9,16 @@ import React from 'react';
  * distintos en claro y en oscuro.
  */
 
-export function Card({ className = '', children, como: Tag = 'div', ...resto }) {
+const CARD_RADIOS = {
+  sm: 'rounded-control',
+  md: 'rounded-card',
+  lg: 'rounded-panel',
+};
+
+export function Card({ className = '', children, como: Tag = 'div', tamaño = 'md', ...resto }) {
   return (
     <Tag
-      className={`bg-surface-1 border border-line rounded-panel shadow-card ${className}`}
+      className={`bg-surface-1 border border-line ${CARD_RADIOS[tamaño] || CARD_RADIOS.md} shadow-card ${className}`}
       {...resto}
     >
       {children}

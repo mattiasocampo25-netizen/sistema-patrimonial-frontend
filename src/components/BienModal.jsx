@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { toInputDateFormat, formatearMiles, normalizeStr } from '../utils/helpers';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
+import Button, { IconButton } from './ui/Button';
 import FiltroCombo from './FiltroCombo';
 
 export default function BienModal({
@@ -231,21 +232,19 @@ export default function BienModal({
                 </div>
               </div>
 
-              <button
-                onClick={() => setIsBienModalOpen(false)}
-                title="Cerrar" aria-label="Cerrar"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-              >
-                 <i className="fa-solid fa-xmark text-base"></i>
-              </button>
+              <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setIsBienModalOpen(false)} />
             </div>
 
             {esNuevo && hayBorrador && !restaurado && (
-              <div className="mx-8 mt-6 mb-0 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
-                <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar de este formulario.</p>
-                <button type="button" onClick={continuarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
-                <button type="button" onClick={limpiarBorrador} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
+              <div className="mx-8 mt-6 mb-0 flex flex-wrap items-center gap-2 rounded-card bg-warn-soft border border-warn/25 px-4 py-3 animate-fade-in">
+                <i className="fa-solid fa-history text-warn dark:text-warn text-sm"></i>
+                <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-warn">Tienes un borrador sin guardar de este formulario.</p>
+                <Button variante="subtle" tamano="sm" icono="fa-rotate-right" onClick={continuarBorrador} className="text-[11px] font-black">
+                  Continuar
+                </Button>
+                <Button variante="ghost" tamano="sm" onClick={limpiarBorrador} className="text-[11px] font-black">
+                  Descartar
+                </Button>
               </div>
             )}
             <form key={formKey} ref={bienFormRef} onSubmit={async (e) => { const ok = await saveBien(e, false); if (ok) limpiarBorrador(); }} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
@@ -472,32 +471,25 @@ export default function BienModal({
 
               {/* Footer Buttons */}
               <div className="flex justify-end items-center gap-2 px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0 z-10">
-                <button
-                  type="button"
-                  onClick={() => setIsBienModalOpen(false)}
-                  className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                >
+                <Button variante="ghost" tamano="md" onClick={() => setIsBienModalOpen(false)}>
                   Cancelar
-                </button>
+                </Button>
 
                 {!esNuevo && (
-                    <button
-                      type="button"
-                      disabled={isSaving}
-                      onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }}
-                      className="inline-flex items-center justify-center h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
-                    >
-                      + Guardar y Añadir Otro
-                    </button>
+                  <Button variante="subtle" tamano="md" disabled={isSaving} onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }}>
+                    + Guardar y Añadir Otro
+                  </Button>
                 )}
 
-                <button
+                <Button
                   type="submit"
+                  variante="primary"
+                  tamano="md"
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-800 dark:hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
+                  cargando={isSaving}
                 >
                   {isSaving ? 'Guardando...' : (esNuevo ? '+ Guardar Registro' : 'Actualizar Bien')}
-                </button>
+                </Button>
               </div>
 
             </form>

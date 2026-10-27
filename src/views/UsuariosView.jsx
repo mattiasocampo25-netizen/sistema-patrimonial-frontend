@@ -1,9 +1,9 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Badge, Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Badge, Button, Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
-  esDesarrollador, currentUser, setItemToDelete, STYLES, isLoading
+  esDesarrollador, currentUser, setItemToDelete, isLoading
 }) {
   return (
     <div className="flex flex-col flex-1 space-y-6">
@@ -20,10 +20,9 @@ export default function UsuariosView({
             )}
           />
           <Toolbar className="mt-4">
-  
-          <button onClick={() => { setUsuarioEditing(null); setIsUsuarioModalOpen(true); }} className={STYLES.btnPrimary}>
-            <i className="fa-solid fa-user-plus text-xs"></i> Nuevo Usuario
-          </button>
+          <Button variante="primary" tamano="md" icono="fa-user-plus" onClick={() => { setUsuarioEditing(null); setIsUsuarioModalOpen(true); }}>
+            Nuevo Usuario
+          </Button>
           </Toolbar>
         </div>
       </Card>
@@ -69,18 +68,12 @@ export default function UsuariosView({
                       <TD className="relative py-3 pl-4 pr-6 align-middle text-right">
                           <div className="flex items-center justify-end gap-1">
                             {u.cargo === 'desarrollador' && !esDesarrollador ? (
-                                <span title="Solo el Desarrollador gestiona esta cuenta" className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 dark:text-content-2">
-                                    <i className="fa-solid fa-lock text-[13px]"></i>
-                                </span>
+                                <IconButton titulo="Solo el Desarrollador gestiona esta cuenta" icono="fa-lock" variante="ghost" tamano="sm" disabled />
                             ) : (
                             <>
-                            <button onClick={() => { setUsuarioEditing(u); setIsUsuarioModalOpen(true); }} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Editar usuario" aria-label="Editar usuario">
-                                <i className="fa-solid fa-pen-to-square text-[13px]"></i>
-                            </button>
+                            <IconButton titulo="Editar usuario" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setUsuarioEditing(u); setIsUsuarioModalOpen(true); }} />
                             {u.username !== currentUser.username && (
-                                <button onClick={() => setItemToDelete({type:'usuario', username: u.username, cargo: u.cargo, item: u})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar usuario" aria-label="Eliminar usuario">
-                                    <i className="fa-solid fa-trash-can text-[13px]"></i>
-                                </button>
+                                <IconButton titulo="Eliminar usuario" icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({type:'usuario', username: u.username, cargo: u.cargo, item: u})} />
                             )}
                             </>
                             )}

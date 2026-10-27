@@ -1,5 +1,6 @@
 import React from 'react';
 import Dialogo from './ui/Dialogo';
+import { IconButton, Button } from './ui';
 import { formatCurrency, formatDateText } from '../utils/helpers';
 
 // Comparador lado a lado de 2 o 3 bienes seleccionados.
@@ -31,9 +32,7 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
               <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Diferencias lado a lado</p>
             </div>
           </div>
-          <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer">
-            <i className="fa-solid fa-xmark text-base"></i>
-          </button>
+          <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={onClose} />
         </div>
         <div className="p-6 overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[520px]">
@@ -50,7 +49,7 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
                 const vals = bienes.map(get);
                 const difieren = new Set(vals).size > 1;
                 return (
-                  <tr key={label} className={difieren ? 'bg-amber-500/[0.06]' : ''}>
+                  <tr key={label} className={difieren ? 'bg-warn-soft' : ''}>
                     <td className="p-3 text-[11px] font-bold uppercase tracking-wider text-content-3">{label}</td>
                     {vals.map((v, i) => (
                       <td key={bienes[i].id} className={`p-3 text-[13px] font-semibold ${difieren ? 'text-warn dark:text-amber-300' : 'text-content-1 dark:text-zinc-200'}`}>{v}</td>
@@ -62,7 +61,9 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
           </table>
         </div>
         <div className="flex justify-end px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Cerrar</button>
+          <Button variante="primary" tamano="md" onClick={onClose}>
+            Cerrar
+          </Button>
         </div>
       </div>
     </Dialogo>

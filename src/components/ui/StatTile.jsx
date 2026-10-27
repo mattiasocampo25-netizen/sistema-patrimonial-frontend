@@ -27,22 +27,28 @@ export default function StatTile({
   tono = 'neutral',
   animado = true,
   className = '',
-  onClick
+  onClick,
+  progress,        // 0-100, opcional: barra delgada bajo el valor
+  progressColor,   // token de color para la barra (brand, ok, warn, info, danger)
 }) {
   const t = TONOS[tono] || TONOS.neutral;
   const Contenedor = onClick ? 'button' : 'div';
+  const pct = progress != null ? Math.max(0, Math.min(100, Number(progress))) : 0;
 
   return (
     <Contenedor
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`flex items-center gap-3 p-4 rounded-panel bg-surface-1 border border-line shadow-card text-left w-full ${ onClick ? 'hover:-translate-y-0.5 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
+      className={`flex flex-col gap-2 p-4 rounded-panel bg-surface-1 border border-line shadow-card text-left w-full ${ onClick ? 'hover:-translate-y-0.5 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
     >
-      {icono ? (
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control ${t.fondo} ${t.icono}`} aria-hidden="true">
-          <i className={`fa-solid ${icono}`} />
-        </span>
-      ) : null}
+      <div className="flex items-center justify-between gap-3">
+        {icono ? (
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control ${t.fondo} ${t.icono}`} aria-hidden="true">
+            <i className={`fa-solid ${icono}`} />
+          </span>
+        ) : null}
+        {onClick ? <i className="fa-solid fa-chevron-right text-[10px] text-content-3 group-hover:text-brand group-hover:translate-x-0.5 motion" aria-hidden="true" /> : null}
+      </div>
 
       <div className="min-w-0 flex-1">
         <p className="text-label font-semibold text-content-2 uppercase tracking-wide truncate">{etiqueta}</p>
@@ -50,6 +56,11 @@ export default function StatTile({
           {animado && typeof valor === 'number' ? <AnimatedNumber value={valor} /> : valor}
         </p>
         {sub ? <p className="text-label text-content-3 truncate">{sub}</p> : null}
+        {pct > 0 ? (
+          <div className="mt-1.5 h-1.5 w-full bg-surface-3 dark:bg-surface-1/5 rounded-full overflow-hidden">
+            <div className={`h-full rounded-full motion duration-[var(--dur-slow)] ${ progressColor ? 'bg-' + progressColor : 'bg-brand' } shadow-xs shadow-${ progressColor ? progressColor + '/40' : 'brand/30' }`} style={{ width: pct + '%' }}></div>
+          </div>
+        ) : null}
       </div>
     </Contenedor>
   );

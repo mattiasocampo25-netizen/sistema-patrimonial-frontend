@@ -4,6 +4,7 @@ import { useDraft, serializarForm } from '../hooks/useDraft';
 import CampoCatalogo from './CampoCatalogo';
 import SelectorPersona from './SelectorPersona';
 import Dialogo from './ui/Dialogo';
+import { Button, IconButton } from './ui';
 import { FC10_ORGANOS, FC10_UNIDADES, opcionesCatalogoFC10, organoDeUnidad } from '../constants/fc10Catalogo';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
@@ -384,17 +385,19 @@ const valorOrgExplicito = (campo) => {
                         </div>
                     </div>
 
-                    <button type="button" title="Cerrar" aria-label="Cerrar" onClick={() => setIsFC10ModalOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-colors cursor-pointer shrink-0">
-                        <i className="fa-solid fa-xmark text-sm"></i>
-                    </button>
+                    <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setIsFC10ModalOpen(false)} />
                 </div>
                 
 {esNuevoFC && hayBorradorFC && !restauradoFC && (
-                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                    <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
-                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar.</p>
-                    <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
-                    <button type="button" onClick={limpiarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
+                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-warn-soft border border-warn/25 px-4 py-3 animate-fade-in">
+                    <i className="fa-solid fa-history text-warn dark:text-warn text-sm"></i>
+                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-warn">Tienes un borrador sin guardar.</p>
+                    <Button variante="subtle" tamano="sm" icono="fa-rotate-right" onClick={continuarBorradorFC}>
+                      Continuar
+                    </Button>
+                    <Button variante="ghost" tamano="sm" onClick={limpiarBorradorFC}>
+                      Descartar
+                    </Button>
                   </div>
                 )}<form key={formKeyFC} onSubmit={async (e) => { e.preventDefault(); if (step !== 3) return; if (Date.now() - bloqueoRef.current < 1000) return; if (enviandoRef.current) return; if (!puedeGuardar) return; enviandoRef.current = true; try { const ok = await saveFC10(e); if (ok) limpiarBorradorFC(); } finally { enviandoRef.current = false; } }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} onKeyDown={handleKeyDown} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
                     <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
@@ -407,7 +410,7 @@ const valorOrgExplicito = (campo) => {
                             ].map((s, i, arr) => (
                                 <React.Fragment key={s.n}>
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${ step > s.n ? 'bg-emerald-500 text-white' : step === s.n ? 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 ring-4 ring-zinc-900/10 dark:ring-white/10' : 'bg-surface-3 dark:bg-surface-3 text-content-3 dark:text-content-2' }`}>
+                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${ step > s.n ? 'bg-ok text-content-inverse' : step === s.n ? 'bg-brand text-content-inverse ring-4 ring-brand/20 dark:ring-brand/30' : 'bg-surface-3 dark:bg-surface-3 text-content-3' }`}>
                                             {step > s.n ? <i className="fa-solid fa-check text-[10px]"></i> : s.n}
                                         </span>
                                         <span className={`hidden sm:block text-xs font-bold whitespace-nowrap transition-colors ${ step >= s.n ? 'text-content-1 dark:text-white' : 'text-content-3 dark:text-content-2' }`}>
@@ -415,7 +418,7 @@ const valorOrgExplicito = (campo) => {
                                         </span>
                                     </div>
                                     {i < arr.length - 1 && (
-                                        <div className={`h-px flex-1 min-w-4 transition-colors duration-[var(--dur-base)] ${step > s.n ? 'bg-emerald-400/60' : 'bg-surface-3 dark:bg-surface-3'}`}></div>
+                                        <div className={`h-px flex-1 min-w-4 transition-colors duration-[var(--dur-base)] ${step > s.n ? 'bg-ok/60' : 'bg-surface-3 dark:bg-surface-3'}`}></div>
                                     )}
                                 </React.Fragment>
                             ))}
@@ -438,9 +441,9 @@ const valorOrgExplicito = (campo) => {
                         {/* PASO 1 */}
                         <div id="step-1" className={step === 1 ? "block animate-fade-in" : "hidden"}>
                             <div className="bg-surface-1 dark:bg-surface-1 p-7 rounded-[24px] border border-line/60 dark:border-line shadow-sm relative group/section">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-[24px]"></div>
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand rounded-l-[24px]"></div>
                                 <h3 className="text-sm font-black text-content-1 dark:text-white flex items-center gap-3 mb-6 uppercase tracking-wider">
-                                    <div className="h-8 w-8 rounded-control bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 flex items-center justify-center border border-indigo-100 dark:border-indigo-800"><i className="fa-solid fa-sitemap"></i></div>
+                                    <div className="h-8 w-8 rounded-control bg-brand-soft text-brand-text dark:bg-brand/20 flex items-center justify-center border border-brand/25 dark:border-brand/40"><i className="fa-solid fa-sitemap"></i></div>
                                     Paso 1: Dependencia Organizacional
                                 </h3>
                                 <div className="space-y-4">
@@ -460,10 +463,9 @@ const valorOrgExplicito = (campo) => {
                                             Elegí de arriba hacia abajo: cada lista se filtra según lo anterior.
                                         </p>
                                         {savedOrg && savedOrg.reparticion && (
-                                            <button type="button" onClick={usarUltimaAsignacion} className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg text-[11px] font-bold text-content-3 dark:text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer shrink-0">
-                                                <i className="fa-solid fa-clock-rotate-left text-[10px]"></i>
-                                                Reusar última
-                                            </button>
+                                            <Button variante="subtle" tamano="xs" icono="fa-clock-rotate-left" onClick={usarUltimaAsignacion}>
+                                              Reusar última
+                                            </Button>
                                         )}
                                     </div>
 
@@ -756,19 +758,23 @@ const valorOrgExplicito = (campo) => {
                     <div className="flex items-center justify-between gap-3 px-5 sm:px-6 py-4 border-t border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1 shrink-0 z-10">
                         <span className="text-[11px] font-semibold text-content-3 dark:text-content-3 hidden sm:block">Paso {step} de 3</span>
                         {step === 1 ? (
-                            <button type="button" onClick={() => setIsFC10ModalOpen(false)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">Cancelar</button>
+                            <Button variante="ghost" tamano="md" onClick={() => setIsFC10ModalOpen(false)}>
+                              Cancelar
+                            </Button>
                         ) : (
-                            <button type="button" onClick={() => irPaso(step - 1)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">Anterior</button>
+                            <Button variante="subtle" tamano="md" onClick={() => irPaso(step - 1)}>
+                              Anterior
+                            </Button>
                         )}
                         
                         {step < 3 ? (
-                            <button type="button" onClick={nextStep} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">
-                                Siguiente Paso <i className="fa-solid fa-arrow-right text-xs ml-1"></i>
-                            </button>
+                            <Button variante="primary" tamano="md" onClick={nextStep}>
+                              Siguiente Paso <i className="fa-solid fa-arrow-right text-xs ml-1"></i>
+                            </Button>
                         ) : (
-                            <button type="submit" disabled={!puedeGuardar} title={puedeGuardar ? 'Confirmar y guardar' : 'Espere...'} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            <Button variante="primary" tamano="md" type="submit" disabled={!puedeGuardar}>
                                 <i className="fa-solid fa-floppy-disk text-xs mr-1"></i> Confirmar y Guardar
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </form>

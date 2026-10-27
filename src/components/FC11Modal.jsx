@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
+import { Button, IconButton } from './ui';
 import FiltroCombo from './FiltroCombo';
 
 export default function FC11Modal({
@@ -60,17 +61,19 @@ export default function FC11Modal({
                         </div>
                     </div>
 
-                    <button type="button" title="Cerrar" aria-label="Cerrar" onClick={() => setIsFC11ModalOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-white hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-colors cursor-pointer shrink-0">
-                        <i className="fa-solid fa-xmark text-base"></i>
-                    </button>
+                    <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setIsFC11ModalOpen(false)} />
                 </div>
                 
 {esNuevoFC && hayBorradorFC && !restauradoFC && (
-                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-amber-500/10 border border-amber-500/20 px-4 py-3 animate-fade-in">
-                    <i className="fa-solid fa-history text-warn dark:text-amber-400 text-sm"></i>
-                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-amber-300">Tienes un borrador sin guardar.</p>
-                    <button type="button" onClick={continuarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-black bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer">Continuar</button>
-                    <button type="button" onClick={limpiarBorradorFC} className="h-8 px-3.5 rounded-control text-[11px] font-bold text-content-3 hover:text-content-1 dark:hover:text-zinc-200 transition-colors cursor-pointer">Descartar</button>
+                  <div className="mx-8 mt-6 flex flex-wrap items-center gap-2 rounded-card bg-warn-soft border border-warn/25 px-4 py-3 animate-fade-in">
+                    <i className="fa-solid fa-history text-warn dark:text-warn text-sm"></i>
+                    <p className="flex-1 min-w-[200px] text-xs font-bold text-warn dark:text-warn">Tienes un borrador sin guardar.</p>
+                    <Button variante="subtle" tamano="sm" icono="fa-rotate-right" onClick={continuarBorradorFC}>
+                      Continuar
+                    </Button>
+                    <Button variante="ghost" tamano="sm" onClick={limpiarBorradorFC}>
+                      Descartar
+                    </Button>
                   </div>
                 )}<form key={formKeyFC} onSubmit={async (e) => { const ok = await saveFC11(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
                     <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
@@ -78,7 +81,7 @@ export default function FC11Modal({
                         {/* BARRA DE PROGRESO WIZARD */}
                         <div className="flex gap-2">
                             {[1, 2].map(i => (
-                                <div key={i} className={`h-2 flex-1 rounded-full motion duration-[var(--dur-slow)] ${step >= i ? 'bg-zinc-900 dark:bg-surface-1' : 'bg-surface-3 dark:bg-surface-3'}`}></div>
+                                <div key={i} className={`h-2 flex-1 rounded-full motion duration-[var(--dur-slow)] ${step >= i ? 'bg-surface-1 dark:bg-surface-2' : 'bg-surface-3 dark:bg-surface-1/5'}`}></div>
                             ))}
                         </div>
 
@@ -100,9 +103,9 @@ export default function FC11Modal({
                         {/* PASO 1: ORIGEN Y DESTINO */}
                         <div id="step-1-fc11" className={step === 1 ? "block animate-fade-in" : "hidden"}>
                             <div className="bg-surface-1 dark:bg-surface-1 p-7 rounded-[24px] border border-line/60 dark:border-line shadow-sm relative group/section">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 rounded-l-[24px]"></div>
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand rounded-l-[24px]"></div>
                                 <h3 className="text-sm font-black text-content-1 dark:text-white flex items-center gap-3 mb-6 uppercase tracking-wider">
-                                    <div className="h-8 w-8 rounded-control bg-indigo-50 text-indigo-500 dark:bg-indigo-900/20 flex items-center justify-center border border-indigo-100 dark:border-indigo-800"><i className="fa-solid fa-route"></i></div>
+                                    <div className="h-8 w-8 rounded-control bg-brand-soft text-brand-text dark:bg-brand/20 flex items-center justify-center border border-brand/25 dark:border-brand/40"><i className="fa-solid fa-route"></i></div>
                                     Paso 1: Ruta del Traslado
                                 </h3>
                                 
@@ -149,9 +152,9 @@ export default function FC11Modal({
                         {/* PASO 2: DETALLES ADICIONALES */}
                         <div id="step-2-fc11" className={step === 2 ? "block animate-fade-in" : "hidden"}>
                             <div className="bg-surface-1 dark:bg-surface-1 p-7 rounded-[24px] border border-line/60 dark:border-line shadow-sm relative group/section">
-                                <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500 rounded-l-[24px]"></div>
+                                <div className="absolute top-0 left-0 w-1.5 h-full bg-ok rounded-l-[24px]"></div>
                                 <h3 className="text-sm font-black text-content-1 dark:text-white flex items-center gap-3 mb-6 uppercase tracking-wider">
-                                    <div className="h-8 w-8 rounded-control bg-ok-soft text-ok dark:bg-emerald-900/20 flex items-center justify-center border border-ok/25 dark:border-emerald-800"><i className="fa-solid fa-clipboard-check"></i></div>
+                                    <div className="h-8 w-8 rounded-control bg-ok-soft text-ok dark:bg-ok/20 flex items-center justify-center border border-ok/25 dark:border-ok/40"><i className="fa-solid fa-clipboard-check"></i></div>
                                     Paso 2: Condiciones del Traslado
                                 </h3>
                                 
@@ -190,19 +193,23 @@ export default function FC11Modal({
                     
                     <div className="flex justify-end gap-3 px-8 py-6 border-t border-line dark:border-line bg-surface-1 dark:bg-surface-1 shrink-0 z-10">
                         {step === 1 ? (
-                            <button type="button" onClick={() => setIsFC11ModalOpen(false)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">Cancelar</button>
+                            <Button variante="ghost" tamano="md" onClick={() => setIsFC11ModalOpen(false)}>
+                              Cancelar
+                            </Button>
                         ) : (
-                            <button type="button" onClick={() => setStep(step - 1)} className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">Anterior</button>
+                            <Button variante="subtle" tamano="md" onClick={() => setStep(step - 1)}>
+                              Anterior
+                            </Button>
                         )}
                         
                         {step < 2 ? (
-                            <button type="button" onClick={nextStep} className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">
-                                Siguiente Paso <i className="fa-solid fa-arrow-right text-xs ml-1"></i>
-                            </button>
+                            <Button variante="primary" tamano="md" onClick={nextStep}>
+                              Siguiente Paso <i className="fa-solid fa-arrow-right text-xs ml-1"></i>
+                            </Button>
                         ) : (
-                            <button type="submit" className="inline-flex items-center justify-center gap-2 bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] h-10 px-5 rounded-control hover:bg-zinc-800 dark:hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion active:scale-95 cursor-pointer">
+                            <Button variante="primary" tamano="md" type="submit">
                                 <i className="fa-solid fa-paper-plane text-xs mr-1"></i> Confirmar Traslado
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </form>

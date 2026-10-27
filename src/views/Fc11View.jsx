@@ -1,6 +1,6 @@
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
-import { Card, EmptyState, PageHeader, Toolbar } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Button, IconButton } from '../components/ui';
 
 // Vista de autorizaciones de traslado FC-11 (extraída de App.jsx, Fase 4).
 export default function Fc11View({
@@ -25,9 +25,9 @@ export default function Fc11View({
           <Toolbar className="mt-4">
           <div className="flex flex-wrap gap-2 items-center">
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
-            <button onClick={handleExportFC11CSV} className={STYLES.btnSecondary}>
-                <i className="fa-solid fa-file-csv text-ok dark:text-emerald-400"></i> Exportar CSV
-            </button>
+            <Button variante="subtle" tamano="md" icono="fa-file-csv" onClick={handleExportFC11CSV}>
+              Exportar CSV
+            </Button>
           </div>
           </Toolbar>
         </div>
@@ -55,10 +55,10 @@ export default function Fc11View({
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <button onClick={()=>handleGenerateFC11PDF([fc])} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:bg-darkbg-hover transition cursor-pointer" title="Re-imprimir" aria-label="Re-imprimir"><i className="fa-solid fa-print text-xs"></i></button>
-                      <button onClick={()=>openFC11Modal(bienes.find(b => b.id === fc.bienId) || fc.bienSnapshot, fc)} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-brand-text hover:bg-brand-soft dark:hover:bg-brand/20 transition cursor-pointer" title="Editar" aria-label="Editar"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                      <IconButton titulo="Re-imprimir" icono="fa-print" variante="ghost" tamano="sm" onClick={()=>handleGenerateFC11PDF([fc])} />
+                      <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={()=>openFC11Modal(bienes.find(b => b.id === fc.bienId) || fc.bienSnapshot, fc)} />
                       {isAdmin && (
-                          <button onClick={()=>setItemToDelete({type:'fc11', id:fc.id, item: fc})} className="flex h-8 w-8 items-center justify-center rounded-control text-content-3 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition cursor-pointer"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                        <IconButton titulo="Eliminar" icono="fa-trash-can" variante="danger" tamano="sm" onClick={()=>setItemToDelete({type:'fc11', id:fc.id, item: fc})} />
                       )}
                     </div>
                   </div>

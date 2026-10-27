@@ -9,6 +9,7 @@
 // pantalla principal cuando la pantalla quedó sin tocar, que es el comportamiento
 // deseado en un punto de atención unattended.
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button, IconButton } from './ui';
 
 // Segundos de inactividad antes de volver al inicio. Configurable por ?kioskIdle=N
 
@@ -74,19 +75,10 @@ export default function KioskBar({ idleSegundos = 45, onSalir, onEscanearOtro })
           Vuelve al inicio en {restantes}s
         </span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={onEscanearOtro}
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-control bg-brand hover:bg-blue-500 text-content-inverse text-xs font-bold motion active:scale-95 cursor-pointer"
-          >
+          <Button variante="primary" tamano="sm" onClick={onEscanearOtro} className="h-9 px-4">
             <i className="fa-solid fa-qrcode text-[11px]"></i> Escanear otro QR
-          </button>
-          <button
-            onClick={onSalir}
-            title="Salir del modo kiosco"
-            className="flex h-9 w-9 items-center justify-center rounded-control bg-surface-1/10 hover:bg-surface-1/20 text-white motion cursor-pointer"
-          >
-            <i className="fa-solid fa-xmark text-xs"></i>
-          </button>
+          </Button>
+          <IconButton titulo="Salir del modo kiosco" icono="fa-xmark" variante="ghost" tamano="sm" onClick={onSalir} className="bg-surface-1/10 hover:bg-surface-1/20 text-content-1" />
         </div>
       </div>
     </>
@@ -110,13 +102,9 @@ export function BotonPantallaCompleta({ onCambio }) {
   };
 
   return (
-    <button
-      onClick={toggle}
-      title={activo ? 'Salir de pantalla completa' : 'Pantalla completa'}
-      className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-line bg-surface-1 text-content-2 text-[11px] font-bold hover:bg-surface-2 active:scale-95 motion cursor-pointer"
-    >
+    <Button variante="subtle" tamano="sm" onClick={toggle} title={activo ? 'Salir de pantalla completa' : 'Pantalla completa'}>
       <i className={`fa-solid ${activo ? 'fa-compress' : 'fa-expand'} text-[10px]`}></i>
       <span className="hidden sm:inline">{activo ? 'Reducir' : 'Pantalla completa'}</span>
-    </button>
+    </Button>
   );
 }

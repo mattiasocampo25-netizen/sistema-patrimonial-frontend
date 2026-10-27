@@ -9,6 +9,7 @@ html {
 @theme {
   /* Open Sans es la única tipografía del sistema. */
   --font-sans: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   /* La monoespaciada es de verdad monoespaciada: los rótulos, las cédulas y
      las cifras con tabular-nums tienen que alinearse en columna. Antes
      apuntaba a la sans y tabular-nums no hacía nada. */

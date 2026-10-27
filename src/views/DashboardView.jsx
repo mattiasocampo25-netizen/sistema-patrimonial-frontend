@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
-import { Card, Tile } from '../components/ui';
+import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 
@@ -43,73 +43,48 @@ export default function DashboardView({
   };
   const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias']];
 
-  // Tarjetas de métrica con diseño consistente y simétrico
+  // Tarjetas de métrica con diseño consistente y simétrico.
+  // Un solo sistema de tonos (StatTile): el estado se comunica con el tono
+  // semántico, nunca con fondos de color ajenos a la marca.
   const METRIC_CARDS = [
     {
       id: 'activos',
       label: 'Bienes Activos',
       valor: stats.totalItems,
-      sublabel: 'Total en ' + dependenciaActual,
-      icon: 'fa-boxes-stacked',
-      iconBg: 'bg-brand-soft',
-      iconColor: 'text-brand-text',
-      border: 'border-line',
-      hoverBorder: 'hover:border-line-strong',
-      ring: 'focus-visible:ring-brand',
-      numero: <AnimatedNumber value={stats.totalItems} />,
+      sub: 'Total en ' + dependenciaActual,
+      icono: 'fa-boxes-stacked',
+      tono: 'brand',
       onClick: () => { clearAllFilters(); setActiveTab('inventario'); },
-      showProgress: false,
     },
     {
       id: 'qr',
       label: 'Bienes con QR',
       valor: stats.withQR,
-      total: stats.totalItems,
-      sublabel: stats.withQR + ' de ' + Number(stats.totalItems || 0).toLocaleString('es-PY') + ' con código',
-      icon: 'fa-qrcode',
-      iconBg: 'bg-violet-500/10 backdrop-blur border border-violet-500/25',
-      iconColor: 'text-violet-600 dark:text-violet-300',
-      border: 'border-line',
-      hoverBorder: 'hover:border-line-strong',
-      ring: 'focus-visible:ring-brand',
-      numero: <><AnimatedNumber value={stats.withQR} /><span className="text-base text-content-3 font-semibold"> / {Number(stats.totalItems || 0).toLocaleString('es-PY')}</span></>,
+      sub: stats.withQR + ' de ' + Number(stats.totalItems || 0).toLocaleString('es-PY') + ' con código',
+      icono: 'fa-qrcode',
+      tono: 'brand',
+      progress: stats.percQR || 0,
       onClick: () => irInventario(() => setFiltroQR('YES')),
-      showProgress: true,
-      pct: stats.percQR || 0,
-      progressColor: 'bg-violet-500',
     },
     {
       id: 'sin-fc10',
       label: 'Sin FC-10',
       valor: stats.withoutFc10,
-      sublabel: stats.fc10Pendientes > 0
+      sub: stats.fc10Pendientes > 0
         ? stats.fc10Pendientes + ' en firma · ' + Math.max(0, stats.withoutFc10 - stats.fc10Pendientes) + ' sin acta'
         : 'Pendientes de asignación',
-      subColor: 'text-brand-text dark:text-brand',
-      icon: 'fa-file-signature',
-      iconBg: 'bg-brand text-content-inverse',
-      iconColor: 'text-content-inverse',
-      border: 'border-brand/20 dark:border-brand/25',
-      hoverBorder: 'hover:border-brand/40 dark:hover:border-brand/45',
-      ring: 'focus-visible:ring-brand',
-      numero: <AnimatedNumber value={stats.withoutFc10} />,
+      icono: 'fa-file-signature',
+      tono: 'warn',
       onClick: () => irInventario(() => setFiltroFC10('NO')),
-      showProgress: false,
     },
     {
       id: 'pendiente-qr',
       label: 'Pendiente QR',
       valor: stats.withoutQR,
-      sublabel: 'Sin etiqueta generada',
-      icon: 'fa-triangle-exclamation',
-      iconBg: 'bg-rose-500 text-white',
-      iconColor: 'text-white',
-      border: 'border-rose-200/80 dark:border-rose-500/35',
-      hoverBorder: 'hover:border-rose-300 dark:hover:border-rose-500/40',
-      ring: 'focus-visible:ring-rose-500',
-      numero: <AnimatedNumber value={stats.withoutQR} />,
+      sub: 'Sin etiqueta generada',
+      icono: 'fa-triangle-exclamation',
+      tono: 'warn',
       onClick: () => irInventario(() => setFiltroQR('NO')),
-      showProgress: false,
     },
   ];
 
@@ -193,39 +168,24 @@ export default function DashboardView({
       </div>
       </Card>
 
-      {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES */}
+      {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES (simétricas, un solo sistema de tonos) */}
       {widgets.metricas && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" data-tour="dash-stats">
-        {METRIC_CARDS.map((card) => (
-          <button
-            key={card.id}
-            onClick={card.onClick}
-            title={card.label}
-            className={`dashboard-metric-card group relative text-left bg-surface-1 rounded-card border ${card.border} p-4 sm:p-5 shadow-card hover:shadow-panel hover:-translate-y-0.5 focus-visible:ring-2 ${card.ring} outline-none transition-[transform,box-shadow,border-color] duration-[var(--dur-base)] ease-[var(--ease-out)] cursor-pointer`}
-          >
-            <div className="flex items-center justify-between gap-1 mb-1.5">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${card.iconBg} shadow-xs`}>
-                <i className={`fa-solid ${card.icon} text-sm ${card.iconColor}`}></i>
-              </div>
-              <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-3 group-hover:text-content-3 dark:group-hover:text-content-3 group-hover:translate-x-0 motion"></i>
-            </div>
-            <p className="text-2xl sm:text-3xl font-black text-content-1 tracking-tight tabular-nums leading-snug">
-              {isLoading ? '…' : card.numero}
-            </p>
-            <p className="text-label font-bold text-content-2 mt-1.5 uppercase tracking-[0.1em]">
-              {card.label}
-            </p>
-            <p className={`text-label font-medium ${card.subColor || 'text-content-3'} mt-1 truncate`}>
-              {card.sublabel}
-            </p>
-            {card.showProgress && (
-              <div className="mt-1.5 h-1 w-full bg-surface-3 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className={`h-full ${card.progressColor} rounded-full motion duration-[var(--dur-slow)] shadow-xs shadow-${card.progressColor === 'bg-violet-500' ? 'violet-500/40' : 'emerald-500/40'} ${card.pct > 0 ? '' : 'w-0'}`} style={{ width: card.pct > 0 ? card.pct + '%' : '0%' }}></div>
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
+        <KpiGrid columnas={4} className="gap-3" data-tour="dash-stats">
+          {METRIC_CARDS.map((card) => (
+            <StatTile
+              key={card.id}
+              etiqueta={card.label}
+              valor={isLoading ? '…' : card.valor}
+              sub={card.sub}
+              icono={card.icono}
+              tono={card.tono}
+              animado={!isLoading && typeof card.valor === 'number'}
+              onClick={card.onClick}
+              progress={card.progress}
+              progressColor="brand"
+            />
+          ))}
+        </KpiGrid>
       )}
 
       {/* 2A. ACTAS POR FIRMAR */}

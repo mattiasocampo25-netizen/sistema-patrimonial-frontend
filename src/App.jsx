@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } fr
 import { lazyConReintento } from './utils/lazyConReintento';
 import { STYLES, DEPENDENCIAS_UNP, ESTADOS_CONSERVACION, ORIGENES_FC04 } from './constants/appConstants';
 import FiltroCombo from './components/FiltroCombo';
+import { Pagination, Card, Button, StatTile, Badge } from './components/ui';
 import AtajosModal from './components/modals/AtajosModal';
 import AppShell from './components/shell/AppShell';
 // Modales de apertura bajo demanda: carga diferida para acelerar el arranque
@@ -1236,9 +1237,14 @@ useEffect(() => {
   }, []);
 
   const renderPagination = () => (
-    <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-line dark:border-line shrink-0 bg-surface-1 dark:bg-surface-1">
-      <span className="text-sm text-content-3 font-medium">{ti('inv.mostrando')} <span className="font-bold text-content-1 dark:text-white">{(currentPage - 1) * itemsPorPagina + (filteredBienes.length > 0 ? 1 : 0)} - {Math.min(currentPage * itemsPorPagina, filteredBienes.length)}</span> {ti('inv.de')} {filteredBienes.length}</span>
-      <div className="flex items-center gap-2">
+    <Pagination
+      pagina={currentPage}
+      totalPaginas={totalPages}
+      totalElementos={filteredBienes.length}
+      porPagina={itemsPorPagina}
+      onCambioPagina={setCurrentPage}
+      etiquetas={{ mostrando: ti('inv.mostrando'), de: ti('inv.de'), anterior: ti('inv.anterior'), siguiente: ti('inv.siguiente') }}
+      herramientas={(
         <FiltroCombo
           ancho="w-[132px]"
           compacto
@@ -1248,10 +1254,9 @@ useEffect(() => {
           etiquetaTodos={ti('inv.por_pagina')}
           titulo={ti('inv.por_pagina')}
         />
-        <button disabled={currentPage <= 1} onClick={() => setCurrentPage(prev => prev - 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer">{ti('inv.anterior')}</button>
-        <button disabled={currentPage >= totalPages || totalPages === 0} onClick={() => setCurrentPage(prev => prev + 1)} className="rounded-control bg-surface-1 dark:bg-surface-2 px-4 py-2 text-xs font-bold text-content-1 dark:text-content-3 shadow-2xs border border-line dark:border-line hover:bg-surface-2 dark:hover:bg-darkbg-hover disabled:opacity-50 motion cursor-pointer">{ti('inv.siguiente')}</button>
-      </div>
-    </div>
+      )}
+      className="px-4 sm:px-6 py-4 border-t border-line dark:border-line shrink-0 bg-surface-1 dark:bg-surface-1"
+    />
   );
 
   // --- INICIO DE CÓDIGO RESTAURADO ---
@@ -1276,22 +1281,22 @@ if (rutaDesconocida && !publicBienId) {
 if (publicBienId) {
   return (
     <div className="h-dvh overflow-y-auto bg-surface-3 flex flex-col items-center p-3 sm:p-6 text-content-1 font-sans selection:bg-brand selection:text-white custom-scrollbar">
-      <div className="bg-surface-1 border border-line/80 rounded-[28px] sm:rounded-[32px] p-4 sm:p-8 max-w-md w-full shadow-2xl relative overflow-hidden m-auto">
+      <Card tamaño="lg" className="max-w-md w-full shadow-pop border border-line m-auto overflow-hidden relative">
 
         {/* Acento superior institucional */}
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500"></div>
+        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-brand via-brand-hover to-brand/60"></div>
 
         {/* Header institucional */}
         <div className="flex flex-col items-center text-center pb-4 border-b border-line">
-          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-blue-50 text-brand mb-2 border border-brand/25 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-brand-soft text-brand-text mb-3 border border-brand/20 shadow-sm">
             <i className="fa-solid fa-shield-halved text-xl"></i>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-brand-text mb-2 border border-blue-200/60">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-brand-soft text-brand-text mb-2 border border-brand/25">
             <i className="fa-solid fa-circle-check text-[10px] text-brand"></i> Verificación Oficial de Activo
           </span>
 
-          <h1 className="text-base sm:text-lg font-black text-content-1 tracking-tight leading-tight">
+          <h1 className="text-base sm:text-lg font-bold text-content-1 tracking-tight leading-tight font-display">
             Universidad Nacional de Pilar
           </h1>
           <p className="text-[11px] sm:text-xs text-content-3 font-semibold mt-0.5">
@@ -1304,141 +1309,99 @@ if (publicBienId) {
           <div className="py-4 space-y-3">
 
             {publicBienData.fotos?.[0]?.url && (
-              <button
-                onClick={() => setPublicFotoAmpliada(publicBienData.fotos[0].url)}
-                title="Ampliar foto"
-                className="block w-full rounded-card overflow-hidden border border-line/80 shadow-xs bg-surface-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
-              >
+              <button type="button" onClick={() => setPublicFotoAmpliada(publicBienData.fotos[0].url)} title="Ampliar foto" aria-label="Ampliar foto del activo" className="block w-full rounded-card overflow-hidden border border-line/80 shadow-xs bg-surface-2 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
                 <img
                   src={publicBienData.fotos[0].url}
                   alt="Foto del activo (toca para ampliar)"
                   loading="lazy"
                   decoding="async"
                   className="w-full max-h-44 sm:max-h-56 object-cover pointer-events-none"
-                  onError={(e) => { e.currentTarget.closest('div').style.display = 'none'; }}
+                  onError={(e) => { e.currentTarget.closest('button').style.display = 'none'; }}
                 />
+                <span className="sr-only">Ampliar foto del activo</span>
               </button>
             )}
 
             {/* Tarjeta de Rótulo y Estado */}
-            <div className="bg-surface-2 p-3.5 sm:p-4 rounded-card border border-line/80 shadow-xs">
-              <div className="flex justify-between items-center gap-2">
+            <Card tamaño="md" className="p-4 shadow-xs border border-line/80">
+              <div className="flex justify-between items-center gap-3">
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black text-content-3 uppercase tracking-widest">Código / Rótulo</p>
+                  <p className="text-[10px] font-bold text-content-2 uppercase tracking-widest">Código / Rótulo</p>
                   <p className="text-xl sm:text-2xl font-black text-content-1 font-mono tracking-tight mt-0.5 truncate">
                     {publicBienData.rotulo || "S/Rótulo"}
                   </p>
                 </div>
                 {publicBienData.estadoConservacion && (
-                  <span className={`px-3 py-1.5 rounded-control text-[10px] font-black uppercase tracking-wider ${ publicBienData.estadoConservacion === "De Baja" ? "bg-danger-soft text-danger border border-rose-200" : "bg-ok-soft text-ok border border-emerald-200" }`}>
+                  <Badge tono={publicBienData.estadoConservacion === 'De Baja' ? 'danger' : 'ok'} icono={publicBienData.estadoConservacion === 'De Baja' ? 'fa-triangle-exclamation' : 'fa-check'}>
                     {publicBienData.estadoConservacion}
-                  </span>
+                  </Badge>
                 )}
               </div>
 
               <div className="mt-3 pt-3 border-t border-line/60">
-                <p className="text-[10px] font-black text-content-3 uppercase tracking-widest">Descripción General</p>
-                <p className={`text-xs sm:text-sm font-bold text-content-1 mt-1 leading-relaxed ${!publicDescExpandida && (publicBienData.descripcion || '').length > 140 ? 'line-clamp-3' : ''}`}>
+                <p className="text-[10px] font-bold text-content-2 uppercase tracking-widest">Descripción General</p>
+                <p className={!publicDescExpandida && (publicBienData.descripcion || '').length > 140 ? 'text-sm font-medium text-content-1 mt-1 leading-relaxed line-clamp-3' : 'text-sm font-medium text-content-1 mt-1 leading-relaxed'}>
                   {publicBienData.descripcion || "Sin descripción asignada"}
                 </p>
                 {(publicBienData.descripcion || '').length > 140 && (
-                  <button onClick={() => setPublicDescExpandida(v => !v)} className="mt-1.5 text-[11px] font-bold text-brand hover:text-blue-800 cursor-pointer">
+                  <Button variante="ghost" tamano="sm" onClick={() => setPublicDescExpandida(v => !v)} className="mt-1.5">
                     {publicDescExpandida ? 'Ver menos' : 'Ver más'}
-                  </button>
+                  </Button>
                 )}
               </div>
-            </div>
+            </Card>
 
             {/* Datos Técnicos y Contables */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="bg-surface-2 p-3 rounded-card border border-line/70">
-                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-layer-group text-brand"></i> Cuenta
-                </p>
-                <p className="text-xs font-mono font-bold text-content-1 mt-1 truncate">
-                  {publicBienData.cuenta || "Sin Cuenta"}
-                </p>
-              </div>
-
-              <div className="bg-surface-2 p-3 rounded-card border border-line/70">
-                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-coins text-ok"></i> Valor
-                </p>
-                <p className="text-xs font-bold text-ok mt-1">
-                  Gs. {formatCurrency(publicBienData.valorUnitario || publicBienData.valor || publicBienData.valorAdquisicion || "0")}
-                </p>
-              </div>
-
+            <div className="grid grid-cols-2 gap-3">
+              <StatTile etiqueta="Cuenta" valor={publicBienData.cuenta || "S/Cuenta"} icono="fa-layer-group" tono="brand" animado={false} />
+              <StatTile etiqueta="Valor" valor={`Gs. ${formatCurrency(publicBienData.valorUnitario || publicBienData.valor || publicBienData.valorAdquisicion || "0")}`} icono="fa-coins" tono="ok" animado={false} />
               {publicBienData.subcuenta && (
-                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
-                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-solid fa-sitemap text-indigo-600"></i> Sub-Cuenta
-                  </p>
-                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
-                    {publicBienData.subcuenta}
-                  </p>
-                </div>
+                <StatTile etiqueta="Sub-Cuenta" valor={publicBienData.subcuenta} icono="fa-sitemap" tono="info" animado={false} />
               )}
-
               {publicBienData.fechaAdquisicion && (
-                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
-                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-regular fa-calendar text-warn"></i> Adquisición
-                  </p>
-                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
-                    {String(publicBienData.fechaAdquisicion).split("T")[0]}
-                  </p>
-                </div>
+                <StatTile etiqueta="Adquisición" valor={String(publicBienData.fechaAdquisicion).split("T")[0]} icono="fa-calendar" tono="neutral" animado={false} />
               )}
-
               {publicBienData.vidaUtil && (
-                <div className="bg-surface-2 p-3 rounded-card border border-line/70">
-                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-solid fa-hourglass-half text-brand-text"></i> Vida Útil
-                  </p>
-                  <p className="text-xs font-bold text-content-1 mt-1 truncate">
-                    {publicBienData.vidaUtil} años
-                  </p>
-                </div>
+                <StatTile etiqueta="Vida Útil" valor={publicBienData.vidaUtil + " años"} icono="fa-hourglass-half" tono="brand" animado={false} />
               )}
             </div>
 
             {/* Custodio, Ubicación y Dependencia */}
-            <div className="bg-surface-2 p-4 rounded-card border border-line/70 space-y-3">
+            <Card tamaño="md" className="p-4 shadow-xs border border-line/70 space-y-3">
               <div>
-                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
                   <i className="fa-solid fa-user-check text-brand"></i> Responsable Asignado
                 </p>
-                <p className="text-xs font-bold text-content-1 mt-1">
+                <p className="text-sm font-bold text-content-1 mt-1">
                   {publicBienData.funcionario || "Sin Responsable Asignado"}
                 </p>
                 {publicBienData.funcionarioCargo && (
-                  <p className="text-[10px] text-content-3 mt-0.5">
+                  <p className="text-[10px] text-content-2 mt-0.5">
                     Cargo: {publicBienData.funcionarioCargo}
                   </p>
                 )}
               </div>
 
-              <div className="pt-2.5 border-t border-line/60">
-                <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-location-dot text-danger"></i> Ubicación Física
+              <div className="pt-2 border-t border-line/60">
+                <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
+                  <i className="fa-solid fa-location-dot text-warn"></i> Ubicación Física
                 </p>
-                <p className="text-xs font-bold text-content-1 mt-1">
+                <p className="text-sm font-bold text-content-1 mt-1">
                   {publicBienData.ubicacion || "Sin Ubicación Registrada"}
                 </p>
               </div>
 
               {publicBienData.dependencia && (
-                <div className="pt-2.5 border-t border-line/60">
-                  <p className="text-[10px] font-bold text-content-3 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="pt-2 border-t border-line/60">
+                  <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
                     <i className="fa-solid fa-building-columns text-ok"></i> Dependencia
                   </p>
-                  <p className="text-xs font-bold text-content-1 mt-1">
+                  <p className="text-sm font-bold text-content-1 mt-1">
                     {publicBienData.dependencia}
                   </p>
                 </div>
               )}
-            </div>
+            </Card>
 
           </div>
         ) : (
@@ -1449,26 +1412,20 @@ if (publicBienId) {
         )}
 
         {/* Pie y botón de retorno */}
-        <div className="pt-2">
-          <button 
-            onClick={() => window.location.href = window.location.origin} 
-            className="w-full py-3.5 px-4 rounded-card bg-brand hover:bg-blue-700 text-content-inverse text-xs font-bold motion cursor-pointer shadow-md shadow-brand/25 flex items-center justify-center gap-2 active:scale-98"
-          >
+        <div className="pt-4 border-t border-line">
+          <Button variante="primary" tamano="md" onClick={() => window.location.href = window.location.origin} className="w-full">
             <i className="fa-solid fa-arrow-left text-xs"></i> Ir a la Plataforma Principal
-          </button>
+          </Button>
         </div>
 
-      </div>
-      {/* Controles de exhibition: pantalla completa siempre; barra de kiosco solo en ?kiosk=1 */}
-        <div className="flex items-center gap-2 mb-2">
+      </Card>
+
+        {/* Controles de exhibition: pantalla completa siempre; barra de kiosco solo en ?kiosk=1 */}
+        <div className="flex items-center gap-2 mb-2 mt-4">
           <span className="flex-1" />
           <BotonPantallaCompleta />
           {!kioscoActivo && (
-            <a
-              href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`}
-              title="Abrir en modo kiosco (pantalla completa con temporizador)"
-              className="inline-flex items-center gap-2 h-9 px-3 rounded-control border border-line bg-surface-1 text-content-2 text-[11px] font-bold hover:bg-surface-2 active:scale-95 motion cursor-pointer"
-            >
+            <a href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`} title="Abrir en modo kiosco (pantalla completa con temporizador)" className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-control bg-transparent text-content-2 hover:bg-surface-2 hover:text-content-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
               <i className="fa-solid fa-display text-[10px]"></i>
               <span className="hidden sm:inline">Kiosco</span>
             </a>
@@ -1480,16 +1437,15 @@ if (publicBienId) {
             idleSegundos={kioscoIdle}
             onSalir={() => { window.location.href = window.location.origin; }}
             onEscanearOtro={() => {
-              // Vuelve al inicio, que es donde vive el botón de escáner.
               window.location.href = window.location.origin;
             }}
           />
         )}
 
       {publicFotoAmpliada && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-zinc-950/90 backdrop-blur-sm" onClick={() => setPublicFotoAmpliada(null)}>
-          <img src={publicFotoAmpliada} alt="Foto ampliada del activo" className="max-h-[90dvh] max-w-full rounded-card shadow-2xl object-contain" />
-          <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-control bg-surface-1/10 text-white">
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-surface-1/90 backdrop-blur-xl" onClick={() => setPublicFotoAmpliada(null)}>
+          <img src={publicFotoAmpliada} alt="Foto ampliada del activo" className="max-h-[90dvh] max-w-full rounded-panel shadow-2xl object-contain" />
+          <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-control bg-surface-1 text-content-1 border border-line shadow-lg">
             <i className="fa-solid fa-xmark"></i>
           </span>
         </div>

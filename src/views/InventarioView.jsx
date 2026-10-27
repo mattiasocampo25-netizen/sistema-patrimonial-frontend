@@ -8,7 +8,7 @@ import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText, repairMojibake } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
 import Dialogo from '../components/ui/Dialogo';
-import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, IconButton } from '../components/ui';
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
 // Es la vista más grande del sistema; recibe todo por props.
@@ -194,81 +194,42 @@ export default function InventarioView({
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
       <div className="flex items-center gap-2 min-w-0">
       <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
-        <button
-          onClick={handleDownloadTemplateCSV}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Descargar Plantilla CSV"
-        >
-          <i className="fa-solid fa-file-excel text-ok"></i>
-          <span>{t('inv.plantilla')}</span>
-        </button>
+        <Button variante="subtle" icono="fa-file-excel" onClick={handleDownloadTemplateCSV} title="Descargar Plantilla CSV">
+          {t('inv.plantilla')}
+        </Button>
 
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Importar archivo CSV"
-        >
-          <i className="fa-solid fa-file-import text-ok"></i>
-          <span>{t('inv.importar')}</span>
-        </button>
+        <Button variante="subtle" icono="fa-file-import" onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV">
+          {t('inv.importar')}
+        </Button>
 
-        <button
-          onClick={handleExportInventarioCSV}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Exportar archivo CSV"
-        >
-          <i className="fa-solid fa-file-export text-sky-600"></i>
-          <span>{t('inv.exportar')}</span>
-        </button>
+        <Button variante="subtle" icono="fa-file-export" onClick={handleExportInventarioCSV} title="Exportar archivo CSV">
+          {t('inv.exportar')}
+        </Button>
 
-        <button
-          onClick={handleExportInventarioExcel}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Exportar Excel real (.xlsx)"
-        >
-          <i className="fa-solid fa-file-excel text-ok dark:text-emerald-400"></i>
-          <span>{t('inv.excel')}</span>
-        </button>
+        <Button variante="subtle" icono="fa-file-excel" onClick={handleExportInventarioExcel} title="Exportar Excel real (.xlsx)">
+          {t('inv.excel')}
+        </Button>
 
         {ultimaExportacion && (
-          <button
-            onClick={onRepetirExport}
-            className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-            title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}
-          >
-            <i className="fa-solid fa-rotate-right text-content-3"></i>
-            <span>{t('inv.repetir')}</span>
-          </button>
+          <Button variante="subtle" icono="fa-rotate-right" onClick={onRepetirExport} title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}>
+            {t('inv.repetir')}
+          </Button>
         )}
 
-        <button
-          onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Generar Lote Masivo de QRs"
-        >
-          <i className="fa-solid fa-qrcode text-indigo-600 dark:text-indigo-400"></i>
-          <span>{t('inv.loteqr')}</span>
-        </button>
+        <Button variante="subtle" icono="fa-qrcode" onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar Lote Masivo de QRs">
+          {t('inv.loteqr')}
+        </Button>
       </div>
 
-        <button
-          onClick={openFC03Modal}
-          className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-          title="Generar Reporte FC-03"
-        >
-          <i className="fa-solid fa-print text-warn"></i>
-          <span>FC-03</span>
-        </button>
+        <Button variante="subtle" icono="fa-print" onClick={openFC03Modal} title="Generar Reporte FC-03">
+          FC-03
+        </Button>
 
-        <div className="h-5 w-px bg-surface-3 dark:bg-surface-3 mx-1 hidden sm:block shrink-0"></div>
+        <span className="hidden sm:block w-px h-5 bg-line shrink-0 mx-2"></span>
 
-        <button
-          onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }}
-          className="inline-flex shrink-0 items-center gap-2 px-5 h-10 rounded-control bg-brand hover:bg-brand-hover text-content-inverse text-[13px] font-bold shadow-sm transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] active:scale-[0.98] cursor-pointer focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 outline-none"
-        >
-          <i className="fa-solid fa-plus text-xs"></i>
-          <span className="whitespace-nowrap">{t('inv.anadir')}</span>
-        </button>
+        <Button variante="primary" icono="fa-plus" onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title={t('inv.anadir')}>
+          {t('inv.anadir')}
+        </Button>
       </div>
 
       </Toolbar>
@@ -656,12 +617,14 @@ export default function InventarioView({
                                   <span className={`rounded-pill border px-2.5 py-1 text-label font-bold ${fc10VigentePorBien.has(item.id) ? 'border-ok/25 bg-ok-soft text-ok' : 'border-line bg-surface-2 text-content-3'}`}>{fc10VigentePorBien.has(item.id) ? 'Con FC-10' : 'Sin FC-10'}</span>
                                 </div>
                                 <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-line pt-3">
-                                  <button onClick={() => openFichaBien(item)} title="Abrir ficha y trazabilidad" aria-label="Abrir ficha y trazabilidad" className="inline-flex h-9 items-center gap-2 rounded-control bg-brand px-3 text-label font-bold text-content-inverse hover:bg-brand-hover motion"><i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" />Ver ficha</button>
-                                  <button onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} title="Ver o generar QR" aria-label="Ver o generar QR" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-qrcode" aria-hidden="true" /></button>
-                                  <button onClick={() => openFC10Modal(item)} title="Crear o gestionar acta FC-10" aria-label="Crear o gestionar acta FC-10" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-file-signature" aria-hidden="true" /></button>
-                                  <button onClick={() => openFC11Modal(item)} title="Registrar traslado FC-11" aria-label="Registrar traslado FC-11" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-truck-fast" aria-hidden="true" /></button>
-                                  <button onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} title="Editar bien" aria-label="Editar bien" className="flex h-9 w-9 items-center justify-center rounded-control border border-line bg-surface-1 text-content-2 hover:bg-surface-2 motion"><i className="fa-solid fa-pen-to-square" aria-hidden="true" /></button>
-                                  <button onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} title={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} aria-label={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} className="flex h-9 w-9 items-center justify-center rounded-control border border-danger/20 bg-danger-soft text-danger hover:bg-danger/15 motion"><i className="fa-solid fa-trash-can" aria-hidden="true" /></button>
+                                  <Button variante="primary" tamano="sm" icono="fa-arrow-up-right-from-square" onClick={() => openFichaBien(item)} title="Abrir ficha y trazabilidad">
+                                    Ver ficha
+                                  </Button>
+                                  <IconButton titulo="Ver o generar QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
+                                  <IconButton titulo="Crear o gestionar acta FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
+                                  <IconButton titulo="Registrar traslado FC-11" icono="fa-truck-fast" variante="ghost" tamano="sm" onClick={() => openFC11Modal(item)} />
+                                  <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
+                                  <IconButton titulo={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} />
                                 </div>
                               </article>
                             );
@@ -684,10 +647,10 @@ export default function InventarioView({
                               </div>
                             </div>
                             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-line dark:border-zinc-700/50">
-                              <button onClick={() => openFichaBien(item)} title="Ficha 360" aria-label="Ficha 360" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-timeline text-xs"></i></button>
-                              <button onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} title="QR" aria-label="QR" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-qrcode text-xs"></i></button>
-                              <button onClick={() => openFC10Modal(item)} title="Asignación FC-10" aria-label="Asignación FC-10" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-file-signature text-xs"></i></button>
-                              <button onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} title="Editar" aria-label="Editar" className="flex h-9 w-9 items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all cursor-pointer"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
+                              <IconButton titulo="Ficha 360" icono="fa-timeline" variante="ghost" tamano="sm" onClick={() => openFichaBien(item)} />
+                              <IconButton titulo="QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
+                              <IconButton titulo="Asignación FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
+                              <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
                             </div>
                           </div>
                         ))}
@@ -851,52 +814,57 @@ export default function InventarioView({
                                   <div className="flex items-center justify-end gap-1.5">
 
                                     {/* Ficha 360 y trazabilidad */}
-                                    <button
+                                    <IconButton
+                                      titulo="Ficha 360 y trazabilidad"
+                                      icono="fa-timeline"
+                                      variante="ghost"
+                                      tamano="sm"
                                       onClick={() => openFichaBien(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all active:scale-90 cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
-                                      title="Ficha 360 y trazabilidad" aria-label="Ficha 360 y trazabilidad"
-                                    >
-                                      <i className="fa-solid fa-timeline text-xs"></i>
-                                    </button>
+                                      className="focus-visible:ring-emerald-500"
+                                    />
 
                                     {/* Generar QR */}
-                                    <button
+                                    <IconButton
+                                      titulo="Generar Código QR"
+                                      icono="fa-qrcode"
+                                      variante="ghost"
+                                      tamano="sm"
                                       onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }}
-                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all active:scale-90 cursor-pointer"
-                                      title="Generar Código QR" aria-label="Generar Código QR"
-                                    >
-                                      <i className="fa-solid fa-qrcode text-xs"></i>
-                                    </button>
+                                    />
 
                                     {/* Asignar FC-10 */}
-                                    <button
+                                    <IconButton
+                                      titulo="Asignación FC-10"
+                                      icono="fa-file-signature"
+                                      variante="ghost"
+                                      tamano="sm"
                                       onClick={() => openFC10Modal(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all active:scale-90 cursor-pointer"
-                                      title="Asignación FC-10" aria-label="Asignación FC-10"
-                                    >
-                                      <i className="fa-solid fa-file-signature text-xs"></i>
-                                    </button>
+                                    />
 
                                     {/* Traslado FC-11 */}
-                                    <button
+                                    <IconButton
+                                      titulo="Traslado FC-11"
+                                      icono="fa-truck-fast"
+                                      variante="ghost"
+                                      tamano="sm"
                                       onClick={() => openFC11Modal(item)}
-                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all active:scale-90 cursor-pointer"
-                                      title="Traslado FC-11" aria-label="Traslado FC-11"
-                                    >
-                                      <i className="fa-solid fa-truck-fast text-xs"></i>
-                                    </button>
+                                    />
 
                                     {/* Editar Bien */}
-                                    <button
+                                    <IconButton
+                                      titulo="Editar Bien"
+                                      icono="fa-pen-to-square"
+                                      variante="ghost"
+                                      tamano="sm"
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
-                                      className="h-9 w-9 flex items-center justify-center text-content-2 dark:text-content-3 bg-surface-3 dark:bg-surface-3/50 hover:bg-surface-3 dark:hover:bg-surface-3/20 rounded-control transition-all active:scale-90 cursor-pointer"
-                                      title="Editar Bien" aria-label="Editar Bien"
-                                    >
-                                      <i className="fa-solid fa-pen-to-square text-xs"></i>
-                                    </button>
+                                    />
 
                                     {/* Eliminar o Solicitar Baja */}
-                                    <button
+                                    <IconButton
+                                      titulo="Eliminar o Solicitar Baja"
+                                      icono="fa-trash-can"
+                                      variante="danger"
+                                      tamano="sm"
                                       onClick={() => {
                                         if (isAdmin) {
                                           setItemToDelete({ type: 'bien', id: item.id, item });
@@ -904,11 +872,7 @@ export default function InventarioView({
                                           setItemToDelete({ type: 'requestBaja', id: item.id, item });
                                         }
                                       }}
-                                      className="h-9 w-9 flex items-center justify-center text-danger dark:text-rose-400 bg-danger-soft dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-control transition-all active:scale-90 cursor-pointer"
-                                      title="Eliminar o Solicitar Baja" aria-label="Eliminar o Solicitar Baja"
-                                    >
-                                      <i className="fa-solid fa-trash-can text-xs"></i>
-                                    </button>
+                                    />
 
                                   </div>
                                 </TD>

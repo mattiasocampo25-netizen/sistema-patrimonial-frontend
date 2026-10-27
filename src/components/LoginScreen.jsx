@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { APP_VERSION } from '../utils/helpers';
 import Dialogo from './ui/Dialogo';
+import Button from './ui/Button';
 
 export default function LoginScreen({
   handleLogin,
@@ -27,16 +28,16 @@ export default function LoginScreen({
 
   return (
     <div
-      className="dark relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-[#0a0f1a] px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8"
+      className="dark relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8"
     >
-      {/* Fondo decorativo sutil */}
+      {/* Fondo decorativo sutil con tonos de marca */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-blue-500/5 blur-[100px]" />
-        <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-indigo-500/5 blur-[100px]" />
+        <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-brand/10 blur-[100px]" />
+        <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand/10 blur-[100px] dark:bg-brand/20" />
       </div>
 
       <div className="relative z-10 flex w-full items-center justify-center max-w-md">
-        <div className="login-card-in w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a] shadow-pop shadow-black/40">
+        <div className="login-card-in w-full overflow-hidden rounded-panel border border-line bg-surface-1 shadow-pop">
           {/* Logo institucional prominente */}
           <div className="login-rise login-rise-1 flex items-center gap-3 px-6 py-6 mb-2">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/15 border border-brand/25 text-brand-text">
@@ -137,34 +138,30 @@ export default function LoginScreen({
                 )}
               </div>
 
-              <button
+              <Button
                 type="submit"
+                variante="primary"
+                tamano="lg"
+                cargando={isProcessing}
                 disabled={isProcessing}
-                aria-busy={isProcessing || undefined}
-                className="login-rise login-rise-4 w-full rounded-xl bg-brand px-4 py-3.5 text-base font-bold text-content-inverse hover:bg-brand-hover focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus:outline-none motion cursor-pointer shadow-lg shadow-brand/25 hover:shadow-brand/35 active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                className="w-full"
               >
-                {isProcessing ? (
-                  <>
-                    <span className="login-spinner" aria-hidden="true"></span>
-                    <span>Verificando…</span>
-                  </>
-                ) : (
-                  <span>Acceder</span>
-                )}
-              </button>
+                {isProcessing ? 'Verificando…' : 'Acceder'}
+              </Button>
             </form>
           </div>
 
           <div className="px-6 py-4 border-t border-line">
-            <div className="flex items-center justify-center gap-4 text-center">
-              <button
+            <div className="flex items-center justify-between gap-4 text-center sm:text-left">
+              <Button
+                variante="ghost"
+                tamano="sm"
+                icono="fa-circle-question"
                 onClick={() => setShowAyudaModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-brand-text hover:bg-brand/10 transition-colors cursor-pointer border border-brand/20 motion"
+                className="text-xs"
               >
-                <i className="fa-solid fa-circle-question text-xs"></i>
                 Centro de Ayuda
-              </button>
-              <span className="w-px h-4 bg-white/20"></span>
+              </Button>
               <span className="text-xs font-medium tracking-tight text-content-3">
                 © {new Date().getFullYear()} UNP · v{version}
               </span>

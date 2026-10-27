@@ -1,7 +1,7 @@
 // Vista de solicitudes de aprobación (bajas, firmas, etc.) - solo admin/desarrollador.
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
 import React, { useState } from 'react';
-import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Card, Chip, ChipGroup, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-warn-soft dark:bg-amber-950/20 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/30', dot: 'bg-amber-500' },
@@ -54,19 +54,19 @@ export default function AprobacionesView({
             )}
           />
           <Toolbar className="mt-4">
-  
           <div className="flex flex-wrap items-center gap-1.5 -mb-1">
-            {ETAPAS.map(et => (
-              <button
-                key={et.id}
-                onClick={() => setFiltroEstado(et.id)}
-                aria-pressed={filtroEstado === et.id}
-                className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-control text-label font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand active:scale-[0.98] ${ filtroEstado === et.id ? 'bg-brand text-content-inverse border-brand shadow-sm' : 'bg-surface-2 border-line text-content-2 hover:bg-surface-3 hover:border-line-strong' }`}
-              >
-                {et.label}
-                <span className={`tabular-nums ${filtroEstado === et.id ? 'opacity-80' : 'text-content-3 dark:text-content-3'}`}>{et.n}</span>
-              </button>
-            ))}
+            <ChipGroup>
+              {ETAPAS.map(et => (
+                <Chip
+                  key={et.id}
+                  activo={filtroEstado === et.id}
+                  conteo={et.n}
+                  onClick={() => setFiltroEstado(et.id)}
+                >
+                  {et.label}
+                </Chip>
+              ))}
+            </ChipGroup>
           </div>
           </Toolbar>
         </div>

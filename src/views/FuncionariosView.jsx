@@ -1,6 +1,6 @@
 import { formatCI } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button } from '../components/ui';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -34,54 +34,24 @@ export default function FuncionariosView({
   
             {/* Botones de Acción Principal */}
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={sincronizarBienesConPadron}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-                title="Sincronizar custodios con inventario"
-              >
-                <i className="fa-solid fa-rotate"></i>
-                <span>Sincronizar</span>
-              </button>
-  
-              <button
-                onClick={handleDownloadTemplateFuncionarios}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-                title="Descargar plantilla de funcionarios"
-              >
-                <i className="fa-solid fa-file-excel text-ok dark:text-emerald-400"></i>
-                <span>Plantilla</span>
-              </button>
-  
-              <button
-                onClick={() => fileInputFuncionariosRef.current?.click()}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-                title="Importar lista de funcionarios desde CSV"
-              >
-                <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i>
-                <span>Importar CSV</span>
-              </button>
-  
+              <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={sincronizarBienesConPadron} title="Sincronizar custodios con inventario">
+                Sincronizar
+              </Button>
+              <Button variante="subtle" tamano="md" icono="fa-file-excel" onClick={handleDownloadTemplateFuncionarios} title="Descargar plantilla de funcionarios">
+                Plantilla
+              </Button>
+              <Button variante="subtle" tamano="md" icono="fa-file-import" onClick={() => fileInputFuncionariosRef.current?.click()} title="Importar lista de funcionarios desde CSV">
+                Importar CSV
+              </Button>
               {isAdmin && (
-              <button
-                onClick={() => setIsUbicacionesModalOpen(true)}
-                className="inline-flex shrink-0 items-center gap-2 px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-                title="Gestionar catálogo de ubicaciones"
-              >
-                <i className="fa-solid fa-location-dot text-sky-600 dark:text-sky-400"></i>
-                <span>Ubicaciones</span>
-              </button>
+                <Button variante="subtle" tamano="md" icono="fa-location-dot" onClick={() => setIsUbicacionesModalOpen(true)} title="Gestionar catálogo de ubicaciones">
+                  Ubicaciones
+                </Button>
               )}
-  
-              <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1"></span>
-  
-              <button
-                onClick={() => setIsNewFuncionarioModalOpen(true)}
-                title="Registrar nuevo funcionario"
-                className="inline-flex items-center gap-2 px-5 h-10 rounded-control bg-zinc-900 dark:bg-surface-1 hover:bg-zinc-700 dark:hover:bg-surface-3 text-white dark:text-content-1 text-[13px] font-bold shadow-sm transition-all active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-              >
-                <i className="fa-solid fa-user-plus text-xs"></i>
-                <span>Nuevo Funcionario</span>
-              </button>
+              <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1" />
+              <Button variante="primary" tamano="md" icono="fa-user-plus" onClick={() => setIsNewFuncionarioModalOpen(true)} title="Registrar nuevo funcionario">
+                Nuevo Funcionario
+              </Button>
             </div>
   
             </Toolbar>

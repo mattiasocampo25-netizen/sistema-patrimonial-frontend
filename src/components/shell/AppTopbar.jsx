@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useIdioma } from '../../utils/i18n';
 import FiltroCombo from '../FiltroCombo';
 import { IconButton } from '../ui';
+import { agruparNotificacionesPorDia } from '../../utils/notificationGroups';
 
 /**
  * AppTopbar — barra superior del sistema.
@@ -75,6 +76,7 @@ export default function AppTopbar({
     filtroNotif === 'noleidas'
       ? (misNotificaciones || []).filter((n) => !n.leido)
       : (misNotificaciones || []);
+  const gruposNotificaciones = agruparNotificacionesPorDia(notifsVisibles);
 
   const RefMenu = useRef(null);
   useEffect(() => {
@@ -307,53 +309,43 @@ export default function AppTopbar({
                         </span>
                       </div>
                     ) : (
-                      notifsVisibles.map((n) => (
-                        <button
-                          key={n.id}
-                          type="button"
-                          onClick={() => {
-                            markAsRead(n);
-                            if (n.esSolicitud && setActiveTab) {
-                              setActiveTab('aprobaciones');
-                              setIsNotifOpen(false);
-                            }
-                          }}
-                          className={`w-full text-left p-4 border-b border-line/60 hover:bg-surface-2 transition-colors relative ${ !n.leido ? 'bg-surface-2' : '' }`}
-                        >
-                          {!n.leido ? (
-                            <span className="absolute left-0 top-0 bottom-0 w-1 bg-brand" aria-hidden="true" />
-                          ) : null}
-                          <div className="flex items-start gap-3 pl-1">
-                            <span
-                              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control ${ n.esSolicitud ? 'bg-warn-soft text-warn' : n.accion === 'anuncio' ? 'bg-info-soft text-info' : n.accion === 'aprobar' ? 'bg-ok-soft text-ok' : 'bg-danger-soft text-danger' }`}
-                              aria-hidden="true"
+                      gruposNotificaciones.map((grupo) => (
+                        <section key={grupo.clave} aria-label={grupo.etiqueta}>
+                          <h4 className="sticky top-0 z-10 border-y border-line/70 bg-surface-1/95 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.14em] text-content-3 backdrop-blur-sm">
+                            <span>{grupo.etiqueta}</span><span className="ml-2 font-medium tabular-nums">{grupo.notificaciones.length}</span>
+                          </h4>
+                          {grupo.notificaciones.map((n) => (
+                            <button
+                              key={n.id}
+                              type="button"
+                              onClick={() => {
+                                markAsRead(n);
+                                if (n.esSolicitud && setActiveTab) {
+                                  setActiveTab('aprobaciones');
+                                  setIsNotifOpen(false);
+                                }
+                              }}
+                              className={`relative w-full border-b border-line/60 p-4 text-left transition-colors hover:bg-surface-2 ${!n.leido ? 'bg-surface-2' : ''}`}
                             >
-                              <i
-                                className={`fa-solid ${ n.esSolicitud ? 'fa-paper-plane' : n.accion === 'anuncio' ? 'fa-bullhorn' : n.accion === 'aprobar' ? 'fa-check' : 'fa-xmark' } text-xs`}
-                              />
-                            </span>
-                            <span className="flex-1 min-w-0">
-                              <span className="flex items-center justify-between gap-2">
-                                <span
-                                  className={`text-body text-content-1 leading-tight tracking-tight ${ !n.leido ? 'font-black' : 'font-bold' }`}
-                                >
-                                  {n.titulo}
+                              {!n.leido ? <span className="absolute bottom-0 left-0 top-0 w-1 bg-brand" aria-hidden="true" /> : null}
+                              <span className="flex items-start gap-3 pl-1">
+                                <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control ${n.esSolicitud ? 'bg-warn-soft text-warn' : n.accion === 'anuncio' ? 'bg-info-soft text-info' : n.accion === 'aprobar' ? 'bg-ok-soft text-ok' : 'bg-danger-soft text-danger'}`} aria-hidden="true">
+                                  <i className={`fa-solid ${n.esSolicitud ? 'fa-paper-plane' : n.accion === 'anuncio' ? 'fa-bullhorn' : n.accion === 'aprobar' ? 'fa-check' : 'fa-xmark'} text-xs`} />
                                 </span>
-                                {n.esSolicitud ? (
-                                  <span className="text-label font-bold text-warn bg-warn-soft px-1.5 py-0.5 rounded-pill border border-warn/25 shrink-0">
-                                    Revisar
+                                <span className="min-w-0 flex-1">
+                                  <span className="flex items-center justify-between gap-2">
+                                    <span className={`text-body leading-tight tracking-tight text-content-1 ${!n.leido ? 'font-black' : 'font-bold'}`}>{n.titulo}</span>
+                                    {n.esSolicitud ? <span className="shrink-0 rounded-full border border-warn/25 bg-warn-soft px-1.5 py-0.5 text-label font-bold text-warn">Revisar</span> : null}
                                   </span>
-                                ) : null}
+                                  <span className="mt-1 block text-label font-medium leading-relaxed text-content-2">{n.mensaje}</span>
+                                  <span className="mt-2 block text-label font-semibold tabular-nums text-content-3">
+                                    {new Date(n.fecha).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                </span>
                               </span>
-                              <span className="block text-label text-content-2 mt-1 font-medium leading-relaxed">
-                                {n.mensaje}
-                              </span>
-                              <span className="block text-label font-bold text-content-3 mt-2 uppercase tracking-widest">
-                                {new Date(n.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}
-                              </span>
-                            </span>
-                          </div>
-                        </button>
+                            </button>
+                          ))}
+                        </section>
                       ))
                     )}
                   </div>

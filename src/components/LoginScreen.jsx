@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { APP_VERSION } from '../utils/helpers';
 import Dialogo from './ui/Dialogo';
 import Button from './ui/Button';
+import rectoradoPilar from '../assets/rectorado-pilar.webp';
 
 export default function LoginScreen({
   handleLogin,
@@ -33,14 +34,18 @@ export default function LoginScreen({
     >
       {/* Fondo decorativo sutil con tonos de marca */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-brand/10 blur-[100px]" />
-        <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand/10 blur-[100px] dark:bg-brand/20" />
+        <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-35" />
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/75 via-slate-950/60 to-brand/45" />
+        <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-brand/20 blur-[100px]" />
+        <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-cyan-400/10 blur-[100px]" />
       </div>
 
       <div className="relative z-10 flex w-full items-center justify-center max-w-5xl">
         <div className="login-card-in grid w-full overflow-hidden rounded-3xl border border-line bg-surface-1 shadow-pop md:grid-cols-[0.95fr_1.05fr]">
           <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-slate-950 p-10 text-white md:flex lg:p-14">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+              <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-65" />
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-950/40 to-slate-950/90" />
               <div className="absolute -right-32 -top-28 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl" />
               <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:42px_42px]" />

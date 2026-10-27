@@ -5,6 +5,106 @@ import { pendienteDeFirma } from '../utils/fc10Firmas';
 import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
+import { crearEventosAgenda, fechaAgenda } from '../utils/agenda';
+
+function claveDia(fecha) {
+  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+}
+
+function AgendaPatrimonial({ bienes, fc10List, dependenciaActual, onAbrirBien, onAbrirFC10 }) {
+  const [mes, setMes] = useState(() => {
+    const hoy = new Date();
+    return new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  });
+  const [diaSeleccionado, setDiaSeleccionado] = useState(() => claveDia(new Date()));
+  const eventos = useMemo(() => crearEventosAgenda(bienes, fc10List, dependenciaActual), [bienes, fc10List, dependenciaActual]);
+  const eventosPorDia = useMemo(() => {
+    const mapa = new Map();
+    for (const evento of eventos) mapa.set(evento.fecha, [...(mapa.get(evento.fecha) || []), evento]);
+    return mapa;
+  }, [eventos]);
+
+  const anio = mes.getFullYear();
+  const numeroMes = mes.getMonth();
+  const inicio = (new Date(anio, numeroMes, 1).getDay() + 6) % 7;
+  const dias = new Date(anio, numeroMes + 1, 0).getDate();
+  const calendario = Array.from({ length: inicio + dias }, (_, indice) => indice < inicio ? null : new Date(anio, numeroMes, indice - inicio + 1));
+  const tituloMes = new Intl.DateTimeFormat('es-PY', { month: 'long', year: 'numeric' }).format(mes);
+  const eventosMes = eventos.filter((evento) => evento.fecha.startsWith(`${anio}-${String(numeroMes + 1).padStart(2, '0')}-`));
+  const eventosDia = eventosPorDia.get(diaSeleccionado) || [];
+  const hoy = claveDia(new Date());
+
+  const cambiarMes = (delta) => {
+    const nuevo = new Date(anio, numeroMes + delta, 1);
+    setMes(nuevo);
+    setDiaSeleccionado(claveDia(nuevo));
+  };
+
+  return (
+    <Card className="overflow-hidden p-0">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-control bg-brand-soft text-brand-text"><i className="fa-solid fa-calendar-days" aria-hidden="true" /></span>
+          <div>
+            <h2 className="text-sm font-bold text-content-1">Agenda patrimonial</h2>
+            <p className="mt-0.5 text-label text-content-3">Altas, asignaciones y fin de vida útil estimado</p>
+          </div>
+        </div>
+        <span className="rounded-full border border-line bg-surface-2 px-3 py-1.5 text-label font-semibold text-content-2">{eventosMes.length} {eventosMes.length === 1 ? 'hito' : 'hitos'} este mes</span>
+      </div>
+
+      <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(240px,0.85fr)]">
+        <section aria-label="Calendario mensual">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-bold capitalize text-content-1">{tituloMes}</h3>
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => cambiarMes(-1)} aria-label="Mes anterior" className="flex h-8 w-8 items-center justify-center rounded-full text-content-2 hover:bg-surface-2 focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-chevron-left text-xs" aria-hidden="true" /></button>
+              <button type="button" onClick={() => { const fecha = new Date(); setMes(new Date(fecha.getFullYear(), fecha.getMonth(), 1)); setDiaSeleccionado(claveDia(fecha)); }} className="h-8 rounded-full px-3 text-label font-semibold text-brand-text hover:bg-brand-soft focus-visible:ring-2 focus-visible:ring-brand">Hoy</button>
+              <button type="button" onClick={() => cambiarMes(1)} aria-label="Mes siguiente" className="flex h-8 w-8 items-center justify-center rounded-full text-content-2 hover:bg-surface-2 focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-chevron-right text-xs" aria-hidden="true" /></button>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center">
+            {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia) => <span key={dia} className="py-1.5 text-[10px] font-bold uppercase tracking-wide text-content-3">{dia}</span>)}
+            {calendario.map((fecha, indice) => {
+              if (!fecha) return <span key={`vacio-${indice}`} aria-hidden="true" className="min-h-10" />;
+              const key = claveDia(fecha);
+              const cantidad = eventosPorDia.get(key)?.length || 0;
+              return (
+                <button key={key} type="button" onClick={() => setDiaSeleccionado(key)} aria-pressed={diaSeleccionado === key} aria-label={`${fecha.toLocaleDateString('es-PY', { dateStyle: 'full' })}${cantidad ? `, ${cantidad} ${cantidad === 1 ? 'actividad' : 'actividades'}` : ''}`} className={`relative flex min-h-10 flex-col items-center justify-center gap-0.5 rounded-xl text-xs font-semibold tabular-nums transition-colors focus-visible:ring-2 focus-visible:ring-brand ${diaSeleccionado === key ? 'bg-brand text-content-inverse shadow-sm' : key === hoy ? 'bg-brand-soft text-brand-text' : 'text-content-2 hover:bg-surface-2'}`}>
+                  {fecha.getDate()}
+                  {cantidad > 0 && <span aria-hidden="true" className={`h-1 w-1 rounded-full ${diaSeleccionado === key ? 'bg-white' : 'bg-brand'}`} />}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-[10px] text-content-3">Las fechas se calculan con los datos registrados. El sistema no tiene campos de agenda manual de mantenimiento.</p>
+        </section>
+
+        <section className="min-w-0 border-t border-line pt-4 lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0" aria-live="polite">
+          <h3 className="text-xs font-bold uppercase tracking-wide text-content-2">{fechaAgenda(diaSeleccionado)?.toLocaleDateString('es-PY', { dateStyle: 'full' }) || 'Actividades del día'}</h3>
+          {eventosDia.length === 0 ? (
+            <div className="mt-3 flex min-h-28 flex-col items-center justify-center rounded-xl border border-dashed border-line bg-surface-2/60 px-4 text-center">
+              <i className="fa-regular fa-calendar text-lg text-content-3" aria-hidden="true" />
+              <p className="mt-2 text-label font-medium text-content-3">No hay actividades registradas para este día.</p>
+            </div>
+          ) : (
+            <ul className="mt-2 max-h-64 space-y-1 overflow-y-auto custom-scrollbar">
+              {eventosDia.map((evento, indice) => (
+                <li key={`${evento.tipo}-${evento.bienId || evento.fecha}-${indice}`}>
+                  <button type="button" onClick={() => evento.tipo === 'asignacion' ? onAbrirFC10(evento) : onAbrirBien(evento)} className="flex w-full items-start gap-2.5 rounded-xl p-2.5 text-left hover:bg-surface-2 focus-visible:ring-2 focus-visible:ring-brand">
+                    <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${evento.tipo === 'vencimiento' ? 'bg-warn-soft text-warn' : evento.tipo === 'asignacion' ? 'bg-info-soft text-info' : 'bg-brand-soft text-brand-text'}`} aria-hidden="true"><i className={`fa-solid ${evento.tipo === 'vencimiento' ? 'fa-hourglass-end' : evento.tipo === 'asignacion' ? 'fa-file-signature' : 'fa-box'}`} /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-label font-bold text-content-1">{evento.titulo}</span><span className="mt-0.5 block truncate text-[10px] text-content-3">{evento.detalle}</span></span>
+                    <i className="fa-solid fa-arrow-up-right-from-square mt-1 text-[9px] text-content-3" aria-hidden="true" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </Card>
+  );
+}
 
 // Vista del panel principal (extraída de App.jsx, Fase 5).
 export default function DashboardView({
@@ -30,8 +130,8 @@ export default function DashboardView({
   };
 
   const [widgets, setWidgets] = useState(() => {
-    try { return { metricas: true, pendientes: true, accesos: true, tendencias: true, ...JSON.parse(localStorage.getItem('dash_widgets') || '{}') }; }
-    catch { return { metricas: true, pendientes: true, accesos: true, tendencias: true }; }
+    try { return { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true, ...JSON.parse(localStorage.getItem('dash_widgets') || '{}') }; }
+    catch { return { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true }; }
   });
   const [menuWidgets, setMenuWidgets] = useState(false);
   const alternarWidget = (k) => {
@@ -41,7 +141,7 @@ export default function DashboardView({
       return n;
     });
   };
-  const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias']];
+  const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias'], ['agenda', 'Agenda']];
 
   // Tarjetas de métrica con diseño consistente y simétrico.
   // Un solo sistema de tonos (StatTile): el estado se comunica con el tono
@@ -427,6 +527,20 @@ export default function DashboardView({
       </div>
         </div>
       </details>
+      )}
+
+      {widgets.agenda && (
+        <AgendaPatrimonial
+          bienes={bienes}
+          fc10List={fc10List}
+          dependenciaActual={dependenciaActual}
+          onAbrirBien={(evento) => irInventario(() => setFiltroAnio(evento.anioAdquisicion || evento.fecha.slice(0, 4)))}
+          onAbrirFC10={(evento) => {
+            setFc10Year(evento.fecha.slice(0, 4));
+            setFc10Month(evento.fecha.slice(5, 7));
+            setActiveTab('fc10');
+          }}
+        />
       )}
 
     </div>

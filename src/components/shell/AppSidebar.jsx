@@ -189,7 +189,7 @@ export default function AppSidebar({
       ) : null}
 
       <aside
-        className={`sidebar-premium fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border-r border-sidebar-line shadow-panel shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:my-4 lg:ml-4 lg:rounded-3xl lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0' : '-translate-x-full' }`}
+        className={`sidebar-premium fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col bg-sidebar border border-sidebar-line shadow-panel shrink-0 transition-[width,transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-standard)] lg:static lg:my-4 lg:ml-4 lg:rounded-3xl lg:translate-x-0 ${compacta ? 'lg:w-[76px]' : 'lg:w-[264px]'} ${ isSidebarOpen ? 'translate-x-0' : '-translate-x-full' }`}
         id="sidebar-navigation"
         aria-label="Navegación principal"
       >

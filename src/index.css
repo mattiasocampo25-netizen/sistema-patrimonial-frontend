@@ -158,6 +158,20 @@ body {
   border-width: 1px;
 }
 
+.topbar-premium {
+  background-color: var(--surface-1);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 5%, transparent), transparent 48%),
+    linear-gradient(165deg, var(--surface-1) 0%, var(--surface-1) 72%, color-mix(in srgb, var(--surface-2) 70%, var(--surface-1)) 100%);
+  border-color: var(--line);
+}
+
+.dark .topbar-premium {
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.16), transparent 48%),
+    linear-gradient(165deg, #14243b 0%, #111e31 58%, var(--surface-1) 100%);
+}
+
 .dark .sidebar-premium {
   background-image:
     radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.3), transparent 48%),

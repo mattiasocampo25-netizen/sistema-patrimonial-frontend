@@ -12,6 +12,7 @@ export default function LoginScreen({
   showPassword,
   setShowPassword,
   loginError,
+  darkMode = false,
   appLogo,
   toasts,
   isProcessing = false,
@@ -28,7 +29,7 @@ export default function LoginScreen({
 
   return (
     <div
-      className="dark relative flex min-h-dvh w-full items-center justify-center overflow-x-hidden bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8"
+      className={`relative flex h-dvh min-h-dvh w-full items-start justify-center overflow-x-hidden overflow-y-auto bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 md:items-center sm:px-8 ${darkMode ? 'dark' : ''}`}
     >
       {/* Fondo decorativo sutil con tonos de marca */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -36,11 +37,42 @@ export default function LoginScreen({
         <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand/10 blur-[100px] dark:bg-brand/20" />
       </div>
 
-      <div className="relative z-10 flex w-full items-center justify-center max-w-md">
-        <div className="login-card-in w-full overflow-hidden rounded-panel border border-line bg-surface-1 shadow-pop">
+      <div className="relative z-10 flex w-full items-center justify-center max-w-5xl">
+        <div className="login-card-in grid w-full overflow-hidden rounded-3xl border border-line bg-surface-1 shadow-pop md:grid-cols-[0.95fr_1.05fr]">
+          <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-slate-950 p-10 text-white md:flex lg:p-14">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute -right-32 -top-28 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl" />
+              <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+              <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:42px_42px]" />
+            </div>
+            <div className="relative z-10 flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-2 shadow-card">
+                {appLogo ? <img src={appLogo} alt="Logo institucional UNP" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-xl text-blue-200" aria-hidden="true" />}
+              </span>
+              <span>
+                <span className="block text-sm font-bold tracking-wide">UNP · PATRIMONIO</span>
+                <span className="mt-0.5 block text-label font-medium uppercase tracking-[0.16em] text-slate-300">Universidad Nacional de Pilar</span>
+              </span>
+            </div>
+
+            <div className="relative z-10 my-12">
+              <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1.5 text-label font-semibold text-blue-100">
+                <i className="fa-solid fa-shield-halved" aria-hidden="true" /> Plataforma institucional
+              </span>
+              <h1 className="max-w-md text-3xl font-bold leading-tight tracking-tight lg:text-4xl">Tu gestión patrimonial, en un solo lugar.</h1>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-slate-300">Inventario, asignaciones y trazabilidad con la información organizada para cada dependencia.</p>
+            </div>
+
+            <div className="relative z-10 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300" aria-hidden="true"><i className="fa-solid fa-lock" /></span>
+              <span><span className="block text-sm font-semibold">Acceso seguro</span><span className="mt-0.5 block text-xs text-slate-300">Solo para personal autorizado</span></span>
+            </div>
+          </aside>
+
+          <section className="min-w-0 bg-surface-1">
           {/* Logo institucional prominente */}
-          <div className="login-rise login-rise-1 flex items-center gap-3 px-6 py-6 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand/15 border border-brand/25 text-brand-text">
+          <div className="login-rise login-rise-1 flex items-center gap-3 border-b border-line px-6 py-5 md:hidden">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-brand-soft text-brand-text ring-1 ring-brand/15">
               {appLogo ? (
                 <img src={appLogo} alt="Logo UNP Patrimonio" className="h-full w-full object-contain" />
               ) : (
@@ -48,15 +80,17 @@ export default function LoginScreen({
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <span className="block text-base font-bold tracking-tight text-content-1">UNP <span className="font-medium text-content-3">· Patrimonio</span></span>
-              <span className="text-[11px] font-medium text-content-2">Universidad Nacional de Pilar · Sistema de Gestión Patrimonial</span>
+              <span className="block text-sm font-bold tracking-tight text-content-1">UNP <span className="font-medium text-content-3">· Patrimonio</span></span>
+              <span className="mt-0.5 block text-label font-medium text-content-2">Sistema de Gestión Patrimonial</span>
             </div>
           </div>
 
-          <div className="px-6 pb-6 pt-4">
+          <div className="px-6 pb-7 pt-7 sm:px-10 sm:pb-9 md:px-12 md:pb-8 md:pt-12">
             <div className="login-rise login-rise-2 mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-content-1">Iniciar sesión</h2>
-              <p className="text-sm mt-1.5 text-content-3">
+              <span className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand-text md:hidden" aria-hidden="true"><i className="fa-solid fa-right-to-bracket" /></span>
+              <p className="text-label font-bold uppercase tracking-[0.16em] text-brand-text">Acceso institucional</p>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-content-1 sm:text-3xl">Iniciar sesión</h2>
+              <p className="mt-2 text-sm leading-relaxed text-content-3">
                 Ingresa con tu cuenta institucional para continuar.
               </p>
             </div>
@@ -85,7 +119,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border border-line bg-surface-2 pl-10 pr-4 py-3 text-base font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-2 focus:ring-brand/20 motion disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-4 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-4 focus:ring-brand/10 motion disabled:opacity-60 outline-none"
                     placeholder="Escribe tu usuario"
                   />
                 </div>
@@ -117,7 +151,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-xl border border-line bg-surface-2 pl-10 pr-10 py-3 text-base font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-2 focus:ring-brand/20 motion disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-11 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-4 focus:ring-brand/10 motion disabled:opacity-60 outline-none"
                     placeholder="••••••••"
                   />
                   <button
@@ -144,14 +178,14 @@ export default function LoginScreen({
                 tamano="lg"
                 cargando={isProcessing}
                 disabled={isProcessing}
-                className="w-full"
+                className="!h-12 w-full !rounded-full shadow-md shadow-brand/20"
               >
                 {isProcessing ? 'Verificando…' : 'Acceder'}
               </Button>
             </form>
           </div>
 
-          <div className="px-6 py-4 border-t border-line">
+          <div className="border-t border-line bg-surface-2/50 px-6 py-4 sm:px-10 md:px-12">
             <div className="flex items-center justify-between gap-4 text-center sm:text-left">
               <Button
                 variante="ghost"
@@ -167,6 +201,7 @@ export default function LoginScreen({
               </span>
             </div>
           </div>
+          </section>
         </div>
       </div>
 

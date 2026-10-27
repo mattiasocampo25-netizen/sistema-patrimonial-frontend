@@ -88,8 +88,8 @@ export default function AppTopbar({
 
   return (
     <>
-      <header className="sticky top-0 z-[120] shrink-0 bg-surface-1/95 backdrop-blur-xl border-b border-line shadow-md">
-        <div className="flex h-16 items-center gap-2 sm:gap-3 px-3 sm:px-5">
+      <header className="topbar-premium sticky top-0 z-[120] shrink-0 mx-3 mt-3 sm:mx-4 sm:mt-4 lg:mx-4 lg:mt-4 rounded-2xl lg:rounded-3xl border backdrop-blur-xl shadow-card">
+        <div className="flex min-h-16 items-center gap-2 sm:gap-3 px-3 sm:px-5">
           {/* Menu (solo movil) */}
           <button
             type="button"
@@ -107,8 +107,11 @@ export default function AppTopbar({
               Con `min-w-0` + `truncate`: en pantallas chicas se recorta en vez
               de empujar el resto de la barra fuera de la pantalla. */}
           <div className="flex items-center gap-2 min-w-0 flex-1">
+            <span className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-text" aria-hidden="true">
+              <i className="fa-solid fa-building-columns text-xs" />
+            </span>
             {isAdmin ? (
-              <div className="min-w-0 max-w-[220px] sm:max-w-[260px]">
+              <div className="min-w-0 max-w-[min(220px,42vw)] sm:max-w-[280px]">
                 <FiltroCombo
                   valor={dependenciaActual}
                   opciones={todasDependencias}
@@ -120,13 +123,13 @@ export default function AppTopbar({
                   etiquetaTodos="Elegí dependencia"
                   titulo="Cambiar entorno de trabajo"
                   ancho="w-full"
-                  className="font-semibold bg-surface-2 border-transparent hover:border-line"
+                  className="!h-9 !rounded-full !border-transparent !bg-surface-2/70 font-semibold hover:!border-line hover:!bg-surface-2"
                 />
               </div>
             ) : (
               <span
                 title="Su cuenta está restringida a esta dependencia"
-                className="inline-flex items-center gap-2 h-10 min-w-0 max-w-[200px] px-3 rounded-control bg-surface-2 border border-line text-body font-semibold text-content-2"
+                className="inline-flex items-center gap-2 h-10 min-w-0 max-w-[min(200px,42vw)] px-3 rounded-full bg-surface-2/70 border border-line text-body font-semibold text-content-2"
               >
                 <i className="fa-solid fa-lock text-[0.7em] shrink-0" aria-hidden="true" />
                 <span className="truncate">{dependenciaActual}</span>
@@ -141,7 +144,7 @@ export default function AppTopbar({
                 type="button"
                 onClick={() => setActiveTab && setActiveTab('fc10')}
                 title={`${actasPorFirmarCount} actas con firmas pendientes`}
-                className="relative inline-flex items-center gap-2 h-10 px-3 rounded-control bg-brand-soft text-brand-text border border-brand/20 hover:bg-brand/10 transition-colors"
+                className="relative inline-flex items-center gap-2 h-10 px-3 rounded-full bg-brand-soft text-brand-text border border-brand/20 hover:bg-brand/10 transition-colors"
               >
                 <i className="fa-solid fa-file-signature text-xs" aria-hidden="true" />
                 <span className="hidden sm:inline text-body font-bold tabular-nums">{actasPorFirmarCount}</span>
@@ -153,7 +156,7 @@ export default function AppTopbar({
               onClick={() => setIsScannerOpen(true)}
               title="Escanear código QR"
               data-tour="scan"
-              className="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-control bg-brand text-content-inverse font-bold hover:bg-brand-hover transition-colors"
+              className="hidden md:inline-flex items-center gap-2 h-10 px-4 rounded-full bg-brand text-content-inverse font-bold shadow-sm shadow-brand/20 hover:bg-brand-hover hover:-translate-y-px transition-[background-color,transform,box-shadow]"
             >
               <i className="fa-solid fa-qrcode text-xs" aria-hidden="true" />
               Escanear QR
@@ -162,7 +165,7 @@ export default function AppTopbar({
             <IconButton
               titulo="Escanear código QR"
               icono="fa-qrcode"
-              className="md:hidden"
+              className="md:hidden rounded-full"
               onClick={() => setIsScannerOpen(true)}
             />
 
@@ -172,6 +175,7 @@ export default function AppTopbar({
               titulo="Alternar tema claro / oscuro"
               icono={darkMode ? 'fa-sun' : 'fa-moon'}
               onClick={() => setDarkMode(!darkMode)}
+              className="rounded-full"
             />
 
             {/* Apariencia */}
@@ -182,6 +186,7 @@ export default function AppTopbar({
                 onClick={() => setMenuApariencia((v) => !v)}
                 aria-expanded={menuApariencia}
                 aria-haspopup="menu"
+                className="rounded-full"
               />
               {menuApariencia ? (
                 <div
@@ -246,7 +251,7 @@ export default function AppTopbar({
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
                 aria-expanded={isNotifOpen}
                 aria-haspopup="dialog"
-                className="relative"
+                className="relative rounded-full"
               />
               {unreadCount > 0 ? (
                 <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-danger pointer-events-none" aria-hidden="true" />

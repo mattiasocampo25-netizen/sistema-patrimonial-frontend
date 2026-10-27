@@ -4,6 +4,7 @@ import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
 import Button, { IconButton } from './ui/Button';
 import FiltroCombo from './FiltroCombo';
+import { detectarBienesSimilares } from '../utils/inventarioInteracciones';
 
 export default function BienModal({
     setIsBienModalOpen,
@@ -62,6 +63,7 @@ export default function BienModal({
         setFormKey(k => k + 1);
     };
     const [descTexto, setDescTexto] = useState(bienEditing?.descripcion || '');
+    const bienesParecidos = useMemo(() => detectarBienesSimilares({ descripcion: descTexto }, sugerenciasBienes, bienEditing?.id), [descTexto, sugerenciasBienes, bienEditing?.id]);
     const [showDescDropdown, setShowDescDropdown] = useState(false);
     const descDropdownRef = useRef(null);
     const sugerenciasDesc = useMemo(() => {
@@ -323,6 +325,15 @@ export default function BienModal({
                             </span>
                           </button>
                         ))}
+                      </div>
+                    )}
+                    {bienesParecidos.length > 0 && (
+                      <div role="status" className="mt-2 rounded-control border border-warn/25 bg-warn-soft px-3 py-2.5 text-label text-warn">
+                        <p className="font-bold"><i className="fa-solid fa-copy mr-1.5" aria-hidden="true" />Puede haber registros similares</p>
+                        <ul className="mt-1.5 space-y-1 text-content-2">
+                          {bienesParecidos.map(({ bien, razones }) => <li key={bien.id} className="flex flex-wrap gap-x-1"><span className="font-mono font-bold">{bien.rotulo || 'Sin rótulo'}</span><span>{bien.descripcion}</span><span className="text-content-3">({razones.join(', ')})</span></li>)}
+                        </ul>
+                        <p className="mt-1 text-content-3">Confirma que no sea el mismo bien antes de guardarlo.</p>
                       </div>
                     )}
                   </div>

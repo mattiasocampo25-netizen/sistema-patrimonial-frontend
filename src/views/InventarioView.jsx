@@ -8,6 +8,7 @@ import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText, repairMojibake } from '../utils/helpers';
 import { useIdioma } from '../utils/i18n';
 import Dialogo from '../components/ui/Dialogo';
+import InlineInventoryField from '../components/InlineInventoryField';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, IconButton } from '../components/ui';
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
@@ -85,6 +86,8 @@ export default function InventarioView({
   onBajaMasiva,
   onAsignarMasivo,
   onExportarSeleccion,
+  onExportarSeleccionPDF,
+  onEditarCampoBien,
   onQRLoteSeleccion,
   onMoverEstado,
   onCopiarLink,
@@ -561,6 +564,9 @@ export default function InventarioView({
                         <button onClick={() => onExportarSeleccion?.('csv')} title="Exportar bienes seleccionados a CSV" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-file-csv text-[11px]"></i> Exportar
                         </button>
+                        <button onClick={() => onExportarSeleccionPDF?.()} title="Generar FC-03 en PDF con los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
+                          <i className="fa-solid fa-file-pdf text-[11px]"></i> PDF FC-03
+                        </button>
                         <button onClick={() => setComparando(true)} disabled={seleccionados.length < 2 || seleccionados.length > 3} title="Comparar 2 o 3 bienes lado a lado" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer disabled:opacity-40">
                           <i className="fa-solid fa-columns-compare text-[11px]"></i> Comparar
                         </button>
@@ -605,7 +611,7 @@ export default function InventarioView({
                                       <h3 className="mt-2 line-clamp-2 text-body font-bold leading-snug text-content-1" title={repairMojibake(item.descripcion)}>{repairMojibake(item.descripcion) || 'Sin descripción'}</h3>
                                     </div>
                                   </div>
-                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar bien" aria-label={`Seleccionar ${item.rotulo || item.descripcion}`} className="mt-1 h-4 w-4 shrink-0 rounded border-line-strong text-brand-text cursor-pointer" />
+                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar bien (Mayús + clic para seleccionar un rango)" aria-label={`Seleccionar ${item.rotulo || item.descripcion}`} className="mt-1 h-4 w-4 shrink-0 rounded border-line-strong text-brand-text cursor-pointer" />
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 gap-2 rounded-control bg-surface-2 p-3">
                                   <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-user-check mt-0.5 w-4 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Responsable</span><span className="block truncate font-semibold text-content-1">{item.funcionario || 'Sin asignar'}</span></span></div>
@@ -638,7 +644,7 @@ export default function InventarioView({
                         {itemsPaginados.map((item) => (
                           <div key={item.id} className={`inventory-item-card relative rounded-card border p-4 shadow-xs bg-surface-1 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
-                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
+                              <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar (Mayús + clic para un rango)" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
@@ -733,7 +739,7 @@ export default function InventarioView({
 
                                 {/* Selección */}
                                 <TD className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
-                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={() => toggleSeleccion(item.id)} title="Seleccionar" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer align-middle" />
+                                  <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar (Mayús + clic para un rango)" aria-label={`Seleccionar ${item.rotulo}`} className="h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer align-middle" />
                                 </TD>
                                 {/* Columna 1: Identificación */}
                                 <TD className={`pr-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
@@ -770,11 +776,11 @@ export default function InventarioView({
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-ok text-xs shrink-0"></i>
-                                      <span className="truncate">{item.funcionario || 'Sin asignación'}</span>
+                                      <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} />
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
                                       <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>
-                                      <span className="truncate">{item.ubicacion || 'Sin ubicación'}</span>
+                                      <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} />
                                     </div>
                                     {(() => {
                                       const fc10 = fc10VigentePorBien.get(item.id);

@@ -265,6 +265,7 @@ const valorOrgExplicito = (campo) => {
             for (let input of inputs) {
                 if (!input.value) {
                     input.reportValidity(); 
+                    setErrorFirmantes(`Completa ${input.labels?.[0]?.textContent?.trim() || 'este campo'} para continuar.`);
                     return; 
                 }
             }
@@ -403,6 +404,7 @@ const valorOrgExplicito = (campo) => {
                     <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
                         {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
                         
+                        {errorFirmantes && step !== 2 && <p role="alert" className="rounded-control border border-danger/20 bg-danger-soft px-3 py-2 text-label font-semibold text-danger">{errorFirmantes}</p>}
                         <nav aria-label="Pasos del alta del FC-10" className="flex items-center gap-2">
                             {[
                                 { n: 1, label: 'Dependencia' },
@@ -411,7 +413,7 @@ const valorOrgExplicito = (campo) => {
                             ].map((s, i, arr) => (
                                 <React.Fragment key={s.n}>
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${ step > s.n ? 'bg-ok text-content-inverse' : step === s.n ? 'bg-brand text-content-inverse ring-4 ring-brand/20 dark:ring-brand/30' : 'bg-surface-3 dark:bg-surface-3 text-content-3' }`}>
+                                        <span aria-current={step === s.n ? 'step' : undefined} className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-black motion duration-[var(--dur-base)] ${ step > s.n ? 'bg-ok text-content-inverse' : step === s.n ? 'bg-brand text-content-inverse ring-4 ring-brand/20 dark:ring-brand/30' : 'bg-surface-3 dark:bg-surface-3 text-content-3' }`}>
                                             {step > s.n ? <i className="fa-solid fa-check text-[10px]"></i> : s.n}
                                         </span>
                                         <span className={`hidden sm:block text-xs font-bold whitespace-nowrap transition-colors ${ step >= s.n ? 'text-content-1 dark:text-white' : 'text-content-3 dark:text-content-2' }`}>

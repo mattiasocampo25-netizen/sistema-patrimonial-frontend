@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
+import { aplicarSeleccionRango, idsEntre } from '../utils/inventarioInteracciones';
 
 // Claves del query string para los filtros compartibles por URL.
 // A scope de modulo: es una constante pura. Dentro del hook seria un objeto
@@ -60,6 +61,7 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
     } catch { return 10; }
   });
   const [seleccionados, setSeleccionados] = useState([]);
+  const anclaSeleccionRef = useRef(null);
   const [vistaInv, setVistaInv] = useState(() => {
     try { return localStorage.getItem('inv_vista') || 'galeria'; } catch { return 'galeria'; }
   });
@@ -72,10 +74,17 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
     setVistaInv(v);
     try { localStorage.setItem('inv_vista', v); } catch {}
   }, []);
-  const toggleSeleccion = useCallback((id) => {
+  const toggleSeleccion = useCallback((id, opciones = {}) => {
+    const { shiftKey = false, visibles = [], seleccionado } = opciones;
+    if (shiftKey && anclaSeleccionRef.current && visibles.includes(anclaSeleccionRef.current)) {
+      const rango = idsEntre(visibles, anclaSeleccionRef.current, id);
+      setSeleccionados(prev => aplicarSeleccionRango(prev, rango, Boolean(seleccionado)));
+      return;
+    }
     setSeleccionados(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    anclaSeleccionRef.current = id;
   }, []);
-  const limpiarSeleccion = useCallback(() => setSeleccionados([]), []);
+  const limpiarSeleccion = useCallback(() => { anclaSeleccionRef.current = null; setSeleccionados([]); }, []);
   // Al cambiar los filtros o la dependencia, la selección vieja no aplica.
 // Todas las variables de filtrado van en la lista: faltaban filtroMes,
 // filtroAnalitico1/2, filtroQR y filtroPendiente, así que al marcar un chip de
@@ -83,6 +92,7 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
 // y la baja masiva daba de baja bienes que ya no se veían en pantalla.
 useEffect(() => {
     setSeleccionados([]);
+    anclaSeleccionRef.current = null;
   }, [dependenciaActual, searchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroFC10, filtroEstado, filtroQR, filtroPendiente]);
   const alternarOrden = useCallback((campo) => {
     setOrden(prev => {

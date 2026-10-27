@@ -154,6 +154,16 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                         </div>
                         {ev.detalle && <p className="text-xs text-content-3 dark:text-content-3 mt-2 leading-relaxed pl-[38px]">{ev.detalle}</p>}
                         {ev.usuario && <p className="text-[10px] font-semibold text-content-3 mt-2 pl-[38px]">Registrado por {ev.usuario}</p>}
+                        {ev.cambios?.anterior && ev.cambios?.nuevo && <details className="mt-2 pl-[38px]">
+                          <summary className="cursor-pointer text-[10px] font-bold text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Comparar antes y después</summary>
+                          <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+                            {Object.keys(ev.cambios.nuevo).filter((campo) => JSON.stringify(ev.cambios.nuevo[campo]) !== JSON.stringify(ev.cambios.anterior[campo])).map((campo) => <div key={campo} className="rounded-control border border-line bg-surface-1 p-2.5">
+                              <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-content-3">{campo}</p>
+                              <p className="break-words text-[10px] text-content-2"><span className="font-bold">Antes:</span> {String(ev.cambios.anterior[campo] ?? '—')}</p>
+                              <p className="break-words text-[10px] text-content-1"><span className="font-bold">Después:</span> {String(ev.cambios.nuevo[campo] ?? '—')}</p>
+                            </div>)}
+                          </div>
+                        </details>}
                       </div>
                     </li>
                   );

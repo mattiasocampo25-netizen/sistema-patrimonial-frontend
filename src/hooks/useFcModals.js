@@ -128,18 +128,19 @@ export function useFcModals({
       setIsFC03ModalOpen(true);
   };
 
-  const executeGenerateFC03 = () => {
+  const executeGenerateFC03 = (selectedIds = null) => {
     if (!window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return notify("Cargando librerías PDF...", "warning");
     
-    let bienesToPrint = filteredBienes.filter(b => b.estadoConservacion !== 'De Baja');
+    const idsSeleccionados = Array.isArray(selectedIds) ? new Set(selectedIds) : null;
+    let bienesToPrint = filteredBienes.filter(b => b.estadoConservacion !== 'De Baja' && (!idsSeleccionados || idsSeleccionados.has(b.id)));
     
-    let repText = "INVENTARIO GENERAL";
+    let repText = idsSeleccionados ? 'SELECCIÓN DE ACTIVOS' : "INVENTARIO GENERAL";
     let funcText = "TODOS LOS RESPONSABLES";
 
-    if (fc03Config.tipoFiltro === 'ubicacion' && fc03Config.filtroValor) {
+    if (!idsSeleccionados && fc03Config.tipoFiltro === 'ubicacion' && fc03Config.filtroValor) {
         bienesToPrint = bienesToPrint.filter(b => normalizeStr(b.ubicacion) === normalizeStr(fc03Config.filtroValor));
         repText = fc03Config.filtroValor.toUpperCase();
-    } else if (fc03Config.tipoFiltro === 'funcionario' && fc03Config.filtroValor) {
+    } else if (!idsSeleccionados && fc03Config.tipoFiltro === 'funcionario' && fc03Config.filtroValor) {
         bienesToPrint = bienesToPrint.filter(b => normalizeStr(b.funcionario) === normalizeStr(fc03Config.filtroValor));
         funcText = fc03Config.filtroValor.toUpperCase();
         const bienRef = bienesToPrint.find(b => b.ubicacion);
@@ -316,7 +317,7 @@ export function useFcModals({
             }
         });
         
-        const descFiltro = fc03Config.tipoFiltro === 'general' ? 'General' : fc03Config.filtroValor.replace(/[^a-zA-Z0-9]/g, '_');
+        const descFiltro = idsSeleccionados ? 'Seleccion' : (fc03Config.tipoFiltro === 'general' ? 'General' : fc03Config.filtroValor.replace(/[^a-zA-Z0-9]/g, '_'));
         const cleanDepName = dependenciaActual.replace(/\s+/g, '_'); 
         guardarPDF(doc, `FC03_${cleanDepName}_${descFiltro}_${todayStr}.pdf`); 
         notify("Reporte Inventario Oficial generado", "success");

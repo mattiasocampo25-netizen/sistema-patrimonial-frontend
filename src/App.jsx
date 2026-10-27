@@ -221,10 +221,12 @@ export default function App() {
       const a = String(row.accion || '').toUpperCase();
       const tipo = a.includes('CREA') || a.includes('ALTA') ? 'alta' : a.includes('BAJA') || a.includes('ELIMINA') ? 'baja' : a.includes('MODIF') ? 'modificacion' : a.includes('FC10') || a.includes('ASIGNA') ? 'asignacion' : a.includes('FC11') || a.includes('TRASLADO') ? 'traslado' : 'otro';
       let detalle = '';
+      let cambios = null;
       try {
         const m = typeof row.mensaje === 'string' ? JSON.parse(row.mensaje) : row.mensaje;
         if (m && typeof m === 'object') {
           if (m.cambios && m.cambios.anterior && m.cambios.nuevo) {
+            cambios = m.cambios;
             const keys = Object.keys(m.cambios.nuevo).filter(k => JSON.stringify(m.cambios.nuevo[k]) !== JSON.stringify(m.cambios.anterior[k]));
             detalle = keys.length ? `Campos: ${keys.slice(0, 6).join(', ')}${keys.length > 6 ? '…' : ''}` : 'Registro actualizado';
           } else {
@@ -235,7 +237,7 @@ export default function App() {
           }
         } else if (m) detalle = String(m);
       } catch { detalle = String(row.mensaje || ''); }
-      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle, usuario: row.usuario || '' });
+      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle, usuario: row.usuario || '', cambios });
     });
     return ev.sort((x, y) => String(y.fecha || '').localeCompare(String(x.fecha || '')));
   }, [fichaBien, eventosAuditFicha, fc10List, fc11List]);
@@ -363,6 +365,63 @@ export default function App() {
     if (!lista.length) return addToast('Selecciona al menos un bien para exportar.', 'warning');
     if (formato === 'xlsx') handleExportInventarioExcel(lista);
     else handleExportInventarioCSV(lista);
+  };
+  const editarCampoBienEnLinea = async (bien, campo, valorNuevo) => {
+    const permitidos = new Set(['funcionario', 'ubicacion']);
+    if (!bien?.id || !permitidos.has(campo)) return false;
+    const anterior = String(bien[campo] || '');
+    if (anterior.trim() === String(valorNuevo || '').trim()) return true;
+    if (!navigator.onLine) {
+      addToast('La edición rápida requiere conexión. Abre la ficha de edición para guardar sin conexión.', 'warning');
+      return false;
+    }
+    const actualizado = { ...bien, [campo]: String(valorNuevo || '').trim() };
+    const payload = conSello({ data: actualizado });
+    try {
+      let query = supabase.from('bens').update(payload).eq('id', bien.id);
+      if (bien.updated_at) query = query.eq('updated_at', bien.updated_at);
+      const { data, error } = await query.select('id').maybeSingle();
+      if (error) throw error;
+      if (!data) { addToast('El bien cambió en otra sesión. Actualiza la página antes de editarlo.', 'warning'); return false; }
+      const guardado = { ...actualizado, updated_at: payload.updated_at };
+      setBienes(prev => prev.map(b => b.id === bien.id ? guardado : b));
+      try {
+        const claveCache = `bienes_cache_${dependenciaActual}`;
+        const cache = await localforage.getItem(claveCache);
+        if (Array.isArray(cache)) await localforage.setItem(claveCache, cache.map(b => b.id === bien.id ? guardado : b));
+      } catch {}
+      await registrarAuditoria({
+        usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+        accion: 'MODIFICACION', entidad: 'BIEN', entidadId: bien.id,
+        detalles: { rotulo: bien.rotulo, cambios: { anterior: { [campo]: anterior }, nuevo: { [campo]: guardado[campo] } } }
+      });
+      const deshacer = async () => {
+        const restaurado = { ...guardado, [campo]: anterior };
+        const payloadReversion = conSello({ data: restaurado });
+        let revertQuery = supabase.from('bens').update(payloadReversion).eq('id', bien.id).eq('updated_at', guardado.updated_at);
+        const { data: revertido, error: errorReversion } = await revertQuery.select('id').maybeSingle();
+        if (errorReversion || !revertido) return addToast('No se pudo deshacer: el bien volvió a cambiar.', 'warning');
+        const bienRestaurado = { ...restaurado, updated_at: payloadReversion.updated_at };
+        setBienes(prev => prev.map(b => b.id === bien.id ? bienRestaurado : b));
+        try {
+          const claveCache = `bienes_cache_${dependenciaActual}`;
+          const cache = await localforage.getItem(claveCache);
+          if (Array.isArray(cache)) await localforage.setItem(claveCache, cache.map(b => b.id === bien.id ? bienRestaurado : b));
+        } catch {}
+        await registrarAuditoria({
+          usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+          accion: 'MODIFICACION_DESHECHA', entidad: 'BIEN', entidadId: bien.id,
+          detalles: { rotulo: bien.rotulo, cambios: { anterior: { [campo]: guardado[campo] }, nuevo: { [campo]: anterior } } }
+        });
+        addToast('Cambio deshecho.', 'success');
+      };
+      addToast(`${campo === 'funcionario' ? 'Responsable' : 'Ubicación'} actualizado.`, 'success', { action: { label: 'Deshacer', onClick: deshacer } });
+      return true;
+    } catch (error) {
+      console.error('No se pudo guardar la edición rápida:', error);
+      addToast('No se pudo guardar el cambio. Vuelve a intentarlo.', 'error');
+      return false;
+    }
   };
   const asignarBienesSeleccionados = async ({ ids, funcionario, ubicacion }) => {
     const objetivo = bienes.filter(b => ids.includes(b.id));
@@ -533,8 +592,9 @@ export default function App() {
   // Tour guiado: pasos según rol, auto-inicio solo la primera vez
   const [tourPaso, setTourPaso] = useState(-1);
   const pasosTour = useMemo(() => {
+    const nombreRol = esDesarrollador ? 'Desarrollador' : isAdmin ? 'Administrador' : 'Funcionario';
     const base = [
-      { tab: 'dashboard', selector: null, titulo: 'Bienvenido al sistema', texto: 'Recorrido rápido de lo más importante. Puedes omitirlo y retomarlo cuando quieras desde Centro de Ayuda.' },
+      { tab: 'dashboard', selector: null, titulo: `Bienvenido, ${nombreRol}`, texto: 'Recorrido adaptado a tus permisos y tareas más frecuentes. Puedes omitirlo y retomarlo cuando quieras desde Centro de Ayuda.' },
       { tab: 'dashboard', selector: '[data-tour="dash-stats"]', titulo: 'Métricas accionables', texto: 'Cada tarjeta filtra el inventario al hacer clic: activos, con QR, sin FC-10 y pendientes de QR.' },
       { tab: 'dashboard', selector: '[data-tour="dash-pendientes"]', titulo: 'Atención requerida', texto: 'Tu lista de trabajo: lo que falta por etiquetar, asignar, ubicar o regularizar, con acceso directo.' },
       { tab: 'dashboard', selector: '[data-tour="dash-firmas"]', titulo: 'Actas por firmar', texto: 'Cuando alguien firma en Acrobat, te aparece acá para que registres la firma. Nunca te tenés que acordar: el botón del encabezado te lleva directo.' },
@@ -542,9 +602,17 @@ export default function App() {
       { tab: 'inventario', selector: '[data-tour="inv-table"]', titulo: 'Acciones por fila', texto: 'Desde cada bien: ficha 360 con trazabilidad, QR, acta FC-10, traslado y edición.' },
       { tab: null, selector: '[data-tour="scan"]', titulo: 'Escáner QR', texto: 'Con la cámara del celular o una lectora USB localizas cualquier bien al instante.' },
     ];
-    if (isAdmin) {
+    if (esDesarrollador) {
       base.push(
-        { tab: 'auditoria', selector: '[data-tour="aud-kpis"]', titulo: 'Módulo de Auditoría', texto: 'Solo administradores: libro de eventos, conciliación física, muestreo aleatorio y salud de datos.' },
+        { tab: 'auditoria', selector: '[data-tour="aud-kpis"]', titulo: 'Auditoría y salud de datos', texto: 'Revisa los eventos, la conciliación física, los muestreos y el uso de la base.' },
+        { tab: 'usuarios', selector: null, titulo: 'Administración de usuarios', texto: 'Gestiona accesos y permisos. Las opciones administrativas solo aparecen para tu rol.' },
+        { tab: 'anuncios', selector: null, titulo: 'Anuncios del sistema', texto: 'Publica avisos para los usuarios de la plataforma.' },
+        { tab: 'ayuda', selector: null, titulo: 'Listo para trabajar', texto: 'El Centro de Ayuda contiene esta guía, atajos y novedades.' }
+      );
+    } else if (isAdmin) {
+      base.push(
+        { tab: 'auditoria', selector: '[data-tour="aud-kpis"]', titulo: 'Módulo de Auditoría', texto: 'Consulta el libro de eventos, la conciliación física, el muestreo aleatorio y la salud de datos.' },
+        { tab: 'aprobaciones', selector: null, titulo: 'Aprobaciones', texto: 'Revisa solicitudes y aplica decisiones con su registro de auditoría.' },
         { tab: 'ayuda', selector: null, titulo: 'Listo para trabajar', texto: 'Eso fue lo esencial. Encontrarás esta guía y las novedades de cada versión en el Centro de Ayuda.' }
       );
     } else {
@@ -554,7 +622,7 @@ export default function App() {
       );
     }
     return base;
-  }, [isAdmin]);
+  }, [isAdmin, esDesarrollador]);
   useEffect(() => {
     if (isAuthenticated && localStorage.getItem('tour_visto_v1') !== '1') {
       const t = setTimeout(() => setTourPaso(0), 900);
@@ -567,7 +635,7 @@ export default function App() {
   };
   // PENDIENTE_LABELS vive en constants/appConstants (se usa en InventarioView).
   // Dominio de auditoría: hook extraído (Fase 6). La vista recibe los mismos nombres.
-  const { auditoriaList, isLoadingAud, searchAud, setSearchAud, filtroAccionAud, setFiltroAccionAud, conteoCodigos, setConteoCodigos, conteoInput, setConteoInput, muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion, conteoUbicacion, setConteoUbicacion, muestra, verificadosMuestra, setVerificadosMuestra, paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud, fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud, evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, resultadoConteo, agregarCodigoConteo, descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV, guardarActaConteo, generarMuestra, guardarActaMuestreo } = useAuditoria({
+  const { auditoriaList, isLoadingAud, searchAud, setSearchAud, filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, conteoCodigos, setConteoCodigos, conteoInput, setConteoInput, muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion, conteoUbicacion, setConteoUbicacion, muestra, verificadosMuestra, setVerificadosMuestra, paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud, fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud, evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, resultadoConteo, agregarCodigoConteo, descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV, guardarActaConteo, generarMuestra, guardarActaMuestreo } = useAuditoria({
     bienes, fc10List, fc11List, funcionariosPadron, dependenciaActual,
     currentUser, ubicacionesUnicas, activeTab, isAdmin,
     notify: addToast,
@@ -1559,11 +1627,11 @@ if (publicBienId) {
                 {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} />)}
 
                 {activeTab === 'resumen' && (<ResumenView dependenciaActual={dependenciaActual} stats={stats} pendientes={pendientes} fc10List={fc10List} />)}
-                {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasInventoryData={bienes.length > 0} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} debouncedSearchTerm={debouncedSearchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} analiticos2Unicos={analiticos2Unicos} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onAsignarMasivo={asignarBienesSeleccionados} onExportarSeleccion={exportarSeleccionInventario} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
+                {activeTab === 'inventario' && (<InventarioView isLoading={isLoading} hasInventoryData={bienes.length > 0} hasFilters={hasFilters} filteredBienes={filteredBienes} stats={stats} handleDownloadTemplateCSV={handleDownloadTemplateCSV} fileInputRef={fileInputRef} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} ultimaExportacion={ultimaExportacion} onRepetirExport={repetirUltimaExportacion} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} searchRef={searchRef} searchTerm={searchTerm} debouncedSearchTerm={debouncedSearchTerm} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} orden={orden} setOrden={setOrden} filtroFuncionario={filtroFuncionario} setFiltroFuncionario={setFiltroFuncionario} funcionariosUnicos={funcionariosUnicos} filtroUbicacion={filtroUbicacion} setFiltroUbicacion={setFiltroUbicacion} ubicacionesUnicas={ubicacionesUnicas} filtroAnio={filtroAnio} setFiltroAnio={setFiltroAnio} aniosUnicos={aniosUnicos} filtroSubcuenta={filtroSubcuenta} setFiltroSubcuenta={setFiltroSubcuenta} subcuentasUnicas={subcuentasUnicas} filtroAnalitico1={filtroAnalitico1} setFiltroAnalitico1={setFiltroAnalitico1} analiticos1Unicos={analiticos1Unicos} filtroAnalitico2={filtroAnalitico2} setFiltroAnalitico2={setFiltroAnalitico2} filtroFC10={filtroFC10} setFiltroFC10={setFiltroFC10} filtroEstado={filtroEstado} setFiltroEstado={setFiltroEstado} vistasGuardadas={vistasGuardadas} aplicarVista={aplicarVista} eliminarVista={eliminarVista} mostrarGuardarVista={mostrarGuardarVista} setMostrarGuardarVista={setMostrarGuardarVista} nombreVista={nombreVista} setNombreVista={setNombreVista} guardarVistaActual={guardarVistaActual} clearAllFilters={clearAllFilters} filtroPendiente={filtroPendiente} setFiltroPendiente={setFiltroPendiente} itemsPaginados={itemsPaginados} fc10VigentePorBien={fc10VigentePorBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} seleccionados={seleccionados} toggleSeleccion={toggleSeleccion} limpiarSeleccion={limpiarSeleccion} vistaInv={vistaInv} cambiarVistaInv={cambiarVistaInv} lastMutatedBienId={lastMutatedBienId} onBajaMasiva={bajaMasiva} onAsignarMasivo={asignarBienesSeleccionados} onExportarSeleccion={exportarSeleccionInventario} onExportarSeleccionPDF={() => executeGenerateFC03(seleccionados)} onEditarCampoBien={editarCampoBienEnLinea} onQRLoteSeleccion={qrLoteSeleccion} onMoverEstado={moverEstadoBien} onCopiarLink={copiarLinkFiltros} onExportarProgramado={() => ejecutarExportacionProgramada(false)} STYLES={STYLES} openFichaBien={openFichaBien} openFC10Modal={openFC10Modal} openFC11Modal={openFC11Modal} renderPagination={renderPagination} />)}
 
                 {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView dependenciaActual={dependenciaActual} solicitudesBaja={solicitudesBaja} bienes={bienes} openResolucionModal={openResolucionModal} />)}
 
-                {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
+                {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} filtroUsuarioAud={filtroUsuarioAud} setFiltroUsuarioAud={setFiltroUsuarioAud} usuariosAud={usuariosAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
                 {activeTab === 'usuarios' && isAdmin && (<UsuariosView isLoading={isLoading} usuariosList={usuariosList} setUsuarioEditing={setUsuarioEditing} setIsUsuarioModalOpen={setIsUsuarioModalOpen} esDesarrollador={esDesarrollador} currentUser={currentUser} setItemToDelete={setItemToDelete} STYLES={STYLES} />)}
                 {activeTab === 'anuncios' && esDesarrollador && (<AnunciosView usuariosList={usuariosList} anunciosGrupos={anunciosGrupos} onEnviar={enviarAnuncio} onEliminarGrupo={eliminarGrupoAnuncio} currentUser={currentUser} />)}
                 {activeTab === 'funcionarios' && (<FuncionariosView isLoading={isLoading} dependenciaActual={dependenciaActual} funcionariosPurosDependencia={funcionariosPurosDependencia} sincronizarBienesConPadron={sincronizarBienesConPadron} handleDownloadTemplateFuncionarios={handleDownloadTemplateFuncionarios} fileInputFuncionariosRef={fileInputFuncionariosRef} isAdmin={isAdmin} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} searchFuncionarioInput={searchFuncionarioInput} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} funcionariosPaginados={funcionariosPaginados} handleEditFuncionario={handleEditFuncionario} handleDeleteFuncionario={handleDeleteFuncionario} renderPaginationFuncionarios={renderPaginationFuncionarios} />)}

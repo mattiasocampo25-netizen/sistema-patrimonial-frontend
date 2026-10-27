@@ -17,7 +17,7 @@ export default function AuditoriaView({
   muestra, verificadosMuestra, setVerificadosMuestra, generarMuestra,
   guardarActaMuestreo, descargarActaMuestreoPDF,
   totalAud, paginaAud, alcanceAud, setAlcanceAud, searchAud, setSearchAud,
-  filtroAccionAud, setFiltroAccionAud, accionesUnicasAud, auditoriaList,
+  filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, accionesUnicasAud, auditoriaList,
   actorAud, tonoAccionAud, detalleAudCorto
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
@@ -325,6 +325,14 @@ export default function AuditoriaView({
             etiquetaTodos="Acción: Todas"
             titulo="Filtrar por acción"
             ancho="max-w-[200px]"
+          />
+          <FiltroCombo
+            valor={filtroUsuarioAud}
+            opciones={usuariosAud}
+            onElegir={setFiltroUsuarioAud}
+            etiquetaTodos="Usuario: Todos"
+            titulo="Filtrar por usuario"
+            ancho="max-w-[220px]"
           />
         </div>
         <div className="overflow-x-auto custom-scrollbar">

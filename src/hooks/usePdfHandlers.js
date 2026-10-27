@@ -320,21 +320,32 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     }, 100);
   };
 
-  const handleGenerateFC10PDF = async (fcsData, bienesData) => {
+  const handleGenerateFC10PDF = async (fcsData, bienesData, opciones = {}) => {
     const fcs = Array.isArray(fcsData) ? fcsData : [fcsData];
     const bienesAListar = Array.isArray(bienesData) ? bienesData : [bienesData];
     if (fcs.length === 0) return notify("No hay datos para generar FC-10", "warning");
 
     if (!window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return notify("Cargando librerías PDF...", "warning");
+    const ventanaPrevia = opciones.vistaPrevia ? window.open('', '_blank') : null;
+    if (opciones.vistaPrevia && !ventanaPrevia) return notify('Permite la ventana emergente para previsualizar el FC-10.', 'warning');
     setIsProcessing({ active: true, text: 'Generando PDF FC-10...' });
     
     setTimeout(async () => {
       try {
         const { doc, fechaDocumento, fc } = await buildFC10PDFDoc(fcs, bienesAListar);
         const cleanFunc = (fc.funcionarioNombre || 'SR').replace(/\s+/g, '_'); 
-        guardarPDF(doc, `FC10_Asignacion_${cleanFunc}_${fechaDocumento}.pdf`); 
-        notify("Reporte PDF FC-10 generado", "success");
+        const nombreArchivo = `FC10_Asignacion_${cleanFunc}_${fechaDocumento}.pdf`;
+        if (opciones.vistaPrevia) {
+          const url = URL.createObjectURL(doc.output('blob'));
+          ventanaPrevia.location.href = url;
+          notify('Vista previa del FC-10 abierta.', 'success');
+          setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
+        } else {
+          guardarPDF(doc, nombreArchivo);
+          notify("Reporte PDF FC-10 generado", "success");
+        }
       } catch(e) { 
+        if (ventanaPrevia && !ventanaPrevia.closed) ventanaPrevia.close();
         console.error(e); notify("Error PDF: " + (e.message || "Desconocido"), "error"); 
       } finally { 
         setIsProcessing({ active: false, text: '' }); 

@@ -34,6 +34,7 @@ export function useAuditoria({
   const [isLoadingAud, setIsLoadingAud] = useState(false);
   const [searchAud, setSearchAud] = useState('');
   const [filtroAccionAud, setFiltroAccionAud] = useState('');
+  const [filtroUsuarioAud, setFiltroUsuarioAud] = useState('');
   const conteoDraftKey = `conteo_auditoria_${normalizeStr(currentUser?.username || 'usuario')}_${normalizeStr(dependenciaActual || 'sin_dependencia')}`;
   const leerBorradorConteo = () => {
     try {
@@ -55,6 +56,7 @@ export function useAuditoria({
   const [alcanceAud, setAlcanceAud] = useState('dep');
   const [kpisAud, setKpisAud] = useState({ total: 0, altas: 0, mods: 0, bajas: 0 });
   const [accionesUnicasAud, setAccionesUnicasAud] = useState([]);
+  const [usuariosAud, setUsuariosAud] = useState([]);
   useEffect(() => {
     let guardado = {};
     try { guardado = JSON.parse(localStorage.getItem(conteoDraftKey) || '{}'); } catch { /* borrador dañado: iniciar vacío */ }
@@ -106,6 +108,7 @@ export function useAuditoria({
       let q = supabase.from('auditoria').select('*', { count: 'exact' }).order('fecha', { ascending: false });
       if (alcanceAud === 'dep') q = q.eq('dependencia', dependenciaActual);
       if (filtroAccionAud) q = q.eq('accion', filtroAccionAud);
+      if (filtroUsuarioAud) q = q.eq('usuario', filtroUsuarioAud);
       if (searchAud.trim()) {
         const t = `%${limpiarBusquedaAud(searchAud).split(' ').filter(Boolean).join('%')}%`;
         q = q.or(`titulo.ilike.${t},mensaje.ilike.${t}`);
@@ -144,14 +147,15 @@ export function useAuditoria({
       // el desplegable ofrecía acciones que al filtrar no daban resultados, y
       // gastaba 1000 filas leídas en cada tecla del buscador.
       try {
-        let qAcc = supabase.from('auditoria').select('accion').limit(200);
+        let qAcc = supabase.from('auditoria').select('accion,usuario').limit(200);
         if (alcanceAud === 'dep') qAcc = qAcc.eq('dependencia', dependenciaActual);
         const { data: ad } = await qAcc;
         setAccionesUnicasAud([...new Set((ad || []).map(r => String(r.accion || 'OTROS')))].sort());
+        setUsuariosAud([...new Set((ad || []).map(r => String(r.usuario || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b)));
       } catch {}
     } catch {}
     finally { setIsLoadingAud(false); }
-  }, [alcanceAud, dependenciaActual, searchAud, filtroAccionAud]);
+  }, [alcanceAud, dependenciaActual, searchAud, filtroAccionAud, filtroUsuarioAud]);
   // dependenciaActual faltaba en las dependencias: al cambiar de dependencia la
   // vista de auditoría no volvía a consultar y seguía mostrando el libro de
   // eventos de la dependencia anterior. En una pantalla de auditoría eso es un
@@ -165,7 +169,7 @@ export function useAuditoria({
     if (activeTab !== 'auditoria' || !isAdmin) return;
     const t = setTimeout(() => fetchAuditoria(1), 450);
     return () => clearTimeout(t);
-  }, [searchAud, filtroAccionAud, activeTab, isAdmin, fetchAuditoria]);
+  }, [searchAud, filtroAccionAud, filtroUsuarioAud, activeTab, isAdmin, fetchAuditoria]);
   // `fetchAuditoria` se recrea en cada render: meterla en las
   // dependencias reejecutaria el efecto en cada render.
   const actorAud = (row) => {
@@ -407,7 +411,7 @@ export function useAuditoria({
 
   return {
     auditoriaList, isLoadingAud, searchAud, setSearchAud,
-    filtroAccionAud, setFiltroAccionAud,
+    filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud,
     conteoCodigos, setConteoCodigos, conteoInput, setConteoInput,
     muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion,
     conteoUbicacion, setConteoUbicacion, muestra, setMuestra,

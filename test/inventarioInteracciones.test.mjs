@@ -1,6 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { aplicarSeleccionRango, detectarBienesSimilares, idsEntre } from '../src/utils/inventarioInteracciones.js';
+import { aplicarSeleccionRango, construirLinkInventario, detectarBienesSimilares, idsEntre } from '../src/utils/inventarioInteracciones.js';
+
+test('el link compartido abre inventario y conserva filtros y fragmento', () => {
+  const enlace = construirLinkInventario('https://ejemplo.test/app?q=notebook&estado=Bueno#inventario');
+  const url = new URL(enlace);
+  assert.equal(url.searchParams.get('tab'), 'inventario');
+  assert.equal(url.searchParams.get('q'), 'notebook');
+  assert.equal(url.searchParams.get('estado'), 'Bueno');
+  assert.equal(url.hash, '#inventario');
+  assert.equal(construirLinkInventario('no es una url'), '');
+});
 
 test('idsEntre obtiene un rango inclusivo en ambas direcciones', () => {
   assert.deepEqual(idsEntre(['a', 'b', 'c', 'd'], 'b', 'd'), ['b', 'c', 'd']);

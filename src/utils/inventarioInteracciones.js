@@ -1,5 +1,15 @@
 import { normalizeStr } from './helpers.js';
 
+export function construirLinkInventario(urlActual) {
+  try {
+    const url = new URL(urlActual);
+    url.searchParams.set('tab', 'inventario');
+    return url.href;
+  } catch {
+    return '';
+  }
+}
+
 export function idsEntre(ids, desdeId, hastaId) {
   const desde = ids.indexOf(desdeId);
   const hasta = ids.indexOf(hastaId);

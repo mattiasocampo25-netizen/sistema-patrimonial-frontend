@@ -153,7 +153,7 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(window.location.search).get('tab') === 'inventario' ? 'inventario' : 'dashboard');
   const [isLoading, setIsLoading] = useState(true);
   // Modo mantenimiento: aviso global que bloquea el uso para todos
   // Aviso "Sistema Actualizado": una vez por versión, para todo usuario autenticado

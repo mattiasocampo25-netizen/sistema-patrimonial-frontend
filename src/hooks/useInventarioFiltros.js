@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
-import { aplicarSeleccionRango, idsEntre } from '../utils/inventarioInteracciones';
+import { aplicarSeleccionRango, construirLinkInventario, idsEntre } from '../utils/inventarioInteracciones';
 
 // Claves del query string para los filtros compartibles por URL.
 // A scope de modulo: es una constante pura. Dentro del hook seria un objeto
@@ -196,7 +196,7 @@ useEffect(() => {
 
   // "Copiar link" de la vista actual.
   const urlFiltrosActual = useCallback(() => {
-    try { return window.location.href; } catch { return ''; }
+    return construirLinkInventario(window.location.href);
   }, []);
 
   // Vistas guardadas por usuario (foto de filtros con nombre)

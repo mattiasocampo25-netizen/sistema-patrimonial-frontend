@@ -370,7 +370,7 @@ const valorOrgExplicito = (campo) => {
 
     return (
         <Dialogo className={STYLES.modalOverlay}>
-            <div className={`${STYLES.modalContent} max-w-3xl`}>
+            <div className={`${STYLES.modalContent} w-[min(96vw,72rem)] max-w-6xl`}>
                 
                 <div className="px-5 sm:px-6 py-4 border-b border-line/70 dark:border-white/10 bg-surface-1 dark:bg-surface-1 shrink-0 z-10 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
@@ -705,6 +705,20 @@ const valorOrgExplicito = (campo) => {
                                     <input type="hidden" name="valorTotal" value={fc10TargetBien.valorUnitario} />
                                 </div>
                             </div>
+
+                            <section aria-label="Resumen de asignación FC-10" className="rounded-card border border-brand/20 bg-brand-soft/50 px-5 py-4">
+                                <div className="mb-3 flex items-center gap-2">
+                                    <i className="fa-solid fa-clipboard-check text-brand-text" aria-hidden="true" />
+                                    <h3 className="text-xs font-bold text-content-1 dark:text-white">Revisa la asignación</h3>
+                                </div>
+                                <div className="grid grid-cols-1 gap-3 text-label sm:grid-cols-2 lg:grid-cols-3">
+                                    <div><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Bien</span><span className="font-semibold text-content-1 dark:text-white">{fc10TargetBien.rotulo || 'Sin rótulo'} · {fc10TargetBien.descripcion || 'Sin descripción'}</span></div>
+                                    <div><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Responsable</span><span className="font-semibold text-content-1 dark:text-white">{funcData.nombre || 'Pendiente'}</span></div>
+                                    <div><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Jefatura</span><span className="font-semibold text-content-1 dark:text-white">{jefeData.nombre || 'Pendiente'}</span></div>
+                                    <div className="sm:col-span-2 lg:col-span-3"><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Dependencia organizacional</span><span className="font-semibold text-content-1 dark:text-white">{[org, reparticion, dependencia, area].filter(Boolean).join(' › ') || 'Pendiente'}</span></div>
+                                </div>
+                                <p className="mt-3 text-label leading-relaxed text-content-2">Al confirmar se guardará el acta y quedará esperando la firma del funcionario.</p>
+                            </section>
 
                             {/* Devolución: solo al editar un acta ya existente. Va
                                 aparte y apagada hasta que se marque, porque es una

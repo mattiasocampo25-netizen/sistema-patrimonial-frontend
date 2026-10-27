@@ -174,7 +174,7 @@ export default function InventarioView({
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
   return (
-<div className="inventory-view inventory-stagger space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
+<div className="inventory-view inventory-stagger min-w-0 space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <Card className="p-0">
@@ -237,10 +237,10 @@ export default function InventarioView({
   </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
-  <div className="bg-surface-1 p-4 sm:p-5 rounded-panel border border-line shadow-sm space-y-4">
+  <div className="w-full min-w-0 bg-surface-1 p-4 sm:p-5 rounded-panel border border-line shadow-sm space-y-4">
 
     {/* Campo de Búsqueda Principal */}
-    <div className="relative w-full">
+    <div className="relative block w-full min-w-0">
       <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input
         type="search"
@@ -255,7 +255,7 @@ export default function InventarioView({
         onFocus={() => setShowHistorial(true)}
         onBlur={() => setTimeout(() => setShowHistorial(false), 150)}
         onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) { guardarReciente(searchTerm); setShowHistorial(false); } }}
-        className="w-full rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
+        className="block h-12 w-full min-w-0 rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
       />
       {showHistorial && !searchTerm && recientes.length > 0 && (
         <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">

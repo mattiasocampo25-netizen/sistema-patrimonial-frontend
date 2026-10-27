@@ -116,7 +116,7 @@ export default function AppShell({
           actasPorFirmarCount={actasPorFirmarCount}
         />
 
-        <main id="contenido" className="workspace-main m-3 mt-2 flex-1 overflow-y-auto rounded-2xl border border-line/70 bg-surface-1 shadow-card custom-scrollbar sm:mx-4 sm:mb-4 lg:mt-3 lg:rounded-3xl lg:shadow-panel lg:border-line/50">
+        <main id="contenido" className="workspace-main m-3 mt-2 min-w-0 flex-1 overflow-y-auto rounded-2xl border border-line/70 bg-surface-1 shadow-card custom-scrollbar sm:mx-4 sm:mb-4 lg:mt-3 lg:rounded-3xl lg:shadow-panel lg:border-line/50">
           {children}
         </main>
       </div>

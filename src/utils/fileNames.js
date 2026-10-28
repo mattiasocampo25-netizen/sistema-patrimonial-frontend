@@ -20,14 +20,37 @@ export function fechaParaArchivo(fecha = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+let abrirDialogoNombreArchivo = null;
+
+export function registrarDialogoNombreArchivo(controlador) {
+  abrirDialogoNombreArchivo = controlador;
+  return () => {
+    if (abrirDialogoNombreArchivo === controlador) abrirDialogoNombreArchivo = null;
+  };
+}
+
 export function solicitarNombreArchivo(nombreSugerido) {
-  if (typeof window === 'undefined' || typeof window.prompt !== 'function') return nombreSugerido;
-  const extension = String(nombreSugerido).match(/\.([A-Za-z0-9]{1,8})$/)?.[1] || 'pdf';
-  const base = normalizarSegmentoArchivo(String(nombreSugerido).replace(/\.[A-Za-z0-9]{1,8}$/, ''), 'descarga');
-  let elegido = null;
-  try { elegido = window.prompt('Puedes cambiar el nombre del archivo. Si cancelas, se usará el nombre sugerido:', base); } catch { /* navegador sin diálogo disponible */ }
-  const nombre = normalizarSegmentoArchivo(elegido, base);
-  return `${nombre}.${extension.toLowerCase()}`;
+  const sugerido = String(nombreSugerido || 'descarga.pdf');
+  const extension = sugerido.match(/\.([A-Za-z0-9]{1,8})$/)?.[1]?.toLowerCase() || 'pdf';
+  const base = normalizarSegmentoArchivo(sugerido.replace(/\.[A-Za-z0-9]{1,8}$/, ''), 'descarga');
+  const nombreCompleto = (valor) => `${normalizarSegmentoArchivo(valor, base)}.${extension}`;
+  if (!abrirDialogoNombreArchivo) return Promise.resolve(nombreCompleto(base));
+
+  return new Promise(resolve => {
+    let resuelto = false;
+    const terminar = (valor) => {
+      if (resuelto) return;
+      resuelto = true;
+      resolve(valor == null ? nombreCompleto(base) : nombreCompleto(valor));
+    };
+    abrirDialogoNombreArchivo({
+      id: `${Date.now()}-${Math.random()}`,
+      nombreSugerido: base,
+      extension,
+      aceptar: terminar,
+      usarSugerido: () => terminar(base)
+    });
+  });
 }
 
 export function nombreFC10Archivo(fc, fecha = new Date()) {

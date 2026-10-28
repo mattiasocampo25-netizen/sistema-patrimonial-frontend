@@ -398,8 +398,8 @@ function limpiarFuentesNoUsadasBytes(datos, usadas) {
  *
  * Se usa en vez de doc.save() para poder pasar los bytes por el saneado.
  */
-export function guardarPDF(doc, nombreArchivo) {
-  const nombreElegido = solicitarNombreArchivo(nombreArchivo);
+export async function guardarPDF(doc, nombreArchivo) {
+  const nombreElegido = await solicitarNombreArchivo(nombreArchivo);
   const buffer = doc.output('arraybuffer');
   const limpio = sanearPDF(buffer);
   const blob = new Blob([limpio], { type: 'application/pdf' });

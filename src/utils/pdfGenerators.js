@@ -488,7 +488,7 @@ export const generateProfessionalLabelPNG = async (bien, logoUrl, returnOnly = f
 
     const link = document.createElement('a');
     link.href = dataUrl;
-    link.download = solicitarNombreArchivo(`Etiqueta_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
+    link.download = await solicitarNombreArchivo(`Etiqueta_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
     link.click();
     return dataUrl;
 };
@@ -517,7 +517,7 @@ export const generateSimpleQR = async (bien, returnOnly = false) => {
 
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = solicitarNombreArchivo(`QR_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
+        link.download = await solicitarNombreArchivo(`QR_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
         link.click();
         return dataUrl;
     } catch (e) {

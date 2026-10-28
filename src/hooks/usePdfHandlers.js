@@ -156,7 +156,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         const content = await zip.generateAsync({ type: "blob" });
 
         if (window.saveAs) {
-          window.saveAs(content, solicitarNombreArchivo(`Etiquetas_Patrimoniales_${cleanDepName}_${fechaParaArchivo()}.zip`));
+          window.saveAs(content, await solicitarNombreArchivo(`Etiquetas_Patrimoniales_${cleanDepName}_${fechaParaArchivo()}.zip`));
         }
         
         try {
@@ -231,7 +231,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         const content = await zip.generateAsync({ type: "blob" });
 
         if (window.saveAs) {
-          window.saveAs(content, solicitarNombreArchivo(`QRs_Simples_${cleanDepName}_${fechaParaArchivo()}.zip`));
+          window.saveAs(content, await solicitarNombreArchivo(`QRs_Simples_${cleanDepName}_${fechaParaArchivo()}.zip`));
         }
         
         try {
@@ -287,7 +287,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         if (!fc.sinMovimiento && fc.bienesSnapshot?.length > 0) { doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 0, 0); doc.text(`Cantidad Total de Bienes: ${fc.bienesSnapshot.length}`, 14, finalY); finalY += 10; }
         if (finalY > pageHeight - 45) { doc.addPage(); finalY = 40; }
         let firmasY = finalY + 25; doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4); doc.line(pageWidth / 4 - 30, firmasY, pageWidth / 4 + 30, firmasY); doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.text("Director Administrativo", pageWidth / 4, firmasY + 5, { align: 'center' }); doc.line(pageWidth * 0.75 - 30, firmasY, pageWidth * 0.75 + 30, firmasY); doc.text("Jefe de Bienes Patrimoniales", pageWidth * 0.75, firmasY + 5, { align: 'center' });
-        const cleanDepName = fc.dependencia.replace(/\s+/g, '_'); guardarPDF(doc, `FC04_${cleanDepName}_${fc.mes}-${fc.anio}.pdf`); notify("Reporte PDF FC-04 generado", "success");
+        const cleanDepName = fc.dependencia.replace(/\s+/g, '_'); await guardarPDF(doc, `FC04_${cleanDepName}_${fc.mes}-${fc.anio}.pdf`); notify("Reporte PDF FC-04 generado", "success");
       } catch(e) { console.error(e); notify("Error PDF: " + (e.message || "Desconocido"), "error"); } finally { setIsProcessing({ active: false, text: '' }); }
     }, 100);
   };
@@ -324,7 +324,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
             doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4); doc.line(14, finalY, 70, finalY); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text("Jefe de Dependencia Remitente", 42, finalY + 5, { align: 'center' }); doc.line(78, finalY, 138, finalY); doc.text("Jefe de Dependencia Destinataria", 108, finalY + 5, { align: 'center' }); doc.line(146, finalY, 202, finalY); doc.text("Jefe Dpto. Bienes Patrimoniales", 174, finalY + 5, { align: 'center' });
             let pieY = pageHeight - 15; doc.setFont("helvetica", "normal"); doc.text("Distribución: Original para el Departamento de Bienes Patrimoniales, Copias para dependencia remitente y destinataria.", 14, pieY);
         }
-        const cleanFormNum = (fc.numeroFormulario || 'S-N').replace(/[^a-zA-Z0-9]/g, '-'); guardarPDF(doc, `FC11_Traslado_${cleanFormNum}_${todayStr}.pdf`); notify("Reporte FC-11 generado", "success");
+        const cleanFormNum = (fc.numeroFormulario || 'S-N').replace(/[^a-zA-Z0-9]/g, '-'); await guardarPDF(doc, `FC11_Traslado_${cleanFormNum}_${todayStr}.pdf`); notify("Reporte FC-11 generado", "success");
       } catch(e) { console.error(e); notify("Error PDF: " + (e.message || "Desconocido"), "error"); } finally { setIsProcessing({ active: false, text: '' }); }
     }, 100);
   };
@@ -349,7 +349,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
           notify('Vista previa del FC-10 abierta.', 'success');
           setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
         } else {
-          guardarPDF(doc, nombreSugerido);
+          await guardarPDF(doc, nombreSugerido);
           notify("Reporte PDF FC-10 generado", "success");
         }
       } catch(e) { 
@@ -381,7 +381,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         }
         const blob = await zip.generateAsync({ type: 'blob' });
         const sugerido = `FC10_Actas_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.zip`;
-        const nombre = solicitarNombreArchivo(sugerido);
+        const nombre = await solicitarNombreArchivo(sugerido);
         if (!nombre) { notify('Descarga cancelada.', 'info'); return; }
         if (window.saveAs) window.saveAs(blob, nombre);
         else {
@@ -450,7 +450,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     if (fcsAnuales.length === 0) return notify(`No hay datos FC-10 para el año ${fc10Year}`, "warning");
     
     setIsProcessing({ active: true, text: 'Generando Excel...' });
-    setTimeout(() => {
+    setTimeout(async () => {
       let csvContent = "\uFEFF"; 
       csvContent += "Fecha Asignacion;Dependencia;Unidad;Reparticion;Area;Funcionario;C.I.;Cargo;Rotulo;Descripcion;Cuenta Contable;Estado Fisico;Valor (Gs.);Fecha Devolucion;Observaciones\n";
       
@@ -471,7 +471,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       if (window.saveAs) {
-        const nombre = solicitarNombreArchivo(`FC10_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`);
+        const nombre = await solicitarNombreArchivo(`FC10_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`);
         if (nombre) window.saveAs(blob, nombre);
       }
       setIsProcessing({ active: false, text: '' });
@@ -491,7 +491,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     if (fcsAnuales11.length === 0) return notify(`No hay datos FC-11 para el año ${fc10Year}`, "warning");
     
     setIsProcessing({ active: true, text: 'Generando Excel...' });
-    setTimeout(() => {
+    setTimeout(async () => {
       let csvContent = "\uFEFF";
       csvContent += "N Formulario;Fecha;Dep. Remitente;Area Remitente;Dep. Destinataria;Area Destinataria;Rotulo Bien;Descripcion Bien;Estado Fisico;Motivo;Observaciones\n";
       
@@ -509,7 +509,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      if (window.saveAs) window.saveAs(blob, solicitarNombreArchivo(`FC11_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`));
+      if (window.saveAs) window.saveAs(blob, await solicitarNombreArchivo(`FC11_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`));
       setIsProcessing({ active: false, text: '' });
       notify(`Reporte Excel FC-11 (${fc10Year}) descargado`, "success");
     }, 100);
@@ -594,12 +594,12 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       const fechaStr = new Date().toISOString().split("T")[0];
       
       if (window.saveAs) {
-        window.saveAs(blob, solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`));
+        window.saveAs(blob, await solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`));
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`);
+        a.download = await solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`);
         a.click();
         // Con margen: revocar en el mismo tick puede cancelar la descarga en
         // Safari (el blob todavía se está leyendo).
@@ -629,7 +629,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   const handleExportInventarioCSV = (registros = filteredBienes) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
       setIsProcessing({ active: true, text: 'Generando Reporte Excel...' });
-      setTimeout(() => {
+      setTimeout(async () => {
           let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
           const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
           registros.forEach(b => {
@@ -646,7 +646,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
           if (window.saveAs) {
             const sufijo = registros.length !== filteredBienes.length ? '_Seleccion' : '';
-            const nombre = solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
+            const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
             if (nombre) window.saveAs(blob, nombre);
           }
           setIsProcessing({ active: false, text: '' });
@@ -658,7 +658,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
       if (!window.XLSX) return notify("Cargando librería Excel, intenta de nuevo...", "warning");
       setIsProcessing({ active: true, text: 'Generando Excel...' });
-      setTimeout(() => {
+      setTimeout(async () => {
           try {
           const filas = registros.map(b => ({
                   'Cuenta': b.cuenta || '-', 'Subcuenta': b.subcuenta || '-',
@@ -691,7 +691,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               ws2['!cols'] = [{ wch: 28 }, { wch: 34 }];
               window.XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
               window.XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
-              const nombre = solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.xlsx`);
+              const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.xlsx`);
               if (nombre) window.XLSX.writeFile(wb, nombre);
               notify("Excel generado exitosamente", "success");
           } catch {

@@ -320,7 +320,7 @@ export function useFcModals({
         
         const descFiltro = idsSeleccionados ? 'Seleccion' : (fc03Config.tipoFiltro === 'general' ? 'General' : fc03Config.filtroValor.replace(/[^a-zA-Z0-9]/g, '_'));
         const cleanDepName = dependenciaActual.replace(/\s+/g, '_'); 
-        guardarPDF(doc, `FC03_${cleanDepName}_${descFiltro}_${todayStr}.pdf`); 
+        await guardarPDF(doc, `FC03_${cleanDepName}_${descFiltro}_${todayStr}.pdf`);
         notify("Reporte Inventario Oficial generado", "success");
       } catch(e) { 
         console.error(e); 

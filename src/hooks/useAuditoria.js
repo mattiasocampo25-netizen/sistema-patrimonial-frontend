@@ -312,7 +312,7 @@ export function useAuditoria({
         resumen: `${resultadoConteo.hallados} hallados de ${resultadoConteo.total} · ${resultadoConteo.faltantes.length} faltantes · ${resultadoConteo.noRegistrados.length} no registrados`,
         filas, logoDataUrl: logo
       });
-      guardarPDF(doc, `Acta_Conciliacion_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+      await guardarPDF(doc, `Acta_Conciliacion_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
       notify('Acta de conciliación generada.', 'success');
     } catch (e) {
       notify('Error al generar el acta: ' + (e.message || 'desconocido'), 'error');
@@ -340,7 +340,7 @@ export function useAuditoria({
         })),
         logoDataUrl: logo
       });
-      guardarPDF(doc, `Acta_Muestreo_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+      await guardarPDF(doc, `Acta_Muestreo_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
       notify('Acta de muestreo generada.', 'success');
     } catch (e) {
       notify('Error al generar el acta: ' + (e.message || 'desconocido'), 'error');

@@ -24,6 +24,8 @@ import { useFcModals } from './hooks/useFcModals';
 import { useRestoreBackup } from './hooks/useRestoreBackup';
 import AppModals from './components/AppModals';
 import RestoreBackupModal from './components/RestoreBackupModal';
+import NombreArchivoModal from './components/NombreArchivoModal';
+import { registrarDialogoNombreArchivo } from './utils/fileNames.js';
 import { useInventarioFiltros } from './hooks/useInventarioFiltros';
 import { useDependencias } from './hooks/useDependencias';
 import { pendienteDeFirma } from './utils/fc10Firmas';
@@ -103,6 +105,16 @@ export default function App() {
   const [publicFotoAmpliada, setPublicFotoAmpliada] = useState(null);
   const [publicDescExpandida, setPublicDescExpandida] = useState(false);
   const { toasts, addToast, quitarToast } = useToasts();
+  const [solicitudesNombreArchivo, setSolicitudesNombreArchivo] = useState([]);
+  const solicitudNombreArchivo = solicitudesNombreArchivo[0] || null;
+  useEffect(() => registrarDialogoNombreArchivo((solicitud) => {
+    setSolicitudesNombreArchivo(actuales => [...actuales, solicitud]);
+  }), []);
+  const resolverNombreArchivo = (accion) => {
+    if (!solicitudNombreArchivo) return;
+    solicitudNombreArchivo[accion]();
+    setSolicitudesNombreArchivo(actuales => actuales.slice(1));
+  };
   // Sesión y autenticación: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { isAuthenticated, currentUser, setCurrentUser, isAdmin, esDesarrollador, loginUser, setLoginUser, loginPass, setLoginPass, showPassword, setShowPassword, loginError, isProcessing, setIsProcessing, dependenciaActual, setDependenciaActual, showLogoutConfirm, setShowLogoutConfirm, mantenimiento, versionApp, isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant, mostrarLoginDev, setMostrarLoginDev, mantBypass, handleLogin, handleLogout, saveMantenimiento } = useAuthSession({ notify: addToast });
   const [appLogo, _setAppLogo] = useState(() => localStorage.getItem('logoOficial'));
@@ -1661,6 +1673,12 @@ if (publicBienId) {
       </Suspense>
       <AtajosModal isOpen={isAtajosOpen} onClose={() => setIsAtajosOpen(false)} STYLES={STYLES} />
       <RestoreBackupModal restore={restore} />
+      <NombreArchivoModal
+        key={solicitudNombreArchivo?.id || 'sin-solicitud'}
+        solicitud={solicitudNombreArchivo}
+        onAceptar={(nombre) => { solicitudNombreArchivo?.aceptar(nombre); setSolicitudesNombreArchivo(actuales => actuales.slice(1)); }}
+        onUsarSugerido={() => resolverNombreArchivo('usarSugerido')}
+      />
     </div>
   );
 }

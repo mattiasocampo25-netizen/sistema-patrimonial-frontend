@@ -158,6 +158,7 @@ useEffect(() => {
   }, []);
 
   const refUrlAplicada = useRef(false);
+  const refSeleccionCompartidaAplicada = useRef(false);
   useEffect(() => {
     if (refUrlAplicada.current) return;
     const desdeUrl = leerUrl();
@@ -194,10 +195,36 @@ useEffect(() => {
     VALORES
   ]);
 
+  // Restablece los bienes incluidos en el enlace una vez cargado el inventario
+  // y aplicados los filtros de URL.
+  useEffect(() => {
+    if (refSeleccionCompartidaAplicada.current) return;
+    let params;
+    try { params = new URLSearchParams(window.location.search); } catch { return; }
+    const idsCompartidos = (params.get('sel') || '').split(',').filter(Boolean);
+    if (!idsCompartidos.length) {
+      refSeleccionCompartidaAplicada.current = true;
+      return;
+    }
+    const filtrosCompartidos = leerUrl();
+    if (Object.keys(filtrosCompartidos).length > 0) {
+      if (!refUrlAplicada.current) return;
+      const faltaAplicarFiltro = Object.entries(filtrosCompartidos)
+        .some(([estado, valor]) => String(VALORES[estado] ?? '') !== String(valor));
+      if (faltaAplicarFiltro) return;
+    }
+    if (!Array.isArray(bienes) || bienes.length === 0) return;
+    const disponibles = new Set(bienes
+      .filter(b => !dependenciaActual || b.dependencia === dependenciaActual)
+      .map(b => String(b.id)));
+    setSeleccionados(idsCompartidos.filter(id => disponibles.has(id)));
+    refSeleccionCompartidaAplicada.current = true;
+  }, [bienes, dependenciaActual, leerUrl, VALORES, debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroQR, filtroFC10, filtroEstado, filtroPendiente]);
+
   // "Copiar link" de la vista actual.
-  const urlFiltrosActual = useCallback(() => {
-    return construirLinkInventario(window.location.href);
-  }, []);
+  const urlFiltrosActual = useCallback((ids = seleccionados) => {
+    return construirLinkInventario(window.location.href, ids);
+  }, [seleccionados]);
 
   // Vistas guardadas por usuario (foto de filtros con nombre)
   const [vistasGuardadas, setVistasGuardadas] = useState(() => {

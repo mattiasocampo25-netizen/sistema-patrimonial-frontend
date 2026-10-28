@@ -35,6 +35,15 @@ test('el link compartido abre inventario y conserva filtros y fragmento', () => 
   assert.equal(construirLinkInventario('no es una url'), '');
 });
 
+test('el link del inventario incluye solo los bienes seleccionados, sin duplicados', () => {
+  const enlace = construirLinkInventario('https://ejemplo.test/app?q=mesa#inventario', ['b1', 'b2', 'b1']);
+  const url = new URL(enlace);
+  assert.equal(url.searchParams.get('tab'), 'inventario');
+  assert.equal(url.searchParams.get('q'), 'mesa');
+  assert.equal(url.searchParams.get('sel'), 'b1,b2');
+  assert.equal(new URL(construirLinkInventario(enlace)).searchParams.has('sel'), false);
+});
+
 test('idsEntre obtiene un rango inclusivo en ambas direcciones', () => {
   assert.deepEqual(idsEntre(['a', 'b', 'c', 'd'], 'b', 'd'), ['b', 'c', 'd']);
   assert.deepEqual(idsEntre(['a', 'b', 'c', 'd'], 'd', 'b'), ['b', 'c', 'd']);

@@ -481,14 +481,15 @@ export default function InventarioView({
               <i className="fa-solid fa-address-card text-xs"></i>
             </button>
           </div>
-          {hasFilters && onCopiarLink && (
+          {(hasFilters || seleccionados.length > 0) && onCopiarLink && (
             <button
               onClick={onCopiarLink}
-              title="Copiar un link con estos filtros aplicados"
+              title={seleccionados.length > 0 ? 'Copiar un link con filtros y bienes seleccionados' : 'Copiar un link con estos filtros aplicados'}
+              aria-label={seleccionados.length > 0 ? `Copiar enlace con ${seleccionados.length} bienes seleccionados` : 'Copiar enlace con filtros aplicados'}
               className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-zinc-700/30 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
               <i className="fa-solid fa-link text-[10px]"></i>
-              <span className="hidden sm:inline">Copiar link</span>
+              <span className="hidden sm:inline">{seleccionados.length > 0 ? `Copiar link (${seleccionados.length})` : 'Copiar link'}</span>
             </button>
           )}
           <ExportScheduleMenu onEjecutarAhora={onExportarProgramado} />

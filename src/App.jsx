@@ -31,6 +31,7 @@ import { useDependencias } from './hooks/useDependencias';
 import { pendienteDeFirma } from './utils/fc10Firmas';
 import { detectarCambios, fusionarSobreFresco, detectarConflictos, describirCampos } from './services/escrituraSegura';
 import { normalizarBien } from './utils/bienPublico';
+import { copiarAlPortapapeles } from './utils/inventarioInteracciones.js';
 import MaintenanceScreen from './components/MaintenanceScreen';
 const AyudaView = lazyConReintento(() => import('./views/AyudaView'));
 const ResumenView = lazyConReintento(() => import('./views/ResumenView'));
@@ -1034,14 +1035,16 @@ useEffect(() => {
 
   // --- FILTROS COMPARTIBLES: copiar link de la vista actual -----------------
   const copiarLinkFiltros = async () => {
-    const url = urlFiltrosActual();
+    const url = urlFiltrosActual(seleccionados);
     if (!url) return;
-    try {
-      await navigator.clipboard.writeText(url);
-      addToast('Link copiado. Quien lo abra verá estos filtros.', 'success');
-    } catch {
-      // clipboard puede estar bloqueado en http:// o sin permiso: cae al prompt.
-      window.prompt('Copiá este link para compartir la vista filtrada:', url);
+    const copiado = await copiarAlPortapapeles(url);
+    if (copiado) {
+      const detalle = seleccionados.length
+        ? ` y ${seleccionados.length} bien${seleccionados.length === 1 ? '' : 'es'} seleccionado${seleccionados.length === 1 ? '' : 's'}`
+        : '';
+      addToast(`Link copiado${detalle}.`, 'success');
+    } else {
+      addToast('No se pudo copiar automáticamente. Revisa los permisos del navegador e inténtalo otra vez.', 'error');
     }
   };
 

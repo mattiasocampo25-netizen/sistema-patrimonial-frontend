@@ -1,12 +1,42 @@
 import { normalizeStr } from './helpers.js';
 
-export function construirLinkInventario(urlActual) {
+export function construirLinkInventario(urlActual, bienesSeleccionados = []) {
   try {
     const url = new URL(urlActual);
     url.searchParams.set('tab', 'inventario');
+    const ids = [...new Set((bienesSeleccionados || []).filter(Boolean).map(String))];
+    if (ids.length) url.searchParams.set('sel', ids.join(','));
+    else url.searchParams.delete('sel');
     return url.href;
   } catch {
     return '';
+  }
+}
+
+export async function copiarAlPortapapeles(texto) {
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(texto);
+      return true;
+    }
+  } catch { /* cae al método compatible con permisos/contextos restringidos */ }
+
+  if (typeof document === 'undefined' || !document.body || typeof document.execCommand !== 'function') return false;
+  const campo = document.createElement('textarea');
+  campo.value = String(texto || '');
+  campo.setAttribute('readonly', '');
+  campo.style.position = 'fixed';
+  campo.style.opacity = '0';
+  campo.style.pointerEvents = 'none';
+  document.body.appendChild(campo);
+  try {
+    campo.focus();
+    campo.select();
+    return document.execCommand('copy');
+  } catch {
+    return false;
+  } finally {
+    campo.remove();
   }
 }
 

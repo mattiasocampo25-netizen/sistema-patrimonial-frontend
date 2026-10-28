@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import {
@@ -10,7 +10,7 @@ import { ESTADOS_FC10, ESTADO_INFO, estadoInicialFC10, pendienteDeFirma, esFC10L
 
 // Vista de actas de responsabilidad FC-10 (extraída de App.jsx, Fase 4).
 export default function Fc10View({
-  filteredFC10, fc10Year, setFc10Year, fc10Month, setFc10Month,
+  filteredFC10, conteosFC10PorMes = {}, fc10Year, setFc10Year, fc10Month, setFc10Month,
   setIsConsolidatedFC10ModalOpen, handleExportFC10CSV,
   isLoading, bienes, handleGenerateFC10PDF, openFC10Modal,
   handleBulkFC10Zip,
@@ -20,6 +20,8 @@ export default function Fc10View({
 }) {
   const [busqueda, setBusqueda] = useState('');
   const [seleccionadas, setSeleccionadas] = useState([]);
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(25);
   const nombreMes = new Date(Number(fc10Year), Number(fc10Month) - 1, 1).toLocaleDateString('es-PY', { month: 'long' });
   // Cuántas hay en cada etapa: el trabajo real que falta por hacer.
   const conteo = { pendientes: 0, cerradas: 0, esperaFuncionario: 0, esperaJefe: 0 };
@@ -54,6 +56,10 @@ export default function Fc10View({
     return [fc.funcionarioNombre, fc.funcionarioDoc, fc.id, bien.rotulo, bien.descripcion]
       .filter(Boolean).some(valor => normalizeStr(valor).includes(consulta));
   });
+  const totalPaginas = Math.max(1, Math.ceil(listaVisible.length / porPagina));
+  const actasPagina = useMemo(() => listaVisible.slice((pagina - 1) * porPagina, pagina * porPagina), [listaVisible, pagina, porPagina]);
+  useEffect(() => { setPagina(1); }, [busqueda, filtroEtapa, fc10Year, fc10Month, porPagina]);
+  useEffect(() => { if (pagina > totalPaginas) setPagina(totalPaginas); }, [pagina, totalPaginas]);
   useEffect(() => {
     const idsVigentes = new Set((filteredFC10 || []).map(fc => fc.id));
     setSeleccionadas(prev => {
@@ -64,7 +70,7 @@ export default function Fc10View({
   const alternarSeleccion = (id) => setSeleccionadas(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const seleccionarVisibles = (marcar) => setSeleccionadas(prev => {
     const ids = new Set(prev);
-    listaVisible.forEach(fc => marcar ? ids.add(fc.id) : ids.delete(fc.id));
+    actasPagina.forEach(fc => marcar ? ids.add(fc.id) : ids.delete(fc.id));
     return [...ids];
   });
 
@@ -167,22 +173,23 @@ export default function Fc10View({
               setSelectedMonth={setFc10Month}
               descripcion="Periodo del historial"
               ayuda="Se incluyen actas entregadas o devueltas durante el mes seleccionado."
+              conteosMes={conteosFC10PorMes}
               className="w-full self-end"
             />
           </Toolbar>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line/70 pt-3">
             <label className="inline-flex min-h-10 items-center gap-2 rounded-control px-2 text-label font-semibold text-content-2 cursor-pointer hover:bg-surface-2">
-              <input type="checkbox" checked={listaVisible.length > 0 && listaVisible.every(fc => seleccionadas.includes(fc.id))} onChange={event => seleccionarVisibles(event.target.checked)} aria-label="Seleccionar todas las actas visibles" className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand" />
-              Seleccionar visibles ({listaVisible.length})
+              <input type="checkbox" checked={actasPagina.length > 0 && actasPagina.every(fc => seleccionadas.includes(fc.id))} onChange={event => seleccionarVisibles(event.target.checked)} aria-label="Seleccionar todas las actas de esta página" className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand" />
+              Seleccionar esta página ({actasPagina.length})
             </label>
-            <span className="text-label text-content-3">Las actas seleccionadas se incluirán en un ZIP.</span>
+            <span className="text-label text-content-3">La selección se conserva al cambiar de página y se incluirá en un ZIP.</span>
           </div>
         </div>
       </Card>
       <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Resultados del historial FC-10">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface-2/70 px-4 py-3 sm:px-5">
           <div>
-            <h2 className="text-body font-bold text-content-1">Actas de {nombreMes} {fc10Year}</h2>
+            <h2 className="text-body font-bold text-content-1">Actas de {nombreMes} {fc10Year} <span className="ml-1 inline-flex rounded-full bg-brand-soft px-2 py-0.5 align-middle text-label font-bold text-brand-text">{filteredFC10.length}</span></h2>
             <p className="mt-0.5 text-label text-content-3">El periodo incluye la fecha de entrega o la de devolución.</p>
           </div>
           <div className="relative w-full sm:w-80">
@@ -191,7 +198,7 @@ export default function Fc10View({
             <input id="fc10-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar funcionario, rótulo o bien…" className="h-10 w-full rounded-control border border-line bg-surface-1 pl-9 pr-10 text-body text-content-1 placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
             {busqueda && <button type="button" onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda FC-10" className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-control text-content-3 hover:bg-surface-3 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-xmark text-xs" aria-hidden="true" /></button>}
           </div>
-          <span aria-live="polite" className="w-full text-label font-semibold text-content-3 sm:w-auto">{listaVisible.length} {listaVisible.length === 1 ? 'acta' : 'actas'}</span>
+          <span aria-live="polite" className="w-full text-label font-semibold text-content-3 sm:w-auto">{listaVisible.length} {listaVisible.length === 1 ? 'resultado' : 'resultados'}</span>
         </div>
       <div className="min-h-[280px] p-4 sm:p-6">
         {isLoading ? (
@@ -211,7 +218,7 @@ export default function Fc10View({
           />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {listaVisible.map(fc => {
+            {actasPagina.map(fc => {
               const bien = bienes.find(b=>b.id === fc.bienId) || {};
               const isDevuelto = !!fc.devolucionFecha;
               const estado = estadoInicialFC10(fc);
@@ -391,6 +398,25 @@ export default function Fc10View({
           </div>
         )}
       </div>
+      {!isLoading && listaVisible.length > 0 && (
+        <div className="flex flex-col gap-3 border-t border-line bg-surface-2/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-label text-content-3">
+            <label className="inline-flex items-center gap-2">Por página
+              <select value={porPagina} onChange={e => setPorPagina(Number(e.target.value))} className="h-9 rounded-control border border-line bg-surface-1 px-2 font-semibold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <option value={25}>25</option><option value={50}>50</option>
+              </select>
+            </label>
+            <span aria-live="polite">Mostrando {Math.min((pagina - 1) * porPagina + 1, listaVisible.length)}–{Math.min(pagina * porPagina, listaVisible.length)} de {listaVisible.length}</span>
+          </div>
+          <nav aria-label="Páginas del historial FC-10" className="flex items-center gap-1">
+            <button type="button" onClick={() => setPagina(1)} disabled={pagina === 1} aria-label="Primera página" className="h-9 rounded-control px-3 text-label font-semibold text-content-2 hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-angles-left" aria-hidden="true" /></button>
+            <button type="button" onClick={() => setPagina(p => Math.max(1, p - 1))} disabled={pagina === 1} aria-label="Página anterior" className="h-9 rounded-control px-3 text-label font-semibold text-content-2 hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
+            <span className="min-w-24 px-2 text-center text-label font-semibold text-content-2" aria-live="polite">Página {pagina} de {totalPaginas}</span>
+            <button type="button" onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))} disabled={pagina >= totalPaginas} aria-label="Página siguiente" className="h-9 rounded-control px-3 text-label font-semibold text-content-2 hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
+            <button type="button" onClick={() => setPagina(totalPaginas)} disabled={pagina >= totalPaginas} aria-label="Última página" className="h-9 rounded-control px-3 text-label font-semibold text-content-2 hover:bg-surface-3 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-angles-right" aria-hidden="true" /></button>
+          </nav>
+        </div>
+      )}
       </section>
     </div>
   );

@@ -18,7 +18,7 @@ const MESES = [
  * Usa FiltroCombo en vez de <select> nativo: el popup del navegador se dibuja
  * con los colores del sistema y quedaba ilegible sobre la app oscura.
  */
-export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año', ayuda, className = '' }) {
+export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, setSelectedMonth, descripcion = 'Filtrar por mes y año', ayuda, className = '', conteosMes = {} }) {
   const nombreMes = MESES.find(m => m.val === String(selectedMonth))?.name || 'Seleccionar mes';
   return (
     <div className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(190px,1.15fr)] items-end gap-3 rounded-panel border border-line bg-surface-2/70 p-3 ${className}`} role="group" aria-label={descripcion}>
@@ -33,7 +33,7 @@ export function PeriodSelector({ selectedYear, setSelectedYear, selectedMonth, s
           <FiltroCombo
             compacto
             valor={selectedMonth}
-            opciones={MESES.map(m => ({ label: m.name, value: m.val }))}
+            opciones={MESES.map(m => ({ label: conteosMes[m.val] == null ? m.name : `${m.name} · ${conteosMes[m.val]}`, value: m.val }))}
             onElegir={setSelectedMonth}
             etiquetaTodos="Mes"
             titulo="Elegir mes del periodo"

@@ -41,6 +41,8 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
           <button
             type="button"
             onClick={() => setActivo(!activo)}
+            role="switch"
+            aria-checked={activo}
             className="flex w-full items-center justify-between rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <span className="flex items-center gap-3">
@@ -52,38 +54,51 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               </span>
             </span>
           </button>
+          <div className={`flex items-start gap-3 rounded-xl border p-3 text-xs leading-relaxed ${activo ? 'border-amber-500/30 bg-amber-500/10 text-content-2' : 'border-line bg-surface-2/60 text-content-3'}`}>
+            <i className={`fa-solid ${activo ? 'fa-triangle-exclamation text-amber-500' : 'fa-circle-info text-brand-text'} mt-0.5`} aria-hidden="true" />
+            <p>{activo ? 'Al publicar, las personas sin acceso de desarrollo verán solo la pantalla de mantenimiento. Guarda el aviso antes de activar el bloqueo.' : 'Puedes preparar el mensaje y las mejoras sin bloquear el acceso. El estado actual sigue vigente hasta que publiques.'}</p>
+          </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Título del aviso</label>
+            <label htmlFor="maintenance-title" className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Título del aviso</label>
             <input
+              id="maintenance-title"
               type="text"
+              maxLength={100}
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ej: Estamos mejorando el sistema"
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
             />
+            <p className="text-right text-[10px] text-content-3">{titulo.length}/100</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Mensaje</label>
+            <label htmlFor="maintenance-message" className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Mensaje</label>
             <textarea
+              id="maintenance-message"
               rows={3}
+              maxLength={500}
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
               placeholder="Ej: El acceso está pausado por trabajos programados..."
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
+            <p className="text-right text-[10px] text-content-3">{mensaje.length}/500</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Mejoras en curso (una por línea)</label>
+            <label htmlFor="maintenance-improvements" className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Mejoras en curso (una por línea)</label>
             <textarea
+              id="maintenance-improvements"
               rows={4}
+              maxLength={1200}
               value={mejoras}
               onChange={(e) => setMejoras(e.target.value)}
               placeholder={"Ej:\nNuevo buscador con tildes\nReportes FC más rápidos"}
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
+            <p className="text-right text-[10px] text-content-3">{mejoras.length}/1200</p>
           </div>
         </div>
 
@@ -93,10 +108,10 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
           </button>
           <button
             onClick={() => onSave({ en_mantenimiento: activo, titulo: titulo.trim(), mensaje: mensaje.trim(), mejoras: mejoras.split('\n').map(s => s.trim()).filter(Boolean) })}
-            disabled={isSaving}
+            disabled={isSaving || (activo && (!titulo.trim() || !mensaje.trim()))}
             className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
           >
-            {isSaving ? 'Guardando...' : 'Publicar aviso'}
+            {isSaving ? 'Guardando…' : activo ? 'Activar y publicar aviso' : 'Guardar y publicar aviso'}
           </button>
         </div>
       </div>

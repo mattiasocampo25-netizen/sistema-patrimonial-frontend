@@ -64,7 +64,7 @@ const GRUPOS = [
  * render: desmonta y remonta todo el subarbol, y el clic se pierde si hay un
  * re-render entre que se busca el boton y se lo pulsa (pasaba con FC-04).
  */
-function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
+function ItemNav({ item, activo, onIr, solicitudes, t, compacta, favorito = false, onToggleFavorito }) {
   const [tooltip, setTooltip] = useState(null);
   const ubicarTooltip = (event) => {
     if (!compacta || window.innerWidth < 1024) return;
@@ -73,6 +73,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
   };
   return (
     <>
+    <div className="group/item flex min-w-0 items-center gap-1">
     <button
       type="button"
       onClick={() => onIr(item.id)}
@@ -83,7 +84,7 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
       onFocus={ubicarTooltip}
       onBlur={() => setTooltip(null)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex w-full items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
+      className={`group relative flex min-w-0 flex-1 items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
       <span className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-[var(--dur-fast)] group-hover:scale-110 ${activo ? 'text-brand-text' : 'text-sidebar-content-2 group-hover:text-sidebar-content'}`}>
         <i className={`fa-solid ${item.icon} text-[13px] ${activo ? 'text-white' : ''}`} aria-hidden="true" />
@@ -96,6 +97,8 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta }) {
         </span>
       ) : null}
     </button>
+    {onToggleFavorito && <button type="button" onClick={() => onToggleFavorito(item.id)} aria-label={`${favorito ? 'Quitar de' : 'Agregar a'} favoritos: ${t(item.label)}`} aria-pressed={favorito} title={`${favorito ? 'Quitar de' : 'Agregar a'} favoritos`} className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control text-xs transition-colors hover:bg-brand/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${favorito ? 'text-amber-500' : 'text-sidebar-content-3 hover:text-amber-500'} ${compacta ? 'lg:hidden' : ''}`}><i className={`fa-${favorito ? 'solid' : 'regular'} fa-star`} aria-hidden="true" /></button>}
+    </div>
     {compacta && tooltip && createPortal(
       <span aria-hidden="true" style={{ left: tooltip.left, top: tooltip.top, transform: 'translateY(-50%)' }} className="pointer-events-none fixed z-[100] whitespace-nowrap rounded-lg bg-zinc-950 px-3 py-2 text-xs font-semibold text-white shadow-xl animate-fade-in">
         {t(item.label)}
@@ -149,6 +152,34 @@ export default function AppSidebar({
   const [utilidadesAbiertas, setUtilidadesAbiertas] = useState(true);
   const [gruposAbiertos, setGruposAbiertos] = useState(() => Object.fromEntries(GRUPOS.map(grupo => [grupo.titulo, true])));
   const [desbordes, setDesbordes] = useState({ arriba: false, abajo: false });
+  const [favoritos, setFavoritos] = useState([]);
+  const [favoritosUsuario, setFavoritosUsuario] = useState(null);
+  const usuarioKey = currentUser?.username || currentUser?.id || 'sesion';
+  const itemsPermitidos = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).flatMap(g => g.items);
+  const favoritosVisibles = itemsPermitidos.filter(item => favoritos.includes(item.id));
+
+  useEffect(() => {
+    const key = `sidebar_favoritos_${usuarioKey}`;
+    try {
+      const guardados = JSON.parse(localStorage.getItem(key) || '[]');
+      setFavoritos(Array.isArray(guardados) ? guardados.filter(id => itemsPermitidos.some(item => item.id === id)) : []);
+    } catch { setFavoritos([]); }
+    setFavoritosUsuario(key);
+  // Solo cargar al cambiar la identidad; los permisos se vuelven a aplicar al mostrar.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [usuarioKey]);
+
+  useEffect(() => {
+    if (favoritosUsuario !== `sidebar_favoritos_${usuarioKey}`) return;
+    try { localStorage.setItem(favoritosUsuario, JSON.stringify(favoritos)); } catch { /* preferencia opcional */ }
+  }, [favoritos, favoritosUsuario, usuarioKey]);
+
+  useEffect(() => {
+    const grupoActivo = GRUPOS.find(grupo => grupo.items.some(item => item.id === activeTab));
+    if (grupoActivo) setGruposAbiertos(actuales => actuales[grupoActivo.titulo] ? actuales : { ...actuales, [grupoActivo.titulo]: true });
+  }, [activeTab]);
+
+  const alternarFavorito = (id) => setFavoritos(actuales => actuales.includes(id) ? actuales.filter(item => item !== id) : [...actuales, id]);
 
   useEffect(() => {
     const el = navRef.current;
@@ -247,6 +278,10 @@ export default function AppSidebar({
           ref={navRef}
           className={`flex-1 overflow-y-auto ${compacta ? 'px-3 py-4 space-y-4 lg:px-2 lg:space-y-3' : 'px-3 py-4 space-y-4'} custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
         >
+          {favoritosVisibles.length > 0 && <section className="space-y-1" aria-label="Favoritos">
+            <p className={`px-3 text-[9px] font-bold uppercase tracking-[0.13em] text-sidebar-content-3 ${compacta ? 'lg:hidden' : ''}`}>Favoritos</p>
+            {favoritosVisibles.map(item => <ItemNav key={`fav-${item.id}`} item={item} activo={activeTab === item.id} onIr={irA} solicitudes={solicitudesBaja} t={t} compacta={compacta} favorito onToggleFavorito={alternarFavorito} />)}
+          </section>}
           {GRUPOS.map((grupo) => {
             if (grupo.soloAdmin && !isAdmin) return null;
             if (grupo.soloDesarrollador && !esDesarrollador) return null;
@@ -276,6 +311,8 @@ export default function AppSidebar({
                       solicitudes={solicitudesBaja}
                       t={t}
                       compacta={compacta}
+                      favorito={favoritos.includes(item.id)}
+                      onToggleFavorito={alternarFavorito}
                     />
                   ))}
                 </div> : null}

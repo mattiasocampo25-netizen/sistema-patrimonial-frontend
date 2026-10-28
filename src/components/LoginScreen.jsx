@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { APP_VERSION } from '../utils/helpers';
 import Dialogo from './ui/Dialogo';
 import Button from './ui/Button';
@@ -22,7 +22,25 @@ export default function LoginScreen({
 }) {
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const [showAyudaModal, setShowAyudaModal] = useState(false);
+  const [showPrivacidadModal, setShowPrivacidadModal] = useState(false);
+  const [recordarUsuario, setRecordarUsuario] = useState(() => {
+    try { return Boolean(localStorage.getItem('unp_login_usuario_recordado')); } catch { return false; }
+  });
   const [capsLock, setCapsLock] = useState(false);
+
+  useEffect(() => {
+    try {
+      const guardado = localStorage.getItem('unp_login_usuario_recordado');
+      if (guardado) setLoginUser(guardado);
+    } catch { /* el acceso funciona aunque el almacenamiento esté deshabilitado */ }
+  }, [setLoginUser]);
+
+  useEffect(() => {
+    try {
+      if (recordarUsuario && loginUser.trim()) localStorage.setItem('unp_login_usuario_recordado', loginUser.trim());
+      else if (!recordarUsuario) localStorage.removeItem('unp_login_usuario_recordado');
+    } catch { /* preferencia opcional */ }
+  }, [recordarUsuario, loginUser]);
 
   const detectarCaps = (e) => {
     try { setCapsLock(!!(e.getModifierState && e.getModifierState('CapsLock'))); } catch { /* noop */ }
@@ -121,6 +139,8 @@ export default function LoginScreen({
                     onKeyDown={detectarCaps}
                     required
                     autoComplete="username"
+                    autoCapitalize="none"
+                    spellCheck={false}
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
@@ -129,6 +149,11 @@ export default function LoginScreen({
                   />
                 </div>
               </div>
+
+              <label htmlFor="remember-username" className="inline-flex min-h-8 cursor-pointer items-center gap-2 text-xs font-medium text-content-2">
+                <input id="remember-username" type="checkbox" checked={recordarUsuario} onChange={e => setRecordarUsuario(e.target.checked)} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand" />
+                Recordar mi usuario en este dispositivo <span className="text-content-3">(no guarda la contraseña)</span>
+              </label>
 
               <div className="login-rise login-rise-3 space-y-2 text-left">
                 <div className="flex justify-between items-center">
@@ -187,6 +212,7 @@ export default function LoginScreen({
               >
                 {isProcessing ? 'Verificando…' : 'Acceder'}
               </Button>
+              <p className="-mt-2 text-center text-[11px] leading-relaxed text-content-3">El acceso está limitado a usuarios autorizados. La información del padrón se muestra según tus permisos.</p>
             </form>
           </div>
 
@@ -201,6 +227,7 @@ export default function LoginScreen({
               >
                 Centro de Ayuda
               </Button>
+              <button type="button" onClick={() => setShowPrivacidadModal(true)} className="rounded-control px-2 py-2 text-xs font-semibold text-content-2 hover:bg-surface-3 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Privacidad</button>
               <span className="text-xs font-medium tracking-tight text-content-3">
                 © {new Date().getFullYear()} UNP · v{version}
               </span>
@@ -297,6 +324,19 @@ export default function LoginScreen({
                 Cerrar
               </button>
             </div>
+          </div>
+        </Dialogo>
+      )}
+      {showPrivacidadModal && (
+        <Dialogo className="fixed inset-0 z-[400] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fade-in" onCerrar={() => setShowPrivacidadModal(false)}>
+          <div className="w-full max-w-lg rounded-2xl border border-line bg-surface-1 p-6 text-content-1 shadow-pop animate-slide-up">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-shield-halved" aria-hidden="true" /></span>
+              <div><h3 className="text-lg font-bold">Privacidad y datos personales</h3><p className="mt-2 text-sm leading-relaxed text-content-2">Este sistema utiliza datos de funcionarios para administrar bienes, asignaciones y trazabilidad institucional. Solo deben consultarse y descargarse los datos necesarios para las tareas autorizadas; el acceso queda limitado por permisos.</p></div>
+            </div>
+            <p className="mt-4 rounded-xl border border-line bg-surface-2 p-3 text-xs leading-relaxed text-content-3">Para consultar o solicitar la corrección de información, contacta al área de Patrimonio: <a href="mailto:patrimonio@unp.edu.py?subject=Consulta%20sobre%20datos%20personales" className="font-semibold text-brand-text underline underline-offset-2">patrimonio@unp.edu.py</a>. La Universidad debe completar este aviso con la base legal, los plazos de conservación y el canal formal que establezca su política institucional.</p>
+            <p className="mt-3 text-[11px] leading-relaxed text-content-3">Referencia normativa: Ley N.º 7593/2025 de Protección de Datos Personales, sujeta a su entrada en vigor y reglamentación. Consulta con el área jurídica institucional para el aviso definitivo.</p>
+            <Button variante="primary" className="mt-5 w-full" onClick={() => setShowPrivacidadModal(false)}>Entendido</Button>
           </div>
         </Dialogo>
       )}

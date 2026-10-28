@@ -333,7 +333,18 @@ export function useFcModals({
 
   const openResolucionModal = (bien, accion, notifOrigen = null) => { setResolucionBaja({ bien, accion, notifOrigen }); setMotivoResolucion(""); };
 
-  const openFC10Modal = (bien, fc = null) => { setFc10TargetBien(bien); setFc10Editing(fc); setIsFC10ModalOpen(true); };
+  const openFC10Modal = (bien, fc = null) => {
+    if (!bien?.id) return notify('Selecciona un bien válido para crear el FC-10.', 'warning');
+    if (!fc) {
+      const activo = (fc10List || []).find(item => item.bienId === bien.id && !item.devolucionFecha && estadoInicialFC10(item) !== ESTADOS_FC10.CERRADO);
+      if (activo) {
+        notify(`Este bien ya tiene un FC-10 pendiente (${pendienteDeFirma(activo)?.puesto || 'firmas'}). Revisa el acta existente antes de crear otra.`, 'warning');
+        setActiveTab('fc10');
+        return;
+      }
+    }
+    setFc10TargetBien(bien); setFc10Editing(fc); setIsFC10ModalOpen(true);
+  };
 
   const openFC11Modal = (bien, fc = null) => { setFc11TargetBien(bien); setFc11Editing(fc); setFc11FormNumber(fc ? fc.numeroFormulario : ''); setIsFC11ModalOpen(true); };
 

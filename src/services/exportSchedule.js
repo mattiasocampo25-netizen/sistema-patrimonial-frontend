@@ -17,6 +17,7 @@
 // pesar megabytes y localStorage tiene un límite de ~5 MB que lanzaría
 // QuotaExceededError.
 import localforage from 'localforage';
+import { normalizarSegmentoArchivo } from '../utils/fileNames.js';
 
 const CLAVE_CFG = 'export_programada';
 
@@ -165,7 +166,8 @@ export const construirCSVInventario = (bienes, _dependenciaActual) => {
 };
 
 export const nombreArchivoInventario = (dependenciaActual, formato, sufijo = '') => {
-  const dep = String(dependenciaActual || 'inventario').replace(/\s+/g, '_');
+  const dep = normalizarSegmentoArchivo(dependenciaActual, 'inventario');
   const ext = formato === 'xlsx' ? 'xlsx' : 'csv';
-  return `Reporte_Inventario_${dep}${sufijo ? `_${sufijo}` : ''}_${selloFecha()}.${ext}`;
+  const etiqueta = sufijo ? `_${normalizarSegmentoArchivo(sufijo, 'seleccion')}` : '';
+  return `Inventario_${dep}${etiqueta}_${selloFecha()}.${ext}`;
 };

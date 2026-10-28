@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
@@ -134,6 +135,27 @@ export default function DashboardView({
     catch { return { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true }; }
   });
   const [menuWidgets, setMenuWidgets] = useState(false);
+  const widgetButtonRef = useRef(null);
+  const [widgetMenuStyle, setWidgetMenuStyle] = useState(null);
+  useLayoutEffect(() => {
+    if (!menuWidgets) return undefined;
+    const posicionar = () => {
+      const rect = widgetButtonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const margen = 12;
+      const ancho = Math.min(240, window.innerWidth - margen * 2);
+      const abajo = window.innerHeight - rect.bottom - margen;
+      const arriba = rect.top - margen;
+      const desplegarAbajo = abajo >= 180 || abajo >= arriba;
+      setWidgetMenuStyle({ position: 'fixed', left: Math.min(Math.max(margen, rect.right - ancho), window.innerWidth - ancho - margen), top: desplegarAbajo ? rect.bottom + 8 : undefined, bottom: desplegarAbajo ? undefined : window.innerHeight - rect.top + 8, width: ancho, maxHeight: Math.max(120, Math.min(340, (desplegarAbajo ? abajo : arriba) - 8)), zIndex: 101 });
+    };
+    posicionar();
+    window.addEventListener('resize', posicionar);
+    window.addEventListener('scroll', posicionar, true);
+    const escapar = (event) => { if (event.key === 'Escape') setMenuWidgets(false); };
+    document.addEventListener('keydown', escapar);
+    return () => { window.removeEventListener('resize', posicionar); window.removeEventListener('scroll', posicionar, true); document.removeEventListener('keydown', escapar); };
+  }, [menuWidgets]);
   const alternarWidget = (k) => {
     setWidgets(prev => {
       const n = { ...prev, [k]: !prev[k] };
@@ -242,16 +264,17 @@ export default function DashboardView({
         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           <div className="relative">
             <button
+              ref={widgetButtonRef}
               onClick={() => setMenuWidgets(v => !v)}
               title="Personalizar panel" aria-label="Personalizar panel"
               className="flex items-center gap-2 h-11 px-4 rounded-card bg-surface-1 dark:bg-surface-1/5 border border-line/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-2 dark:hover:bg-surface-1/10 motion cursor-pointer"
             >
               <i className="fa-solid fa-sliders text-xs"></i> <span className="hidden sm:inline">Personalizar</span>
             </button>
-            {menuWidgets && (
+            {menuWidgets && widgetMenuStyle && createPortal(
               <>
-                <div className="fixed inset-0 z-40" onClick={() => setMenuWidgets(false)}></div>
-                <div className="absolute right-0 z-50 mt-1.5 w-52 rounded-card border border-line bg-surface-1 shadow-pop p-1.5 animate-pop">
+                <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)}></button>
+                <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
                   <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
                   {WIDGETS.map(([k, label]) => (
                     <button
@@ -265,7 +288,7 @@ export default function DashboardView({
                     </button>
                   ))}
                 </div>
-              </>
+              </>, document.body
             )}
           </div>
           <div className="flex items-center gap-2.5 rounded-card bg-surface-1 dark:bg-surface-1/5 px-4 py-2.5 border border-line/80 dark:border-white/10 shadow-sm">

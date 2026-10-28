@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import {
@@ -13,11 +13,13 @@ export default function Fc10View({
   filteredFC10, fc10Year, setFc10Year, fc10Month, setFc10Month,
   setIsConsolidatedFC10ModalOpen, handleExportFC10CSV,
   isLoading, bienes, handleGenerateFC10PDF, openFC10Modal,
+  handleBulkFC10Zip,
   isAdmin, setItemToDelete, setActiveTab, registrarFirmaFC10, registrarAmbasFirmas, firmandoId,
   ponerFC10EnTramite, poniendoEnTramite,
   actualizarEstadoFirma, currentUser
 }) {
   const [busqueda, setBusqueda] = useState('');
+  const [seleccionadas, setSeleccionadas] = useState([]);
   const nombreMes = new Date(Number(fc10Year), Number(fc10Month) - 1, 1).toLocaleDateString('es-PY', { month: 'long' });
   // Cuántas hay en cada etapa: el trabajo real que falta por hacer.
   const conteo = { pendientes: 0, cerradas: 0, esperaFuncionario: 0, esperaJefe: 0 };
@@ -52,6 +54,19 @@ export default function Fc10View({
     return [fc.funcionarioNombre, fc.funcionarioDoc, fc.id, bien.rotulo, bien.descripcion]
       .filter(Boolean).some(valor => normalizeStr(valor).includes(consulta));
   });
+  useEffect(() => {
+    const idsVigentes = new Set((filteredFC10 || []).map(fc => fc.id));
+    setSeleccionadas(prev => {
+      const next = prev.filter(id => idsVigentes.has(id));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [filteredFC10]);
+  const alternarSeleccion = (id) => setSeleccionadas(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const seleccionarVisibles = (marcar) => setSeleccionadas(prev => {
+    const ids = new Set(prev);
+    listaVisible.forEach(fc => marcar ? ids.add(fc.id) : ids.delete(fc.id));
+    return [...ids];
+  });
 
   // =========================================================================
   // ESTADO DE FIRMAS FC-10 (solo administrador)
@@ -70,6 +85,8 @@ export default function Fc10View({
 
   const handleCambiarEstadoFirma = async (fc, nuevoEstado) => {
     if (!puedeGestionarFirmas) return;
+    const estadoActual = estadoInicialFC10(fc);
+    if (nuevoEstado !== estadoActual && !window.confirm(`Cambiar el estado de firma de ${ESTADO_INFO[estadoActual]?.corto || estadoActual} a ${ESTADO_INFO[nuevoEstado]?.corto || nuevoEstado}. Esta acción quedará registrada en auditoría.`)) return;
     setCambiandoEstado(prev => ({ ...prev, [fc.id]: true }));
     try {
       await actualizarEstadoFirma(fc.id, { estadoFirma: nuevoEstado, registradoPor: currentUser?.username || 'admin' });
@@ -120,6 +137,9 @@ export default function Fc10View({
                 >
                   Exportar año
                 </Button>
+                <Button variante="primary" icono="fa-file-zipper" disabled={!seleccionadas.length || !handleBulkFC10Zip} onClick={() => handleBulkFC10Zip(filteredFC10.filter(fc => seleccionadas.includes(fc.id)))} title="Descargar las actas seleccionadas en un ZIP">
+                  ZIP {seleccionadas.length ? `(${seleccionadas.length})` : ''}
+                </Button>
               </>
             }
           />
@@ -150,6 +170,13 @@ export default function Fc10View({
               className="w-full self-end"
             />
           </Toolbar>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line/70 pt-3">
+            <label className="inline-flex min-h-10 items-center gap-2 rounded-control px-2 text-label font-semibold text-content-2 cursor-pointer hover:bg-surface-2">
+              <input type="checkbox" checked={listaVisible.length > 0 && listaVisible.every(fc => seleccionadas.includes(fc.id))} onChange={event => seleccionarVisibles(event.target.checked)} aria-label="Seleccionar todas las actas visibles" className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand" />
+              Seleccionar visibles ({listaVisible.length})
+            </label>
+            <span className="text-label text-content-3">Las actas seleccionadas se incluirán en un ZIP.</span>
+          </div>
         </div>
       </Card>
       <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Resultados del historial FC-10">
@@ -203,6 +230,9 @@ export default function Fc10View({
                       <div className="flex justify-between items-start gap-2 mb-4">
                           <div className="flex flex-col gap-1.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
+                                  <label className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-control hover:bg-surface-2 cursor-pointer" title="Incluir acta en descarga ZIP">
+                                    <input type="checkbox" checked={seleccionadas.includes(fc.id)} onChange={() => alternarSeleccion(fc.id)} aria-label={`Seleccionar FC-10 de ${fc.funcionarioNombre || 'responsable'}`} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand" />
+                                  </label>
                                   {isDevuelto ? (
                                       <span className="inline-flex w-fit items-center rounded-lg bg-surface-3 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-content-3 dark:bg-surface-1/10 dark:text-content-3">
                                           Devuelto
@@ -221,10 +251,10 @@ export default function Fc10View({
                           </div>
                           <div className="flex gap-1 shrink-0 rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 p-1">
                               <button onClick={()=>handleGenerateFC10PDF([fc], [bien], { vistaPrevia: true })} className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Previsualizar acta PDF" aria-label="Previsualizar acta PDF"><i className="fa-solid fa-eye text-xs"></i></button>
-                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Imprimir acta" aria-label="Imprimir acta"><i className="fa-solid fa-print text-xs"></i></button>
+                              <button onClick={()=>handleGenerateFC10PDF([fc], [bien])} className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Descargar acta" aria-label="Descargar acta"><i className="fa-solid fa-download text-xs"></i></button>
                               <button onClick={() => openFC10Modal(bien, fc)} className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-content-3 hover:text-content-1 hover:bg-surface-1 dark:hover:text-white dark:hover:bg-surface-1/10 shadow-sm motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none" title="Editar acta" aria-label="Editar acta"><i className="fa-solid fa-pen-to-square text-xs"></i></button>
                               {isAdmin && (
-                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
+                                  <button onClick={()=>setItemToDelete({type:'fc10', id:fc.id, bienId:bien.id, item: { ...fc, bienRotulo: bien?.rotulo, bienDescripcion: bien?.descripcion }})} className="flex h-11 w-11 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none" title="Eliminar acta" aria-label="Eliminar acta"><i className="fa-solid fa-trash-can text-xs"></i></button>
                               )}
                           </div>
                       </div>
@@ -287,8 +317,12 @@ export default function Fc10View({
                           <p className="text-[11px] font-semibold text-emerald-900 dark:text-emerald-200 leading-snug">
                             Si recibiste el PDF con las dos firmas, confirma aquí su recepción.
                           </p>
+                          <p className="text-[10px] text-content-2 dark:text-content-3">El sistema aún espera: {pendiente.nombre || pendiente.puesto} ({pendiente.puesto}).</p>
                           <button
-                            onClick={() => registrarAmbasFirmas(fc)}
+                            onClick={() => {
+                              const confirmar = window.confirm(`Vas a registrar las dos firmas del FC-10 de ${fc.funcionarioNombre || 'este responsable'} como recibidas y cerrar el acta. Confirma solo si revisaste el PDF firmado.`);
+                              if (confirmar) registrarAmbasFirmas(fc);
+                            }}
                             disabled={estaFirmando}
                             title="Confirmar que el PDF regresó con ambas firmas"
                             className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 shadow-sm shadow-emerald-500/25"
@@ -306,7 +340,10 @@ export default function Fc10View({
                           </summary>
                           <p className="mt-2 text-[10px] text-content-3">Firma de {pendiente.puesto}: {pendiente.nombre || 'sin nombre registrado'}</p>
                           <button
-                            onClick={() => registrarFirmaFC10(fc)}
+                            onClick={() => {
+                              const confirmar = window.confirm(`Vas a registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto} en el FC-10 de ${fc.funcionarioNombre || 'este responsable'}. Esta acción quedará en el historial.`);
+                              if (confirmar) registrarFirmaFC10(fc);
+                            }}
                             disabled={estaFirmando}
                             title={`Registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto}`}
                             className="mt-2 w-full inline-flex min-h-10 items-center justify-center gap-2 rounded-control px-3 py-2 text-body font-semibold leading-tight text-content-2 bg-surface-2 hover:bg-surface-3 motion active:scale-[0.98] cursor-pointer disabled:opacity-60 border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"

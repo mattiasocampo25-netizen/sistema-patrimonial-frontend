@@ -17,7 +17,7 @@ export default function AuditoriaView({
   muestra, verificadosMuestra, setVerificadosMuestra, generarMuestra,
   guardarActaMuestreo, descargarActaMuestreoPDF,
   totalAud, paginaAud, alcanceAud, setAlcanceAud, searchAud, setSearchAud,
-  filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, accionesUnicasAud, auditoriaList,
+  filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, accionesUnicasAud, auditoriaList,
   actorAud, tonoAccionAud, detalleAudCorto
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
@@ -334,6 +334,15 @@ export default function AuditoriaView({
             titulo="Filtrar por usuario"
             ancho="max-w-[220px]"
           />
+          <label className="flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">
+            Desde
+            <input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Auditoría desde la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />
+          </label>
+          <label className="flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">
+            Hasta
+            <input type="date" value={hastaAud} min={desdeAud || undefined} onChange={event => setHastaAud(event.target.value)} aria-label="Auditoría hasta la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />
+          </label>
+          {(desdeAud || hastaAud) && <button type="button" onClick={() => { setDesdeAud(''); setHastaAud(''); }} className="min-h-10 rounded-control px-3 text-label font-bold text-content-3 hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Limpiar fechas</button>}
         </div>
         <div className="overflow-x-auto custom-scrollbar">
           <Table sinContenedor minWidth={false} className="w-full text-left border-collapse min-w-[720px]">

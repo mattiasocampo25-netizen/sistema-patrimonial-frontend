@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { aplicarSeleccionRango, construirLinkInventario, detectarBienesSimilares, idsEntre } from '../src/utils/inventarioInteracciones.js';
+import { fechaParaArchivo, nombreFC10Archivo, normalizarSegmentoArchivo } from '../src/utils/fileNames.js';
+
+test('los nombres sugeridos de descargas son legibles, seguros y conservan fecha local ISO', () => {
+  assert.equal(normalizarSegmentoArchivo('Área: Dirección/Académica'), 'Area_Direccion_Academica');
+  assert.equal(fechaParaArchivo('2026-10-28'), '2026-10-28');
+  assert.equal(nombreFC10Archivo({ funcionarioNombre: 'José Pérez', bienRotulo: 'UNP/123', entregadoFecha: '2026-10-28' }), 'FC10_Acta_Jose_Perez_UNP_123_2026-10-28.pdf');
+});
 
 test('el link compartido abre inventario y conserva filtros y fragmento', () => {
   const enlace = construirLinkInventario('https://ejemplo.test/app?q=notebook&estado=Bueno#inventario');

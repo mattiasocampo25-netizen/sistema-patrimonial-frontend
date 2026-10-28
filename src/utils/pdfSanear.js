@@ -1,3 +1,5 @@
+import { solicitarNombreArchivo } from './fileNames.js';
+
 // ============================================================================
 // SANEADO DE LOS PDF: que Acrobat no salga con el "Informe de integridad del
 // aspecto" lleno de avisos.
@@ -397,16 +399,17 @@ function limpiarFuentesNoUsadasBytes(datos, usadas) {
  * Se usa en vez de doc.save() para poder pasar los bytes por el saneado.
  */
 export function guardarPDF(doc, nombreArchivo) {
+  const nombreElegido = solicitarNombreArchivo(nombreArchivo);
   const buffer = doc.output('arraybuffer');
   const limpio = sanearPDF(buffer);
   const blob = new Blob([limpio], { type: 'application/pdf' });
   if (window.saveAs) {
-    window.saveAs(blob, nombreArchivo);
+    window.saveAs(blob, nombreElegido);
   } else {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = nombreArchivo;
+    a.download = nombreElegido;
     document.body.appendChild(a);
     a.click();
     a.remove();

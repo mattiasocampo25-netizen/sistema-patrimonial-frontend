@@ -11,6 +11,7 @@ import {
 } from '../utils/pdfGenerators';
 import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
+import { fechaParaArchivo, nombreFC10Archivo, normalizarSegmentoArchivo, solicitarNombreArchivo } from '../utils/fileNames.js';
 
 // Handlers de PDFs, QR, CSV, Excel y backup (extraídos de App.jsx, Fase 6).
 // Funciones de presentación: reciben todo por parámetros, sin estado propio.
@@ -115,9 +116,10 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
     setTimeout(async () => {
       try {
-        const cleanDepName = dependenciaActual.replace(/\s+/g, '_');
+        const cleanDepName = normalizarSegmentoArchivo(dependenciaActual, 'dependencia');
         const zip = new window.JSZip();
         const folder = zip.folder(`Etiquetas_Completas_${cleanDepName}`);
+        const nombresEnZip = new Set();
         
         const CHUNK_SIZE = 8;
         const totalBienes = objetivos.length;
@@ -133,7 +135,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
           const results = await Promise.all(
             chunk.map(async (bien) => {
-              const dataUrl = await generateProfessionalLabelPNG(bien, appLogo);
+              const dataUrl = await generateProfessionalLabelPNG(bien, appLogo, true);
               return { bien, dataUrl };
             })
           );
@@ -141,8 +143,11 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
           results.forEach(({ bien, dataUrl }) => {
             if (dataUrl) {
               const rotuloSeguro = bien.rotulo ? String(bien.rotulo) : 'S-R';
-              const cleanRotulo = rotuloSeguro.replace(/[^a-zA-Z0-9]/g, '');
-              folder.file(`Etiqueta_${cleanRotulo}.png`, dataUrl.replace(/^data:image\/png;base64,/, ""), { base64: true });
+              const cleanRotulo = normalizarSegmentoArchivo(rotuloSeguro, 'sin_rotulo');
+              let nombre = `Etiqueta_${cleanRotulo}`;
+              if (nombresEnZip.has(nombre)) nombre += `_${normalizarSegmentoArchivo(bien.id, String(nombresEnZip.size + 1))}`;
+              nombresEnZip.add(nombre);
+              folder.file(`${nombre}.png`, dataUrl.replace(/^data:image\/png;base64,/, ""), { base64: true });
             }
           });
         }
@@ -151,7 +156,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         const content = await zip.generateAsync({ type: "blob" });
 
         if (window.saveAs) {
-          window.saveAs(content, `Etiquetas_Patrimoniales_${cleanDepName}_${new Date().toISOString().split('T')[0]}.zip`);
+          window.saveAs(content, solicitarNombreArchivo(`Etiquetas_Patrimoniales_${cleanDepName}_${fechaParaArchivo()}.zip`));
         }
         
         try {
@@ -186,9 +191,10 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
     setTimeout(async () => {
       try {
-        const cleanDepName = dependenciaActual.replace(/\s+/g, '_');
+        const cleanDepName = normalizarSegmentoArchivo(dependenciaActual, 'dependencia');
         const zip = new window.JSZip();
         const folder = zip.folder(`QRs_Simples_${cleanDepName}`);
+        const nombresEnZip = new Set();
         
         const CHUNK_SIZE = 10;
         const totalBienes = objetivos.length;
@@ -204,7 +210,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
           const results = await Promise.all(
             chunk.map(async (bien) => {
-              const dataUrl = await generateSimpleQR(bien);
+              const dataUrl = await generateSimpleQR(bien, true);
               return { bien, dataUrl };
             })
           );
@@ -212,8 +218,11 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
           results.forEach(({ bien, dataUrl }) => {
             if (dataUrl) {
               const rotuloSeguroQR = bien.rotulo ? String(bien.rotulo) : 'S-R';
-              const cleanRotulo = rotuloSeguroQR.replace(/[^a-zA-Z0-9]/g, '');
-              folder.file(`QR_${cleanRotulo}.png`, dataUrl.replace(/^data:image\/png;base64,/, ""), { base64: true });
+              const cleanRotulo = normalizarSegmentoArchivo(rotuloSeguroQR, 'sin_rotulo');
+              let nombre = `QR_${cleanRotulo}`;
+              if (nombresEnZip.has(nombre)) nombre += `_${normalizarSegmentoArchivo(bien.id, String(nombresEnZip.size + 1))}`;
+              nombresEnZip.add(nombre);
+              folder.file(`${nombre}.png`, dataUrl.replace(/^data:image\/png;base64,/, ""), { base64: true });
             }
           });
         }
@@ -222,7 +231,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         const content = await zip.generateAsync({ type: "blob" });
 
         if (window.saveAs) {
-          window.saveAs(content, `QRs_Simples_${cleanDepName}_${new Date().toISOString().split('T')[0]}.zip`);
+          window.saveAs(content, solicitarNombreArchivo(`QRs_Simples_${cleanDepName}_${fechaParaArchivo()}.zip`));
         }
         
         try {
@@ -333,15 +342,14 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     setTimeout(async () => {
       try {
         const { doc, fechaDocumento, fc } = await buildFC10PDFDoc(fcs, bienesAListar);
-        const cleanFunc = (fc.funcionarioNombre || 'SR').replace(/\s+/g, '_'); 
-        const nombreArchivo = `FC10_Asignacion_${cleanFunc}_${fechaDocumento}.pdf`;
+        const nombreSugerido = nombreFC10Archivo(fc, fechaDocumento);
         if (opciones.vistaPrevia) {
           const url = URL.createObjectURL(doc.output('blob'));
           ventanaPrevia.location.href = url;
           notify('Vista previa del FC-10 abierta.', 'success');
           setTimeout(() => URL.revokeObjectURL(url), 10 * 60 * 1000);
         } else {
-          guardarPDF(doc, nombreArchivo);
+          guardarPDF(doc, nombreSugerido);
           notify("Reporte PDF FC-10 generado", "success");
         }
       } catch(e) { 
@@ -351,6 +359,45 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         setIsProcessing({ active: false, text: '' }); 
       }
     }, 100);
+  };
+
+  const handleBulkFC10Zip = async (fcsSeleccionados = []) => {
+    const lista = Array.isArray(fcsSeleccionados) ? fcsSeleccionados : [];
+    if (!lista.length) return notify('Selecciona al menos un FC-10.', 'warning');
+    if (!window.JSZip) return notify('No está disponible el generador ZIP. Recarga e inténtalo de nuevo.', 'error');
+    return conCerrojo(async () => {
+      setIsProcessing({ active: true, text: `Preparando ${lista.length} actas FC-10...` });
+      try {
+        const zip = new window.JSZip();
+        const usados = new Set();
+        for (const fc of lista) {
+          const bien = bienes.find(item => item.id === fc.bienId) || {};
+          const { doc } = await buildFC10PDFDoc([fc], [bien]);
+          const nombreBase = nombreFC10Archivo({ ...fc, bienRotulo: bien.rotulo }, fc.entregadoFecha || fc.fechaGeneracion);
+          const nombre = nombreBase.replace(/\.pdf$/i, '');
+          const unico = usados.has(nombre) ? `${nombre}_${normalizarSegmentoArchivo(fc.id, String(usados.size + 1))}` : nombre;
+          usados.add(nombre);
+          zip.file(`${unico}.pdf`, doc.output('blob'));
+        }
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const sugerido = `FC10_Actas_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.zip`;
+        const nombre = solicitarNombreArchivo(sugerido);
+        if (!nombre) { notify('Descarga cancelada.', 'info'); return; }
+        if (window.saveAs) window.saveAs(blob, nombre);
+        else {
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url; anchor.download = nombre; anchor.click();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }
+        notify(`${lista.length} actas FC-10 descargadas en un ZIP.`, 'success');
+      } catch (error) {
+        console.error('No se pudo preparar el lote de FC-10:', error);
+        notify('No se pudo preparar el ZIP de FC-10.', 'error');
+      } finally {
+        setIsProcessing({ active: false, text: '' });
+      }
+    });
   };
 
   const handleGenerateConsolidatedFC10PDF = (funcionarioNombreSeleccionado, fechaDesde, fechaHasta) => {
@@ -423,7 +470,10 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      if (window.saveAs) window.saveAs(blob, `Reporte_FC10_${dependenciaActual.replace(/\s+/g, '_')}_${fc10Year}.csv`);
+      if (window.saveAs) {
+        const nombre = solicitarNombreArchivo(`FC10_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`);
+        if (nombre) window.saveAs(blob, nombre);
+      }
       setIsProcessing({ active: false, text: '' });
       notify(`Reporte Excel FC-10 (${fc10Year}) descargado`, "success");
     }, 100);
@@ -459,7 +509,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      if (window.saveAs) window.saveAs(blob, `Reporte_FC11_${dependenciaActual.replace(/\s+/g, '_')}_${fc10Year}.csv`);
+      if (window.saveAs) window.saveAs(blob, solicitarNombreArchivo(`FC11_Reporte_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fc10Year}.csv`));
       setIsProcessing({ active: false, text: '' });
       notify(`Reporte Excel FC-11 (${fc10Year}) descargado`, "success");
     }, 100);
@@ -544,12 +594,12 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       const fechaStr = new Date().toISOString().split("T")[0];
       
       if (window.saveAs) {
-        window.saveAs(blob, `BACKUP_SISTEMA_PATRIMONIAL_UNP_${fechaStr}.json`);
+        window.saveAs(blob, solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`));
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `BACKUP_SISTEMA_PATRIMONIAL_UNP_${fechaStr}.json`;
+        a.download = solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`);
         a.click();
         // Con margen: revocar en el mismo tick puede cancelar la descarga en
         // Safari (el blob todavía se está leyendo).
@@ -594,7 +644,11 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               csvContent += row.join(';') + "\r\n";
           });
           const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          if (window.saveAs) window.saveAs(blob, `Inventario${registros.length !== filteredBienes.length ? '_Seleccion' : ''}_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`);
+          if (window.saveAs) {
+            const sufijo = registros.length !== filteredBienes.length ? '_Seleccion' : '';
+            const nombre = solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
+            if (nombre) window.saveAs(blob, nombre);
+          }
           setIsProcessing({ active: false, text: '' });
           notify("Reporte Excel descargado exitosamente", "success");
       }, 100);
@@ -637,7 +691,8 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               ws2['!cols'] = [{ wch: 28 }, { wch: 34 }];
               window.XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
               window.XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
-              window.XLSX.writeFile(wb, `Inventario_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
+              const nombre = solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.xlsx`);
+              if (nombre) window.XLSX.writeFile(wb, nombre);
               notify("Excel generado exitosamente", "success");
           } catch {
               notify("Error al generar el Excel.", "error");
@@ -657,7 +712,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   return {
     marcarBienConQR, handleDownloadLabelPNG, handleDownloadSimpleQR,
     handleBulkLabelPNGZip, handleBulkSimpleQRZip,
-    handleGenerateFC04PDF, handleGenerateFC11PDF, handleGenerateFC10PDF,
+    handleGenerateFC04PDF, handleGenerateFC11PDF, handleGenerateFC10PDF, handleBulkFC10Zip,
     handleGenerateConsolidatedFC10PDF, handleExportFC10CSV, handleExportFC11CSV,
     handleDownloadTemplateCSV, handleExportBackupGeneral,
     handleExportInventarioCSV, handleExportInventarioExcel,

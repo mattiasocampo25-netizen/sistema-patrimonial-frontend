@@ -219,6 +219,10 @@ const valorOrgExplicito = (campo) => {
         doc: fc10Editing?.jefeInmediatoDoc || '',
         cargo: fc10Editing?.jefeInmediatoCargo || ''
     });
+    const firmantesCoinciden = Boolean(
+        (funcData.doc && jefeData.doc && normalizeStr(funcData.doc) === normalizeStr(jefeData.doc)) ||
+        (funcData.nombre && jefeData.nombre && normalizeStr(funcData.nombre) === normalizeStr(jefeData.nombre))
+    );
     // Guardia anti-doble-clic: los botones Siguiente/Confirmar ocupan el mismo
     // lugar; sin esto un doble clic salta del paso 2 al guardado sin ver el 3.
     // bloqueoRef es síncrono (el state tarda un render en aplicarse y no frena
@@ -623,6 +627,7 @@ const valorOrgExplicito = (campo) => {
                                                     placeholder="Buscar en el padron..."
                                                     requerido
                                                 />
+                                                {firmantesCoinciden && <p role="status" className="mt-1.5 rounded-control border border-warn/25 bg-warn-soft px-2.5 py-2 text-[10px] font-semibold text-warn">El funcionario y la jefatura parecen ser la misma persona. Verifica los datos antes de continuar.</p>}
                                                 {jefeData.nombre.trim() !== '' && (
                                                     <p className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-bold ${jefeConDatos ? 'text-ok dark:text-emerald-400' : jefeEnPadron ? 'text-warn dark:text-amber-400' : 'text-content-3 dark:text-content-3'}`}>
                                                         <i className={`fa-solid ${jefeConDatos ? 'fa-circle-check' : jefeEnPadron ? 'fa-triangle-exclamation' : 'fa-circle-info'} text-[9px]`}></i>

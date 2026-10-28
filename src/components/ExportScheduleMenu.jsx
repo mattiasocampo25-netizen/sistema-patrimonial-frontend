@@ -8,7 +8,8 @@
 //   - ver y descargar los archivos que quedaron "pendientes" de sesiones
 //     anteriores (generados al abrir la app cuando ya había vencido el plazo).
 // ============================================================================
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   FRECUENCIAS, FORMATOS, obtenerProgramacion, guardarProgramacion,
   listarPendientes, descargarPendiente, descartarPendiente
@@ -16,6 +17,9 @@ import {
 
 export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
   const [abierto, setAbierto] = useState(false);
+  const botonRef = useRef(null);
+  const panelRef = useRef(null);
+  const [panelStyle, setPanelStyle] = useState(null);
   const [cfg, setCfg] = useState(() => obtenerProgramacion() || { frecuencia: 'manual', formato: 'csv', ultimaEjecucion: 0 });
   const [pendientes, setPendientes] = useState([]);
 
@@ -30,9 +34,30 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
   const activa = cfg.frecuencia && cfg.frecuencia !== 'manual';
   const etiquetaFrecuencia = FRECUENCIAS.find(f => f.id === cfg.frecuencia)?.label || 'Manual';
 
+  useLayoutEffect(() => {
+    if (!abierto) return undefined;
+    const posicionar = () => {
+      const rect = botonRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const margen = 12;
+      const ancho = Math.min(320, window.innerWidth - margen * 2);
+      const abajo = window.innerHeight - rect.bottom - margen;
+      const arriba = rect.top - margen;
+      const desplegarAbajo = abajo >= 260 || abajo >= arriba;
+      setPanelStyle({ position: 'fixed', left: Math.min(Math.max(margen, rect.right - ancho), window.innerWidth - ancho - margen), top: desplegarAbajo ? rect.bottom + 8 : undefined, bottom: desplegarAbajo ? undefined : window.innerHeight - rect.top + 8, width: ancho, maxHeight: Math.max(160, Math.min(520, (desplegarAbajo ? abajo : arriba) - 8)), zIndex: 101 });
+    };
+    posicionar();
+    window.addEventListener('resize', posicionar);
+    window.addEventListener('scroll', posicionar, true);
+    const escapar = (event) => { if (event.key === 'Escape') setAbierto(false); };
+    document.addEventListener('keydown', escapar);
+    return () => { window.removeEventListener('resize', posicionar); window.removeEventListener('scroll', posicionar, true); document.removeEventListener('keydown', escapar); };
+  }, [abierto]);
+
   return (
     <div className="relative shrink-0">
       <button
+        ref={botonRef}
         onClick={() => setAbierto(v => !v)}
         disabled={disabled}
         title="Exportación programada"
@@ -47,10 +72,10 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
         )}
       </button>
 
-      {abierto && (
+      {abierto && panelStyle && createPortal(
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setAbierto(false)}></div>
-          <div className="absolute right-0 z-50 mt-1.5 w-72 rounded-card border border-line dark:border-zinc-700 bg-surface-1 dark:bg-surface-1 shadow-xl p-3 animate-pop">
+          <button type="button" aria-label="Cerrar programación de exportación" className="fixed inset-0 z-[100] cursor-default" onClick={() => setAbierto(false)}></button>
+          <div ref={panelRef} style={panelStyle} role="dialog" aria-label="Exportación programada" className="overflow-y-auto overscroll-contain rounded-card border border-line dark:border-zinc-700 bg-surface-1 p-3 text-content-1 shadow-pop animate-pop">
             <p className="px-1 pb-2 text-[10px] font-bold uppercase tracking-widest text-content-3 flex items-center gap-1.5">
               <i className="fa-solid fa-calendar-clock"></i> Exportación programada
             </p>
@@ -133,7 +158,7 @@ export default function ExportScheduleMenu({ onEjecutarAhora, disabled }) {
               </div>
             )}
           </div>
-        </>
+        </>, document.body
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 import { aplanarImagen } from './pdfSanear';
+import { normalizarSegmentoArchivo, solicitarNombreArchivo } from './fileNames.js';
 
 // Nota: 'qrcode' (npm) se importa dinámicamente dentro de cada función que lo
 // usa, para no inflar el bundle inicial.
@@ -487,7 +488,7 @@ export const generateProfessionalLabelPNG = async (bien, logoUrl, returnOnly = f
 
     const link = document.createElement('a');
     link.href = dataUrl;
-    link.download = `Etiqueta_${bien.rotulo || 'patrimonio'}.png`;
+    link.download = solicitarNombreArchivo(`Etiqueta_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
     link.click();
     return dataUrl;
 };
@@ -516,7 +517,7 @@ export const generateSimpleQR = async (bien, returnOnly = false) => {
 
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `QR_${bien.rotulo || 'patrimonio'}.png`;
+        link.download = solicitarNombreArchivo(`QR_${normalizarSegmentoArchivo(bien.rotulo, 'patrimonio')}.png`);
         link.click();
         return dataUrl;
     } catch (e) {

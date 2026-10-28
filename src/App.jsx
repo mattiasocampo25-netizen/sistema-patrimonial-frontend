@@ -1596,7 +1596,9 @@ if (publicBienId) {
         
       </div>
 
-      {isProcessing.active && (
+      {/* El cuadro para confirmar el nombre de descarga debe quedar accesible
+          por encima del indicador global de generación. */}
+      {isProcessing.active && !solicitudNombreArchivo && (
         <div className="fixed inset-0 bg-surface-1/80 dark:bg-black/80 backdrop-blur-sm z-[500] flex flex-col items-center justify-center animate-fade-in">
           <div className="proc-track"><div className={`proc-fill ${isProcessing.pct == null ? 'indete' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined}></div></div>
           <i className="fa-solid fa-circle-notch fa-spin text-4xl text-brand-text mb-4"></i>

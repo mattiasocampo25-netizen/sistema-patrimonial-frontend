@@ -36,6 +36,15 @@ body {
   overflow: hidden;
 } 
 
+/* Preferencia de densidad para consultar más filas sin cambiar la escala global. */
+html.density-compact table th,
+html.density-compact table td {
+  padding-block: 0.4rem;
+  font-size: 0.78rem;
+}
+
+html.density-compact table th { letter-spacing: 0.035em; }
+
 /* El fondo lo pone el token --canvas, que ya cambia con el tema. */
 
 

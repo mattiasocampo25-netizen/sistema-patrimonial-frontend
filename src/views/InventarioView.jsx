@@ -562,6 +562,9 @@ export default function InventarioView({
                         <button onClick={() => setMostrarAsignacionMasiva(true)} title="Asignar responsable o ubicación a los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-user-gear text-[11px]"></i> Asignar
                         </button>
+                        {openFC11Modal && <button onClick={() => openFC11Modal(filteredBienes.filter(item => seleccionados.includes(item.id)))} title="Crear un FC-11 único para todos los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
+                          <i className="fa-solid fa-truck-fast text-[11px]"></i> FC-11 ({seleccionados.length})
+                        </button>}
                         <button onClick={() => onExportarSeleccion?.('csv')} title="Exportar bienes seleccionados a CSV" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-file-csv text-[11px]"></i> Exportar
                         </button>

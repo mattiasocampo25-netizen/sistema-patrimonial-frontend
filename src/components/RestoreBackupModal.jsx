@@ -88,7 +88,7 @@ export default function RestoreBackupModal({ restore }) {
             <input
               ref={fileRef}
               type="file"
-              accept=".json,application/json"
+              accept=".json,.gz,application/json,application/gzip"
               disabled={ejecutando}
               onChange={(e) => manejarArchivo(e.target.files?.[0])}
               className="block w-full cursor-pointer rounded-control border border-line bg-surface-2/50 text-xs font-medium text-content-1 dark:border-white/10 dark:bg-surface-1/5 dark:text-zinc-200 focus:border-brand focus:outline-none disabled:opacity-50"

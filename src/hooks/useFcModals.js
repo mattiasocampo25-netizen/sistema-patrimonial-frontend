@@ -347,7 +347,16 @@ export function useFcModals({
     setFc10TargetBien(bien); setFc10Editing(fc); setIsFC10ModalOpen(true);
   };
 
-  const openFC11Modal = (bien, fc = null) => { setFc11TargetBien(bien); setFc11Editing(fc); setFc11FormNumber(fc ? fc.numeroFormulario : ''); setIsFC11ModalOpen(true); };
+  const openFC11Modal = (bien, fc = null) => {
+    const bienesFC11 = Array.isArray(bien) ? bien.filter(item => item?.id) : (bien?.id ? [bien] : []);
+    if (!bienesFC11.length) return notify('Selecciona uno o más bienes válidos para generar el FC-11.', 'warning');
+    const dependencias = new Set(bienesFC11.map(item => normalizeStr(item.dependencia)));
+    if (dependencias.size > 1) return notify('Todos los bienes del FC-11 deben pertenecer a la misma dependencia remitente.', 'warning');
+    setFc11TargetBien(bienesFC11);
+    setFc11Editing(fc);
+    setFc11FormNumber(fc ? fc.numeroFormulario : '');
+    setIsFC11ModalOpen(true);
+  };
 
   const openFC04Modal = (fc = null) => { setFc04Editing(fc); if (fc) { setFc04Items(fc.bienesSnapshot || []); setFc04SinMovimiento(fc.sinMovimiento); } else { setFc04Items([]); setFc04SinMovimiento(false); } setIsFC04ModalOpen(true); };
 
@@ -685,10 +694,40 @@ export function useFcModals({
 
   const saveFC11 = async (e) => {
     e.preventDefault(); 
-    const f = new FormData(e.target); 
-    const fc11Data = { id: fc11Editing ? fc11Editing.id : generateId(), numeroFormulario: f.get('numeroFormulario'), fecha: f.get('fecha'), dependenciaRemitente: dependenciaActual, areaRemitente: f.get('areaRemitente'), dependenciaDestinataria: f.get('dependenciaDestinataria'), areaDestinataria: f.get('areaDestinataria'), motivo: f.get('motivo'), estadoConservacion: f.get('estadoConservacion'), observaciones: f.get('observaciones'), bienId: fc11TargetBien.id, bienSnapshot: fc11TargetBien, tipoRegistro: 'FC11' }; 
-    const esMovimientoInterno = fc11Data.dependenciaRemitente === fc11Data.dependenciaDestinataria; 
-    const updatedBien = { ...fc11TargetBien, dependencia: fc11Data.dependenciaDestinataria, estadoConservacion: fc11Data.estadoConservacion, hasFC10: false, funcionario: esMovimientoInterno ? fc11TargetBien.funcionario : '', ubicacion: esMovimientoInterno ? fc11TargetBien.ubicacion : '' };
+    const faltante = Array.from(e.currentTarget.querySelectorAll('[required]'))
+      .find(input => !String(input.value || '').trim());
+    if (faltante) {
+      faltante.focus();
+      notify('Completa los campos requeridos del FC-11 antes de guardarlo.', 'warning');
+      return false;
+    }
+    const f = new FormData(e.target);
+    if (fc11Editing && fc11Editing.estado && fc11Editing.estado !== 'PENDIENTE_FIRMAS') {
+      notify('Un FC-11 con firmas registradas no se puede editar.', 'warning');
+      return false;
+    }
+    const bienesBase = Array.isArray(fc11TargetBien) ? fc11TargetBien : [fc11TargetBien];
+    const bienesSnapshot = bienesBase.filter(Boolean).map(bien => ({
+      ...bien,
+      estadoConservacion: f.get(`estadoConservacion_${bien.id}`) || f.get('estadoConservacion') || bien.estadoConservacion || ''
+    }));
+    const fc11Data = {
+      id: fc11Editing ? fc11Editing.id : generateId(),
+      numeroFormulario: f.get('numeroFormulario'), fecha: f.get('fecha'),
+      dependenciaRemitente: dependenciaActual, areaRemitente: f.get('areaRemitente'),
+      dependenciaDestinataria: f.get('dependenciaDestinataria'), areaDestinataria: f.get('areaDestinataria'),
+      motivo: f.get('motivo'), estadoConservacion: f.get('estadoConservacion'),
+      observaciones: f.get('observaciones'), bienId: bienesSnapshot[0]?.id,
+      bienIds: bienesSnapshot.map(bien => bien.id), bienesSnapshot,
+      bienSnapshot: bienesSnapshot[0], tipoRegistro: 'FC11',
+      receptorNombre: String(f.get('receptorNombre') || '').trim(),
+      receptorDocumento: String(f.get('receptorDocumento') || '').trim(),
+      receptorCargo: String(f.get('receptorCargo') || '').trim(),
+      estado: fc11Editing?.estado || 'PENDIENTE_FIRMAS',
+      firmasExternas: fc11Editing?.firmasExternas || null,
+      referenciaArchivo: fc11Editing?.referenciaArchivo || null,
+      registradoPor: fc11Editing?.registradoPor || currentUser?.username || ''
+    };
     const payloadFC11 = { id: fc11Data.id, data: fc11Data };
 
     try {
@@ -699,19 +738,73 @@ export function useFcModals({
           res = await supabase.from('fc11').insert([payloadFC11]);
       }
       if (res?.error) throw res.error;
-
-      const openFc10 = fc10List.find(fc => fc.bienId === fc11TargetBien.id && !fc.devolucionFecha); 
-      if (openFc10) { 
-          const closedFc10 = { ...openFc10, devolucionFecha: new Date().toISOString().split('T')[0], devolucionLugar: "Traslado FC-11", devolucionReceptor: "Sistema" }; 
-          await supabase.from('fc10').update({ data: closedFc10 }).eq('id', closedFc10.id);
-          setFc10List(prev => prev.map(fc => fc.id === closedFc10.id ? closedFc10 : fc)); 
-      }
-
-      await supabase.from('bens').update(conSello({ data: updatedBien })).eq('id', updatedBien.id);
-      
       if (fc11Editing) setFc11List(prev => prev.map(item => item.id === fc11Data.id ? fc11Data : item)); else setFc11List(prev => [fc11Data, ...prev]);
-      if (esMovimientoInterno) { setBienes(prev => prev.map(b => b.id === updatedBien.id ? updatedBien : b)); notify(`Movimiento interno registrado en ${fc11Data.dependenciaDestinataria}.`, "warning"); } else { setBienes(prev => prev.filter(b => b.id !== updatedBien.id)); notify(`El bien fue transferido a ${fc11Data.dependenciaDestinataria}.`, "success"); } setIsFC11ModalOpen(false); return true;
+      await registrarAuditoria({
+        usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+        accion: fc11Editing ? 'FC11_EDITADO' : 'FC11_CREADO', entidad: 'FC11',
+        entidadId: fc11Data.id,
+        detalles: { bienIds: fc11Data.bienIds, bienes: bienesSnapshot.map(bien => bien.rotulo), estado: fc11Data.estado, destino: fc11Data.dependenciaDestinataria }
+      });
+      notify('FC-11 guardado. El inventario se actualizará después de registrar las firmas y la recepción.', 'success');
+      setIsFC11ModalOpen(false);
+      return true;
     } catch (error) { console.error(error); notify("Error al registrar FC-11.", "error"); return false; }
+  };
+
+  const registrarFirmasFC11 = async (fc, registro) => {
+    if (!fc?.id || !isAdmin) {
+      notify('Solo Patrimonio puede registrar el cierre del FC-11.', 'error');
+      return false;
+    }
+    const firmaReceptor = {
+      nombre: String(fc.receptorNombre || '').trim(),
+      documento: String(fc.receptorDocumento || '').trim(),
+      cargo: String(fc.receptorCargo || '').trim(),
+      fecha: registro?.fechaFirma
+    };
+    if (!firmaReceptor.nombre || !firmaReceptor.documento || !firmaReceptor.cargo || !firmaReceptor.fecha
+      || !String(registro?.referenciaArchivo || '').trim()) {
+      notify('Completa los datos del responsable receptor, la fecha y la referencia de archivo.', 'warning');
+      return false;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data, error } = await supabase.rpc('confirmar_fc11_firmado', {
+        p_fc11_id: fc.id,
+        p_firmas: { receptor: firmaReceptor },
+        p_referencia_archivo: String(registro.referenciaArchivo).trim()
+      });
+      if (error) throw error;
+      if (!data?.fc11?.data || !Array.isArray(data?.bienes)) throw new Error('La RPC no devolvió el movimiento actualizado.');
+
+      const movimiento = data.fc11.data;
+      setFc11List(prev => prev.map(item => item.id === fc.id ? movimiento : item));
+      const bienesActualizados = data.bienes.map(fila => ({ id: fila.id, ...fila.data, updated_at: fila.updated_at }));
+      setBienes(prev => {
+        const mapa = new Map(prev.map(item => [item.id, item]));
+        for (const bien of bienesActualizados) {
+          if (normalizeStr(bien.dependencia) === normalizeStr(dependenciaActual)) mapa.set(bien.id, bien);
+          else mapa.delete(bien.id);
+        }
+        return Array.from(mapa.values());
+      });
+      const fc10Actualizados = Array.isArray(data.fc10) ? data.fc10.map(fila => ({ id: fila.id, ...fila.data })) : [];
+      if (fc10Actualizados.length) setFc10List(prev => prev.map(item => fc10Actualizados.find(updated => updated.id === item.id) || item));
+      await registrarAuditoria({
+        usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+        accion: 'FC11_FIRMAS_REGISTRADAS', entidad: 'FC11', entidadId: fc.id,
+        detalles: { firmaReceptor, referenciaArchivo: String(registro.referenciaArchivo).trim(), bienIds: movimiento.bienIds || [movimiento.bienId] }
+      });
+      notify('Firmas y recepción registradas. Se actualizaron el FC-10 y el inventario.', 'success');
+      return true;
+    } catch (error) {
+      console.error('No se pudo cerrar el FC-11:', error);
+      notify(error?.message || 'No se pudo registrar el cierre del FC-11.', 'error');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const saveFC04 = async (e) => {
@@ -1305,7 +1398,7 @@ export function useFcModals({
     openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal,
     handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange,
     handleScanSuccess,
-    saveBien, saveUsuario, saveFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite,
+    saveBien, saveUsuario, saveFC11, registrarFirmasFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite,
     submitResolucionBaja, confirmDeleteAction
   };
 }

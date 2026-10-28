@@ -42,7 +42,8 @@ export default function AppTopbar({
   currentUser,
   isAdmin,
   handleLogout,
-  actasPorFirmarCount
+  actasPorFirmarCount,
+  ultimoSyncBienes
 }) {
   const [filtroNotif, setFiltroNotif] = useState('todas');
   const { lang, setLang, t } = useIdioma();
@@ -55,6 +56,9 @@ export default function AppTopbar({
   });
   const [reducirAnim, setReducirAnim] = useState(() => {
     try { return localStorage.getItem('ap_reduce_motion') === '1'; } catch { return false; }
+  });
+  const [densidadCompacta, setDensidadCompacta] = useState(() => {
+    try { return localStorage.getItem('ap_densidad_compacta') === '1'; } catch { return false; }
   });
 
   useEffect(() => {
@@ -71,6 +75,11 @@ export default function AppTopbar({
     document.documentElement.classList.toggle('reduce-motion', reducirAnim);
     try { localStorage.setItem('ap_reduce_motion', reducirAnim ? '1' : '0'); } catch { /* ignore */ }
   }, [reducirAnim]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('density-compact', densidadCompacta);
+    try { localStorage.setItem('ap_densidad_compacta', densidadCompacta ? '1' : '0'); } catch { /* ignore */ }
+  }, [densidadCompacta]);
 
   const notifsVisibles =
     filtroNotif === 'noleidas'
@@ -138,6 +147,15 @@ export default function AppTopbar({
               </span>
             )}
           </div>
+
+          <span
+            title={ultimoSyncBienes ? `Inventario sincronizado el ${new Date(ultimoSyncBienes).toLocaleString('es-PY')}` : 'Aún no hay una sincronización confirmada para esta dependencia'}
+            className="hidden xl:inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line/70 bg-surface-2/60 px-2.5 py-1.5 text-[10px] font-semibold text-content-3"
+            aria-live="polite"
+          >
+            <i className={`fa-solid ${ultimoSyncBienes ? 'fa-cloud-check text-ok' : 'fa-cloud-arrow-down'}`} aria-hidden="true" />
+            {ultimoSyncBienes ? `Actualizado ${new Date(ultimoSyncBienes).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' })}` : 'Sincronizando'}
+          </span>
 
           {/* Acciones */}
           <div className="flex items-center gap-1.5 shrink-0">
@@ -219,7 +237,8 @@ export default function AppTopbar({
                   {[
                     ['Texto grande', textoGrande, setTextoGrande, 'fa-text-height'],
                     ['Contraste alto', contrasteAlto, setContrasteAlto, 'fa-circle-half-stroke'],
-                    ['Reducir animaciones', reducirAnim, setReducirAnim, 'fa-film']
+                    ['Reducir animaciones', reducirAnim, setReducirAnim, 'fa-film'],
+                    ['Tablas compactas', densidadCompacta, setDensidadCompacta, 'fa-table-cells']
                   ].map(([label, val, set, icon]) => (
                     <button
                       key={label}

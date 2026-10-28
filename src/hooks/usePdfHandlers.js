@@ -310,18 +310,18 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
             doc.addImage(logoImg, 'PNG', 14, 12, 22, 22); doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.text("UNIVERSIDAD NACIONAL DE PILAR", pageWidth / 2, 18, { align: 'center' }); doc.setFontSize(11); doc.text("DIRECCIÓN DE CONTABILIDAD", pageWidth / 2, 24, { align: 'center' }); doc.text("DEPARTAMENTO DE BIENES PATRIMONIALES", pageWidth / 2, 29, { align: 'center' }); doc.setFontSize(13); doc.text("FORMULARIO DE MOVIMIENTO INTERNO DE BIENES (FC-11)", pageWidth / 2, 38, { align: 'center' });
             doc.setFontSize(6); doc.setTextColor(200); doc.setFont("helvetica", "normal"); doc.text(`--- ${copias[i]} ---`, pageWidth - 14, 12, { align: 'right' }); doc.setTextColor(0); doc.setFont("helvetica", "normal");
             doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.text(`Nº Formulario: ${fc.numeroFormulario || 'S/N'}`, 14, 48); doc.setFont("helvetica", "normal"); doc.text(formattedDate, pageWidth - 14, 48, { align: 'right' });
-            let finalY = 54; doc.autoTable({ startY: finalY, theme: 'grid', rowPageBreak: 'avoid', margin: { bottom: 30 }, body: [ [`Dependencia Remitente: ${fc.dependenciaRemitente || ''} ${fc.areaRemitente ? '- ' + fc.areaRemitente : ''}`.trim()], [`Dependencia Destinataria: ${fc.dependenciaDestinataria || ''} ${fc.areaDestinataria ? '- ' + fc.areaDestinataria : ''}`.trim()] ], styles: { fontSize: 10, cellPadding: 4, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold', fillColor: [248, 249, 250] } }); finalY = doc.lastAutoTable.finalY + 6;
-            const tableRows = fcs.map(item => { const b = item.bienSnapshot || {}; const cuentaFull = [b.cuenta, b.subcuenta, b.analitico1, b.analitico2].filter(Boolean).join('-'); return [ cuentaFull || '-', b.rotulo || '-', b.descripcion || '-', formatDateText(b.fechaAdquisicion) || '-', (item.estadoConservacion || b.estadoConservacion || '-').toUpperCase(), b.hasQR ? 'SÍ' : 'NO' ]; });
+            let finalY = 54; doc.autoTable({ startY: finalY, theme: 'grid', rowPageBreak: 'avoid', margin: { bottom: 30 }, body: [ [`Dependencia Remitente: ${fc.dependenciaRemitente || ''} ${fc.areaRemitente ? '- ' + fc.areaRemitente : ''}`.trim()], [`Dependencia Destinataria: ${fc.dependenciaDestinataria || ''} ${fc.areaDestinataria ? '- ' + fc.areaDestinataria : ''}`.trim()], [`Responsable que recibe: ${fc.receptorNombre || '____________________________'}  ·  C.I.: ${fc.receptorDocumento || '____________'}  ·  Cargo: ${fc.receptorCargo || '________________'}`] ], styles: { fontSize: 9, cellPadding: 3.5, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold', fillColor: [248, 249, 250] } }); finalY = doc.lastAutoTable.finalY + 6;
+            const tableRows = fcs.flatMap(item => (item.bienesSnapshot?.length ? item.bienesSnapshot : [item.bienSnapshot || {}]).map(b => { const cuentaFull = [b.cuenta, b.subcuenta, b.analitico1, b.analitico2].filter(Boolean).join('-'); return [ cuentaFull || '-', b.rotulo || '-', b.descripcion || '-', formatDateText(b.fechaAdquisicion) || '-', (b.estadoConservacion || item.estadoConservacion || '-').toUpperCase(), b.hasQR ? 'SÍ' : 'NO' ]; }));
             if (finalY > pageHeight - 40) { doc.addPage(); finalY = 20; }
             doc.autoTable({ startY: finalY, theme: 'grid', head: [["Cuenta Contable", "Rótulo / Código", "Descripción del Bien", "Fecha de Adquisición", "Estado Físico", "QR"]], body: tableRows, rowPageBreak: 'avoid', margin: { bottom: 30 }, styles: { fontSize: 8, cellPadding: 3, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.1 }, headStyles: { fillColor: [248, 249, 250], fontStyle: 'bold', halign: 'center', textColor: [32,33,36] }, alternateRowStyles: { fillColor: [250, 252, 253] }, columnStyles: { 0: { halign: 'center', cellWidth: 32 }, 1: { halign: 'center', cellWidth: 26 }, 2: { cellWidth: 'auto' }, 3: { halign: 'center', cellWidth: 30 }, 4: { halign: 'center', cellWidth: 24 }, 5: { halign: 'center', cellWidth: 12 } } }); finalY = doc.lastAutoTable.finalY + 8;
-            doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text(`Cantidad Total de Bienes Trasladados: ${fcs.length}`, 14, finalY); finalY += 10;
+            doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.text(`Cantidad Total de Bienes Trasladados: ${tableRows.length}`, 14, finalY); finalY += 10;
             if (finalY > pageHeight - 40) { doc.addPage(); finalY = 20; }
-            doc.setFont("helvetica", "bold"); doc.text("Motivo o circunstancia del movimiento:", 14, finalY); finalY += 8; const motivos = ["Traspaso", "Préstamo", "Inservible", "Faltante"]; let startX = 20; doc.setFont("helvetica", "normal");
-            motivos.forEach((m) => { doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.3); doc.rect(startX, finalY - 3, 4, 4); if (fc.motivo === m) { doc.setFont("helvetica", "bold"); doc.text("X", startX + 0.9, finalY + 0.4); doc.setFont("helvetica", "normal"); } doc.text(m, startX + 6, finalY + 0.4); startX += 40; }); finalY += 10;
+            doc.setFont("helvetica", "bold"); doc.text("Motivo o circunstancia del movimiento:", 14, finalY); finalY += 8; const motivos = ["Traspaso", "Préstamo", "Devolución a Patrimonio", "Inservible", "Faltante"]; let startX = 14; doc.setFont("helvetica", "normal"); doc.setFontSize(7.5);
+            motivos.forEach((m) => { doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.3); doc.rect(startX, finalY - 3, 4, 4); if (fc.motivo === m) { doc.setFont("helvetica", "bold"); doc.text("X", startX + 0.9, finalY + 0.4); doc.setFont("helvetica", "normal"); } doc.text(m, startX + 5, finalY + 0.4, { maxWidth: 34 }); startX += 39; }); finalY += 10;
             if (finalY > pageHeight - 30) { doc.addPage(); finalY = 20; }
             doc.setFont("helvetica", "bold"); doc.text("Observaciones:", 14, finalY); finalY += 6; doc.setFont("helvetica", "normal"); doc.text(fc.observaciones || 'Ninguna.', 14, finalY, { maxWidth: pageWidth - 28, align: 'justify' });
             if (finalY > pageHeight - 65) { doc.addPage(); finalY = 30;} else { finalY += 35; }
-            doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4); doc.line(14, finalY, 70, finalY); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text("Jefe de Dependencia Remitente", 42, finalY + 5, { align: 'center' }); doc.line(78, finalY, 138, finalY); doc.text("Jefe de Dependencia Destinataria", 108, finalY + 5, { align: 'center' }); doc.line(146, finalY, 202, finalY); doc.text("Jefe Dpto. Bienes Patrimoniales", 174, finalY + 5, { align: 'center' });
+            doc.setDrawColor(0, 0, 0); doc.setLineWidth(0.4); doc.line(pageWidth / 2 - 35, finalY, pageWidth / 2 + 35, finalY); doc.setFont("helvetica", "bold"); doc.setFontSize(8); doc.text("Firma del responsable que recibe los bienes", pageWidth / 2, finalY + 5, { align: 'center' }); doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.text("Fecha de recepción: ____________________", pageWidth / 2, finalY + 10, { align: 'center' });
             let pieY = pageHeight - 15; doc.setFont("helvetica", "normal"); doc.text("Distribución: Original para el Departamento de Bienes Patrimoniales, Copias para dependencia remitente y destinataria.", 14, pieY);
         }
         const cleanFormNum = (fc.numeroFormulario || 'S-N').replace(/[^a-zA-Z0-9]/g, '-'); await guardarPDF(doc, `FC11_Traslado_${cleanFormNum}_${todayStr}.pdf`); notify("Reporte FC-11 generado", "success");
@@ -497,16 +497,18 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       csvContent += "N Formulario;Fecha;Dep. Remitente;Area Remitente;Dep. Destinataria;Area Destinataria;Rotulo Bien;Descripcion Bien;Estado Fisico;Motivo;Observaciones\n";
       
       fcsAnuales11.forEach(fc => {
-          const b = fc.bienSnapshot || {};
-          const row = [
-              fc.numeroFormulario, formatDateText(fc.fecha),
-              fc.dependenciaRemitente || fc.remitente, fc.areaRemitente || '-',
-              fc.dependenciaDestinataria || fc.destinatario, fc.areaDestinataria || '-',
-              b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`,
-              fc.estadoConservacion || b.estadoConservacion, fc.motivo,
-              `"${(fc.observaciones || '').replace(/"/g, '""')}"`
-          ];
-          csvContent += row.join(';') + "\n";
+          const bienesFC11 = fc.bienesSnapshot?.length ? fc.bienesSnapshot : [fc.bienSnapshot || {}];
+          bienesFC11.forEach(b => {
+            const row = [
+                fc.numeroFormulario, formatDateText(fc.fecha),
+                fc.dependenciaRemitente || fc.remitente, fc.areaRemitente || '-',
+                fc.dependenciaDestinataria || fc.destinatario, fc.areaDestinataria || '-',
+                b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`,
+                b.estadoConservacion || fc.estadoConservacion, fc.motivo,
+                `"${(fc.observaciones || '').replace(/"/g, '""')}"`
+            ];
+            csvContent += row.join(';') + "\n";
+          });
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -590,17 +592,28 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         auditoria: auditDb
       };
 
-      const jsonString = JSON.stringify(backupData, null, 2);
-      const blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+      const jsonString = JSON.stringify(backupData);
+      let blob = new Blob([jsonString], { type: "application/json;charset=utf-8;" });
+      let extension = '.json';
+      if (typeof CompressionStream !== 'undefined') {
+        try {
+          const comprimido = await new Response(blob.stream().pipeThrough(new CompressionStream('gzip'))).blob();
+          if (comprimido.size < blob.size) {
+            blob = new Blob([comprimido], { type: 'application/gzip' });
+            extension = '.json.gz';
+          }
+        } catch { /* Conserva JSON legible si este navegador no comprime. */ }
+      }
       const fechaStr = new Date().toISOString().split("T")[0];
+      const nombreBase = `Respaldo_Sistema_Patrimonial_UNP_${fechaStr}${extension}`;
       
       if (window.saveAs) {
-        window.saveAs(blob, await solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`));
+        window.saveAs(blob, await solicitarNombreArchivo(nombreBase));
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = await solicitarNombreArchivo(`Respaldo_Sistema_Patrimonial_UNP_${fechaStr}.json`);
+        a.download = await solicitarNombreArchivo(nombreBase);
         a.click();
         // Con margen: revocar en el mismo tick puede cancelar la descarga en
         // Safari (el blob todavía se está leyendo).
@@ -613,10 +626,11 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         accion: "BACKUP_COMPLETO",
         entidad: "SISTEMA",
         entidadId: "BACKUP",
-        detalles: { fecha: fechaStr, generadoPor: currentUser?.username }
+        detalles: { fecha: fechaStr, generadoPor: currentUser?.username, comprimido: extension.endsWith('.gz'), bytes: blob.size }
       });
 
-      notify(`Respaldo descargado: ${bienesDb.length} bienes, ${fc10Db.length} FC-10, ${auditDb.length} auditorías.`, "success");
+      notify(`Respaldo ${extension.endsWith('.gz') ? 'comprimido ' : ''}descargado: ${bienesDb.length} bienes, ${fc10Db.length} FC-10, ${auditDb.length} auditorías.`, "success");
+      window.dispatchEvent(new Event('respaldo-generado'));
     } catch (err) {
       console.error("Error al generar backup general:", err);
       // Un respaldo incompleto es peor que no tener respaldo: da falsa

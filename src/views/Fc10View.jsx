@@ -3,7 +3,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import {
   Card, EmptyState, PageHeader, Toolbar,
-  Button, Badge, Chip, ChipGroup
+  Button, Badge, Chip, ChipGroup, Modal
 } from '../components/ui';
 import { formatDateText, formatCI, normalizeStr } from '../utils/helpers';
 import { ESTADOS_FC10, ESTADO_INFO, estadoInicialFC10, pendienteDeFirma, esFC10Legado } from '../utils/fc10Firmas';
@@ -55,6 +55,14 @@ export default function Fc10View({
     const bien = bienes.find(b => b.id === fc.bienId) || {};
     return [fc.funcionarioNombre, fc.funcionarioDoc, fc.id, bien.rotulo, bien.descripcion]
       .filter(Boolean).some(valor => normalizeStr(valor).includes(consulta));
+  }).sort((a, b) => {
+    const pendienteA = Boolean(pendienteDeFirma(a)) && !a.devolucionFecha;
+    const pendienteB = Boolean(pendienteDeFirma(b)) && !b.devolucionFecha;
+    if (pendienteA !== pendienteB) return pendienteA ? -1 : 1;
+    if (!pendienteA) return 0;
+    const fechaA = new Date(a.entregadoFecha || a.fechaGeneracion || 0).getTime();
+    const fechaB = new Date(b.entregadoFecha || b.fechaGeneracion || 0).getTime();
+    return fechaA - fechaB;
   });
   const totalPaginas = Math.max(1, Math.ceil(listaVisible.length / porPagina));
   const actasPagina = useMemo(() => listaVisible.slice((pagina - 1) * porPagina, pagina * porPagina), [listaVisible, pagina, porPagina]);
@@ -80,7 +88,18 @@ export default function Fc10View({
   // el documento físico o digital devuelto. Solo el rol admin puede cambiarlo.
   // =========================================================================
   const [cambiandoEstado, setCambiandoEstado] = useState({});
+  const [confirmacionPendiente, setConfirmacionPendiente] = useState(null);
   const puedeGestionarFirmas = isAdmin && typeof actualizarEstadoFirma === 'function';
+
+  const pedirConfirmacion = (mensaje, accion, titulo = 'Confirmar acción') => {
+    setConfirmacionPendiente({ mensaje, accion, titulo });
+  };
+
+  const confirmarAccion = async () => {
+    const accion = confirmacionPendiente?.accion;
+    setConfirmacionPendiente(null);
+    if (accion) await accion();
+  };
 
   const ESTADOS_FIRMA_OPCIONES = [
     { valor: 'BORRADOR', label: 'Borrador' },
@@ -89,21 +108,29 @@ export default function Fc10View({
     { valor: 'CERRADO', label: 'Firmada y cerrada' }
   ];
 
-  const handleCambiarEstadoFirma = async (fc, nuevoEstado) => {
+  const handleCambiarEstadoFirma = (fc, nuevoEstado) => {
     if (!puedeGestionarFirmas) return;
     const estadoActual = estadoInicialFC10(fc);
-    if (nuevoEstado !== estadoActual && !window.confirm(`Cambiar el estado de firma de ${ESTADO_INFO[estadoActual]?.corto || estadoActual} a ${ESTADO_INFO[nuevoEstado]?.corto || nuevoEstado}. Esta acción quedará registrada en auditoría.`)) return;
-    setCambiandoEstado(prev => ({ ...prev, [fc.id]: true }));
-    try {
-      await actualizarEstadoFirma(fc.id, { estadoFirma: nuevoEstado, registradoPor: currentUser?.username || 'admin' });
-      // Refrescar localmente si se recibe el acta actualizada desde el padre vía filteredFC10.
-      // Se emite evento global para que otras vistas se actualicen.
-      window.dispatchEvent(new CustomEvent('fc10-estado-cambiado', { detail: { id: fc.id, estadoFirma: nuevoEstado } }));
-    } catch (e) {
-      console.error('No se pudo cambiar el estado de firma:', e);
-    } finally {
-      setCambiandoEstado(prev => { const { [fc.id]: _, ...resto } = prev; return resto; });
-    }
+    const actualizar = async () => {
+      setCambiandoEstado(prev => ({ ...prev, [fc.id]: true }));
+      try {
+        await actualizarEstadoFirma(fc.id, { estadoFirma: nuevoEstado, registradoPor: currentUser?.username || 'admin' });
+        // Refrescar localmente si se recibe el acta actualizada desde el padre vía filteredFC10.
+        // Se emite evento global para que otras vistas se actualicen.
+        window.dispatchEvent(new CustomEvent('fc10-estado-cambiado', { detail: { id: fc.id, estadoFirma: nuevoEstado } }));
+      } catch (e) {
+        console.error('No se pudo cambiar el estado de firma:', e);
+      } finally {
+        setCambiandoEstado(prev => { const { [fc.id]: _, ...resto } = prev; return resto; });
+      }
+    };
+    if (nuevoEstado !== estadoActual) {
+      pedirConfirmacion(
+        `Cambiar el estado de firma de ${ESTADO_INFO[estadoActual]?.corto || estadoActual} a ${ESTADO_INFO[nuevoEstado]?.corto || nuevoEstado}. Esta acción quedará registrada en auditoría.`,
+        actualizar,
+        'Cambiar estado de firma'
+      );
+    } else actualizar();
   };
 
   return (
@@ -229,6 +256,10 @@ export default function Fc10View({
               const firmasRegistradas = Number(Boolean(f1)) + Number(Boolean(f2));
               const estaFirmando = firmandoId === fc.id;
               const esLegada = esFC10Legado(fc);
+              const fechaPendiente = new Date(fc.entregadoFecha || fc.fechaGeneracion || Date.now());
+              const diasPendiente = pendiente && !isDevuelto
+                ? Math.max(0, Math.floor((Date.now() - fechaPendiente.getTime()) / 86400000))
+                : 0;
               const ponerEnTramite = ponerFC10EnTramite;
               return (
                 <div key={fc.id} className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm hover:shadow-md motion flex flex-col relative overflow-hidden group">
@@ -254,6 +285,7 @@ export default function Fc10View({
                               <span className="flex flex-col gap-0.5 text-[10px] font-medium tabular-nums text-content-3">
                                   <span><i className="fa-regular fa-calendar mr-1.5"></i>Entregada: {formatDateText(fc.entregadoFecha || fc.fechaGeneracion)}</span>
                                   {isDevuelto && <span className="text-warn"><i className="fa-solid fa-rotate-left mr-1.5"></i>Devuelta: {formatDateText(fc.devolucionFecha)}</span>}
+                                  {pendiente && !isDevuelto && <span className={`font-bold ${diasPendiente >= 30 ? 'text-danger' : diasPendiente >= 14 ? 'text-warn' : 'text-content-3'}`}><i className="fa-regular fa-clock mr-1.5" aria-hidden="true"></i>Pendiente hace {diasPendiente} {diasPendiente === 1 ? 'día' : 'días'}</span>}
                               </span>
                           </div>
                           <div className="flex gap-1 shrink-0 rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/70 dark:border-white/10 p-1">
@@ -326,10 +358,11 @@ export default function Fc10View({
                           </p>
                           <p className="text-[10px] text-content-2 dark:text-content-3">El sistema aún espera: {pendiente.nombre || pendiente.puesto} ({pendiente.puesto}).</p>
                           <button
-                            onClick={() => {
-                              const confirmar = window.confirm(`Vas a registrar las dos firmas del FC-10 de ${fc.funcionarioNombre || 'este responsable'} como recibidas y cerrar el acta. Confirma solo si revisaste el PDF firmado.`);
-                              if (confirmar) registrarAmbasFirmas(fc);
-                            }}
+                            onClick={() => pedirConfirmacion(
+                              `Vas a registrar las dos firmas del FC-10 de ${fc.funcionarioNombre || 'este responsable'} como recibidas y cerrar el acta. Confirma solo si revisaste el PDF firmado.`,
+                              () => registrarAmbasFirmas(fc),
+                              'Registrar ambas firmas'
+                            )}
                             disabled={estaFirmando}
                             title="Confirmar que el PDF regresó con ambas firmas"
                             className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-black uppercase tracking-wider motion active:scale-95 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 shadow-sm shadow-emerald-500/25"
@@ -347,10 +380,11 @@ export default function Fc10View({
                           </summary>
                           <p className="mt-2 text-[10px] text-content-3">Firma de {pendiente.puesto}: {pendiente.nombre || 'sin nombre registrado'}</p>
                           <button
-                            onClick={() => {
-                              const confirmar = window.confirm(`Vas a registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto} en el FC-10 de ${fc.funcionarioNombre || 'este responsable'}. Esta acción quedará en el historial.`);
-                              if (confirmar) registrarFirmaFC10(fc);
-                            }}
+                            onClick={() => pedirConfirmacion(
+                              `Vas a registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto} en el FC-10 de ${fc.funcionarioNombre || 'este responsable'}. Esta acción quedará en el historial.`,
+                              () => registrarFirmaFC10(fc),
+                              'Registrar firma pendiente'
+                            )}
                             disabled={estaFirmando}
                             title={`Registrar la firma pendiente de ${pendiente.nombre || pendiente.puesto}`}
                             className="mt-2 w-full inline-flex min-h-10 items-center justify-center gap-2 rounded-control px-3 py-2 text-body font-semibold leading-tight text-content-2 bg-surface-2 hover:bg-surface-3 motion active:scale-[0.98] cursor-pointer disabled:opacity-60 border border-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
@@ -418,6 +452,22 @@ export default function Fc10View({
         </div>
       )}
       </section>
+      <Modal
+        abierto={Boolean(confirmacionPendiente)}
+        onCerrar={() => setConfirmacionPendiente(null)}
+        titulo={confirmacionPendiente?.titulo}
+        descripcion="Revisa la acción antes de continuar."
+        icono="fa-file-signature"
+        tamano="sm"
+        pie={(
+          <>
+            <Button variante="secondary" onClick={() => setConfirmacionPendiente(null)}>Cancelar</Button>
+            <Button variante="primary" onClick={confirmarAccion}>Confirmar</Button>
+          </>
+        )}
+      >
+        <p className="px-5 py-5 text-sm leading-relaxed text-content-2 sm:px-6">{confirmacionPendiente?.mensaje}</p>
+      </Modal>
     </div>
   );
 }

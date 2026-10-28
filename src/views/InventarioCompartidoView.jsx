@@ -24,7 +24,7 @@ export default function InventarioCompartidoView({ token }) {
   }, [token]);
 
   return (
-    <main className="min-h-dvh bg-canvas px-4 py-8 text-content-1 sm:px-6 sm:py-12">
+    <main className="h-dvh overflow-y-auto overscroll-y-contain bg-canvas px-4 py-8 text-content-1 sm:px-6 sm:py-12">
       <div className="mx-auto w-full max-w-3xl">
         <header className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand-text">

@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, StatTile } from '../components/ui';
+import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
   fetchAuditoria, isLoadingAud, kpisAud, evolucionValor, maxEvolucion, formatoCortoGs,
   clearAllFilters, setFiltroAnio, setFiltroMes, setActiveTab,
-  saludDatos, usoDb, alertaDb, setSearchTerm, setSearchInput, setCurrentPage,
+  saludDatos, usoDb, alertaDb, errorUsoDb, setSearchTerm, setSearchInput, setCurrentPage,
   setSearchFuncionarioInput, setCurrentPaginaFuncionarios,
   conteoUbicacion, setConteoUbicacion, bienes, dependenciaActual,
   ubicacionesUnicas, conteoCodigos, conteoInput, setConteoInput, agregarCodigoConteo,
@@ -18,7 +19,7 @@ export default function AuditoriaView({
   guardarActaMuestreo, descargarActaMuestreoPDF,
   totalAud, paginaAud, alcanceAud, setAlcanceAud, searchAud, setSearchAud,
   filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, accionesUnicasAud, auditoriaList,
-  actorAud, tonoAccionAud, detalleAudCorto
+  actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
   return (
@@ -90,31 +91,49 @@ export default function AuditoriaView({
           </div>
           <p className="text-xs text-content-3 dark:text-content-3 mb-4">Detecta inconsistencias sin modificar nada. Toca un duplicado para revisarlo.</p>
 
-          {/* Consumo del plan free de Supabase. El número es estimado a partir
-              del conteo de filas por tabla: sirve para saber cuanto margen queda
-              antes de tener que archivar informacion vieja. */}
+          {/* Tamaños medidos en Postgres; no son estimaciones por cantidad de filas. */}
           {usoDb && (
             <div className="mb-4 rounded-card border border-line/70 dark:border-white/10 bg-surface-2/50 dark:bg-surface-1/[0.02] p-3.5 shadow-sm">
-              <div className="flex items-center justify-between gap-3 mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 flex items-center gap-1.5">
-                  <i className="fa-solid fa-database text-[10px]"></i> Consumo de base de datos
-                </span>
-                <span className={`text-[11px] font-black tabular-nums ${alertaDb?.nivel === 'critico' ? 'text-danger dark:text-rose-400' : alertaDb?.nivel === 'aviso' ? 'text-warn dark:text-amber-400' : 'text-ok dark:text-emerald-400'}`}>
-                  {usoDb.pctUso.toFixed(1)}% de 500 MB
-                </span>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-content-3 flex items-center gap-1.5"><i className="fa-solid fa-gauge-high text-[10px]" aria-hidden="true" /> Uso de recursos de Supabase</span>
+                <span className="text-[10px] text-content-3">Medido {usoDb.medidoEn ? new Date(usoDb.medidoEn).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' }) : 'ahora'}</span>
               </div>
-              <div className="w-full h-2 rounded-full bg-surface-3/60 dark:bg-surface-1/10 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-700 ${ alertaDb?.nivel === 'critico' ? 'bg-rose-500' : alertaDb?.nivel === 'aviso' ? 'bg-amber-500' : 'bg-emerald-500' } shadow-sm ${ alertaDb?.nivel === 'critico' ? 'shadow-rose-500/40' : alertaDb?.nivel === 'aviso' ? 'shadow-amber-500/40' : 'shadow-emerald-500/40' }`}
-                  style={{ width: `${Math.min(100, Math.max(1.5, usoDb.pctUso))}%` }}
-                ></div>
-              </div>
-              <p className="mt-2 text-[10px] text-content-3 dark:text-content-3">
-                {usoDb.totalFilas.toLocaleString('es-PY')} filas · ~{(usoDb.bytesEstimados / 1024 / 1024).toFixed(1)} MB estimados
-                {alertaDb ? ` · ${alertaDb.texto}` : ' · Dentro del plan free.'}
-              </p>
+              {[
+                { id: 'db', label: 'Base de datos', bytes: usoDb.bytesEstimados, limite: LIMITE_DB, pct: usoDb.pctUso, icono: 'fa-database' },
+                { id: 'storage', label: 'Archivos y fotos', bytes: usoDb.storageBytes, limite: LIMITE_STORAGE, pct: usoDb.pctStorage, icono: 'fa-images' }
+              ].map(recurso => (
+                <div key={recurso.id} className="mb-3 last:mb-0">
+                  <div className="mb-1 flex items-center justify-between gap-2 text-[10px]">
+                    <span className="font-semibold text-content-2"><i className={`fa-solid ${recurso.icono} mr-1.5 text-content-3`} aria-hidden="true" />{recurso.label}</span>
+                    <span className="font-bold tabular-nums text-content-2">{(recurso.bytes / 1024 / 1024).toFixed(1)} / {(recurso.limite / 1024 / 1024).toFixed(0)} MB · {recurso.pct.toFixed(1)}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-3/60 dark:bg-surface-1/10" role="progressbar" aria-label={`Uso de ${recurso.label}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.min(100, Math.round(recurso.pct))}>
+                    <div className={`h-full rounded-full transition-all duration-700 ${recurso.pct >= 95 ? 'bg-rose-500' : recurso.pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500'}`} style={{ width: `${Math.min(100, Math.max(recurso.bytes > 0 ? 1.5 : 0, recurso.pct))}%` }} />
+                  </div>
+                </div>
+              ))}
+              <p className="mt-2 text-[10px] text-content-3">{usoDb.objetosStorage.toLocaleString('es-PY')} archivos en Storage{alertaDb ? ` · ${alertaDb.texto}` : ' · Sin alertas de capacidad.'}</p>
             </div>
           )}
+          {errorUsoDb && !usoDb && (
+            <p role="status" className="mb-4 rounded-control border border-warn/25 bg-warn-soft/60 px-3 py-2 text-[11px] leading-relaxed text-content-2">
+              <i className="fa-solid fa-circle-exclamation mr-1.5 text-warn" aria-hidden="true" />No se pudieron medir los recursos. Actualiza la página o pide al administrador que aplique la migración de métricas.
+            </p>
+          )}
+          <section className="mb-4 flex flex-col gap-3 rounded-card border border-line/70 bg-surface-2/40 p-3.5 sm:flex-row sm:items-center sm:justify-between" aria-label="Respaldo del sistema">
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-content-1"><i className="fa-solid fa-shield-halved mr-2 text-brand-text" aria-hidden="true" />Respaldo externo</p>
+              <p className="mt-1 text-[10px] leading-relaxed text-content-3">
+                {ultimoBackup ? `Último archivo descargado: ${new Date(ultimoBackup).toLocaleDateString('es-PY')}. Guarda una copia fuera de este dispositivo.` : 'No hay un respaldo reciente registrado. Descarga y guarda una copia en un lugar seguro.'}
+                {' '}El plan Free no incluye copias automáticas descargables.
+              </p>
+            </div>
+            <Button variante="secondary" tamano="sm" icono="fa-download" onClick={handleExportBackupGeneral} className="shrink-0">Crear respaldo</Button>
+          </section>
+          <p className="mb-4 rounded-control border border-info/20 bg-info-soft/50 px-3 py-2 text-[10px] leading-relaxed text-content-2">
+            <i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />Los proyectos Free pueden pausarse tras 7 días de poca actividad. Revisa el panel de uso de Supabase si el sistema deja de responder.
+            {' '}<a href="https://supabase.com/docs/guides/deployment/going-into-prod" target="_blank" rel="noreferrer" className="font-bold text-brand-text underline underline-offset-2">Ver disponibilidad y límites</a>
+          </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-4">
               {saludDatos.map(s => (
                   <div key={s.id} className="rounded-card border border-line/70 dark:border-white/10 px-3 py-3 text-center shadow-sm">

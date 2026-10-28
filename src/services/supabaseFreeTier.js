@@ -4,11 +4,10 @@
 // El plan free tiene limites que pesan sobre el uso real del sistema:
 //
 //   - 500 MB de base de datos
-//   - 1 GB de egress (salida) por mes
-//   - 5 GB de storage
-//   - 2 millones de filas leidas por mes
-//   - 500 MB de ancho de banda
-//   - Realtime con limites de conexiones y mensajes
+//   - 5 GB de egress sin caché y 5 GB de egress en caché por organización
+//   - 1 GB de Storage por organización
+//   - 2 millones de mensajes Realtime y 200 conexiones máximas
+//   - Hasta 50.000 usuarios activos al mes
 //
 // Este modulo concentra las decisiones que las respetan. Todo lo que sigue
 // asume que el sistema corre sobre el free tier, no sobre un plan pagos.
@@ -16,13 +15,15 @@
 // ============================================================================
 
 /** Egress: bytes que Supabase puede descargar desde la region del proyecto. */
-export const LIMITE_EGRESS_MES = 1 * 1024 * 1024 * 1024; // 1 GB
-/** Filas leidas por mes (2 M en free). */
-export const LIMITE_FILAS_MES = 2_000_000;
+export const LIMITE_EGRESS_MES = 5 * 1024 * 1024 * 1024; // 5 GB sin caché
+export const LIMITE_EGRESS_CACHE_MES = 5 * 1024 * 1024 * 1024; // 5 GB en caché
+export const LIMITE_MENSAJES_REALTIME_MES = 2_000_000;
+export const LIMITE_CONEXIONES_REALTIME = 200;
+export const LIMITE_USUARIOS_ACTIVOS_MES = 50_000;
 /** Espacio de base de datos. */
 export const LIMITE_DB = 500 * 1024 * 1024; // 500 MB
 /** Storage de archivos. */
-export const LIMITE_STORAGE = 5 * 1024 * 1024 * 1024; // 5 GB
+export const LIMITE_STORAGE = 1 * 1024 * 1024 * 1024; // 1 GB
 
 /**
  * Trafico que genera una carga completa del inventario.
@@ -52,10 +53,10 @@ export const INTERVALO_RESYNC_MS = 24 * 60 * 60 * 1000; // 24 h (el valor actual
 // ---------------------------------------------------------------------------
 // 2. Compresión de imágenes antes de subirlas
 // ---------------------------------------------------------------------------
-// El storage del free es 5 GB y cada foto cuenta. comprimirImagen() en helpers
-// ya recorta a 1024 px y ~120 KB, que es lo razonable. Lo que se controla acá
-// es cuántas se permiten por bien: 5 fotos de 120 KB son 600 KB por bien.
-// Con 1800 bienes, el tope teorico es ~1 GB solo en fotos.
+// Storage del plan free es 1 GB y cada foto cuenta. comprimirImagen() en helpers
+// ya recorta a 1024 px y ~120 KB. Se limitan las fotos por bien para dejar margen
+// al resto de archivos: tres fotos de ese tamaño son ~360 KB por bien.
+// Con 1800 bienes, el tope teórico es ~650 MB solo en fotos.
 // ---------------------------------------------------------------------------
 export const MAX_FOTOS_POR_BIEN = 3;
 export const KB_POR_FOTO = 120;
@@ -78,8 +79,7 @@ export const AUDITORIA_MAX_FILAS = 1000;
 //   - bens: SI se suscribe. Es la tabla que cambia entre equipos y el Savings
 //     es lo que hace útil la app en campo. Como el delta ya cubre el resto,
 //     llega muy poco por este canal.
-//   - notificaciones: se puede reemplazar por sondeo (ya hay un setInterval
-//     de 30 s en useRealtimeSync) si se quiere ahorrar conexiones.
+//   - notificaciones: se reemplazan por sondeo para ahorrar conexiones.
 //
 // Los canales se abren solo con la sesión iniciada y se cierran al salir
 // (ver el return del useEffect), así que no quedan conexiones colgando.
@@ -87,11 +87,7 @@ export const AUDITORIA_MAX_FILAS = 1000;
 export const REALTIME_BENS_ACTIVO = true;
 export const REALTIME_NOTIF_ACTIVO = false; // el sondeo ya cubre el caso
 
-// Cadencia del sondeo de notificaciones. El presupuesto del free es de 2 M de
-// filas leidas al mes (plan de 8 h/dia ≈ 1.44 M con 100 filas cada 60 s: dos o
-// tres equipos lo reventaban). Con 25 filas cada 3 minutos son ~30 k por mes
-// por cliente: margen amplio para lo que realmente importa (que le avisen de
-// una solicitud de baja o un anuncio).
+// La cadencia limita llamadas innecesarias y evita sondear en segundo plano.
 export const POLL_NOTIFICACIONES_MS = 180000; // 3 minutos
 export const POLL_NOTIF_ROWS = 25;
 
@@ -102,31 +98,27 @@ export const POLL_NOTIF_ROWS = 25;
 // seleccionan columnas anidadas. El select explicito de id, data, updated_at
 // ya es lo que usa syncBienes para el delta.
 
-/**
- * Estimacion de lo que ocupa la base con el estado actual.
- * Se usa para mostrar en el dashboard de salud de datos cuanto queda libre.
- */
+/** Uso real del disco de Postgres y Storage, medido en una RPC administrativa. */
 export const estimarUsoDB = async (supabase) => {
-  const tablas = ['bens', 'fc10', 'fc11', 'fc04', 'estructuras', 'usuarios', 'funcionarios', 'notificaciones', 'auditoria', 'dependencias', 'ubicaciones'];
-  let totalFilas = 0;
-  const porTabla = {};
-  for (const t of tablas) {
-    try {
-      const { count, error } = await supabase.from(t).select('*', { count: 'exact', head: true });
-      if (!error && typeof count === 'number') {
-        porTabla[t] = count;
-        totalFilas += count;
-      }
-    } catch { /* tabla que aun no existe */ }
-  }
-  // 2 KB por fila es el orden de magnitud de un bien con su JSONB.
-  const bytesEstimados = totalFilas * BYTES_POR_FILA_BIEN;
-  return { porTabla, totalFilas, bytesEstimados, pctUso: (bytesEstimados / LIMITE_DB) * 100 };
+  const { data, error } = await supabase.rpc('admin_obtener_uso_recursos');
+  if (error) throw error;
+  if (!data || !Number.isFinite(Number(data.dbBytes))) throw new Error('La RPC no devolvió el tamaño de la base.');
+  const bytesEstimados = Number(data.dbBytes);
+  const storageBytes = Number(data.storageBytes) || 0;
+  return {
+    bytesEstimados,
+    storageBytes,
+    objetosStorage: Number(data.storageObjetos) || 0,
+    pctUso: (bytesEstimados / LIMITE_DB) * 100,
+    pctStorage: (storageBytes / LIMITE_STORAGE) * 100,
+    medidoEn: data.medidoEn || null
+  };
 };
 
 /** Aviso si el uso se acerca al limite del free. */
-export const alertaUso = ({ pctUso }) => {
-  if (pctUso >= 90) return { nivel: 'critico', texto: 'Base de datos casi llena. Conviene archivar auditoría antigua.' };
-  if (pctUso >= 70) return { nivel: 'aviso', texto: 'La base de datos está usando más de 70% del plan free.' };
+export const alertaUso = ({ pctUso, pctStorage = 0 }) => {
+  const maximo = Math.max(pctUso || 0, pctStorage || 0);
+  if (maximo >= 95) return { nivel: 'critico', texto: 'El almacenamiento está casi lleno. Revisa la base y las fotos antes de continuar.' };
+  if (maximo >= 80) return { nivel: 'aviso', texto: 'El almacenamiento está por encima del 80% de la cuota gratuita.' };
   return null;
 };

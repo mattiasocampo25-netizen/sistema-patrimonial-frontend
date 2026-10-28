@@ -78,7 +78,12 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
     setPrevia(null);
     setErrorArchivo('');
     try {
-      const texto = await archivo.text();
+      const esGzip = archivo.name.toLowerCase().endsWith('.gz');
+      let texto;
+      if (esGzip) {
+        if (typeof DecompressionStream === 'undefined') throw new Error('Este navegador no puede abrir respaldos comprimidos. Prueba con Chrome, Edge o Firefox actualizado.');
+        texto = await new Response(archivo.stream().pipeThrough(new DecompressionStream('gzip'))).text();
+      } else texto = await archivo.text();
       // Un respaldo de 1800 bienes pesa algunos MB; JSON.parse bloquearía el
       // hilo unos cientos de ms. Aceptable para una operación de administración.
       const crudo = JSON.parse(texto);

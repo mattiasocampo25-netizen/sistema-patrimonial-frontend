@@ -262,24 +262,32 @@ export default function App() {
     if (!fichaBien || !file) return;
     if (!file.type.startsWith('image/')) return addToast('El archivo debe ser una imagen.', 'warning');
     setSubiendoFoto(true);
+    let rutaSubida = null;
     try {
       const blob = await comprimirImagen(file);
       const nombre = `${fichaBien.id}/${generateId()}.jpg`;
+      rutaSubida = nombre;
       const { error: upErr } = await supabase.storage.from('fotos-bienes').upload(nombre, blob, { contentType: 'image/jpeg', upsert: false });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from('fotos-bienes').getPublicUrl(nombre);
-      // Tope de 3 fotos: el storage del plan free de Supabase es de 5 GB y cada
-      // foto pesa ~120 KB. Con 5 por bien el consumo se dispara sin aporte real
+      // Tope de 3 fotos: Storage del plan Free tiene 1 GB y cada
+      // foto pesa ~120 KB. Una galería breve deja espacio para más bienes
       // (las fichas se revisan con 2 o 3 fotos).
       const fotos = [...(fichaBien.fotos || []), { url: pub.publicUrl, ruta: nombre, fecha: new Date().toISOString(), usuario: currentUser?.username || 'Usuario' }].slice(-MAX_FOTOS_POR_BIEN);
-      // Si se supera el tope, borrar la más vieja del storage
       const sobrantes = (fichaBien.fotos || []).filter(f => !fotos.includes(f));
-      if (sobrantes.length > 0) {
-        try { await supabase.storage.from('fotos-bienes').remove(sobrantes.map(f => f.ruta).filter(Boolean)); } catch {}
-      }
       const actualizado = { ...fichaBien, fotos };
       const { error: dbErr } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
       if (dbErr) throw dbErr;
+      rutaSubida = null;
+      // Actualiza primero la referencia en Postgres; solo entonces borra fotos
+      // antiguas para no dejar rutas rotas si falla la escritura del bien.
+      if (sobrantes.length > 0) {
+        const rutasAntiguas = sobrantes.map(f => f.ruta).filter(Boolean);
+        if (rutasAntiguas.length) {
+          const { error: errorLimpieza } = await supabase.storage.from('fotos-bienes').remove(rutasAntiguas);
+          if (errorLimpieza) addToast('La foto se guardó, pero no se pudieron limpiar algunos archivos anteriores.', 'warning');
+        }
+      }
       // Releer del servidor como fuente de verdad (la galería muestra exactamente lo guardado)
       let final = actualizado;
       try {
@@ -294,6 +302,9 @@ export default function App() {
       const kb = Math.round(blob.size / 1024);
       addToast(`Foto agregada (${kb} KB).`, 'success');
     } catch {
+      if (rutaSubida) {
+        try { await supabase.storage.from('fotos-bienes').remove([rutaSubida]); } catch {}
+      }
       addToast('No se pudo subir la foto. Verifica el bucket fotos-bienes en Supabase.', 'error');
     } finally {
       setSubiendoFoto(false);
@@ -302,12 +313,13 @@ export default function App() {
   const eliminarFotoBien = async (foto) => {
     if (!fichaBien || !foto) return;
     try {
-      if (foto.ruta) {
-        try { await supabase.storage.from('fotos-bienes').remove([foto.ruta]); } catch {}
-      }
       const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => f.url !== foto.url) };
       const { error } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
       if (error) throw error;
+      if (foto.ruta) {
+        const { error: errorStorage } = await supabase.storage.from('fotos-bienes').remove([foto.ruta]);
+        if (errorStorage) addToast('La foto se quitó del bien, pero no se pudo limpiar el archivo del almacenamiento.', 'warning');
+      }
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? actualizado : b)));
       setFichaBien(actualizado);
       addToast('Foto eliminada.', 'success');
@@ -650,7 +662,7 @@ export default function App() {
   };
   // PENDIENTE_LABELS vive en constants/appConstants (se usa en InventarioView).
   // Dominio de auditoría: hook extraído (Fase 6). La vista recibe los mismos nombres.
-  const { auditoriaList, isLoadingAud, searchAud, setSearchAud, filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, conteoCodigos, setConteoCodigos, conteoInput, setConteoInput, muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion, conteoUbicacion, setConteoUbicacion, muestra, verificadosMuestra, setVerificadosMuestra, paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud, fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud, evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, resultadoConteo, agregarCodigoConteo, descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV, guardarActaConteo, generarMuestra, guardarActaMuestreo } = useAuditoria({
+  const { auditoriaList, isLoadingAud, searchAud, setSearchAud, filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, conteoCodigos, setConteoCodigos, conteoInput, setConteoInput, muestraN, setMuestraN, muestraUbicacion, setMuestraUbicacion, conteoUbicacion, setConteoUbicacion, muestra, verificadosMuestra, setVerificadosMuestra, paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud, fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud, evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, errorUsoDb, ultimoBackup, resultadoConteo, agregarCodigoConteo, descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV, guardarActaConteo, generarMuestra, guardarActaMuestreo } = useAuditoria({
     bienes, fc10List, fc11List, funcionariosPadron, dependenciaActual,
     currentUser, ubicacionesUnicas, activeTab, isAdmin,
     notify: addToast,
@@ -775,14 +787,14 @@ useEffect(() => {
 
   // Ficha 360: la lee el realtime (H5) anterior a H8, vive en App.
   // Sincronización de datos: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const { isOnline, colaOffline, notificaciones, setNotificaciones, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount } = useRealtimeSync({
-    notify: addToast, currentUser, setCurrentUser, dependenciaActual, isAuthenticated, isAdmin,
+  const { isOnline, colaOffline, notificaciones, setNotificaciones, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount, ultimoSyncBienes, isLoadingDocumentos } = useRealtimeSync({
+    notify: addToast, currentUser, setCurrentUser, dependenciaActual, activeTab, isAuthenticated, isAdmin,
     handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
     setEstructurasDB, setUsuariosList, setFuncionariosPadron,
     setDbError, setIsLoading, setFichaBien
   });
   // Modales de fichas y formularios: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const { isBulkQR, setIsBulkQR, qrTargetBien, setQrTargetBien, isQRModalOpen, setIsQRModalOpen, isBienModalOpen, setIsBienModalOpen, bienEditing, setBienEditing, bienFormRef, isFC10ModalOpen, setIsFC10ModalOpen, fc10TargetBien, fc10Editing, isFC11ModalOpen, setIsFC11ModalOpen, fc11TargetBien, fc11Editing, isFC04ModalOpen, setIsFC04ModalOpen, fc04Editing, fc04Items, fc04SinMovimiento, setFc04SinMovimiento, isFC03ModalOpen, setIsFC03ModalOpen, fc03Config, setFc03Config, fc03FuncionarioTexto, setFc03FuncionarioTexto, showFC03FuncDropdown, setShowFC03FuncDropdown, isUsuarioModalOpen, setIsUsuarioModalOpen, usuarioEditing, setUsuarioEditing, isSaving, confirmBackupModal, setConfirmBackupModal, resolucionBaja, setResolucionBaja, motivoResolucion, setMotivoResolucion, fileInputRef, showUnsavedChangesModal, setShowUnsavedChangesModal, scanParaConteo, setScanParaConteo, modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo, openFichaBien, openFC03Modal, executeGenerateFC03, openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal, handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange, handleScanSuccess, saveBien, saveUsuario, saveFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite, submitResolucionBaja, confirmDeleteAction } = useFcModals({
+  const { isBulkQR, setIsBulkQR, qrTargetBien, setQrTargetBien, isQRModalOpen, setIsQRModalOpen, isBienModalOpen, setIsBienModalOpen, bienEditing, setBienEditing, bienFormRef, isFC10ModalOpen, setIsFC10ModalOpen, fc10TargetBien, fc10Editing, isFC11ModalOpen, setIsFC11ModalOpen, fc11TargetBien, fc11Editing, isFC04ModalOpen, setIsFC04ModalOpen, fc04Editing, fc04Items, fc04SinMovimiento, setFc04SinMovimiento, isFC03ModalOpen, setIsFC03ModalOpen, fc03Config, setFc03Config, fc03FuncionarioTexto, setFc03FuncionarioTexto, showFC03FuncDropdown, setShowFC03FuncDropdown, isUsuarioModalOpen, setIsUsuarioModalOpen, usuarioEditing, setUsuarioEditing, isSaving, confirmBackupModal, setConfirmBackupModal, resolucionBaja, setResolucionBaja, motivoResolucion, setMotivoResolucion, fileInputRef, showUnsavedChangesModal, setShowUnsavedChangesModal, scanParaConteo, setScanParaConteo, modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo, openFichaBien, openFC03Modal, executeGenerateFC03, openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal, handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange, handleScanSuccess, saveBien, saveUsuario, saveFC11, registrarFirmasFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite, submitResolucionBaja, confirmDeleteAction } = useFcModals({
     notify: addToast, setIsProcessing, appLogo,
     bienes, setBienes, filteredBienes, fc10List, fc11List, fc04List,
     dependenciaActual, funcionariosConDatos,
@@ -830,7 +842,7 @@ useEffect(() => {
     }
     return mapa;
   }, [fc10List]);
-  const filteredFC11 = useMemo(() => { return fc11List.filter(fc => { const rem = fc.dependenciaRemitente || fc.remitente || ''; const dest = fc.dependenciaDestinataria || fc.destinatario || ''; if (rem !== dependenciaActual && dest !== dependenciaActual) return false; const [year, month] = String(fc.fecha || '').split('-'); return year === fc10Year && month === fc10Month; }).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()); }, [fc11List, dependenciaActual, fc10Year, fc10Month]);
+  const filteredFC11 = useMemo(() => { return fc11List.filter(fc => { const rem = fc.dependenciaRemitente || fc.remitente || ''; const dest = fc.dependenciaDestinataria || fc.destinatario || ''; if (rem !== dependenciaActual && dest !== dependenciaActual) return false; const [year, month] = String(fc.fecha || '').split('-'); return fc.estado === 'PENDIENTE_FIRMAS' || (year === fc10Year && month === fc10Month); }).sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()); }, [fc11List, dependenciaActual, fc10Year, fc10Month]);
   const filteredFC04 = useMemo(() => { return fc04List.filter(fc => { return fc.dependencia === dependenciaActual && fc.anio === fc10Year && fc.mes === fc10Month; }).sort((a, b) => new Date(b.fechaRegistro).getTime() - new Date(a.fechaRegistro).getTime()); }, [fc04List, dependenciaActual, fc10Year, fc10Month]);
   const solicitudesBaja = useMemo(() => { 
       return notificaciones.filter(n => {
@@ -1070,7 +1082,7 @@ useEffect(() => {
       url.searchParams.set('compartir', token);
       const copiado = await copiarAlPortapapeles(url.href);
       if (!copiado) throw new Error('No se pudo copiar el enlace en este navegador');
-      addToast(`Enlace de solo lectura copiado (${bienesCompartidos.length} bienes). Vence en 7 días.`, 'success');
+      addToast(`Enlace de solo lectura copiado (${bienesCompartidos.length} bienes). Vence en 1 día.`, 'success');
     } catch (error) {
       console.error('No se pudo crear el enlace de inventario:', error);
       addToast('No se pudo crear el enlace. Verifica la conexión e inténtalo nuevamente.', 'error');
@@ -1673,6 +1685,7 @@ if (publicBienId) {
         currentUser={currentUser}
         handleLogout={() => setShowLogoutConfirm(true)}
         actasPorFirmarCount={actasPorFirmarCount}
+        ultimoSyncBienes={ultimoSyncBienes}
         errorBanner={dbError ? (
           <div className="flex items-center justify-center gap-x-6 bg-danger-soft px-6 py-2.5 sm:px-3.5 border-b border-danger/30 z-50">
             <p className="text-body leading-6 text-danger font-medium">
@@ -1690,15 +1703,15 @@ if (publicBienId) {
 
                 {activeTab === 'aprobaciones' && isAdmin && (<AprobacionesView dependenciaActual={dependenciaActual} solicitudesBaja={solicitudesBaja} bienes={bienes} openResolucionModal={openResolucionModal} />)}
 
-                {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} filtroUsuarioAud={filtroUsuarioAud} setFiltroUsuarioAud={setFiltroUsuarioAud} usuariosAud={usuariosAud} desdeAud={desdeAud} setDesdeAud={setDesdeAud} hastaAud={hastaAud} setHastaAud={setHastaAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
+                {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} errorUsoDb={errorUsoDb} ultimoBackup={ultimoBackup} handleExportBackupGeneral={handleExportBackupGeneral} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} filtroUsuarioAud={filtroUsuarioAud} setFiltroUsuarioAud={setFiltroUsuarioAud} usuariosAud={usuariosAud} desdeAud={desdeAud} setDesdeAud={setDesdeAud} hastaAud={hastaAud} setHastaAud={setHastaAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
                 {activeTab === 'usuarios' && isAdmin && (<UsuariosView isLoading={isLoading} usuariosList={usuariosList} setUsuarioEditing={setUsuarioEditing} setIsUsuarioModalOpen={setIsUsuarioModalOpen} esDesarrollador={esDesarrollador} currentUser={currentUser} setItemToDelete={setItemToDelete} STYLES={STYLES} />)}
                 {activeTab === 'anuncios' && esDesarrollador && (<AnunciosView usuariosList={usuariosList} anunciosGrupos={anunciosGrupos} onEnviar={enviarAnuncio} onEliminarGrupo={eliminarGrupoAnuncio} currentUser={currentUser} />)}
                 {activeTab === 'funcionarios' && (<FuncionariosView isLoading={isLoading} dependenciaActual={dependenciaActual} funcionariosPurosDependencia={funcionariosPurosDependencia} filtroCargo={filtroCargo} setFiltroCargo={setFiltroCargo} cargosFuncionarios={cargosFuncionarios} sincronizarBienesConPadron={sincronizarBienesConPadron} handleDownloadTemplateFuncionarios={handleDownloadTemplateFuncionarios} fileInputFuncionariosRef={fileInputFuncionariosRef} isAdmin={isAdmin} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} searchFuncionarioInput={searchFuncionarioInput} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} funcionariosPaginados={funcionariosPaginados} handleEditFuncionario={handleEditFuncionario} handleDeleteFuncionario={handleDeleteFuncionario} renderPaginationFuncionarios={renderPaginationFuncionarios} />)}
 
-                {activeTab === 'fc04' && (<Fc04View filteredFC04={filteredFC04} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} openFC04Modal={openFC04Modal} STYLES={STYLES} isLoading={isLoading} ORIGENES_FC04={ORIGENES_FC04} handleGenerateFC04PDF={handleGenerateFC04PDF} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
+                {activeTab === 'fc04' && (<Fc04View filteredFC04={filteredFC04} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} openFC04Modal={openFC04Modal} STYLES={STYLES} isLoading={isLoading || isLoadingDocumentos} ORIGENES_FC04={ORIGENES_FC04} handleGenerateFC04PDF={handleGenerateFC04PDF} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
 
                 {activeTab === 'fc10' && (<Fc10View filteredFC10={filteredFC10} conteosFC10PorMes={conteosFC10PorMes} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleExportFC10CSV={handleExportFC10CSV} handleBulkFC10Zip={handleBulkFC10Zip} isLoading={isLoading} bienes={bienes} handleGenerateFC10PDF={handleGenerateFC10PDF} openFC10Modal={openFC10Modal} isAdmin={isAdmin} setItemToDelete={setItemToDelete} setActiveTab={setActiveTab} registrarFirmaFC10={firmarConBloqueo} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} ponerFC10EnTramite={ponerEnTramiteConBloqueo} poniendoEnTramite={poniendoEnTramite} actualizarEstadoFirma={actualizarEstadoFirma} currentUser={currentUser} />)}
-                {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}
+                {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading || isLoadingDocumentos} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} registrarFirmasFC11={registrarFirmasFC11} registrandoFirmasFC11={isSaving} />)}
                 {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} version={versionApp} />)}
             </div>
             </Suspense>

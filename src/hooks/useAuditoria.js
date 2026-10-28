@@ -399,17 +399,28 @@ export function useAuditoria({
     fetchAuditoria();
   };
 
-  // Consumo estimado de la base, para el panel de "salud de datos". Se calcula
-  // una sola vez al abrir Auditoría (son 10 conteos head, no traen filas).
+  // Uso real de base y Storage, medido con una RPC administrativa al abrir Auditoría.
   const [usoDb, setUsoDb] = useState(null);
+  const [errorUsoDb, setErrorUsoDb] = useState(false);
+  const [ultimoBackup, setUltimoBackup] = useState(null);
   const cargarUso = useCallback(async () => {
     try {
       const est = await estimarUsoDB(supabase);
       setUsoDb(est);
-    } catch { setUsoDb(null); }
+      setErrorUsoDb(false);
+    } catch { setUsoDb(null); setErrorUsoDb(true); }
   }, []);
   useEffect(() => {
-    if (activeTab === 'auditoria' && isAdmin) cargarUso();
+    if (activeTab !== 'auditoria' || !isAdmin) return;
+    cargarUso();
+    let vigente = true;
+    const cargarUltimoBackup = () => supabase.from('auditoria').select('fecha').eq('accion', 'BACKUP_COMPLETO')
+      .order('fecha', { ascending: false }).limit(1).maybeSingle()
+      .then(({ data }) => { if (vigente) setUltimoBackup(data?.fecha || null); })
+      .catch(() => { if (vigente) setUltimoBackup(null); });
+    cargarUltimoBackup();
+    window.addEventListener('respaldo-generado', cargarUltimoBackup);
+    return () => { vigente = false; window.removeEventListener('respaldo-generado', cargarUltimoBackup); };
   }, [activeTab, isAdmin, cargarUso]);
   const alertaDb = usoDb ? alertaUso(usoDb) : null;
 
@@ -422,7 +433,7 @@ export function useAuditoria({
     verificadosMuestra, setVerificadosMuestra,
     paginaAud, totalAud, alcanceAud, setAlcanceAud, kpisAud, accionesUnicasAud,
     fetchAuditoria, actorAud, detalleAudCorto, tonoAccionAud,
-    evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb,
+    evolucionValor, maxEvolucion, formatoCortoGs, saludDatos, usoDb, alertaDb, errorUsoDb, ultimoBackup,
     resultadoConteo, agregarCodigoConteo,
     descargarActaConteoPDF, descargarActaMuestreoPDF, exportarConteoCSV,
     guardarActaConteo, generarMuestra, guardarActaMuestreo

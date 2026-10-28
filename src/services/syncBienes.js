@@ -1,6 +1,6 @@
 // Sincronización delta de bienes (ahorro de egress de Supabase).
 //
-// Estrategia: la primera carga (o cada 24 h) descarga todo; después solo las
+// Estrategia: la primera carga (o cada 24 horas) descarga todo; después solo las
 // filas con `updated_at` posterior a la última sincronización. Como cada fila
 // pesa ~2 KB y son ~1800 por dependencia, un refetch silencioso pasa de ~4 MB
 // a unos pocos KB cuando no hubo cambios.
@@ -17,7 +17,7 @@ export const ahoraISO = () => new Date().toISOString();
 // Sella cualquier payload { data } o { id, data } con marca de tiempo fresca.
 export const conSello = (payload) => ({ ...payload, updated_at: ahoraISO() });
 
-// ¿Toca descarga total? Sin meta, sin marca, o meta vieja (>24 h, válvula
+// ¿Toca descarga total? Sin meta, sin marca, o meta vieja (>24 horas, válvula
 // de seguridad contra derivas: borrados externos, cambios de dependencia).
 export const debeResyncTotal = (meta, ahora = Date.now()) => {
   if (!meta || !meta.actualizadoEn || !meta.updated_at) return true;

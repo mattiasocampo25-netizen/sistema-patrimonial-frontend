@@ -15,9 +15,11 @@ export default function FC11Modal({
     STYLES
 }) {
     const esNuevoFC = !fc11Editing;
+    const bienesFC11 = Array.isArray(fc11TargetBien) ? fc11TargetBien : [fc11TargetBien].filter(Boolean);
     const { borrador: borradorFC, hayBorrador: hayBorradorFC, estadoGuardado, guardarBorrador: guardarBorradorFC, limpiarBorrador: limpiarBorradorFC } = useDraft('borrador_fc11_nuevo', esNuevoFC);
     const [restauradoFC, setRestauradoFC] = useState(null);
     const [formKeyFC, setFormKeyFC] = useState(0);
+    const [errorValidacion, setErrorValidacion] = useState('');
     const defectoFC = (campo, fb) => (restauradoFC && restauradoFC[campo] !== undefined && restauradoFC[campo] !== null ? restauradoFC[campo] : fb);
     const continuarBorradorFC = () => {
         if (!borradorFC) return;
@@ -26,7 +28,7 @@ export default function FC11Modal({
     };
     const [step, setStep] = useState(1);
 
-    if (!fc11TargetBien) return null;
+    if (!bienesFC11.length) return null;
 
     // Función para validar el paso actual antes de avanzar
     const nextStep = () => {
@@ -34,12 +36,14 @@ export default function FC11Modal({
         if (currentSection) {
             const inputs = currentSection.querySelectorAll('input[required], select[required]');
             for (let input of inputs) {
-                if (!input.value) {
-                    input.reportValidity();
+                if (!String(input.value || '').trim()) {
+                    setErrorValidacion('Completa los campos requeridos antes de continuar.');
+                    input.focus();
                     return; 
                 }
             }
         }
+        setErrorValidacion('');
         setStep(prev => Math.min(prev + 1, 2));
     };
 
@@ -55,7 +59,7 @@ export default function FC11Modal({
                         </div>
                         <div>
                             <h2 className="text-lg font-bold tracking-tight text-content-1 dark:text-white">
-                                {fc11Editing ? 'Editar Traslado FC-11' : 'Nuevo Traslado FC-11'}
+                                    {fc11Editing ? 'Editar Traslado FC-11' : `Nuevo FC-11 · ${bienesFC11.length} bien${bienesFC11.length === 1 ? '' : 'es'}`}
                             </h2>
                             <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Movilidad interna institucional de bienes entre dependencias</p>
                         </div>
@@ -75,9 +79,10 @@ export default function FC11Modal({
                       Descartar
                     </Button>
                   </div>
-                )}<form key={formKeyFC} onSubmit={async (e) => { const ok = await saveFC11(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => guardarBorradorFC(serializarForm(e.currentTarget))} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
+                )}<form key={formKeyFC} noValidate onSubmit={async (e) => { const ok = await saveFC11(e); if (ok) limpiarBorradorFC(); }} onChange={(e) => { setErrorValidacion(''); guardarBorradorFC(serializarForm(e.currentTarget)); }} className="flex flex-col h-full overflow-hidden bg-surface-2/30 dark:bg-surface-2/50">
                     <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
                         {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
+                        {errorValidacion && <p role="alert" className="rounded-control border border-danger/20 bg-danger-soft px-3 py-2 text-sm font-semibold text-danger">{errorValidacion}</p>}
                         
                         {/* BARRA DE PROGRESO WIZARD */}
                         <div className="flex gap-2">
@@ -86,19 +91,16 @@ export default function FC11Modal({
                             ))}
                         </div>
 
-                        {/* RESUMEN DEL BIEN (Visible siempre) */}
-                        <div className="bg-surface-1 dark:bg-surface-1 border border-line/60 dark:border-line rounded-[20px] p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 shadow-sm relative overflow-hidden">
+                        {/* RESUMEN DE BIENES (Visible siempre) */}
+                        <div className="bg-surface-1 dark:bg-surface-1 border border-line/60 dark:border-line rounded-[20px] p-5 shadow-sm relative overflow-hidden">
                             <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500"></div>
-                            <div className="pl-3">
-                                <p className="text-[10px] text-content-3 font-black uppercase tracking-widest mb-1.5">Bien a trasladar</p>
-                                <p className="font-black text-content-1 dark:text-zinc-100 text-sm">
-                                    {fc11TargetBien.rotulo} <span className="font-medium text-content-3 dark:text-content-3 ml-1">- {fc11TargetBien.descripcion}</span>
-                                </p>
-                            </div>
-                            <div className="sm:text-right pl-3 sm:pl-0">
-                                <p className="text-[10px] text-content-3 font-black uppercase tracking-widest mb-1.5">Valor Patrimonial</p>
-                                <p className="font-black text-ok dark:text-emerald-400 text-sm tabular-nums">Gs. {formatCurrency(fc11TargetBien.valorUnitario)}</p>
-                            </div>
+                            <p className="pl-3 text-[10px] text-content-3 font-black uppercase tracking-widest mb-2">Bienes del expediente · verifica el estado de cada uno</p>
+                            <ul className="pl-3 divide-y divide-line">
+                              {bienesFC11.map(bien => <li key={bien.id} className="flex flex-wrap justify-between gap-2 py-2 text-sm">
+                                <span className="font-semibold text-content-1 dark:text-zinc-100">{bien.rotulo || 'Sin rótulo'} · {bien.descripcion || 'Sin descripción'}</span>
+                                <span className="font-bold text-ok tabular-nums">Gs. {formatCurrency(bien.valorUnitario || 0)}</span>
+                              </li>)}
+                            </ul>
                         </div>
 
                         {/* PASO 1: ORIGEN Y DESTINO */}
@@ -166,21 +168,36 @@ export default function FC11Modal({
                                             name="motivo"
                                             required
                                             valor={defectoFC('motivo', (fc11Editing?.motivo || 'Traspaso'))}
-                                            opciones={['Traspaso', 'Préstamo', 'Inservible', 'Faltante']}
+                                            opciones={['Traspaso', 'Préstamo', 'Devolución a Patrimonio', 'Inservible', 'Faltante']}
                                             etiquetaTodos="Motivo"
                                             titulo="Motivo del traslado"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Estado de Conservación Actual</label>
-                                        <FiltroCombo
-                                            name="estadoConservacion"
-                                            required
-                                            valor={defectoFC('estadoConservacion', (fc11Editing?.estadoConservacion || fc11TargetBien.estadoConservacion || 'Bueno'))}
-                                            opciones={['Muy bueno', 'Bueno', 'Regular', 'Malo', 'Inutilizable']}
-                                            etiquetaTodos="Estado"
-                                            titulo="Estado de conservación"
-                                        />
+                                    <div className="md:col-span-2">
+                                      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-content-3">Estado físico verificado por bien</p>
+                                      <div className="grid gap-2 sm:grid-cols-2">
+                                        {bienesFC11.map(bien => <label key={bien.id} className="rounded-control border border-line bg-surface-1 p-3 text-xs text-content-2">
+                                          <span className="mb-2 block font-semibold">{bien.rotulo || bien.id} · {bien.descripcion || 'Sin descripción'}</span>
+                                          <select name={`estadoConservacion_${bien.id}`} required defaultValue={fc11Editing?.bienesSnapshot?.find(item => item.id === bien.id)?.estadoConservacion || bien.estadoConservacion || 'Bueno'} className="h-10 w-full rounded-control border border-line bg-surface-1 px-3 text-sm text-content-1">
+                                            {['Muy bueno', 'Bueno', 'Regular', 'Malo', 'Inutilizable'].map(estado => <option key={estado} value={estado}>{estado}</option>)}
+                                          </select>
+                                        </label>)}
+                                      </div>
+                                    </div>
+                                    <div className="md:col-span-2 rounded-control border border-brand/20 bg-brand-soft/30 p-4">
+                                      <h4 className="mb-3 text-xs font-bold uppercase tracking-wider text-content-1">Responsable que recibe los bienes</h4>
+                                      <div className="grid gap-3 sm:grid-cols-3">
+                                        <label className="text-xs text-content-3">Nombre y apellido
+                                          <input name="receptorNombre" required maxLength={160} defaultValue={fc11Editing?.receptorNombre || ''} className="mt-1 h-10 w-full rounded-control border border-line bg-surface-1 px-3 text-sm text-content-1" />
+                                        </label>
+                                        <label className="text-xs text-content-3">Cédula / documento
+                                          <input name="receptorDocumento" required maxLength={30} defaultValue={fc11Editing?.receptorDocumento || ''} className="mt-1 h-10 w-full rounded-control border border-line bg-surface-1 px-3 text-sm text-content-1" />
+                                        </label>
+                                        <label className="text-xs text-content-3">Cargo
+                                          <input name="receptorCargo" required maxLength={120} defaultValue={fc11Editing?.receptorCargo || ''} className="mt-1 h-10 w-full rounded-control border border-line bg-surface-1 px-3 text-sm text-content-1" />
+                                        </label>
+                                      </div>
+                                      <p className="mt-2 text-[11px] text-content-3">Esta persona será el único firmante obligatorio de recepción en el PDF FC-11.</p>
                                     </div>
                                     <div className="md:col-span-2">
                                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Observaciones</label>

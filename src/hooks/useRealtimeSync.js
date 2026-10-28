@@ -28,14 +28,23 @@ import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../uti
 //   setUsuariosList, setFuncionariosPadron, setDbError, setIsLoading,
 //   setFichaBien: setters que viven en App.
 export function useRealtimeSync({
-  notify, currentUser, setCurrentUser, dependenciaActual, isAuthenticated, isAdmin,
+  notify, currentUser, setCurrentUser, dependenciaActual, activeTab, isAuthenticated, isAdmin,
   handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
   setEstructurasDB, setUsuariosList, setFuncionariosPadron,
   setDbError, setIsLoading, setFichaBien
 }) {
   const [notificaciones, setNotificaciones] = useState([]);
+  const [ultimoSyncBienes, setUltimoSyncBienes] = useState(null);
+  const [isLoadingDocumentos, setIsLoadingDocumentos] = useState(false);
 
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [pestanaVisible, setPestanaVisible] = useState(() => typeof document === 'undefined' || !document.hidden);
+
+  useEffect(() => {
+    const actualizarVisibilidad = () => setPestanaVisible(!document.hidden);
+    document.addEventListener('visibilitychange', actualizarVisibilidad);
+    return () => document.removeEventListener('visibilitychange', actualizarVisibilidad);
+  }, []);
 
   // Guarda de concurrencia en ref para que sobreviva a los renders.
   // Invalida cargas viejas cuando el usuario cambia de dependencia o desmonta.
@@ -47,10 +56,23 @@ export function useRealtimeSync({
   // petición ya esté en camino, su resultado corresponde a otra dependencia y no
   // debe llegar a la pantalla.
   const depAnteriorRef = useRef(dependenciaActual);
+  const secundariosCargadosRef = useRef({ dependencia: dependenciaActual, fc11: 0, fc04: 0 });
+  useEffect(() => {
+    let vigente = true;
+    setUltimoSyncBienes(null);
+    localforage.getItem(`bienes_meta_${dependenciaActual}`).then(meta => {
+      if (vigente && meta?.actualizadoEn) setUltimoSyncBienes(meta.actualizadoEn);
+    }).catch(() => {});
+    return () => { vigente = false; };
+  }, [dependenciaActual]);
+
   useEffect(() => {
     if (depAnteriorRef.current !== dependenciaActual) {
       depAnteriorRef.current = dependenciaActual;
       guardaGen.invalidar();
+      secundariosCargadosRef.current = { dependencia: dependenciaActual, fc11: 0, fc04: 0 };
+      setFc11List([]);
+      setFc04List([]);
     }
   }, [dependenciaActual, guardaGen]);
 
@@ -185,16 +207,24 @@ export function useRealtimeSync({
         // Inicia las consultas de actas y catálogos junto con la descarga de
         // bienes. Antes empezaban después de bajar el inventario completo, lo
         // que sumaba ambas latencias en cada arranque.
-        const escDep = escaparFiltroPostgrest(dependenciaActual);
+        const traerPaginas = async (crearConsulta, columnaOrden = 'id') => {
+          const filas = [];
+          const tamanoPagina = 1000;
+          for (let desde = 0; ; desde += tamanoPagina) {
+            const { data, error } = await crearConsulta()
+              .order(columnaOrden, { ascending: true })
+              .range(desde, desde + tamanoPagina - 1);
+            if (error) throw error;
+            filas.push(...(data || []));
+            if (!data || data.length < tamanoPagina) return filas;
+          }
+        };
         const consultasSecundariasPromise = Promise.all([
-          supabase.from('fc10').select('id, data').eq('data->>dependencia', dependenciaActual),
-          supabase.from('fc11').select('id, data')
-            .or(`data->>dependenciaRemitente.eq.${escDep},data->>dependenciaDestinataria.eq.${escDep}`),
-          supabase.from('fc04').select('id, data').eq('data->>dependencia', dependenciaActual),
-          supabase.from('estructuras').select('id, data'),
+          traerPaginas(() => supabase.from('fc10').select('id, data').eq('data->>dependencia', dependenciaActual)),
+          traerPaginas(() => supabase.from('estructuras').select('id, data')),
           queryNotificacionesAcotadas(),
-          supabase.from('usuarios').select('username, nombre, cargo, dependencia'),
-          supabase.from('funcionarios').select('*')
+          traerPaginas(() => supabase.from('usuarios').select('username, nombre, cargo, dependencia'), 'username'),
+          traerPaginas(() => supabase.from('funcionarios').select('*'))
         ]).then(value => ({ value }), error => ({ error }));
 
         if (descargaTotal) {
@@ -230,12 +260,18 @@ export function useRealtimeSync({
           await localforage.setItem(CACHE_BIENES, inventarioFinal);
           // Si ninguna fila trae sello (datos legacy), el punto de sync es "ahora":
           // desde aquí, toda edición ya sale sellada y entra en el delta.
-          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || ahoraISO(), actualizadoEn: Date.now() });
+          const fechaSync = Date.now();
+          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || ahoraISO(), actualizadoEn: fechaSync });
           if (!turnoVigente()) return;
           setBienes(inventarioFinal);
+          setUltimoSyncBienes(fechaSync);
         } else {
+          const fechaVacia = Date.now();
+          await localforage.setItem(CACHE_BIENES, []);
+          await localforage.setItem(META_BIENES, { updated_at: ahoraISO(), actualizadoEn: fechaVacia });
           if (!turnoVigente()) return;
           setBienes([]);
+          setUltimoSyncBienes(fechaVacia);
         }
         } else {
           // Delta: solo filas tocadas desde la última sincronización (KB, no MB).
@@ -247,9 +283,11 @@ export function useRealtimeSync({
           if (errorDelta) throw errorDelta;
           const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, cambios || [], dependenciaActual);
           await localforage.setItem(CACHE_BIENES, lista);
-          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: Date.now() });
+          const fechaSync = Date.now();
+          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: fechaSync });
           if (!turnoVigente()) return;
           setBienes(lista);
+          setUltimoSyncBienes(fechaSync);
         }
 
         // fc11 no tiene columna 'dependencia': guarda remitente y destinataria. Antes
@@ -258,7 +296,7 @@ export function useRealtimeSync({
         // incluye un snapshot completo del bien — y los mostraba la Ficha 360.
         const consultasSecundarias = await consultasSecundariasPromise;
         if (consultasSecundarias.error) throw consultasSecundarias.error;
-        const [resFc10, resFc11, resFc04, resEstructuras, resAuditoria, resUsuarios, resFuncionarios] = consultasSecundarias.value;
+        const [resFc10, resEstructuras, resAuditoria, resUsuarios, resFuncionarios] = consultasSecundarias.value;
 
         const parseDirect = (resData) => {
             if (!resData) return [];
@@ -275,8 +313,6 @@ export function useRealtimeSync({
         if (!turnoVigente()) return;
 
         setFc10List(parseDirect(resFc10.data));
-        setFc11List(parseDirect(resFc11.data));
-        setFc04List(parseDirect(resFc04.data));
         setEstructurasDB(parseDirect(resEstructuras.data));
 
         const notifData = resAuditoria.data || [];
@@ -315,9 +351,65 @@ export function useRealtimeSync({
     setUsuariosList, setFuncionariosPadron, setIsLoading, setDbError,
     guardaGen]);
 
+  // FC-11 y FC-04 se consultan al entrar a su sección. Cada página usa el
+  // límite de PostgREST y la descarga se repite tras cinco minutos.
+  const solicitudDocumentoRef = useRef(0);
+  useEffect(() => {
+    const modulo = activeTab === 'fc11' ? 'fc11' : activeTab === 'fc04' ? 'fc04' : null;
+    if (!isAuthenticated || !pestanaVisible || !modulo) return undefined;
+    const marca = secundariosCargadosRef.current;
+    if (marca.dependencia !== dependenciaActual) {
+      secundariosCargadosRef.current = { dependencia: dependenciaActual, fc11: 0, fc04: 0 };
+    }
+    const ahora = Date.now();
+    if (ahora - (secundariosCargadosRef.current[modulo] || 0) < 5 * 60 * 1000) return undefined;
+
+    let vigente = true;
+    const solicitud = ++solicitudDocumentoRef.current;
+    const paginar = async () => {
+      const filas = [];
+      const escDep = escaparFiltroPostgrest(dependenciaActual);
+      for (let desde = 0; ; desde += 1000) {
+        const query = modulo === 'fc11'
+          ? supabase.from('fc11').select('id, data')
+            .or(`data->>dependenciaRemitente.eq.${escDep},data->>dependenciaDestinataria.eq.${escDep}`)
+          : supabase.from('fc04').select('id, data').eq('data->>dependencia', dependenciaActual);
+        const { data, error } = await query.order('id', { ascending: true }).range(desde, desde + 999);
+        if (error) throw error;
+        filas.push(...(data || []));
+        if (!data || data.length < 1000) return filas;
+      }
+    };
+
+    setIsLoadingDocumentos(true);
+    paginar().then(filas => {
+      if (!vigente || solicitudDocumentoRef.current !== solicitud) return;
+      const registros = filas.map(item => {
+        if (!item.data) return item;
+        const datos = typeof item.data === 'string' ? JSON.parse(item.data) : item.data;
+        return { id: item.id, ...datos };
+      });
+      if (modulo === 'fc11') setFc11List(registros);
+      else setFc04List(registros);
+      secundariosCargadosRef.current[modulo] = Date.now();
+    }).catch(error => {
+      if (vigente) notify(`No se pudo cargar ${modulo.toUpperCase()}. Vuelve a intentarlo al entrar de nuevo.`, 'error');
+      console.error(`Error al cargar ${modulo}:`, error);
+    }).finally(() => {
+      if (vigente && solicitudDocumentoRef.current === solicitud) setIsLoadingDocumentos(false);
+    });
+
+    return () => {
+      vigente = false;
+      if (solicitudDocumentoRef.current === solicitud) setIsLoadingDocumentos(false);
+    };
+  }, [activeTab, dependenciaActual, isAuthenticated, pestanaVisible, notify, setFc11List, setFc04List]);
+
   // --- MOTOR DE ARRANQUE DE DATOS ---
   useEffect(() => { 
-      if (isAuthenticated) {
+      if (isAuthenticated && pestanaVisible) {
+          // Al volver a la pestaña se reconcilia el delta antes de retomar
+          // canales y sondeos; mientras está oculta no consume conexiones ni mensajes.
           fetchData(false); 
   // `cargarNotificaciones`, `sondearNotificaciones` y `fusionarNotificacion`
   // se decluan DESPUES de este efecto: listarlas aqui las usaria antes de
@@ -351,6 +443,9 @@ export function useRealtimeSync({
                   // Comparación tolerante (tildes/mayúsculas) como el resto.
                   if (normalizeStr(d.dependencia || '') !== normalizeStr(dependenciaActual)) {
                       setBienes(prev => prev.filter(b => b.id !== row.id));
+                      localforage.getItem(`bienes_cache_${dependenciaActual}`).then(cache => {
+                        if (Array.isArray(cache)) localforage.setItem(`bienes_cache_${dependenciaActual}`, cache.filter(b => b.id !== row.id));
+                      }).catch(() => {});
                       return;
                   }
                   const bien = { id: row.id, ...d };
@@ -362,6 +457,17 @@ export function useRealtimeSync({
                       return copia;
                   });
                   setFichaBien(prev => (prev && prev.id === bien.id ? bien : prev));
+                  localforage.getItem(`bienes_cache_${dependenciaActual}`).then(async cache => {
+                    if (!Array.isArray(cache)) return;
+                    const { lista, maxUpdatedAt } = fusionarBienes(cache, [row], dependenciaActual);
+                    const actualizadoEn = Date.now();
+                    await localforage.setItem(`bienes_cache_${dependenciaActual}`, lista);
+                    await localforage.setItem(`bienes_meta_${dependenciaActual}`, {
+                      updated_at: maxUpdatedAt || row.updated_at,
+                      actualizadoEn
+                    });
+                    setUltimoSyncBienes(actualizadoEn);
+                  }).catch(() => {});
               } catch {}
           }).subscribe() : null;
           return () => {
@@ -375,7 +481,7 @@ export function useRealtimeSync({
               guardaGen.invalidar();
           };
       }
-  }, [isAuthenticated, fetchData, dependenciaActual, isAdmin,
+  }, [isAuthenticated, pestanaVisible, fetchData, dependenciaActual, isAdmin,
     setBienes, setFichaBien, guardaGen]);
 
   const markAsRead = async (notif) => {
@@ -577,7 +683,7 @@ export function useRealtimeSync({
   // competing sobre la misma caché de IndexedDB.
 
   return {
-    isOnline, colaOffline, notificaciones, setNotificaciones,
+    isOnline, colaOffline, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
     fetchData, cargarNotificaciones, sondearNotificaciones, fusionarNotificacion,
     markAsRead, markAllAsRead, misNotificaciones, unreadCount
   };

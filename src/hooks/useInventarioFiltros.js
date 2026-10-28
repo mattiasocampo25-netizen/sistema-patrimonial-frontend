@@ -433,7 +433,17 @@ useEffect(() => {
     // Búsqueda robusta: tildes, multi-palabra (AND), rótulo sin ceros/guiones, más campos.
     // Usa término con debounce para no filtrar en cada tecla con 1800+ registros.
     if (debouncedSearchTerm && String(debouncedSearchTerm).trim()) {
-      filtered = filtered.filter(b => matchBienSearch(b, debouncedSearchTerm, fc10PorBien.get(String(b.id))));
+      const tokens = normalizeStr(debouncedSearchTerm).split(' ').filter(Boolean);
+      const consultaNumerica = tokens.length > 0 && tokens.every(token => /^[\d.,/#_-]+$/.test(token));
+      const porCodigo = consultaNumerica
+        ? filtered.filter(b => matchBienSearch(b, debouncedSearchTerm, [], { codigoSolo: true }))
+        : [];
+      // Si el número identifica un bien por su rótulo/código, mostrar esos
+      // resultados. Buscar por CI/datos de acta queda como alternativa cuando
+      // ningún código del inventario coincide.
+      filtered = porCodigo.length ? porCodigo : filtered.filter(b =>
+        matchBienSearch(b, debouncedSearchTerm, fc10PorBien.get(String(b.id)))
+      );
     }
 
     filtered.sort((a, b) => {

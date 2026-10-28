@@ -481,15 +481,15 @@ export default function InventarioView({
               <i className="fa-solid fa-address-card text-xs"></i>
             </button>
           </div>
-          {(hasFilters || seleccionados.length > 0) && onCopiarLink && (
+          {(seleccionados.length > 0 || filtroFuncionario) && onCopiarLink && (
             <button
               onClick={onCopiarLink}
-              title={seleccionados.length > 0 ? 'Copiar un link con filtros y bienes seleccionados' : 'Copiar un link con estos filtros aplicados'}
-              aria-label={seleccionados.length > 0 ? `Copiar enlace con ${seleccionados.length} bienes seleccionados` : 'Copiar enlace con filtros aplicados'}
-              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-line dark:border-zinc-700/30 text-[11px] font-bold text-content-3 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-3/20 hover:text-content-1 dark:hover:text-zinc-200 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              title={seleccionados.length > 0 ? 'Crear enlace temporal de solo lectura para los bienes seleccionados' : 'Crear enlace temporal de solo lectura para todos los bienes de este funcionario'}
+              aria-label={seleccionados.length > 0 ? `Compartir ${seleccionados.length} bienes en modo de solo lectura` : `Compartir los bienes de ${filtroFuncionario} en modo de solo lectura`}
+              className="inline-flex items-center gap-1.5 h-9 px-2.5 rounded-control border border-brand/25 bg-brand-soft text-[11px] font-bold text-brand-text hover:bg-brand/15 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
-              <i className="fa-solid fa-link text-[10px]"></i>
-              <span className="hidden sm:inline">{seleccionados.length > 0 ? `Copiar link (${seleccionados.length})` : 'Copiar link'}</span>
+              <i className="fa-solid fa-share-nodes text-[10px]"></i>
+              <span className="hidden sm:inline">{seleccionados.length > 0 ? `Compartir (${seleccionados.length})` : 'Compartir bienes'}</span>
             </button>
           )}
           <ExportScheduleMenu onEjecutarAhora={onExportarProgramado} />

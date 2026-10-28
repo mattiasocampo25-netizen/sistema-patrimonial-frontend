@@ -58,3 +58,10 @@ export function nombreFC10Archivo(fc, fecha = new Date()) {
   const rotulo = normalizarSegmentoArchivo(fc?.rotulo || fc?.bienRotulo, '');
   return `FC10_Acta_${responsable}${rotulo ? `_${rotulo}` : ''}_${fechaParaArchivo(fc?.entregadoFecha || fc?.fechaGeneracion || fecha)}.pdf`;
 }
+
+export function nombreDescargaFC10(fc, bien, fecha = new Date()) {
+  return nombreFC10Archivo({
+    ...fc,
+    bienRotulo: fc?.bienRotulo || fc?.rotulo || bien?.rotulo
+  }, fecha);
+}

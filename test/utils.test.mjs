@@ -4,7 +4,7 @@ import { numeroALetras } from '../src/utils/numeroLetras.js';
 import { extraerCodigoQR } from '../src/utils/qr.js';
 import { normalizarBien, tieneValor } from '../src/utils/bienPublico.js';
 import { puntuarOpcion, ordenarPorCercania } from '../src/utils/busqueda.js';
-import { normalizeStr } from '../src/utils/helpers.js';
+import { matchBienSearch, normalizeStr } from '../src/utils/helpers.js';
 
 describe('numeroALetras', () => {
   it('casos base', () => {
@@ -73,5 +73,19 @@ describe('busqueda sin tildes (reclamo de Victor/Victor)', () => {
   it('ordenarPorCercania devuelve lo mas cercano primero', () => {
     const r = ordenarPorCercania(['Alvíctor Gómez', 'Víctor Ríos'], 'victor').map(o => o.original);
     assert.deepEqual(r, ['Víctor Ríos', 'Alvíctor Gómez']);
+  });
+});
+
+describe('búsqueda numérica del inventario', () => {
+  it('prioriza coincidencias en rótulo y código sobre números de datos relacionados', () => {
+    const bienCoincidente = { id: '1', rotulo: '2803-01-05-4778', descripcion: 'Silla' };
+    const bienNoCoincidente = { id: '2', rotulo: '2803-01-05-3441', descripcion: 'La teoría', funcionarioDoc: '4778' };
+    assert.equal(matchBienSearch(bienCoincidente, '4778'), true);
+    assert.equal(matchBienSearch(bienNoCoincidente, '4778', [{ funcionarioDoc: '4778' }], { codigoSolo: true }), false);
+  });
+
+  it('mantiene búsqueda por CI cuando ningún código de bien coincide', () => {
+    const bien = { id: '2', rotulo: '2803-01-05-3441', descripcion: 'La teoría' };
+    assert.equal(matchBienSearch(bien, '4778', [{ funcionarioDoc: '4778' }]), true);
   });
 });

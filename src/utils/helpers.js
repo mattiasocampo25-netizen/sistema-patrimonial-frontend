@@ -73,7 +73,7 @@ export const repairMojibake = (value) => {
 //
 // OJO: no cambiar la version a mano. Se cambia con:
 //   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
-export const APP_VERSION = '2.16.4';
+export const APP_VERSION = '2.16.5';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.
@@ -146,9 +146,32 @@ export const formatearMiles = (valor) => {
 
 // Búsqueda robusta de bienes: insensible a tildes/mayúsculas, multi-palabra (AND),
 // tolerante a ceros/guiones en rótulos y ampliada a más campos.
-export const matchBienSearch = (bien, query, registrosRelacionados = []) => {
+export const matchBienSearch = (bien, query, registrosRelacionados = [], { codigoSolo = false } = {}) => {
   if (!query || !String(query).trim()) return true;
   const b = bien || {};
+  const tokens = normalizeStr(query).split(' ').filter(Boolean);
+  const esConsultaNumerica = tokens.length > 0 && tokens.every(tok => /^[\d.,/#_-]+$/.test(tok));
+  const camposCodigo = [b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial, b.id]
+    .map(v => String(v ?? ''));
+  // Al buscar un número que coincide con un rótulo/código, no incluir bienes
+  // cuyo único match está en una CI, fecha u otro dato relacionado. Eso hacía
+  // que el contador mostrara bienes que no parecían coincidir con la búsqueda.
+  const coincideCodigo = (campo, token) => {
+    const digitos = token.replace(/\D/g, '');
+    const sinCeros = digitos.replace(/^0+/, '') || '0';
+    const raw = String(campo ?? '').replace(/\D/g, '');
+    return Boolean(raw && (raw.includes(digitos) || (raw.replace(/^0+/, '') || '0').includes(sinCeros)));
+  };
+  if (esConsultaNumerica && codigoSolo) {
+    return tokens.every(token => camposCodigo.some(campo => coincideCodigo(campo, token)));
+  }
+  if (esConsultaNumerica && tokens.some(token => {
+    const digitos = token.replace(/\D/g, '');
+    const sinCeros = digitos.replace(/^0+/, '') || '0';
+    return camposCodigo.some(campo => coincideCodigo(campo, token));
+  })) {
+    return tokens.every(token => camposCodigo.some(campo => coincideCodigo(campo, token)));
+  }
   const fields = [
     b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial, b.descripcion,
     b.cuenta, b.subcuenta, b.analitico1, b.analitico2, b.ubicacion,
@@ -167,7 +190,6 @@ export const matchBienSearch = (bien, query, registrosRelacionados = []) => {
     const raw = String(f).replace(/\D/g, '');
     return { raw, stripped: raw.replace(/^0+/, '') || (raw ? '0' : '') };
   });
-  const tokens = normalizeStr(query).split(' ').filter(Boolean);
   if (tokens.length === 0) return true;
   return tokens.every(tok => {
     if (fieldsNorm.some(field => field.includes(tok))) return true;

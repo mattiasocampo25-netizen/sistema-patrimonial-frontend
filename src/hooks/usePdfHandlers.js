@@ -11,7 +11,7 @@ import {
 } from '../utils/pdfGenerators';
 import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
-import { fechaParaArchivo, nombreFC10Archivo, normalizarSegmentoArchivo, solicitarNombreArchivo } from '../utils/fileNames.js';
+import { fechaParaArchivo, nombreDescargaFC10, nombreFC10Archivo, normalizarSegmentoArchivo, solicitarNombreArchivo } from '../utils/fileNames.js';
 
 // Handlers de PDFs, QR, CSV, Excel y backup (extraídos de App.jsx, Fase 6).
 // Funciones de presentación: reciben todo por parámetros, sin estado propio.
@@ -342,7 +342,8 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     setTimeout(async () => {
       try {
         const { doc, fechaDocumento, fc } = await buildFC10PDFDoc(fcs, bienesAListar);
-        const nombreSugerido = nombreFC10Archivo(fc, fechaDocumento);
+        const bienDelActa = bienesAListar.find(bien => String(bien?.id) === String(fc?.bienId)) || bienesAListar[0] || {};
+        const nombreSugerido = nombreDescargaFC10(fc, bienDelActa, fechaDocumento);
         if (opciones.vistaPrevia) {
           const url = URL.createObjectURL(doc.output('blob'));
           ventanaPrevia.location.href = url;

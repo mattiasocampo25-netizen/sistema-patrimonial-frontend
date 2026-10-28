@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { aplicarSeleccionRango, construirLinkInventario, detectarBienesSimilares, idsEntre } from '../src/utils/inventarioInteracciones.js';
-import { fechaParaArchivo, nombreFC10Archivo, normalizarSegmentoArchivo, registrarDialogoNombreArchivo, solicitarNombreArchivo } from '../src/utils/fileNames.js';
+import { fechaParaArchivo, nombreDescargaFC10, nombreFC10Archivo, normalizarSegmentoArchivo, registrarDialogoNombreArchivo, solicitarNombreArchivo } from '../src/utils/fileNames.js';
 
 test('los nombres sugeridos de descargas son legibles, seguros y conservan fecha local ISO', () => {
   assert.equal(normalizarSegmentoArchivo('Área: Dirección/Académica'), 'Area_Direccion_Academica');
   assert.equal(fechaParaArchivo('2026-10-28'), '2026-10-28');
   assert.equal(nombreFC10Archivo({ funcionarioNombre: 'José Pérez', bienRotulo: 'UNP/123', entregadoFecha: '2026-10-28' }), 'FC10_Acta_Jose_Perez_UNP_123_2026-10-28.pdf');
+  assert.equal(nombreDescargaFC10({ funcionarioNombre: 'Ana Vera', bienId: 'bien-1', entregadoFecha: '2026-03-04' }, { id: 'bien-1', rotulo: '2803-01/4778' }), 'FC10_Acta_Ana_Vera_2803-01_4778_2026-03-04.pdf');
+  assert.equal(nombreDescargaFC10({ funcionarioNombre: 'Ana Vera', fechaGeneracion: '2026-03-02' }, { rotulo: 'A-27' }), 'FC10_Acta_Ana_Vera_A-27_2026-03-02.pdf');
 });
 
 test('el diálogo permite cambiar el nombre y usar el sugerido sin extensiones duplicadas', async () => {

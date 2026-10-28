@@ -48,6 +48,7 @@ const InventarioView = lazyConReintento(() => import('./views/InventarioView'));
 import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
 import ErrorView from './views/ErrorView';
+import InventarioCompartidoView from './views/InventarioCompartidoView';
 import KioskBar, { BotonPantallaCompleta } from './components/KioskBar';
 import { parseIdleSegundos } from './utils/kiosk';
 import { obtenerProgramacion, guardarProgramacion, tocaEjecutar, construirCSVInventario, nombreArchivoInventario, descargarYArchivar } from './services/exportSchedule';
@@ -92,6 +93,7 @@ function CargaModulo() {
 export default function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const publicBienId = urlParams.get('id') || urlParams.get('bienId');
+  const publicShareToken = urlParams.get('compartir') || urlParams.get('share');
   // Rutas conocidas del sistema. Si la URL no corresponde a ninguna y tampoco
   // es la vista pública de un bien, se muestra el 404 en vez de un shell vacío.
   const RUTAS_CONOCIDAS = ['escaner', 'inventario', 'dashboard', 'usuarios', 'ayuda', 'auditoria', 'panel', 'kiosco'];
@@ -316,7 +318,7 @@ export default function App() {
 
   // Filtros/búsqueda/paginación del inventario: hook extraído (Fase 3).
   // La UI usa los mismos nombres vía desestructuración.
-  const { setSearchInput, searchTerm, debouncedSearchTerm, setSearchTerm, orden, setOrden, filtroFuncionario, setFiltroFuncionario, filtroUbicacion, setFiltroUbicacion, filtroAnio, setFiltroAnio, setFiltroMes, filtroSubcuenta, setFiltroSubcuenta, filtroAnalitico1, setFiltroAnalitico1, filtroAnalitico2, setFiltroAnalitico2, setFiltroQR, filtroFC10, setFiltroFC10, filtroEstado, setFiltroEstado, filtroPendiente, setFiltroPendiente, currentPage, setCurrentPage, clearAllFilters, hasFilters, vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista, guardarVistaActual, aplicarVista, eliminarVista, funcionariosUnicos, ubicacionesUnicas, aniosUnicos, subcuentasUnicas, analiticos1Unicos, stats, pendientes, filteredBienes, itemsPaginados, totalPages, itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion, vistaInv, cambiarVistaInv, urlFiltrosActual } = useInventarioFiltros({ bienes, dependenciaActual, fc10List, username: currentUser?.username, notify: addToast });
+  const { setSearchInput, searchTerm, debouncedSearchTerm, setSearchTerm, orden, setOrden, filtroFuncionario, setFiltroFuncionario, filtroUbicacion, setFiltroUbicacion, filtroAnio, setFiltroAnio, setFiltroMes, filtroSubcuenta, setFiltroSubcuenta, filtroAnalitico1, setFiltroAnalitico1, filtroAnalitico2, setFiltroAnalitico2, setFiltroQR, filtroFC10, setFiltroFC10, filtroEstado, setFiltroEstado, filtroPendiente, setFiltroPendiente, currentPage, setCurrentPage, clearAllFilters, hasFilters, vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista, guardarVistaActual, aplicarVista, eliminarVista, funcionariosUnicos, ubicacionesUnicas, aniosUnicos, subcuentasUnicas, analiticos1Unicos, stats, pendientes, filteredBienes, itemsPaginados, totalPages, itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion, vistaInv, cambiarVistaInv } = useInventarioFiltros({ bienes, dependenciaActual, fc10List, username: currentUser?.username, notify: addToast });
   // Sugerencias para auto_completado (memoizado: evita refiltrar miles de bienes en cada render)
   const sugerenciasBienesDep = useMemo(
     () => bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
@@ -1035,16 +1037,43 @@ useEffect(() => {
 
   // --- FILTROS COMPARTIBLES: copiar link de la vista actual -----------------
   const copiarLinkFiltros = async () => {
-    const url = urlFiltrosActual(seleccionados);
-    if (!url) return;
-    const copiado = await copiarAlPortapapeles(url);
-    if (copiado) {
-      const detalle = seleccionados.length
-        ? ` y ${seleccionados.length} bien${seleccionados.length === 1 ? '' : 'es'} seleccionado${seleccionados.length === 1 ? '' : 's'}`
-        : '';
-      addToast(`Link copiado${detalle}.`, 'success');
-    } else {
-      addToast('No se pudo copiar automáticamente. Revisa los permisos del navegador e inténtalo otra vez.', 'error');
+    const funcionarioCompartido = seleccionados.length ? null : filtroFuncionario;
+    const bienesCompartidos = seleccionados.length
+      ? bienes.filter(bien => seleccionados.includes(bien.id) && normalizeStr(bien.dependencia) === normalizeStr(dependenciaActual))
+      : (() => {
+          const bienesConActa = new Set(fc10List
+            .filter(fc => !fc.devolucionFecha && normalizeStr(fc.funcionarioNombre) === normalizeStr(funcionarioCompartido))
+            .map(fc => String(fc.bienId)));
+          return bienes.filter(bien => normalizeStr(bien.dependencia) === normalizeStr(dependenciaActual)
+            && bien.estadoConservacion !== 'De Baja'
+            && (normalizeStr(bien.funcionario) === normalizeStr(funcionarioCompartido) || bienesConActa.has(String(bien.id))));
+        })();
+
+    if (!bienesCompartidos.length) {
+      addToast(funcionarioCompartido ? 'Este funcionario no tiene bienes disponibles para compartir.' : 'Selecciona uno o más bienes para compartir.', 'warning');
+      return;
+    }
+    if (bienesCompartidos.length > 500) {
+      addToast('El enlace admite hasta 500 bienes. Selecciona menos bienes para compartir.', 'warning');
+      return;
+    }
+
+    try {
+      const { data: token, error } = await supabase.rpc('crear_enlace_inventario', {
+        p_bien_ids: bienesCompartidos.map(bien => bien.id),
+        p_dependencia: dependenciaActual,
+        p_funcionario: funcionarioCompartido || null
+      });
+      if (error || !token) throw error || new Error('No se recibió el enlace');
+
+      const url = new URL(window.location.origin);
+      url.searchParams.set('compartir', token);
+      const copiado = await copiarAlPortapapeles(url.href);
+      if (!copiado) throw new Error('No se pudo copiar el enlace en este navegador');
+      addToast(`Enlace de solo lectura copiado (${bienesCompartidos.length} bienes). Vence en 7 días.`, 'success');
+    } catch (error) {
+      console.error('No se pudo crear el enlace de inventario:', error);
+      addToast('No se pudo crear el enlace. Verifica la conexión e inténtalo nuevamente.', 'error');
     }
   };
 
@@ -1368,8 +1397,11 @@ if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && mostra
       <LoginScreen handleLogin={handleLogin} loginUser={loginUser} setLoginUser={setLoginUser} loginPass={loginPass} setLoginPass={setLoginPass} showPassword={showPassword} setShowPassword={setShowPassword} loginError={loginError} darkMode={darkMode} appLogo={appLogo} toasts={toasts} isProcessing={isProcessing.active} version={versionApp} />
   );
 }
-if (rutaDesconocida && !publicBienId) {
+if (rutaDesconocida && !publicBienId && !publicShareToken) {
   return <ErrorView variante="404" onAccion={() => { window.location.href = window.location.origin; }} />;
+}
+if (publicShareToken) {
+  return <InventarioCompartidoView token={publicShareToken} />;
 }
 if (publicBienId) {
   return (

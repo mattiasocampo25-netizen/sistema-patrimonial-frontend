@@ -9,6 +9,7 @@ import { ESTADOS_FC10, ESTADO_NUEVO_FC10, estadoInicialFC10, pendienteDeFirma, r
 import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
 import { enqueueOfflineAction } from '../services/offlineSyncService';
+import { detectarCambios, detectarConflictos, fusionarSobreFresco, describirCampos } from '../services/escrituraSegura';
 import { FORMATO_PDF } from '../constants/appConstants';
 
 // Normalización de rótulo para comparar bienes. Vive a nivel de módulo porque
@@ -499,6 +500,8 @@ export function useFcModals({
         fotos: bienEditing?.fotos || []
     };
     
+    let bienGuardado = bienData;
+    let camposEnConflicto = [];
     try { 
         // xÓ AQUÍ SE INTERCEPTA EL MODO OFFLINE
         if (!navigator.onLine) {
@@ -518,17 +521,43 @@ export function useFcModals({
         let res;
         const payload = conSello({ id: bienData.id, data: bienData });
         if (esEdicion) {
-            let update = supabase.from('bens').update(payload).eq('id', bienData.id);
-            // Evita sobrescribir silenciosamente una edición más reciente de otro usuario.
-            if (bienEditing.updated_at) update = update.eq('updated_at', bienEditing.updated_at);
-            res = await update.select('id').maybeSingle();
-            if (!res.error && bienEditing.updated_at && !res.data) {
-                const conflicto = new Error('CONFLICTO_BIEN');
-                conflicto.code = 'CONFLICTO_BIEN';
-                throw conflicto;
+            const cambiosUsuario = detectarCambios(bienEditing, bienData);
+            let guardado = false;
+            // Relee y aplica solo los campos editados. Si otra persona guarda
+            // entre la lectura y la escritura, vuelve a intentarlo con su versión.
+            for (let intento = 0; intento < 3 && !guardado; intento++) {
+                const { data: fila, error: errorLectura } = await supabase
+                    .from('bens').select('id, data, updated_at').eq('id', bienData.id).maybeSingle();
+                if (errorLectura) throw errorLectura;
+                if (!fila) throw new Error('El bien ya no existe o no tienes acceso para editarlo.');
+
+                const datosFrescos = typeof fila.data === 'string' ? JSON.parse(fila.data) : (fila.data || {});
+                camposEnConflicto = [...new Set([
+                    ...camposEnConflicto,
+                    ...detectarConflictos(bienEditing, datosFrescos, cambiosUsuario)
+                ])];
+                bienGuardado = fusionarSobreFresco(datosFrescos, cambiosUsuario, bienData);
+                const sello = conSello({ id: bienData.id, data: bienGuardado });
+                let update = supabase.from('bens').update(sello).eq('id', bienData.id);
+                if (fila.updated_at) update = update.eq('updated_at', fila.updated_at);
+                res = await update.select('id, data, updated_at').maybeSingle();
+                if (res.error) throw res.error;
+                if (res.data) {
+                    const datosGuardados = typeof res.data.data === 'string' ? JSON.parse(res.data.data) : (res.data.data || bienGuardado);
+                    bienGuardado = { id: res.data.id, ...datosGuardados, updated_at: res.data.updated_at || sello.updated_at };
+                    guardado = true;
+                }
             }
+            if (!guardado) throw new Error('El bien sigue cambiando en otra sesión. Intenta guardar de nuevo.');
         } else {
             res = await supabase.from('bens').insert([payload]);
+            if (!res.error && res.data?.[0]) {
+                const fila = res.data[0];
+                const datos = typeof fila.data === 'string' ? JSON.parse(fila.data) : (fila.data || bienData);
+                bienGuardado = { id: fila.id, ...datos, updated_at: fila.updated_at || payload.updated_at };
+            } else {
+                bienGuardado = { ...bienData, updated_at: payload.updated_at };
+            }
         }
 
         if (!res.error) {
@@ -541,14 +570,17 @@ export function useFcModals({
                 detalles: {
                     rotulo: bienData.rotulo,
                     descripcion: bienData.descripcion,
-                    cambios: esEdicion ? { anterior: bienEditing, nuevo: bienData } : bienData
+                    cambios: esEdicion ? { anterior: bienEditing, nuevo: bienGuardado } : bienGuardado
                 }
             });
 
-            if (funcNombre && funcDoc) {
-                const funcExists = funcionariosPadron.find(f => f.cedula === funcDoc && f.dependencia === dependenciaActual);
+            if (bienGuardado.funcionario && bienGuardado.funcionarioDoc) {
+                const funcNombreGuardado = bienGuardado.funcionario;
+                const funcDocGuardado = bienGuardado.funcionarioDoc;
+                const funcCargoGuardado = bienGuardado.funcionarioCargo;
+                const funcExists = funcionariosPadron.find(f => f.cedula === funcDocGuardado && f.dependencia === dependenciaActual);
                 if (!funcExists) {
-                    const newFunc = { id: generateId(), cedula: funcDoc, nombre: funcNombre, cargo: funcCargo, dependencia: dependenciaActual };
+                    const newFunc = { id: generateId(), cedula: funcDocGuardado, nombre: funcNombreGuardado, cargo: funcCargoGuardado, dependencia: dependenciaActual };
                     await supabase.from('funcionarios').insert([newFunc]);
                     setFuncionariosPadron(prev => [...prev, newFunc]);
                 }
@@ -556,9 +588,9 @@ export function useFcModals({
 
             setBienes(prev => {
                 if (esEdicion) {
-                    return prev.map(b => b.id === bienData.id ? bienData : b);
+                    return prev.map(b => b.id === bienData.id ? bienGuardado : b);
                 } else {
-                    return [bienData, ...prev];
+                    return [bienGuardado, ...prev];
                 }
             });
             try { if (onBienGuardado) onBienGuardado(bienData.id); } catch {}
@@ -567,9 +599,9 @@ export function useFcModals({
             let nuevoCache = [...cacheActual];
             const idxCache = nuevoCache.findIndex(b => b.id === bienData.id);
             if (idxCache !== -1) {
-                nuevoCache[idxCache] = bienData;
+                nuevoCache[idxCache] = bienGuardado;
             } else {
-                nuevoCache.push(bienData);
+                nuevoCache.push(bienGuardado);
             }
             await localforage.setItem(`bienes_cache_${dependenciaActual}`, nuevoCache);
 
@@ -584,15 +616,15 @@ export function useFcModals({
                 setIsBienModalOpen(false); 
                 notify("Bien guardado y actualizado con el padrón", "success"); 
             }
+            if (camposEnConflicto.length) {
+                notify(`Se guardó tu edición. También se detectaron cambios simultáneos en ${describirCampos(camposEnConflicto)}; tu valor quedó aplicado y se conservaron los demás cambios.`, 'warning');
+            }
         } else {
             notify("Error al guardar en el servidor.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         }
     } catch (error) {
-        if (error?.code === 'CONFLICTO_BIEN') {
-            notify('Este bien fue actualizado por otra persona. Cierra y vuelve a abrirlo para cargar la versión más reciente.', 'warning');
-        } else {
-            notify("Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
-        }
+        console.error('No se pudo guardar el bien:', error);
+        notify(error?.message || "Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         return false;
     } finally {
         setIsSaving(false);

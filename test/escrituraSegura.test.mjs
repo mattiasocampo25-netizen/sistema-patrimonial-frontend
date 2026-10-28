@@ -64,6 +64,19 @@ test('avisa cuando el MISMO campo cambió en la base', () => {
   assert.deepEqual(conflictos, ['estadoConservacion']);
 });
 
+test('un conflicto de campo no bloquea el guardado y conserva los demás cambios', () => {
+  const mio = { ...base, ubicacion: 'Aula 8', estadoConservacion: 'Regular' };
+  const cambios = detectarCambios(base, mio);
+  const fresco = { ...base, ubicacion: 'Depósito', funcionario: 'Ana' };
+  const conflictos = detectarConflictos(base, fresco, cambios);
+  const escrito = fusionarSobreFresco(fresco, cambios, mio);
+
+  assert.deepEqual(conflictos, ['ubicacion']);
+  assert.equal(escrito.ubicacion, 'Aula 8', 'el cambio que el usuario confirmó se aplica');
+  assert.equal(escrito.estadoConservacion, 'Regular', 'se conservan los otros campos editados');
+  assert.equal(escrito.funcionario, 'Ana', 'se conserva la actualización ajena en un campo distinto');
+});
+
 test('sin conflicto si el campo sigue igual en la base', () => {
   const mio = { ...base, ubicacion: 'Aula 9' };
   const cambios = detectarCambios(base, mio);

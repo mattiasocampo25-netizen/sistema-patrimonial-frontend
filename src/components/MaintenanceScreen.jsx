@@ -14,9 +14,10 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
   const estimado = config?.estimado || '';
 
   return (
-    <div className="min-h-dvh flex flex-col w-full bg-canvas font-sans antialiased relative overflow-hidden selection:bg-brand/30">
+    <div className="dark min-h-dvh flex flex-col w-full bg-slate-950 font-sans antialiased relative overflow-hidden text-content-1 selection:bg-brand/30">
       {/* Fondo decorativo premium */}
       <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-950 to-blue-950/80"></div>
         <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-brand/10 blur-[100px]"></div>
         <div className="absolute top-1/3 -right-40 h-80 w-80 rounded-full bg-brand/10 blur-[100px]"></div>
         <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-brand/10 blur-[80px]"></div>

@@ -30,6 +30,11 @@ export function useFuncionarios({
   const [csvPreviewData, setCsvPreviewData] = useState({ validos: [], duplicados: [], errores: [] });
   const [pendingFuncionariosToImport, setPendingFuncionariosToImport] = useState([]);
   const [searchFuncionarioInput, setSearchFuncionarioInput] = useState('');
+  const [filtroCargo, setFiltroCargo] = useState('');
+  const cargosFuncionarios = useMemo(() => [...new Set(funcionariosPadron
+    .filter(f => f.dependencia === dependenciaActual)
+    .map(f => String(f.cargo || '').trim())
+    .filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')), [funcionariosPadron, dependenciaActual]);
 
     const funcionariosPurosDependencia = useMemo(() => {  
         let lista = funcionariosPadron.filter(f => f.dependencia === dependenciaActual);  
@@ -45,10 +50,13 @@ export function useFuncionarios({
                     return Boolean(tokDigits) && hayDigits.includes(tokDigits);  
                 });  
             });  
-        }  
+        }
+        if (filtroCargo) lista = lista.filter(f => String(f.cargo || '').trim() === filtroCargo);
+  
     
         return lista.sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || '')));  
-    }, [funcionariosPadron, dependenciaActual, searchFuncionarioInput]);  
+    }, [funcionariosPadron, dependenciaActual, searchFuncionarioInput, filtroCargo]);
+  
   
     const totalPagesFuncs = Math.ceil(funcionariosPurosDependencia.length / ITEMS_POR_PAGINA_FUNCS);  
   
@@ -408,6 +416,7 @@ export function useFuncionarios({
     pendingFuncionariosToImport, setPendingFuncionariosToImport,
     searchFuncionarioInput, setSearchFuncionarioInput,
     funcionariosPurosDependencia, totalPagesFuncs, funcionariosPaginados,
+    filtroCargo, setFiltroCargo, cargosFuncionarios,
     funcionariosConDatos,
     sincronizarBienesConPadron, handleFileUploadFuncionarios,
     executeProcessFuncionariosCSV, handleSaveManualFuncionario,

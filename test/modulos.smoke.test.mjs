@@ -208,6 +208,15 @@ describe('smoke por modulo', () => {
     assert.ok(await app.hayDialogo(), 'debe abrir el formulario de alta');
   });
 
+  test('Utilidades: abre restauración e informa qué datos admite el JSON', async () => {
+    await entrar();
+    await app.clickSiExiste('Restaurar respaldo');
+    assert.ok(await app.hayDialogo(), 'Restaurar respaldo debe abrir el cuadro aunque la aplicación use un contenedor con scroll');
+    assert.ok(app.tiene('El archivo contiene datos de hasta 9 tablas'), 'debe anticipar qué cubre el respaldo');
+    assert.ok(app.tiene('No incluye contraseñas de Auth'), 'debe aclarar qué datos no restaura');
+    assert.ok(app.tiene('Archivo de respaldo'), 'debe permitir seleccionar el JSON');
+  });
+
   // ── 6. FC-04 ────────────────────────────────────────────────────────────
   test('modulo FC-04: renderiza y abre la planilla', async () => {
     await entrar();

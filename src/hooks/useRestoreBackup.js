@@ -36,12 +36,25 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
   const [analisis, setAnalisis] = useState(null);       // salida de analizarRespaldo
   const [previa, setPrevia] = useState(null);           // salida de previsualizarRestauracion
   const [nombreArchivo, setNombreArchivo] = useState('');
+  const [errorArchivo, setErrorArchivo] = useState('');
   const [modo, setModo] = useState('merge');            // 'merge' | 'reemplazar'
   const [tablasElegidas, setTablasElegidas] = useState({});
   const [progreso, setProgreso] = useState(null);       // {tabla, hechas, total, texto}
   const [ejecutando, setEjecutando] = useState(false);
   const [resultado, setResultado] = useState(null);     // {tablas: [{clave, ok, error}], avisos}
   const fileRef = useRef(null);
+
+  const abrir = useCallback(() => {
+    setResultado(null);
+    setAnalisis(null);
+    setPrevia(null);
+    setNombreArchivo('');
+    setErrorArchivo('');
+    setTablasElegidas({});
+    setModo('merge');
+    if (fileRef.current) fileRef.current.value = '';
+    setIsOpen(true);
+  }, []);
 
   const cerrar = useCallback(() => {
     if (ejecutando) return; // no cerrar a mitad de una escritura
@@ -51,6 +64,7 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
     setResultado(null);
     setProgreso(null);
     setNombreArchivo('');
+    setErrorArchivo('');
     setTablasElegidas({});
     setModo('merge');
     if (fileRef.current) fileRef.current.value = '';
@@ -62,6 +76,7 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
     setResultado(null);
     setAnalisis(null);
     setPrevia(null);
+    setErrorArchivo('');
     try {
       const texto = await archivo.text();
       // Un respaldo de 1800 bienes pesa algunos MB; JSON.parse bloquearía el
@@ -72,6 +87,7 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
       setNombreArchivo(archivo.name);
 
       if (!res.ok) {
+        setErrorArchivo(res.error || 'El archivo no se pudo leer como respaldo.');
         notify(res.error || 'El archivo no se pudo leer como respaldo.', 'error');
         return;
       }
@@ -96,9 +112,7 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
           filasActuales.push(...(data || []));
         }
         if (errorLectura) {
-          notify(`No se pudo leer "${t.etiqueta}" para comparar: ${errorLectura.message}. La vista previa puede ser inexacta.`, 'warning');
-          existentes[t.clave] = [];
-          continue;
+          throw new Error(`No se pudo consultar "${t.etiqueta}" para preparar la vista previa: ${errorLectura.message}`);
         }
         existentes[t.clave] = filasActuales
           .map(f => normalizarFilaActual(f, t))
@@ -123,7 +137,10 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
     } catch (e) {
       console.error('Error al leer el respaldo:', e);
       setAnalisis(null);
-      notify('El archivo no es un JSON válido.', 'error');
+      setPrevia(null);
+      const mensaje = e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : (e.message || 'No se pudo analizar el respaldo.');
+      setErrorArchivo(mensaje);
+      notify(mensaje, 'error');
       if (fileRef.current) fileRef.current.value = '';
     }
   }, [notify]);
@@ -254,9 +271,9 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
 
   return {
     isRestoreOpen: isOpen,
-    openRestore: setIsOpen,
+    openRestore: abrir,
     cerrarRestore: cerrar,
-    analisis, previa, nombreArchivo, modo, setModo,
+    analisis, previa, nombreArchivo, errorArchivo, modo, setModo,
     tablasElegidas, alternarTabla,
     progreso, ejecutando, resultado,
     fileRef, manejarArchivo, ejecutar, totalFilasElegidas, perdidasPorTabla

@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import { formatCI } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button } from '../components/ui';
+import FiltroCombo from '../components/FiltroCombo';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -9,10 +11,12 @@ export default function FuncionariosView({
   sincronizarBienesConPadron, handleDownloadTemplateFuncionarios,
   fileInputFuncionariosRef, isAdmin, setIsUbicacionesModalOpen,
   setIsNewFuncionarioModalOpen, searchFuncionarioInput, setSearchFuncionarioInput,
+  filtroCargo = '', setFiltroCargo = () => {}, cargosFuncionarios = [],
   setCurrentPaginaFuncionarios, funcionariosPaginados,
   handleEditFuncionario, handleDeleteFuncionario, renderPaginationFuncionarios,
   isLoading
 }) {
+  const [mostrarCedulas, setMostrarCedulas] = useState(false);
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
 
@@ -64,6 +68,7 @@ export default function FuncionariosView({
     <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
     <input
       type="text"
+      aria-label="Buscar funcionario por nombre, cargo o número de cédula"
       placeholder="Buscar funcionario por nombre, apellido o número de cédula..."
       value={searchFuncionarioInput}
       onChange={(e) => {
@@ -73,6 +78,20 @@ export default function FuncionariosView({
       className="w-full rounded-control border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 h-11 pl-11 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 outline-none transition-all"
     />
   </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+            <FiltroCombo
+              valor={filtroCargo}
+              opciones={cargosFuncionarios}
+              onElegir={valor => { setFiltroCargo(valor); setCurrentPaginaFuncionarios(1); }}
+              etiquetaTodos="Todos los cargos"
+              titulo="Filtrar funcionarios por cargo"
+            />
+            <button type="button" aria-pressed={mostrarCedulas} onClick={() => setMostrarCedulas(actual => !actual)} className="inline-flex h-10 items-center justify-center gap-2 rounded-control border border-line bg-surface-1 px-3 text-label font-semibold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+              <i className={`fa-solid ${mostrarCedulas ? 'fa-eye-slash' : 'fa-eye'}`} aria-hidden="true" />
+              {mostrarCedulas ? 'Ocultar cédulas' : 'Mostrar cédulas'}
+            </button>
+          </div>
+          <p className="mt-2 text-[11px] text-content-3">Las cédulas se ocultan inicialmente para reducir su exposición en pantalla.</p>
 </div>
 
       </div>
@@ -115,7 +134,7 @@ export default function FuncionariosView({
                   return (
                     <TRow key={f.id} className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group">
                         <TD className="py-4 pl-8 pr-4 align-middle tabular-nums font-semibold text-content-1 dark:text-content-3 text-sm">
-                            {formatCI(f.cedula)}
+                            {mostrarCedulas ? formatCI(f.cedula) : `••••${String(f.cedula || '').replace(/\D/g, '').slice(-2) || '••'}`}
                         </TD>
                         <TD className="px-4 py-4 align-middle">
                             <div className="flex items-center gap-3">
@@ -155,11 +174,14 @@ export default function FuncionariosView({
                   <TRow>
                     <TD colSpan="4">
                         <EmptyState
-                          icon="fa-users-slash"
-                          titulo="No hay funcionarios en esta dependencia"
-                          descripcion="Registra el primero manualmente o importa el padrón desde un CSV."
-                          accionLabel="Registrar el primero"
-                          onAccion={() => setIsNewFuncionarioModalOpen(true)}
+                          icon={searchFuncionarioInput || filtroCargo ? 'fa-filter-circle-xmark' : 'fa-users-slash'}
+                          titulo={searchFuncionarioInput || filtroCargo ? 'No hay coincidencias' : 'No hay funcionarios en esta dependencia'}
+                          descripcion={searchFuncionarioInput || filtroCargo ? 'Prueba con otro nombre o cargo, o limpia los filtros.' : 'Registra el primero manualmente o importa el padrón desde un CSV.'}
+                          accionLabel={searchFuncionarioInput || filtroCargo ? 'Limpiar filtros' : 'Registrar el primero'}
+                          onAccion={() => {
+                            if (searchFuncionarioInput || filtroCargo) { setSearchFuncionarioInput(''); setFiltroCargo(''); setCurrentPaginaFuncionarios(1); }
+                            else setIsNewFuncionarioModalOpen(true);
+                          }}
                         />
                     </TD>
                   </TRow>

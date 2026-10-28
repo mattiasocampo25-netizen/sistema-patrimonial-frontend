@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { STYLES } from '../constants/appConstants';
 import Dialogo from './ui/Dialogo';
 import { TABLAS_RESTORABLES, ORDEN_RESTAURACION } from '../services/restore';
@@ -34,7 +35,7 @@ const Chip = ({ children, tono = 'zinc' }) => {
 
 export default function RestoreBackupModal({ restore }) {
   const {
-    isRestoreOpen, cerrarRestore, analisis, previa, nombreArchivo,
+    isRestoreOpen, cerrarRestore, analisis, previa, nombreArchivo, errorArchivo,
     modo, setModo, tablasElegidas, alternarTabla,
     progreso, ejecutando, resultado, fileRef, manejarArchivo,
     ejecutar, totalFilasElegidas, _perdidasPorTabla
@@ -46,7 +47,7 @@ export default function RestoreBackupModal({ restore }) {
   const hayCambios = hayAnalisis && !!previa && ORDEN_RESTAURACION.some(c => previa[c]?.hayCambios);
   const totalSeleccionado = totalFilasElegidas();
 
-  return (
+  return createPortal((
     <Dialogo className={STYLES.modalOverlay}>
       <div className={STYLES.modalContent + " max-w-3xl"}>
         {/* Encabezado */}
@@ -92,6 +93,7 @@ export default function RestoreBackupModal({ restore }) {
               onChange={(e) => manejarArchivo(e.target.files?.[0])}
               className="block w-full cursor-pointer rounded-control border border-line bg-surface-2/50 text-xs font-medium text-content-1 dark:border-white/10 dark:bg-surface-1/5 dark:text-zinc-200 focus:border-brand focus:outline-none disabled:opacity-50"
             />
+            {errorArchivo && <p role="alert" className="mt-2 rounded-lg border border-rose-200 bg-danger-soft/60 px-3 py-2 text-xs font-semibold text-danger dark:border-rose-500/25 dark:bg-rose-500/5 dark:text-rose-300"><i className="fa-solid fa-triangle-exclamation mr-1.5" aria-hidden="true" />{errorArchivo}</p>}
             {nombreArchivo && hayAnalisis && (
               <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-content-1 dark:text-zinc-200">
                 <i className="fa-solid fa-file-lines text-content-3"></i>
@@ -104,6 +106,11 @@ export default function RestoreBackupModal({ restore }) {
                 )}
               </p>
             )}
+            {!nombreArchivo && <div className="mt-3 rounded-control border border-info/20 bg-info-soft/50 p-3 text-[11px] leading-relaxed text-content-2 dark:border-sky-500/20 dark:bg-sky-500/5 dark:text-content-3">
+              <p className="font-bold text-content-1 dark:text-zinc-100"><i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />El archivo contiene datos de hasta 9 tablas</p>
+              <p className="mt-1">Usuarios, funcionarios, estructuras, bienes, actas FC-10, traslados FC-11, expedientes FC-04, notificaciones y auditoría. Primero verás el análisis; nada se escribe hasta que confirmes.</p>
+              <p className="mt-1 font-semibold">No incluye contraseñas de Auth ni archivos adjuntos binarios, como las fotos almacenadas aparte.</p>
+            </div>}
           </section>
 
           {/* Avisos del análisis (filas descartadas, respaldo viejo, etc.) */}
@@ -323,7 +330,7 @@ export default function RestoreBackupModal({ restore }) {
         </div>
       </div>
     </Dialogo>
-  );
+  ), document.body);
 }
 
 /**

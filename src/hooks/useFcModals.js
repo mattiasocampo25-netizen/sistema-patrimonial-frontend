@@ -371,6 +371,30 @@ export function useFcModals({
       }
   };
 
+  const actualizarSolicitud = async (solicitud) => {
+      if (!isAdmin) return notify('Solo administración puede actualizar solicitudes.', 'error');
+      if (!solicitud?.id) return;
+      try {
+          const { error } = await supabase.from('notificaciones').update({ data: solicitud }).eq('id', solicitud.id);
+          if (error) throw error;
+          setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? solicitud : item));
+          await registrarAuditoria({
+              usuario: currentUser?.username || 'Admin',
+              dependencia: solicitud.dependencia || dependenciaActual,
+              accion: 'SOLICITUD_BAJA_ASIGNADA',
+              entidad: 'SOLICITUD_BAJA',
+              entidadId: solicitud.id,
+              detalles: { responsable: solicitud.responsable, solicitante: solicitud.solicitante, tipo: solicitud.tipo }
+          });
+          notify(`Solicitud asignada a ${solicitud.responsable}.`, 'success');
+          return true;
+      } catch (error) {
+          console.error('No se pudo actualizar la solicitud:', error);
+          notify('No se pudo guardar la asignación. Intenta nuevamente.', 'error');
+          return false;
+      }
+  };
+
   const openFC10Modal = (bien, fc = null) => {
     if (!bien?.id) return notify('Selecciona un bien válido para crear el FC-10.', 'warning');
     if (!fc) {
@@ -1445,7 +1469,7 @@ export function useFcModals({
     scanParaConteo, setScanParaConteo,
     modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo,
     openFichaBien, openFC03Modal, executeGenerateFC03,
-    openResolucionModal, marcarSolicitudEnRevision, openFC10Modal, openFC11Modal, openFC04Modal,
+    openResolucionModal, marcarSolicitudEnRevision, actualizarSolicitud, openFC10Modal, openFC11Modal, openFC04Modal,
     handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange,
     handleScanSuccess,
     saveBien, saveUsuario, saveFC11, registrarFirmasFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite,

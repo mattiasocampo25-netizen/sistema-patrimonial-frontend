@@ -1,6 +1,6 @@
 // Vista de solicitudes de aprobación (bajas, firmas, etc.) - solo admin/desarrollador.
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Card, Chip, ChipGroup, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
@@ -15,7 +15,7 @@ const ESTADO_INFO = {
 export default function AprobacionesView({
   dependenciaActual,
   solicitudesBaja, bienes,
-  openResolucionModal, marcarSolicitudEnRevision,
+  openResolucionModal, marcarSolicitudEnRevision, actualizarSolicitud, currentUser,
  
 }) {
   const [filtroEstado, setFiltroEstado] = useState('todos');
@@ -24,6 +24,12 @@ export default function AprobacionesView({
   const [filtroDependencia, setFiltroDependencia] = useState('');
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
+  const [bandeja, setBandeja] = useState(() => { try { return localStorage.getItem('aprobaciones_bandeja') || 'todos'; } catch { return 'todos'; } });
+  const [vistaGuardada, setVistaGuardada] = useState(() => { try { return JSON.parse(localStorage.getItem('aprobaciones_vista') || 'null'); } catch { return null; } });
+  const [detalleId, setDetalleId] = useState(null);
+  const [responsables, setResponsables] = useState({});
+  const [asignandoId, setAsignandoId] = useState(null);
+  const usuarioActual = currentUser?.username || '';
   const [revisandoIds, setRevisandoIds] = useState(() => new Set());
 
   const iniciarRevision = async (solicitud) => {
@@ -54,7 +60,10 @@ export default function AprobacionesView({
     const texto = normalizeStr(`${n.rotulo || ''} ${n.descripcion || ''} ${n.nombre || ''} ${n.cedula || ''} ${n.solicitante || ''} ${n.motivo || ''}`);
     const fecha = String(n.created_at || n.fecha || '').slice(0, 10);
     const dependenciaOK = !filtroDependencia || normalizeStr(n.dependencia) === normalizeStr(filtroDependencia);
-    return estadoOK && tipoOK && dependenciaOK && (!desde || fecha >= desde) && (!hasta || fecha <= hasta) && (!busqueda.trim() || texto.includes(normalizeStr(busqueda)));
+    const activa = !['APROBADO', 'RECHAZADO'].includes(n.estado);
+    const asignadaAMi = !n.responsable || normalizeStr(n.responsable) === normalizeStr(usuarioActual);
+    const bandejaOK = bandeja === 'todos' || (bandeja === 'mis_pendientes' && activa && asignadaAMi) || (bandeja === 'sin_asignar' && activa && !n.responsable);
+    return estadoOK && tipoOK && dependenciaOK && bandejaOK && (!desde || fecha >= desde) && (!hasta || fecha <= hasta) && (!busqueda.trim() || texto.includes(normalizeStr(busqueda)));
   }).sort((a, b) => {
     const prioridad = n => n.estado === 'PENDIENTE' ? 0 : n.estado === 'EN_REVISION' ? 1 : 2;
     const porEstado = prioridad(a) - prioridad(b);
@@ -62,6 +71,30 @@ export default function AprobacionesView({
     return new Date(b.created_at || b.fecha || 0).getTime() - new Date(a.created_at || a.fecha || 0).getTime();
   });
   const dependenciasSolicitud = [...new Set(solicitudesBaja.map(n => n.dependencia).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+  const asignarResponsable = async (solicitud) => {
+    const responsable = (responsables[solicitud.id] || '').trim();
+    if (!actualizarSolicitud || !responsable) return;
+    const fecha = new Date().toISOString();
+    const historial = Array.isArray(solicitud.historial) && solicitud.historial.length ? solicitud.historial : [{ estado: solicitud.estado || 'PENDIENTE', usuario: solicitud.solicitante || 'Usuario', fecha: solicitud.created_at || solicitud.fecha || null, motivo: solicitud.motivo || '' }];
+    const actualizada = { ...solicitud, responsable, asignadoPor: usuarioActual, asignadoEn: fecha, historial: [...historial, { estado: solicitud.estado || 'PENDIENTE', usuario: usuarioActual, fecha, motivo: `Responsable asignado: ${responsable}` }] };
+    setAsignandoId(solicitud.id);
+    try { await actualizarSolicitud(actualizada); setResponsables(prev => ({ ...prev, [solicitud.id]: '' })); }
+    finally { setAsignandoId(null); }
+  };
+  const guardarVistaActual = () => {
+    const vista = { filtroEstado, filtroTipo, filtroDependencia, desde, hasta, bandeja };
+    try { localStorage.setItem('aprobaciones_vista', JSON.stringify(vista)); } catch {}
+    setVistaGuardada(vista);
+  };
+  const aplicarVista = () => { if (!vistaGuardada) return; setFiltroEstado(vistaGuardada.filtroEstado || 'todos'); setFiltroTipo(vistaGuardada.filtroTipo || 'todos'); setFiltroDependencia(vistaGuardada.filtroDependencia || ''); setDesde(vistaGuardada.desde || ''); setHasta(vistaGuardada.hasta || ''); setBandeja(vistaGuardada.bandeja || 'todos'); };
+  const exportarCSV = () => {
+    const filas = [['Tipo', 'Bien/funcionario', 'Descripción', 'Solicitante', 'Dependencia', 'Responsable', 'Estado', 'Fecha', 'Motivo']];
+    listaFiltrada.forEach(n => filas.push([n.tipo || '', n.rotulo || n.cedula || '', n.descripcion || n.nombre || '', n.solicitante || '', n.dependencia || '', n.responsable || '', n.estado || 'PENDIENTE', n.created_at || n.fecha || '', n.motivo || '']));
+    const csv = '\ufeff' + filas.map(f => f.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a'); a.href = url; a.download = `aprobaciones-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
+  };
+  const solicitudesVencidas = useMemo(() => listaFiltrada.filter(n => !['APROBADO', 'RECHAZADO'].includes(n.estado) && n.created_at && Date.now() - new Date(n.created_at).getTime() >= 7 * 86400000).length, [listaFiltrada]);
 
   const ETAPAS = [
     { id: 'todos', label: 'Todos', n: solicitudesBaja.length },
@@ -101,6 +134,14 @@ export default function AprobacionesView({
             </ChipGroup>
           </div>
           </Toolbar>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <label className="sr-only" htmlFor="aprobaciones-bandeja">Bandeja de solicitudes</label>
+            <select id="aprobaciones-bandeja" value={bandeja} onChange={e => { setBandeja(e.target.value); try { localStorage.setItem('aprobaciones_bandeja', e.target.value); } catch {} }} className="h-9 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-1"><option value="todos">Todas las solicitudes</option><option value="mis_pendientes">Mis pendientes / sin asignar</option><option value="sin_asignar">Pendientes sin responsable</option></select>
+            <button type="button" onClick={guardarVistaActual} className="h-9 rounded-control border border-line px-3 text-xs font-semibold text-content-2 hover:bg-surface-2">Guardar filtros</button>
+            {vistaGuardada && <button type="button" onClick={aplicarVista} className="h-9 rounded-control border border-brand/25 px-3 text-xs font-semibold text-brand-text hover:bg-brand/5">Aplicar filtros guardados</button>}
+            <button type="button" onClick={exportarCSV} className="h-9 rounded-control border border-line px-3 text-xs font-semibold text-content-2 hover:bg-surface-2"><i className="fa-solid fa-download mr-1.5"/>Exportar CSV ({listaFiltrada.length})</button>
+          </div>
+          {solicitudesVencidas > 0 && <div role="status" className="mt-3 flex items-center gap-2 rounded-control border border-warn/25 bg-warn-soft px-3 py-2 text-xs font-semibold text-warn"><i className="fa-solid fa-bell"/>Hay {solicitudesVencidas} solicitudes abiertas con 7 días o más; requieren seguimiento.</div>}
           <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(220px,1fr)_auto_auto_auto_auto]">
             <label htmlFor="aprobaciones-search" className="sr-only">Buscar solicitud</label>
             <input id="aprobaciones-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar por bien, funcionario, solicitante o motivo…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
@@ -183,6 +224,14 @@ export default function AprobacionesView({
                             {(notif.resueltoEn || notif.resueltoFecha) && <span className="ml-2">· {new Date(notif.resueltoEn || notif.resueltoFecha).toLocaleDateString('es-PY')}</span>}
                           </div>
                         )}
+                        {notif.responsable && <p className="mt-2 text-xs text-content-2"><i className="fa-solid fa-user-tag mr-1.5 text-brand-text"/>Responsable: <strong>{notif.responsable}</strong></p>}
+                        {!estaResuelto && <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          <label className="sr-only" htmlFor={`responsable-${notif.id}`}>Asignar responsable</label>
+                          <input id={`responsable-${notif.id}`} value={responsables[notif.id] ?? notif.responsable ?? ''} onChange={e => setResponsables(prev => ({ ...prev, [notif.id]: e.target.value }))} placeholder="Usuario responsable" className="h-8 w-40 rounded border border-line bg-surface-1 px-2 text-xs" />
+                          <button type="button" disabled={asignandoId === notif.id || !(responsables[notif.id] || '').trim()} onClick={() => asignarResponsable(notif)} className="h-8 rounded border border-line px-2 text-xs font-semibold disabled:opacity-50">{asignandoId === notif.id ? 'Guardando…' : 'Asignar'}</button>
+                        </div>}
+                        <button type="button" onClick={() => setDetalleId(detalleId === notif.id ? null : notif.id)} className="mt-2 text-xs font-semibold text-brand-text hover:underline" aria-expanded={detalleId === notif.id}>{detalleId === notif.id ? 'Ocultar detalle' : 'Ver detalle'}</button>
+                        {detalleId === notif.id && <div className="mt-2 rounded-control border border-line bg-surface-2 p-3 text-xs text-content-2 space-y-1"><p><strong>Tipo:</strong> {notif.tipo === 'BAJA_FUNCIONARIO' ? 'Baja de funcionario' : 'Baja de bien'}</p><p><strong>Dependencia:</strong> {notif.dependencia || 'No indicada'}</p><p><strong>Solicitante:</strong> {notif.solicitante || 'No indicado'}</p><p><strong>Motivo:</strong> {notif.motivo || 'Sin motivo'}</p><p><strong>Responsable:</strong> {notif.responsable || 'Sin asignar'}</p></div>}
                         <details className="mt-2 text-xs text-content-2">
                           <summary className="cursor-pointer select-none font-semibold text-brand-text hover:underline">Historial ({historial.length})</summary>
                           <ol className="mt-2 space-y-2 border-l border-line pl-3">
@@ -212,7 +261,7 @@ export default function AprobacionesView({
                     </TD>
                     <TD className="px-4 py-4 align-top text-xs text-content-3 font-mono">
                       {fechaSolicitud ? new Date(fechaSolicitud).toLocaleDateString('es-PY') : 'Reciente'}
-                      {!estaResuelto && diasAbierta >= 7 && <span className="mt-1 block rounded bg-warn-soft px-2 py-1 text-[10px] font-bold text-warn">{diasAbierta} días pendiente</span>}
+                      {!estaResuelto && diasAbierta >= 7 && <span className="mt-1 block rounded bg-warn-soft px-2 py-1 text-[10px] font-bold text-warn">{diasAbierta} días pendiente · requiere seguimiento</span>}
                     </TD>
                     <TD className="px-4 py-4 align-top">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${info.color}`}>

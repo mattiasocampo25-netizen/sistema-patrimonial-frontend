@@ -630,7 +630,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       });
 
       notify(`Respaldo ${extension.endsWith('.gz') ? 'comprimido ' : ''}descargado: ${bienesDb.length} bienes, ${fc10Db.length} FC-10, ${auditDb.length} auditorías.`, "success");
-      window.dispatchEvent(new Event('respaldo-generado'));
+      window.dispatchEvent(new window.Event('respaldo-generado'));
     } catch (err) {
       console.error("Error al generar backup general:", err);
       // Un respaldo incompleto es peor que no tener respaldo: da falsa

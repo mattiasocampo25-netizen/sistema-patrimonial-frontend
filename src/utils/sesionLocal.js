@@ -1,4 +1,4 @@
-import { INACTIVITY_LIMIT_MS } from '../constants/appConstants';
+import { INACTIVITY_LIMIT_MS } from '../constants/appConstants.js';
 
 const CLAVE_ULTIMA_ACTIVIDAD = 'unp_session_last_activity';
 

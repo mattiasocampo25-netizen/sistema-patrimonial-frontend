@@ -635,7 +635,7 @@ export default function InventarioView({
                                   <IconButton titulo="Ver o generar QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
                                   {isAdmin && <IconButton titulo="Crear o gestionar acta FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />}
                                   <IconButton titulo="Registrar traslado FC-11" icono="fa-truck-fast" variante="ghost" tamano="sm" onClick={() => openFC11Modal(item)} />
-                                  {isAdmin && <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />}
+                                  <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
                                   {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                                   <IconButton titulo={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} />
                                 </div>
@@ -663,7 +663,7 @@ export default function InventarioView({
                               <IconButton titulo="Ficha 360" icono="fa-timeline" variante="ghost" tamano="sm" onClick={() => openFichaBien(item)} />
                               <IconButton titulo="QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
                               {isAdmin && <IconButton titulo="Asignación FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />}
-                              {isAdmin && <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />}
+                              <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
                               {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                             </div>
                           </div>
@@ -785,11 +785,11 @@ export default function InventarioView({
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-ok text-xs shrink-0"></i>
-                                      {isAdmin ? <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} /> : <span>{item.funcionario || 'Sin asignación'}</span>}
+                                      <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} />
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
                                       <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>
-                                      {isAdmin ? <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} /> : <span>{item.ubicacion || 'Sin ubicación'}</span>}
+                                      <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} />
                                     </div>
                                     {(() => {
                                       const fc10 = fc10VigentePorBien.get(item.id);
@@ -866,13 +866,13 @@ export default function InventarioView({
                                     />
 
                                     {/* Editar Bien */}
-                                    {isAdmin && <IconButton
+                                    <IconButton
                                       titulo="Editar Bien"
                                       icono="fa-pen-to-square"
                                       variante="ghost"
                                       tamano="sm"
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
-                                    />}
+                                    />
 
                                     {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
 

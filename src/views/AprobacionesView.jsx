@@ -12,6 +12,25 @@ const ESTADO_INFO = {
   EN_REVISION: { label: 'En Revisión', color: 'bg-info-soft dark:bg-sky-950/20 text-info dark:text-sky-400 border border-info/25 dark:border-sky-900/30', dot: 'bg-sky-500' }
 };
 
+const escaparHTML = valor => String(valor ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const imprimirInformeSolicitud = (solicitud, bien, historial) => {
+  const fecha = valor => valor && !Number.isNaN(new Date(valor).getTime()) ? new Date(valor).toLocaleString('es-PY') : 'No registrada';
+  const estado = ESTADO_INFO[solicitud.estado || 'PENDIENTE']?.label || 'Pendiente';
+  const campos = [['Rótulo / código patrimonial', bien.rotulo], ['Descripción', bien.descripcion], ['Marca', bien.marca], ['Modelo', bien.modelo], ['Número de serie', bien.numeroSerie || bien.serie], ['Ubicación', bien.ubicacion], ['Estado registrado', bien.estadoConservacion]];
+  const detalles = campos.filter(([, v]) => v).map(([k, v]) => `<tr><th>${escaparHTML(k)}</th><td>${escaparHTML(v)}</td></tr>`).join('');
+  const eventos = historial.map((e, i) => `<tr><td>${i + 1}</td><td>${escaparHTML(ESTADO_INFO[e.estado]?.label || e.estado || 'Actuación')}</td><td>${escaparHTML(e.usuario || 'No registrado')}</td><td>${escaparHTML(fecha(e.fecha))}</td><td>${escaparHTML(e.motivo || '—')}</td></tr>`).join('');
+  const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Informe de solicitud ${escaparHTML(bien.rotulo)}</title><style>@page{size:A4;margin:18mm}*{box-sizing:border-box}body{font:11pt Arial,sans-serif;color:#172033;line-height:1.45;margin:0}.head{border-bottom:3px solid #243b67;padding-bottom:14px;margin-bottom:18px}.brand{font-size:9pt;color:#526078;text-transform:uppercase;letter-spacing:.08em}.head h1{font-size:19pt;margin:8px 0 2px}.sub{color:#526078;font-size:10pt}.notice{border:1px solid #c98c29;background:#fff8e8;padding:12px 14px;margin:16px 0;font-weight:600}.section{font-size:12pt;color:#243b67;border-bottom:1px solid #cbd2dd;padding-bottom:5px;margin:20px 0 8px}table{width:100%;border-collapse:collapse;margin:8px 0 14px}th,td{border:1px solid #d5dbe5;padding:7px 8px;text-align:left;vertical-align:top}th{width:30%;background:#f3f5f8}thead th{background:#e9edf4;font-size:9pt}.sign{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:55px}.line{text-align:center;border-top:1px solid #526078;padding-top:8px;font-size:9pt}.foot{margin-top:25px;color:#6b7280;font-size:8pt;border-top:1px solid #d5dbe5;padding-top:8px}@media print{.no-print{display:none}}</style></head><body><header class="head"><div class="brand">Gestión patrimonial · Centro de Aprobaciones</div><h1>Informe de solicitud de baja</h1><div class="sub">Documento de consulta y seguimiento administrativo</div></header>
+  <div class="notice">Este informe documenta una solicitud y su tramitación en el sistema. La solicitud o su aprobación no constituyen la baja patrimonial del bien ni autorizan su eliminación del inventario. La baja patrimonial requiere el procedimiento administrativo, las verificaciones y los actos aprobatorios correspondientes, y debe registrarse por separado.</div>
+  <h2 class="section">1. Identificación de la solicitud</h2><table><tbody><tr><th>N.º de solicitud</th><td>${escaparHTML(solicitud.id || 'No asignado')}</td></tr><tr><th>Tipo</th><td>${solicitud.tipo === 'BAJA_FUNCIONARIO' ? 'Solicitud relacionada con funcionario' : 'Solicitud de baja de bien'}</td></tr><tr><th>Estado</th><td>${escaparHTML(estado)}</td></tr><tr><th>Fecha de presentación</th><td>${escaparHTML(fecha(solicitud.created_at || solicitud.fecha))}</td></tr><tr><th>Dependencia</th><td>${escaparHTML(solicitud.dependencia || 'No indicada')}</td></tr><tr><th>Solicitante</th><td>${escaparHTML(solicitud.solicitante || 'No indicado')}</td></tr><tr><th>Responsable</th><td>${escaparHTML(solicitud.responsable || 'Sin asignar')}</td></tr></tbody></table>
+  <h2 class="section">2. Identificación del bien relacionado</h2><table><tbody>${detalles || `<tr><th>Rótulo / código</th><td>${escaparHTML(bien.rotulo || 'No indicado')}</td></tr><tr><th>Descripción</th><td>${escaparHTML(bien.descripcion || 'No indicada')}</td></tr>`}</tbody></table>
+  <h2 class="section">3. Fundamento de la solicitud</h2><p>${escaparHTML(solicitud.motivo || 'No se registró un motivo.')}</p>
+  <h2 class="section">4. Resolución registrada en el sistema</h2><table><tbody><tr><th>Resultado</th><td>${escaparHTML(estado)}</td></tr><tr><th>Registrado por</th><td>${escaparHTML(solicitud.resueltoPor || solicitud.revisionPor || 'No registrado')}</td></tr><tr><th>Fecha y hora</th><td>${escaparHTML(fecha(solicitud.resueltoEn || solicitud.resueltoFecha || solicitud.revisionEn))}</td></tr><tr><th>Observación</th><td>${escaparHTML(solicitud.motivoResolucion || 'Sin observaciones')}</td></tr></tbody></table>
+  <h2 class="section">5. Historial de actuaciones</h2><table><thead><tr><th>#</th><th>Actuación</th><th>Usuario</th><th>Fecha y hora</th><th>Observación</th></tr></thead><tbody>${eventos || '<tr><td colspan="5">Sin actuaciones registradas.</td></tr>'}</tbody></table><div class="sign"><div class="line">Responsable de Patrimonio<br>Nombre, firma y fecha</div><div class="line">Autoridad competente<br>Nombre, firma y fecha</div></div><footer class="foot">Generado desde el sistema patrimonial el ${escaparHTML(fecha(new Date().toISOString()))}. Este informe no sustituye el expediente ni los actos administrativos requeridos para la baja patrimonial.</footer><div class="no-print" style="margin-top:20px"><button onclick="window.print()">Imprimir o guardar como PDF</button></div></body></html>`;
+  const ventana = window.open('', '_blank');
+  if (!ventana) { window.alert('Permite las ventanas emergentes de este sitio para generar el informe.'); return; }
+  ventana.document.open(); ventana.document.write(html); ventana.document.close();
+};
+
 export default function AprobacionesView({
   dependenciaActual,
   solicitudesBaja, bienes,
@@ -110,7 +129,7 @@ export default function AprobacionesView({
         <div className="p-5 sm:p-6">
           <PageHeader
             titulo={'Centro de Aprobaciones'}
-            descripcion={<>Gestión y auditoría de solicitudes de baja en <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong></>}
+            descripcion={<>Gestión y seguimiento de solicitudes de baja en <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong>. Su aprobación no da de baja automáticamente el bien.</>}
             icono="fa-check-to-slot"
             contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
@@ -198,6 +217,7 @@ export default function AprobacionesView({
                       ...(notif.estado === 'EN_REVISION' ? [{ estado: 'EN_REVISION', usuario: notif.revisionPor, fecha: notif.revisionEn }] : []),
                       ...(estaResuelto ? [{ estado, usuario: notif.resueltoPor, fecha: notif.resueltoEn || notif.resueltoFecha, motivo: notif.motivoResolucion }] : [])
                     ];
+                const bienParaInforme = esSolicitudFuncionario ? bienAsociado : (bienes.find(b => b.id === (notif.bienId || notif.bien_id)) || bienAsociado);
 
                 return (
                   <TRow key={notif.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
@@ -230,7 +250,7 @@ export default function AprobacionesView({
                           <input id={`responsable-${notif.id}`} value={responsables[notif.id] ?? notif.responsable ?? ''} onChange={e => setResponsables(prev => ({ ...prev, [notif.id]: e.target.value }))} placeholder="Usuario responsable" className="h-8 w-40 rounded border border-line bg-surface-1 px-2 text-xs" />
                           <button type="button" disabled={asignandoId === notif.id || !(responsables[notif.id] || '').trim()} onClick={() => asignarResponsable(notif)} className="h-8 rounded border border-line px-2 text-xs font-semibold disabled:opacity-50">{asignandoId === notif.id ? 'Guardando…' : 'Asignar'}</button>
                         </div>}
-                        <button type="button" onClick={() => setDetalleId(detalleId === notif.id ? null : notif.id)} className="mt-2 text-xs font-semibold text-brand-text hover:underline" aria-expanded={detalleId === notif.id}>{detalleId === notif.id ? 'Ocultar detalle' : 'Ver detalle'}</button>
+                        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1"><button type="button" onClick={() => setDetalleId(detalleId === notif.id ? null : notif.id)} className="text-xs font-semibold text-brand-text hover:underline" aria-expanded={detalleId === notif.id}>{detalleId === notif.id ? 'Ocultar detalle' : 'Ver detalle'}</button><button type="button" onClick={() => imprimirInformeSolicitud(notif, bienParaInforme, historial)} className="text-xs font-semibold text-brand-text hover:underline"><i className="fa-solid fa-file-pdf mr-1"/>Informe / Imprimir PDF</button></div>
                         {detalleId === notif.id && <div className="mt-2 rounded-control border border-line bg-surface-2 p-3 text-xs text-content-2 space-y-1"><p><strong>Tipo:</strong> {notif.tipo === 'BAJA_FUNCIONARIO' ? 'Baja de funcionario' : 'Baja de bien'}</p><p><strong>Dependencia:</strong> {notif.dependencia || 'No indicada'}</p><p><strong>Solicitante:</strong> {notif.solicitante || 'No indicado'}</p><p><strong>Motivo:</strong> {notif.motivo || 'Sin motivo'}</p><p><strong>Responsable:</strong> {notif.responsable || 'Sin asignar'}</p></div>}
                         <details className="mt-2 text-xs text-content-2">
                           <summary className="cursor-pointer select-none font-semibold text-brand-text hover:underline">Historial ({historial.length})</summary>
@@ -292,7 +312,7 @@ export default function AprobacionesView({
                             onClick={() => openResolucionModal(bienAsociado, 'aprobar', notif)}
                             className="px-4 h-10 rounded-control text-[13px] font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                           >
-                            {esSolicitudFuncionario ? 'Aprobar Eliminación' : 'Aprobar Baja'}
+                            {esSolicitudFuncionario ? 'Aprobar Eliminación' : 'Aprobar solicitud'}
                           </button>
                         </div>
                       )}

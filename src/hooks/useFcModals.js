@@ -1197,16 +1197,8 @@ export function useFcModals({
                   const { error: errFunc } = await supabase.from("funcionarios").delete().eq("id", funcId);
                   if (errFunc) throw new Error(`no se pudo eliminar al funcionario: ${errFunc.message}`);
                   setFuncionariosPadron(prev => prev.filter(f => f.id !== funcId));
-              } else {
-                  const bienReal = bienes.find(b => b.id === bien.id) || bien;
-                  const updatedBien = { ...bienReal, estadoConservacion: "De Baja" };
-                  setBienes(prev => prev.map(b => b.id === bien.id ? updatedBien : b));
-                  const { error: errBien } = await supabase.from("bens").update(conSello({ data: updatedBien })).eq("id", bien.id);
-                  if (errBien) throw new Error(`no se pudo dar de baja el bien: ${errBien.message}`);
-                  const cacheKey = "bienes_cache_" + (dependenciaActual || "general");
-                  const cacheActual = (await localforage.getItem(cacheKey)) || [];
-                  await localforage.setItem(cacheKey, cacheActual.map(b => b.id === bien.id ? updatedBien : b));
-              }
+              } // La aprobación de una solicitud de bien registra la decisión de trámite;
+                // la baja patrimonial debe resolverse por su expediente administrativo separado.
           }
 
           // 2. Cerrar la solicitud, ahora que el paso critico salio bien.
@@ -1245,10 +1237,10 @@ export function useFcModals({
                   tipoRegistro: "NOTIFICACION",
                   usuarioDestino: solicitanteUsername,
                   accion,
-                  titulo: accion === "aprobar" ? `Baja Aprobada: ${rotuloAsunto}` : `Baja Rechazada: ${rotuloAsunto}`,
+                  titulo: accion === "aprobar" ? `Solicitud de baja aprobada: ${rotuloAsunto}` : `Solicitud de baja rechazada: ${rotuloAsunto}`,
                   mensaje: accion === "aprobar"
-                      ? `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" ha sido APROBADA por la administración.${motivoFinal ? " Motivo: " + motivoFinal : ""}`
-                      : `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" ha sido RECHAZADA.${motivoFinal ? " Motivo: " + motivoFinal : ""}`,
+                      ? `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" fue aprobada para continuar su trámite administrativo. Esta decisión no da de baja el bien del inventario.${motivoFinal ? " Observación: " + motivoFinal : ""}`
+                      : `La solicitud de baja para ${esFuncionario ? "el funcionario" : "el bien"} "${sujeto}" fue rechazada.${motivoFinal ? " Motivo: " + motivoFinal : ""}`,
                   leido: false,
                   fecha: new Date().toISOString(),
                   bienId: esFuncionario ? undefined : bien.id,
@@ -1258,16 +1250,16 @@ export function useFcModals({
               await supabase.from("notificaciones").insert([{ id: notifId, data: notifUsuario }]);
           }
 
-          // 4. Registrar auditoría de la resolución. La entidad auditada es la
-          //    que de verdad cambio: el bien o el funcionario.
+          // Registrar la resolución de la solicitud (la aprobación no da de
+          // baja patrimonialmente el bien; eso requiere expediente separado).
           await registrarAuditoria({
               usuario: currentUser?.username || "Admin",
               dependencia: dependenciaActual,
               accion: accion === "aprobar"
-                  ? (esSolicitudFuncionario ? "APROBAR_BAJA_FUNCIONARIO" : "APROBAR_BAJA")
-                  : (esSolicitudFuncionario ? "RECHAZAR_BAJA_FUNCIONARIO" : "RECHAZAR_BAJA"),
-              entidad: esSolicitudFuncionario ? "FUNCIONARIO" : "BIEN",
-              entidadId: esSolicitudFuncionario ? notifPendiente?.funcionarioId : bien.id,
+                  ? (esSolicitudFuncionario ? "APROBAR_BAJA_FUNCIONARIO" : "APROBAR_SOLICITUD_BAJA")
+                  : (esSolicitudFuncionario ? "RECHAZAR_BAJA_FUNCIONARIO" : "RECHAZAR_SOLICITUD_BAJA"),
+              entidad: esSolicitudFuncionario ? "FUNCIONARIO" : "SOLICITUD_BAJA",
+              entidadId: esSolicitudFuncionario ? notifPendiente?.funcionarioId : notifPendiente?.id,
               detalles: esSolicitudFuncionario
                   ? { nombre: nombreFuncionario, cedula: notifPendiente?.cedula, motivo: motivoFinal, solicitante: solicitanteUsername }
                   : { rotulo: bien?.rotulo, motivo: motivoFinal, solicitante: solicitanteUsername }
@@ -1275,7 +1267,7 @@ export function useFcModals({
 
           notify(
               accion === "aprobar"
-                  ? (esSolicitudFuncionario ? "Eliminación aprobada y notificada al usuario." : "Baja aprobada y notificada al usuario.")
+              ? (esSolicitudFuncionario ? "Eliminación aprobada y notificada al usuario." : "Solicitud aprobada para continuar el trámite; el bien permanece en el inventario.")
                   : "Solicitud rechazada y notificada al usuario.",
               "success"
           );

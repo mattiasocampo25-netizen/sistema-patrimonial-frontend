@@ -20,7 +20,7 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
         <Modal
             abierto
             onCerrar={() => setResolucionBaja(null)}
-            titulo={esAprobar ? (esFuncionario ? 'Aprobar Eliminación' : 'Aprobar Baja Definitiva') : 'Rechazar Solicitud'}
+            titulo={esAprobar ? (esFuncionario ? 'Aprobar Eliminación' : 'Aprobar solicitud de baja') : 'Rechazar Solicitud'}
             descripcion={resolucionBaja.bien.rotulo}
             icono={esFuncionario ? 'fa-user-minus' : (esAprobar ? 'fa-check-double' : 'fa-xmark')}
             tamano="sm"
@@ -30,7 +30,7 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
                         Cancelar
                     </button>
                     <button type="submit" form="form-resolucion-baja" className={`inline-flex items-center justify-center h-10 px-5 rounded-control text-[13px] font-bold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 ${esAprobar ? 'bg-rose-600 hover:bg-rose-700 text-white' : 'bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1'}`}>
-                        Confirmar {esAprobar ? (esFuncionario ? 'Eliminación' : 'Baja Definitiva') : 'Rechazo'}
+                        Confirmar {esAprobar ? (esFuncionario ? 'Eliminación' : 'Aprobación de solicitud') : 'Rechazo'}
                     </button>
                 </>
             )}
@@ -68,7 +68,7 @@ export default function ResolucionBajaModal({ resolucionBaja, setResolucionBaja,
                             <i className="fa-solid fa-triangle-exclamation mt-0.5"></i>
                             {esFuncionario
                                 ? 'Al aprobar, el funcionario se eliminará del padrón. Esta acción es irreversible.'
-                                : 'Al aprobar, el bien pasará a estado "De Baja" en todo el sistema. Esta acción es irreversible.'}
+                                : 'La aprobación registra la solicitud para continuar el trámite administrativo; no cambia el estado del bien ni lo elimina del inventario. La baja patrimonial requiere un procedimiento y autorización independientes.'}
                         </p>
                     )}
                 </div>

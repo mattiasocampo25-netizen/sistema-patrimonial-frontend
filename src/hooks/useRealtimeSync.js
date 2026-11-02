@@ -312,15 +312,17 @@ export function useRealtimeSync({
         // Punto único de decisión: si meanwhile arrancó otra carga, esta ya no escribe.
         if (!turnoVigente()) return;
 
-        setFc10List(parseDirect(resFc10.data));
-        setEstructurasDB(parseDirect(resEstructuras.data));
+        // Las consultas paginadas (traerPaginas) devuelven el arreglo de filas
+        // directamente; no tienen la envoltura { data, error } de Supabase.
+        setFc10List(parseDirect(resFc10));
+        setEstructurasDB(parseDirect(resEstructuras));
 
         const notifData = resAuditoria.data || [];
         setNotificaciones(notifData.map(item => item.data ? (typeof item.data === 'string' ? JSON.parse(item.data) : item.data) : item));
 
-        setUsuariosList(resUsuarios.data || []);
+        setUsuariosList(resUsuarios || []);
 
-        const funcsData = resFuncionarios.data || [];
+        const funcsData = resFuncionarios || [];
         setFuncionariosPadron(funcsData.map(item => item.data ? (typeof item.data === 'string' ? JSON.parse(item.data) : item.data) : item));
 
         setDbError(false);

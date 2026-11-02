@@ -636,7 +636,7 @@ export default function InventarioView({
                                   <IconButton titulo="Crear o gestionar acta FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
                                   <IconButton titulo="Registrar traslado FC-11" icono="fa-truck-fast" variante="ghost" tamano="sm" onClick={() => openFC11Modal(item)} />
                                   <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
-                                  {isAdmin && <IconButton titulo="Generar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
+                                  {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                                   <IconButton titulo={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} />
                                 </div>
                               </article>
@@ -664,7 +664,7 @@ export default function InventarioView({
                               <IconButton titulo="QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
                               <IconButton titulo="Asignación FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
                               <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
-                              {isAdmin && <IconButton titulo="Generar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
+                              {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                             </div>
                           </div>
                         ))}
@@ -874,7 +874,7 @@ export default function InventarioView({
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
                                     />
 
-                                    {isAdmin && <IconButton titulo="Generar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
+                                    {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
 
                                     {/* Eliminar o Solicitar Baja */}
                                     <IconButton

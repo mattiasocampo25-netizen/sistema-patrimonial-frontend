@@ -9,11 +9,16 @@ export default function UsuariosView({
 }) {
   const [busqueda, setBusqueda] = useState('');
   const [filtroRol, setFiltroRol] = useState('todos');
+  const [pagina, setPagina] = useState(1);
+  const porPagina = 10;
   const usuariosVisibles = useMemo(() => usuariosList.filter(u => {
     const coincideTexto = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).includes(normalizeStr(busqueda));
     const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'desarrollador'].includes(u.cargo) : u.cargo === 'funcionario');
     return coincideTexto && coincideRol;
   }), [usuariosList, busqueda, filtroRol]);
+  const paginas = Math.max(1, Math.ceil(usuariosVisibles.length / porPagina));
+  const paginaActual = Math.min(pagina, paginas);
+  const usuariosPagina = usuariosVisibles.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
   return (
     <div className="flex flex-col flex-1 space-y-6">
       <Card className="p-0">
@@ -35,9 +40,9 @@ export default function UsuariosView({
           </Toolbar>
           <div className="mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <label className="sr-only" htmlFor="usuarios-search">Buscar usuarios</label>
-            <input id="usuarios-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar por nombre, usuario o dependencia…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
+            <input id="usuarios-search" value={busqueda} onChange={e => { setBusqueda(e.target.value); setPagina(1); }} placeholder="Buscar por nombre, usuario o dependencia…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
             <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar usuarios por rol">
-              {[['todos', 'Todos'], ['admin', 'Administración'], ['funcionario', 'Funcionarios']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroRol === id} onClick={() => setFiltroRol(id)} className={`rounded px-3 text-xs font-semibold ${filtroRol === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
+              {[['todos', 'Todos'], ['admin', 'Administración'], ['funcionario', 'Funcionarios']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroRol === id} onClick={() => { setFiltroRol(id); setPagina(1); }} className={`rounded px-3 text-xs font-semibold ${filtroRol === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
             </div>
           </div>
         </div>
@@ -60,7 +65,7 @@ export default function UsuariosView({
                 </TRow>
               </THead>
               <TBody>
-                {usuariosVisibles.map(u => (
+                {usuariosPagina.map(u => (
                   <TRow key={u.username} className="hover:bg-surface-2 dark:hover:bg-darkbg-hover/50 transition-colors border-b border-zinc-50 dark:border-line/30">
                       <TD className="py-3 pl-6 pr-4 align-middle">
                           <div className="flex items-center gap-3">
@@ -111,6 +116,16 @@ export default function UsuariosView({
               </TBody>
             </Table>
           </div>
+          {usuariosVisibles.length > porPagina && (
+            <nav aria-label="Paginación de usuarios" className="flex items-center justify-between gap-3 border-t border-line px-4 py-3 text-sm text-content-2">
+              <span>Mostrando {(paginaActual - 1) * porPagina + 1}–{Math.min(paginaActual * porPagina, usuariosVisibles.length)} de {usuariosVisibles.length}</span>
+              <div className="flex items-center gap-2">
+                <Button variante="secondary" tamano="sm" disabled={paginaActual <= 1} onClick={() => setPagina(p => Math.max(1, p - 1))}>Anterior</Button>
+                <span aria-live="polite" className="tabular-nums">{paginaActual} / {paginas}</span>
+                <Button variante="secondary" tamano="sm" disabled={paginaActual >= paginas} onClick={() => setPagina(p => Math.min(paginas, p + 1))}>Siguiente</Button>
+              </div>
+            </nav>
+          )}
       </div>
       )}
     </div>

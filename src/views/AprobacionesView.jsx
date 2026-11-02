@@ -55,6 +55,11 @@ export default function AprobacionesView({
     const fecha = String(n.created_at || n.fecha || '').slice(0, 10);
     const dependenciaOK = !filtroDependencia || normalizeStr(n.dependencia) === normalizeStr(filtroDependencia);
     return estadoOK && tipoOK && dependenciaOK && (!desde || fecha >= desde) && (!hasta || fecha <= hasta) && (!busqueda.trim() || texto.includes(normalizeStr(busqueda)));
+  }).sort((a, b) => {
+    const prioridad = n => n.estado === 'PENDIENTE' ? 0 : n.estado === 'EN_REVISION' ? 1 : 2;
+    const porEstado = prioridad(a) - prioridad(b);
+    if (porEstado) return porEstado;
+    return new Date(b.created_at || b.fecha || 0).getTime() - new Date(a.created_at || a.fecha || 0).getTime();
   });
   const dependenciasSolicitud = [...new Set(solicitudesBaja.map(n => n.dependencia).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
 

@@ -334,6 +334,43 @@ export function useFcModals({
 
   const openResolucionModal = (bien, accion, notifOrigen = null) => { setResolucionBaja({ bien, accion, notifOrigen }); setMotivoResolucion(""); };
 
+  const marcarSolicitudEnRevision = async (solicitud) => {
+      if (!isAdmin) return notify('Solo administración puede cambiar el estado de una solicitud.', 'error');
+      if (!solicitud?.id || solicitud.estado !== 'PENDIENTE') return;
+      const actor = currentUser?.username || 'Admin';
+      const fecha = new Date().toISOString();
+      const historial = Array.isArray(solicitud.historial) && solicitud.historial.length
+          ? solicitud.historial
+          : [{ estado: 'PENDIENTE', usuario: solicitud.solicitante || 'Usuario', fecha: solicitud.created_at || solicitud.fecha || null, motivo: solicitud.motivo || '' }];
+      const actualizada = {
+          ...solicitud,
+          estado: 'EN_REVISION',
+          revisionPor: actor,
+          revisionEn: fecha,
+          historial: [...historial, { estado: 'EN_REVISION', usuario: actor, fecha, motivo: '' }]
+      };
+      setIsProcessing({ active: true, text: 'Marcando solicitud en revisión...' });
+      try {
+          const { error } = await supabase.from('notificaciones').update({ data: actualizada }).eq('id', solicitud.id);
+          if (error) throw error;
+          setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? actualizada : item));
+          await registrarAuditoria({
+              usuario: actor,
+              dependencia: solicitud.dependencia || dependenciaActual,
+              accion: 'SOLICITUD_BAJA_EN_REVISION',
+              entidad: 'SOLICITUD_BAJA',
+              entidadId: solicitud.id,
+              detalles: { tipo: solicitud.tipo, bienId: solicitud.bienId || solicitud.bien_id, funcionarioId: solicitud.funcionarioId, solicitante: solicitud.solicitante }
+          });
+          notify('Solicitud marcada En Revisión.', 'success');
+      } catch (error) {
+          console.error('No se pudo marcar la solicitud en revisión:', error);
+          notify(`No se pudo actualizar la solicitud: ${error.message || 'Error de conexión.'}`, 'error');
+      } finally {
+          setIsProcessing({ active: false, text: '' });
+      }
+  };
+
   const openFC10Modal = (bien, fc = null) => {
     if (!bien?.id) return notify('Selecciona un bien válido para crear el FC-10.', 'warning');
     if (!fc) {
@@ -1108,10 +1145,11 @@ export function useFcModals({
       try {
           // Encontrar la notificación de solicitud de baja pendiente asociada
           const notifPendiente = notifOrigen || notificaciones.find(
-              n => n.tipo === "BAJA_BIEN" && (n.bienId === bien.id || n.bien_id === bien.id) && n.estado === "PENDIENTE"
+              n => n.tipo === "BAJA_BIEN" && (n.bienId === bien.id || n.bien_id === bien.id) && (n.estado === "PENDIENTE" || n.estado === "EN_REVISION")
           );
 
           const estadoNuevo = accion === "aprobar" ? "APROBADO" : "RECHAZADO";
+          const fechaResolucion = new Date().toISOString();
           const solicitanteUsername = notifPendiente?.solicitante || notifPendiente?.solicitadoPor || bien?.bajaSolicitadaPor || "Usuario";
 
           // Hay dos tipos de solicitud y cada una se resuelve sobre una entidad
@@ -1149,7 +1187,19 @@ export function useFcModals({
 
           // 2. Cerrar la solicitud, ahora que el paso critico salio bien.
           if (notifPendiente) {
-              const notifActualizada = { ...notifPendiente, estado: estadoNuevo, motivoResolucion: motivoFinal, resueltoPor: currentUser?.username || "Admin", resueltoFecha: new Date().toISOString() };
+              const actor = currentUser?.username || "Admin";
+              const historialPrevio = Array.isArray(notifPendiente.historial) && notifPendiente.historial.length
+                  ? notifPendiente.historial
+                  : [{ estado: 'PENDIENTE', usuario: notifPendiente.solicitante || 'Usuario', fecha: notifPendiente.created_at || notifPendiente.fecha || null, motivo: notifPendiente.motivo || '' }];
+              const notifActualizada = {
+                  ...notifPendiente,
+                  estado: estadoNuevo,
+                  motivoResolucion: motivoFinal,
+                  resueltoPor: actor,
+                  resueltoEn: fechaResolucion,
+                  resueltoFecha: fechaResolucion,
+                  historial: [...historialPrevio, { estado: estadoNuevo, usuario: actor, fecha: fechaResolucion, motivo: motivoFinal }]
+              };
               const { error: errNotif } = await supabase.from("notificaciones").update({ data: notifActualizada }).eq("id", notifPendiente.id);
               if (errNotif) throw new Error(`no se pudo cerrar la solicitud: ${errNotif.message}`);
               setNotificaciones(prev => prev.map(n => n.id === notifPendiente.id ? notifActualizada : n));
@@ -1395,7 +1445,7 @@ export function useFcModals({
     scanParaConteo, setScanParaConteo,
     modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo,
     openFichaBien, openFC03Modal, executeGenerateFC03,
-    openResolucionModal, openFC10Modal, openFC11Modal, openFC04Modal,
+    openResolucionModal, marcarSolicitudEnRevision, openFC10Modal, openFC11Modal, openFC04Modal,
     handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange,
     handleScanSuccess,
     saveBien, saveUsuario, saveFC11, registrarFirmasFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite,

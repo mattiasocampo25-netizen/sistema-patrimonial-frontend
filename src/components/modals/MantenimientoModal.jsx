@@ -1,26 +1,41 @@
 import Dialogo from '../ui/Dialogo';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function MantenimientoModal({ isOpen, onClose, initial, onSave, isSaving, STYLES }) {
   const [activo, setActivo] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [mejoras, setMejoras] = useState('');
+  const borradorEditadoRef = useRef(false);
 
   useEffect(() => {
-    if (isOpen) {
-      setActivo(Boolean(initial?.en_mantenimiento));
-      setTitulo(initial?.titulo || '');
-      setMensaje(initial?.mensaje || '');
-      const m = Array.isArray(initial?.mejoras) ? initial.mejoras.join('\n') : (initial?.mejoras || '');
-      setMejoras(m);
+    if (!isOpen) {
+      borradorEditadoRef.current = false;
+      return;
     }
+    if (borradorEditadoRef.current) return;
+    setActivo(Boolean(initial?.en_mantenimiento));
+    setTitulo(initial?.titulo || '');
+    setMensaje(initial?.mensaje || '');
+    const m = Array.isArray(initial?.mejoras) ? initial.mejoras.join('\n') : (initial?.mejoras || '');
+    setMejoras(m);
   }, [isOpen, initial]);
+
+  const editar = (setter, value) => {
+    borradorEditadoRef.current = true;
+    setter(value);
+  };
 
   if (!isOpen) return null;
 
   return (
-    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
+    <Dialogo
+      className={STYLES.modalOverlay}
+      onCerrar={onClose}
+      // En este formulario un clic fuera puede perder cambios de texto;
+      // se cierra con Escape o con los botones explícitos.
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className={STYLES.modalContent + " max-w-md"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3">
@@ -32,7 +47,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Bloquea el acceso y muestra el aviso a todos</p>
             </div>
           </div>
-          <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <button type="button" onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
             <i className="fa-solid fa-xmark text-base"></i>
           </button>
         </div>
@@ -40,7 +55,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
         <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
           <button
             type="button"
-            onClick={() => setActivo(!activo)}
+            onClick={() => editar(setActivo, !activo)}
             role="switch"
             aria-checked={activo}
             className="flex w-full items-center justify-between rounded-card border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
@@ -66,7 +81,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               type="text"
               maxLength={100}
               value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+            onChange={(e) => editar(setTitulo, e.target.value)}
               placeholder="Ej: Estamos mejorando el sistema"
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion"
             />
@@ -80,7 +95,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               rows={3}
               maxLength={500}
               value={mensaje}
-              onChange={(e) => setMensaje(e.target.value)}
+              onChange={(e) => editar(setMensaje, e.target.value)}
               placeholder="Ej: El acceso está pausado por trabajos programados..."
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
@@ -94,7 +109,7 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
               rows={4}
               maxLength={1200}
               value={mejoras}
-              onChange={(e) => setMejoras(e.target.value)}
+              onChange={(e) => editar(setMejoras, e.target.value)}
               placeholder={"Ej:\nNuevo buscador con tildes\nReportes FC más rápidos"}
               className="block w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 px-4 py-3 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 motion resize-none"
             />
@@ -103,10 +118,11 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
         </div>
 
         <div className="flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
-          <button onClick={onClose} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+          <button type="button" onClick={onClose} className="h-10 px-4 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
             Cancelar
           </button>
           <button
+            type="button"
             onClick={() => onSave({ en_mantenimiento: activo, titulo: titulo.trim(), mensaje: mensaje.trim(), mejoras: mejoras.split('\n').map(s => s.trim()).filter(Boolean) })}
             disabled={isSaving || (activo && (!titulo.trim() || !mensaje.trim()))}
             className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"

@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '../supabaseClient';
 import { INACTIVITY_LIMIT_MS } from '../constants/appConstants';
-import { leerUsuarioLocal, sesionMarcadaLocal } from '../utils/sesionLocal';
+import { leerUsuarioLocal, registrarActividadLocal, sesionLocalExpirada, sesionMarcadaLocal } from '../utils/sesionLocal';
 import { normalizarEntradaAcceso, validarPassword, construirSesion } from '../utils/authInput';
 import { APP_VERSION } from '../utils/helpers';
 
@@ -12,6 +12,7 @@ import { APP_VERSION } from '../utils/helpers';
 export function useAuthSession({ notify }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => sesionMarcadaLocal());
   const [currentUser, setCurrentUser] = useState(() => leerUsuarioLocal());
+  const vencimientoProcesadoRef = useRef(false);
 
   // Admin solo por rol. Antes comparaba además `cargo === 'cargo'`, que no es un
   // rol sino el nombre del campo: cualquier registro con ese texto quedaba como
@@ -58,9 +59,10 @@ export function useAuthSession({ notify }) {
   });
 
   const handleLogout = useCallback(() => {
-    try { supabase.auth.signOut(); } catch {}
+    try { supabase.auth.signOut({ scope: 'local' }); } catch {}
     localStorage.removeItem('is_logged_in');
     localStorage.removeItem('current_user');
+    localStorage.removeItem('unp_session_last_activity');
     setIsAuthenticated(false);
     setCurrentUser(null);
     setShowLogoutConfirm(false);
@@ -70,11 +72,16 @@ export function useAuthSession({ notify }) {
   // Sin sesión no hay acceso aunque exista bandera local (cierra la puerta de DevTools).
   useEffect(() => {
     let vivo = true;
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!vivo) return;
-      if (!data.session) {
+      if (!data.session || !sesionMarcadaLocal()) {
         localStorage.removeItem('is_logged_in');
         localStorage.removeItem('current_user');
+        localStorage.removeItem('unp_session_last_activity');
+        if (data.session) {
+          try { await supabase.auth.signOut({ scope: 'local' }); } catch {}
+        }
+        if (!vivo) return;
         setIsAuthenticated(false);
         setCurrentUser(null);
       }
@@ -83,6 +90,7 @@ export function useAuthSession({ notify }) {
       if (evento === 'SIGNED_OUT') {
         localStorage.removeItem('is_logged_in');
         localStorage.removeItem('current_user');
+        localStorage.removeItem('unp_session_last_activity');
         setIsAuthenticated(false);
         setCurrentUser(null);
       }
@@ -152,6 +160,7 @@ export function useAuthSession({ notify }) {
 
         localStorage.setItem('is_logged_in', 'true'); 
         localStorage.setItem('current_user', JSON.stringify(userSession)); 
+        registrarActividadLocal();
         
         setLoginError(false); 
         setCurrentUser(userSession); 
@@ -176,25 +185,35 @@ useEffect(() => {
   if (!isAuthenticated) return;
 
   let inactivityTimer;
+  vencimientoProcesadoRef.current = false;
 
   const handleInactivityLogout = () => {
+    if (vencimientoProcesadoRef.current) return;
+    vencimientoProcesadoRef.current = true;
     notify("Sesión cerrada automáticamente por inactividad (15 min).", "warning");
     handleLogout();
   };
 
   const resetTimer = () => {
+    if (sesionLocalExpirada()) {
+      handleInactivityLogout();
+      return;
+    }
+    registrarActividadLocal();
     if (inactivityTimer) clearTimeout(inactivityTimer);
     inactivityTimer = setTimeout(handleInactivityLogout, INACTIVITY_LIMIT_MS);
   };
 
-  const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+  const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart', 'focus'];
 
   resetTimer();
   events.forEach(event => window.addEventListener(event, resetTimer));
+  document.addEventListener('visibilitychange', resetTimer);
 
   return () => {
     if (inactivityTimer) clearTimeout(inactivityTimer);
     events.forEach(event => window.removeEventListener(event, resetTimer));
+    document.removeEventListener('visibilitychange', resetTimer);
   };
 }, [isAuthenticated, handleLogout, notify]);
 

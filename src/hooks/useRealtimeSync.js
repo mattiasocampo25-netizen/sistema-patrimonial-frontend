@@ -76,13 +76,12 @@ export function useRealtimeSync({
     }
   }, [dependenciaActual, guardaGen]);
 
-  // Higiene de notificaciones: retención de 2 días. Solo se borra lo ya
-  // visto (leídas) y las solicitudes resueltas; lo no leído y lo pendiente
-  // nunca se toca.
+  // Retención de notificaciones comunes: las solicitudes de baja son parte
+  // del historial administrativo y se conservan para consulta y auditoría.
   const RETENCION_NOTIF_MS = 2 * 24 * 60 * 60 * 1000;
   const esAnuncioGlobal = (n) => !!n && n.accion === 'anuncio' && n.usuarioDestino === 'TODOS';
 
-  // Fetch acotado: solo mías + broadcast + solicitudes pendientes, con
+  // Fetch acotado: solo mías + broadcast + todas las solicitudes de baja, con
   // límite. Antes era `select('*')` de toda la tabla para todos.
   // Con useCallback: si no, seria una funcion nueva en cada render y los
   // effects que dependen de ella se reejecutarian sin parar.
@@ -91,8 +90,8 @@ export function useRealtimeSync({
       ? escaparFiltroPostgrest(currentUser.username)
       : '';
     const filtros = u
-      ? `data->>usuarioDestino.eq.${u},data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`
-      : `data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`;
+      ? `data->>usuarioDestino.eq.${u},data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE,data->>tipo.eq.BAJA_BIEN,data->>tipo.eq.BAJA_FUNCIONARIO`
+      : `data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE,data->>tipo.eq.BAJA_BIEN,data->>tipo.eq.BAJA_FUNCIONARIO`;
     return supabase.from('notificaciones').select('id, data, updated_at').or(filtros).order('updated_at', { ascending: false }).limit(500);
   }, [currentUser?.username]);
 
@@ -109,9 +108,7 @@ export function useRealtimeSync({
       const fechaDe = (n) => new Date(n.resueltoFecha || n.fecha || n.created_at || 0).getTime() || 0;
       const paraBorrar = (filas || []).filter(n => {
         if (fechaDe(n) >= corte) return false;
-        if (n.tipo === 'BAJA_BIEN' || n.tipo === 'BAJA_FUNCIONARIO') {
-          return n.estado === 'APROBADO' || n.estado === 'RECHAZADO';
-        }
+        if (n.tipo === 'BAJA_BIEN' || n.tipo === 'BAJA_FUNCIONARIO') return false;
         if (esAnuncioGlobal(n)) {
           return (n.totalDest || 0) > 0 && (n.leidos || []).length >= (n.totalDest || 0);
         }

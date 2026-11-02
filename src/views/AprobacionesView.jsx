@@ -13,10 +13,24 @@ const ESTADO_INFO = {
 export default function AprobacionesView({
   dependenciaActual,
   solicitudesBaja, bienes,
-  openResolucionModal,
+  openResolucionModal, marcarSolicitudEnRevision,
  
 }) {
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [revisandoIds, setRevisandoIds] = useState(() => new Set());
+
+  const iniciarRevision = async (solicitud) => {
+    if (revisandoIds.has(solicitud.id)) return;
+    setRevisandoIds(prev => new Set(prev).add(solicitud.id));
+    try { await marcarSolicitudEnRevision(solicitud); }
+    finally {
+      setRevisandoIds(prev => {
+        const siguiente = new Set(prev);
+        siguiente.delete(solicitud.id);
+        return siguiente;
+      });
+    }
+  };
 
   const conteo = solicitudesBaja.reduce(
     (acc, n) => {
@@ -104,7 +118,14 @@ export default function AprobacionesView({
                     };
                 const estado = notif.estado || 'PENDIENTE';
                 const info = ESTADO_INFO[estado] || ESTADO_INFO.PENDIENTE;
-                const estaResuelto = estado !== 'PENDIENTE';
+                const estaResuelto = estado === 'APROBADO' || estado === 'RECHAZADO';
+                const historial = Array.isArray(notif.historial) && notif.historial.length
+                  ? notif.historial
+                  : [
+                      { estado: 'PENDIENTE', usuario: notif.solicitante || 'Usuario', fecha: notif.created_at || notif.fecha || null, motivo: notif.motivo || '' },
+                      ...(notif.estado === 'EN_REVISION' ? [{ estado: 'EN_REVISION', usuario: notif.revisionPor, fecha: notif.revisionEn }] : []),
+                      ...(estaResuelto ? [{ estado, usuario: notif.resueltoPor, fecha: notif.resueltoEn || notif.resueltoFecha, motivo: notif.motivoResolucion }] : [])
+                    ];
 
                 return (
                   <TRow key={notif.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors ${estaResuelto ? 'opacity-80' : ''}`}>
@@ -128,9 +149,28 @@ export default function AprobacionesView({
                           <div className="mt-2 flex items-start gap-2 text-xs text-content-3 dark:text-content-3">
                             <i className="fa-solid fa-user-check text-[10px] shrink-0 text-content-3"></i>
                             <span className="font-semibold">Resuelto por: {notif.resueltoPor}</span>
-                            {notif.resueltoEn && <span className="ml-2">· {new Date(notif.resueltoEn).toLocaleDateString()}</span>}
+                            {(notif.resueltoEn || notif.resueltoFecha) && <span className="ml-2">· {new Date(notif.resueltoEn || notif.resueltoFecha).toLocaleDateString('es-PY')}</span>}
                           </div>
                         )}
+                        <details className="mt-2 text-xs text-content-2">
+                          <summary className="cursor-pointer select-none font-semibold text-brand-text hover:underline">Historial ({historial.length})</summary>
+                          <ol className="mt-2 space-y-2 border-l border-line pl-3">
+                            {historial.map((evento, indice) => {
+                              const infoEvento = ESTADO_INFO[evento.estado] || ESTADO_INFO.PENDIENTE;
+                              const fechaEvento = evento.fecha ? new Date(evento.fecha) : null;
+                              const fechaValida = fechaEvento && !Number.isNaN(fechaEvento.getTime());
+                              return (
+                                <li key={`${evento.estado}-${evento.fecha || indice}-${indice}`} className="relative">
+                                  <span className={`absolute -left-[17px] top-1.5 h-2 w-2 rounded-full ${infoEvento.dot}`} />
+                                  <span className="font-bold">{infoEvento.label}</span>
+                                  {evento.usuario && <span> · {evento.usuario}</span>}
+                                  {fechaValida && <div className="text-[11px] text-content-3">{fechaEvento.toLocaleString('es-PY')}</div>}
+                                  {evento.motivo && <div className="mt-0.5 text-[11px] text-content-2">{evento.motivo}</div>}
+                                </li>
+                              );
+                            })}
+                          </ol>
+                        </details>
                       </div>
                     </TD>
                     <TD className="px-4 py-4 align-top text-xs font-medium text-content-1 dark:text-content-3">
@@ -150,14 +190,24 @@ export default function AprobacionesView({
                     </TD>
                     <TD className="py-4 pl-4 pr-6 sm:pr-8 align-top text-right">
                       {!estaResuelto && (
-                        <div className="flex items-center justify-end gap-2">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                          {estado === 'PENDIENTE' && <button
+                            type="button"
+                            onClick={() => iniciarRevision(notif)}
+                            disabled={revisandoIds.has(notif.id)}
+                            className="px-3 h-10 rounded-control text-[13px] font-semibold text-info hover:bg-info-soft border border-info/25 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-info outline-none disabled:opacity-60 disabled:cursor-wait"
+                          >
+                            {revisandoIds.has(notif.id) ? 'Guardando…' : 'Marcar en revisión'}
+                          </button>}
                           <button
+                            type="button"
                             onClick={() => openResolucionModal(bienAsociado, 'rechazar', notif)}
                             className="px-4 h-10 rounded-control text-[13px] font-semibold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/[0.05] border border-transparent hover:border-line dark:hover:border-white/10 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                           >
                             Rechazar
                           </button>
                           <button
+                            type="button"
                             onClick={() => openResolucionModal(bienAsociado, 'aprobar', notif)}
                             className="px-4 h-10 rounded-control text-[13px] font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
                           >
@@ -167,7 +217,7 @@ export default function AprobacionesView({
                       )}
                       {estaResuelto && (
                         <span className="text-[10px] font-bold text-content-3 uppercase tracking-wider">
-                          {estado.toLowerCase()}
+                          Decisión registrada
                         </span>
                       )}
                     </TD>

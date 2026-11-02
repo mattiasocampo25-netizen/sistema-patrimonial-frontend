@@ -38,9 +38,9 @@ export default function Fc04View({
               <input id="fc04-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar número, bien u observación…" className="h-10 w-full rounded-control border border-line bg-surface-1 pl-9 pr-9 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
               {busqueda && <button type="button" onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda FC-04" className="absolute right-2 top-1/2 h-7 w-7 -translate-y-1/2 rounded text-content-3 hover:bg-surface-3"><i className="fa-solid fa-xmark" /></button>}
             </div>
-            <Button variante="primary" tamano="md" icono="fa-plus" onClick={() => openFC04Modal(null)}>
+            {isAdmin && <Button variante="primary" tamano="md" icono="fa-plus" onClick={() => openFC04Modal(null)}>
               Redactar Planilla
-            </Button>
+            </Button>}
           </div>
           </Toolbar>
         </div>
@@ -68,7 +68,7 @@ export default function Fc04View({
                     </div>
                     <div className="flex gap-1">
                       <IconButton titulo="Imprimir PDF" icono="fa-print" variante="ghost" tamano="sm" onClick={()=>handleGenerateFC04PDF(fc)} />
-                      <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={()=>openFC04Modal(fc)} />
+                      {isAdmin && <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={()=>openFC04Modal(fc)} />}
                       {isAdmin && (
                         <IconButton titulo="Eliminar" icono="fa-trash-can" variante="danger" tamano="sm" onClick={()=>setItemToDelete({type:'fc04', id:fc.id, item: fc})} />
                       )}

@@ -203,9 +203,9 @@ export default function InventarioView({
           {t('inv.plantilla')}
         </Button>
 
-        <Button variante="subtle" icono="fa-file-import" onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV">
+        {isAdmin && <Button variante="subtle" icono="fa-file-import" onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV">
           {t('inv.importar')}
-        </Button>
+        </Button>}
 
         <Button variante="subtle" icono="fa-file-export" onClick={handleExportInventarioCSV} title="Exportar archivo CSV">
           {t('inv.exportar')}
@@ -232,9 +232,9 @@ export default function InventarioView({
 
         <span className="hidden sm:block w-px h-5 bg-line shrink-0 mx-2"></span>
 
-        <Button variante="primary" icono="fa-plus" onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title={t('inv.anadir')}>
+        {isAdmin && <Button variante="primary" icono="fa-plus" onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title={t('inv.anadir')}>
           {t('inv.anadir')}
-        </Button>
+        </Button>}
       </div>
 
       </Toolbar>
@@ -561,9 +561,9 @@ export default function InventarioView({
                         <button onClick={() => onQRLoteSeleccion && onQRLoteSeleccion()} title="Generar ZIP de etiquetas de la selección" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-qrcode text-[11px]"></i> QRs
                         </button>
-                        <button onClick={() => setMostrarAsignacionMasiva(true)} title="Asignar responsable o ubicación a los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
+                        {isAdmin && <button onClick={() => setMostrarAsignacionMasiva(true)} title="Asignar responsable o ubicación a los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-user-gear text-[11px]"></i> Asignar
-                        </button>
+                        </button>}
                         {openFC11Modal && <button onClick={() => openFC11Modal(filteredBienes.filter(item => seleccionados.includes(item.id)))} title="Crear un FC-11 único para todos los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-truck-fast text-[11px]"></i> FC-11 ({seleccionados.length})
                         </button>}
@@ -633,9 +633,9 @@ export default function InventarioView({
                                     Ver ficha
                                   </Button>
                                   <IconButton titulo="Ver o generar QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
-                                  <IconButton titulo="Crear o gestionar acta FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
+                                  {isAdmin && <IconButton titulo="Crear o gestionar acta FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />}
                                   <IconButton titulo="Registrar traslado FC-11" icono="fa-truck-fast" variante="ghost" tamano="sm" onClick={() => openFC11Modal(item)} />
-                                  <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
+                                  {isAdmin && <IconButton titulo="Editar bien" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />}
                                   {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                                   <IconButton titulo={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} />
                                 </div>
@@ -662,8 +662,8 @@ export default function InventarioView({
                             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-line dark:border-zinc-700/50">
                               <IconButton titulo="Ficha 360" icono="fa-timeline" variante="ghost" tamano="sm" onClick={() => openFichaBien(item)} />
                               <IconButton titulo="QR" icono="fa-qrcode" variante="ghost" tamano="sm" onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }} />
-                              <IconButton titulo="Asignación FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />
-                              <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />
+                              {isAdmin && <IconButton titulo="Asignación FC-10" icono="fa-file-signature" variante="ghost" tamano="sm" onClick={() => openFC10Modal(item)} />}
+                              {isAdmin && <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />}
                               {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                             </div>
                           </div>
@@ -677,7 +677,7 @@ export default function InventarioView({
                                 ? 'Probá con menos filtros o restablecelos para ver todo el inventario.'
                                 : 'Importá un CSV con la plantilla o creá el primer registro a mano.'}
                               accionLabel={hasFilters ? 'Restablecer filtros' : 'Añadir bien'}
-                              onAccion={hasFilters ? clearAllFilters : () => { setBienEditing(null); setIsBienModalOpen(true); }}
+                              onAccion={hasFilters ? clearAllFilters : (isAdmin ? () => { setBienEditing(null); setIsBienModalOpen(true); } : undefined)}
                             />
                           </div>
                         )}
@@ -693,13 +693,13 @@ export default function InventarioView({
                           descripcion={hasFilters
                             ? 'Probá con menos filtros o restablecelos para ver todo el inventario.'
                             : 'Importá un CSV con la plantilla o creá el primer registro a mano.'}
-                          accionLabel={hasFilters ? 'Restablecer filtros' : 'Añadir bien'}
-                          onAccion={hasFilters ? clearAllFilters : () => { setBienEditing(null); setIsBienModalOpen(true); }}
+                          accionLabel={hasFilters ? 'Restablecer filtros' : isAdmin ? 'Añadir bien' : undefined}
+                          onAccion={hasFilters ? clearAllFilters : (isAdmin ? () => { setBienEditing(null); setIsBienModalOpen(true); } : undefined)}
                         />
                       ) : (
                         <KanbanBienes
                           bienes={filteredBienes}
-                          onMover={onMoverEstado}
+                          onMover={isAdmin ? onMoverEstado : undefined}
                           onOpenFicha={openFichaBien}
                           isAdmin={isAdmin}
                         />
@@ -785,11 +785,11 @@ export default function InventarioView({
                                   <div className="space-y-1.5">
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-ok text-xs shrink-0"></i>
-                                      <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} />
+                                      {isAdmin ? <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} /> : <span>{item.funcionario || 'Sin asignación'}</span>}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
                                       <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>
-                                      <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} />
+                                      {isAdmin ? <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} /> : <span>{item.ubicacion || 'Sin ubicación'}</span>}
                                     </div>
                                     {(() => {
                                       const fc10 = fc10VigentePorBien.get(item.id);
@@ -848,13 +848,13 @@ export default function InventarioView({
                                     />
 
                                     {/* Asignar FC-10 */}
-                                    <IconButton
+                                    {isAdmin && <IconButton
                                       titulo="Asignación FC-10"
                                       icono="fa-file-signature"
                                       variante="ghost"
                                       tamano="sm"
                                       onClick={() => openFC10Modal(item)}
-                                    />
+                                    />}
 
                                     {/* Traslado FC-11 */}
                                     <IconButton
@@ -866,13 +866,13 @@ export default function InventarioView({
                                     />
 
                                     {/* Editar Bien */}
-                                    <IconButton
+                                    {isAdmin && <IconButton
                                       titulo="Editar Bien"
                                       icono="fa-pen-to-square"
                                       variante="ghost"
                                       tamano="sm"
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
-                                    />
+                                    />}
 
                                     {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
 
@@ -908,7 +908,7 @@ export default function InventarioView({
                                     ? 'Probá con menos filtros o restablecelos para ver todo el inventario.'
                                     : 'Importá un CSV con la plantilla o creá el primer registro a mano.'}
                                   accionLabel={hasFilters ? 'Restablecer filtros' : 'Añadir bien'}
-                                  onAccion={hasFilters ? clearAllFilters : () => { setBienEditing(null); setIsBienModalOpen(true); }}
+                                  onAccion={hasFilters ? clearAllFilters : (isAdmin ? () => { setBienEditing(null); setIsBienModalOpen(true); } : undefined)}
                                 />
                               </TD>
                             </TRow>

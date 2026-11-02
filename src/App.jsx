@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } fr
 import { lazyConReintento } from './utils/lazyConReintento';
 import { STYLES, DEPENDENCIAS_UNP, ESTADOS_CONSERVACION, ORIGENES_FC04 } from './constants/appConstants';
 import FiltroCombo from './components/FiltroCombo';
-import { Pagination, Card, Button, StatTile, Badge } from './components/ui';
+import { Pagination, Card, Button, Badge } from './components/ui';
 import AtajosModal from './components/modals/AtajosModal';
 import AppShell from './components/shell/AppShell';
 // Modales de apertura bajo demanda: carga diferida para acelerar el arranque
@@ -10,7 +10,7 @@ import localforage from 'localforage';
 import LoginScreen from './components/LoginScreen';
 import { supabase } from './supabaseClient';
 // Modales pesados: carga diferida para acelerar el arranque
-import { formatCurrency, generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia } from './utils/helpers';
+import { generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia } from './utils/helpers';
 import { useIdioma } from './utils/i18n';
 import { conSello } from './services/syncBienes';
 import { mapearFilasBienes } from './utils/csvBienes';
@@ -105,7 +105,6 @@ export default function App() {
   const kioscoIdle = kioscoActivo ? parseIdleSegundos(window.location.search) : 0;
   
   const [publicBienData, setPublicBienData] = useState(null);
-  const [publicFotoAmpliada, setPublicFotoAmpliada] = useState(null);
   const [publicDescExpandida, setPublicDescExpandida] = useState(false);
   const { toasts, addToast, quitarToast } = useToasts();
   const [solicitudesNombreArchivo, setSolicitudesNombreArchivo] = useState([]);
@@ -269,11 +268,10 @@ export default function App() {
       rutaSubida = nombre;
       const { error: upErr } = await supabase.storage.from('fotos-bienes').upload(nombre, blob, { contentType: 'image/jpeg', upsert: false });
       if (upErr) throw upErr;
-      const { data: pub } = supabase.storage.from('fotos-bienes').getPublicUrl(nombre);
       // Tope de 3 fotos: Storage del plan Free tiene 1 GB y cada
       // foto pesa ~120 KB. Una galería breve deja espacio para más bienes
       // (las fichas se revisan con 2 o 3 fotos).
-      const fotos = [...(fichaBien.fotos || []), { url: pub.publicUrl, ruta: nombre, fecha: new Date().toISOString(), usuario: currentUser?.username || 'Usuario' }].slice(-MAX_FOTOS_POR_BIEN);
+      const fotos = [...(fichaBien.fotos || []), { ruta: nombre, fecha: new Date().toISOString(), usuario: currentUser?.username || 'Usuario' }].slice(-MAX_FOTOS_POR_BIEN);
       const sobrantes = (fichaBien.fotos || []).filter(f => !fotos.includes(f));
       const actualizado = { ...fichaBien, fotos };
       const { error: dbErr } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
@@ -313,7 +311,7 @@ export default function App() {
   const eliminarFotoBien = async (foto) => {
     if (!fichaBien || !foto) return;
     try {
-      const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => f.url !== foto.url) };
+      const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => foto.ruta ? f.ruta !== foto.ruta : f.url !== foto.url) };
       const { error } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
       if (error) throw error;
       if (foto.ruta) {
@@ -560,7 +558,7 @@ export default function App() {
         return;
       }
       if ((k === 'n') && !escribiendo && !cmdOpen && !isAtajosOpen) {
-        if (activeTab !== 'inventario') return;
+        if (activeTab !== 'inventario' || !isAdmin) return;
         if (document.querySelector('.modalOverlay')) return;
         e.preventDefault();
         setBienEditing(null);
@@ -582,7 +580,7 @@ export default function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [activeTab, cmdOpen, isAtajosOpen]);
+  }, [activeTab, cmdOpen, isAtajosOpen, isAdmin]);
   // Actas que esperan firma. Vive en App porque lo necesitan dos lugares: el
   // badge del header (para verlo desde cualquier modulo) y la bandeja del
   // dashboard (con el detalle de a quien le toca).
@@ -729,8 +727,7 @@ useEffect(() => {
       //    sesión: el rol anónimo ya no tiene SELECT sobre la tabla 'bens'
       //    (migración 004), así que no se puede volcar el inventario entero.
       //    Antes se consultaba la tabla directamente y el RPC era solo el
-      //    respaldo; ahora el RPC trae todos los campos que muestra la vista
-      //    (incluido el valor).
+      //    respaldo; la RPC devuelve solo los campos básicos del activo.
       try {
         const { data: rpcData, error: rpcError } = await supabase.rpc('obtener_bien_publico', {
           p_id: idSanitizado
@@ -740,25 +737,7 @@ useEffect(() => {
         }
       } catch {}
 
-      // 2. Fallback en caché IndexedDB local (bienes ya vistos en este
-      //    dispositivo). No sirve para un visitante nuevo, pero evita el
-      //    "no encontrado" si la red falla.
-      if (!bienEncontrado) {
-        try {
-          const allKeys = await localforage.keys();
-          for (const k of allKeys) {
-            if (k.startsWith('bienes_cache')) {
-              const cache = (await localforage.getItem(k)) || [];
-              const found = cache.find(b => b.id === idSanitizado || String(b.rotulo).trim() === idSanitizado);
-              if (found) {
-                bienEncontrado = normalizarBien(found);
-                break;
-              }
-            }
-          }
-        } catch {}
-      }
-
+      // Nunca completar una vista pública con cachés del inventario autenticado.
       if (bienEncontrado) {
         setPublicBienData(bienEncontrado);
       } else {
@@ -1444,21 +1423,6 @@ if (publicBienId) {
         {/* Contenido principal o Spinner */}
         {publicBienData ? (
           <div className="py-4 space-y-3">
-
-            {publicBienData.fotos?.[0]?.url && (
-              <button type="button" onClick={() => setPublicFotoAmpliada(publicBienData.fotos[0].url)} title="Ampliar foto" aria-label="Ampliar foto del activo" className="block w-full rounded-card overflow-hidden border border-line/80 shadow-xs bg-surface-2 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-                <img
-                  src={publicBienData.fotos[0].url}
-                  alt="Foto del activo (toca para ampliar)"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full max-h-44 sm:max-h-56 object-cover pointer-events-none"
-                  onError={(e) => { e.currentTarget.closest('button').style.display = 'none'; }}
-                />
-                <span className="sr-only">Ampliar foto del activo</span>
-              </button>
-            )}
-
             {/* Tarjeta de Rótulo y Estado */}
             <Card tamaño="md" className="p-4 shadow-xs border border-line/80">
               <div className="flex justify-between items-center gap-3">
@@ -1486,58 +1450,6 @@ if (publicBienId) {
                   </Button>
                 )}
               </div>
-            </Card>
-
-            {/* Datos Técnicos y Contables */}
-            <div className="grid grid-cols-2 gap-3">
-              <StatTile etiqueta="Cuenta" valor={publicBienData.cuenta || "S/Cuenta"} icono="fa-layer-group" tono="brand" animado={false} />
-              <StatTile etiqueta="Valor" valor={`Gs. ${formatCurrency(publicBienData.valorUnitario || publicBienData.valor || publicBienData.valorAdquisicion || "0")}`} icono="fa-coins" tono="ok" animado={false} />
-              {publicBienData.subcuenta && (
-                <StatTile etiqueta="Sub-Cuenta" valor={publicBienData.subcuenta} icono="fa-sitemap" tono="info" animado={false} />
-              )}
-              {publicBienData.fechaAdquisicion && (
-                <StatTile etiqueta="Adquisición" valor={String(publicBienData.fechaAdquisicion).split("T")[0]} icono="fa-calendar" tono="neutral" animado={false} />
-              )}
-              {publicBienData.vidaUtil && (
-                <StatTile etiqueta="Vida Útil" valor={publicBienData.vidaUtil + " años"} icono="fa-hourglass-half" tono="brand" animado={false} />
-              )}
-            </div>
-
-            {/* Custodio, Ubicación y Dependencia */}
-            <Card tamaño="md" className="p-4 shadow-xs border border-line/70 space-y-3">
-              <div>
-                <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-user-check text-brand"></i> Responsable Asignado
-                </p>
-                <p className="text-sm font-bold text-content-1 mt-1">
-                  {publicBienData.funcionario || "Sin Responsable Asignado"}
-                </p>
-                {publicBienData.funcionarioCargo && (
-                  <p className="text-[10px] text-content-2 mt-0.5">
-                    Cargo: {publicBienData.funcionarioCargo}
-                  </p>
-                )}
-              </div>
-
-              <div className="pt-2 border-t border-line/60">
-                <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
-                  <i className="fa-solid fa-location-dot text-warn"></i> Ubicación Física
-                </p>
-                <p className="text-sm font-bold text-content-1 mt-1">
-                  {publicBienData.ubicacion || "Sin Ubicación Registrada"}
-                </p>
-              </div>
-
-              {publicBienData.dependencia && (
-                <div className="pt-2 border-t border-line/60">
-                  <p className="text-[10px] font-bold text-content-2 uppercase tracking-wider flex items-center gap-1.5">
-                    <i className="fa-solid fa-building-columns text-ok"></i> Dependencia
-                  </p>
-                  <p className="text-sm font-bold text-content-1 mt-1">
-                    {publicBienData.dependencia}
-                  </p>
-                </div>
-              )}
             </Card>
 
           </div>
@@ -1579,14 +1491,6 @@ if (publicBienId) {
           />
         )}
 
-      {publicFotoAmpliada && (
-        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-surface-1/90 backdrop-blur-xl" onClick={() => setPublicFotoAmpliada(null)}>
-          <img src={publicFotoAmpliada} alt="Foto ampliada del activo" className="max-h-[90dvh] max-w-full rounded-panel shadow-2xl object-contain" />
-          <span className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-control bg-surface-1 text-content-1 border border-line shadow-lg">
-            <i className="fa-solid fa-xmark"></i>
-          </span>
-        </div>
-      )}
     </div>
   );
 }

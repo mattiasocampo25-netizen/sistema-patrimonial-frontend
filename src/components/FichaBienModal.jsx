@@ -1,7 +1,8 @@
 import Dialogo from './ui/Dialogo';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, IconButton, Badge } from './ui';
 import { camposIncompletos } from '../utils/dataCompleteness';
+import { supabase } from '../supabaseClient';
 
 const TIPO_TONO = {
   alta: 'ok',
@@ -23,6 +24,34 @@ const TIPO_ICONO = {
 
 export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
+  const [urlsFotosPrivadas, setUrlsFotosPrivadas] = useState({});
+  const fotos = bien?.fotos || [];
+  const claveFotos = fotos.map(f => f.ruta || f.url || '').join('|');
+  useEffect(() => {
+    let vigente = true;
+    const resolverFotos = async () => {
+      const entradas = await Promise.all(fotos.map(async (foto) => {
+        let ruta = foto.ruta;
+        if (!ruta && foto.url) {
+          try {
+            const pathname = new URL(foto.url).pathname;
+            const marca = '/fotos-bienes/';
+            const indice = pathname.indexOf(marca);
+            if (indice >= 0) ruta = decodeURIComponent(pathname.slice(indice + marca.length));
+          } catch {}
+        }
+        if (!ruta) return [foto.ruta || foto.url || '', null];
+        const { data, error } = await supabase.storage.from('fotos-bienes').createSignedUrl(ruta, 3600);
+        return [foto.ruta || foto.url || '', error ? null : data?.signedUrl || null];
+      }));
+      if (vigente) setUrlsFotosPrivadas(Object.fromEntries(entradas));
+    };
+    if (isOpen && fotos.length) resolverFotos();
+    else setUrlsFotosPrivadas({});
+    return () => { vigente = false; };
+  // `claveFotos` representa las rutas que deben solicitar URL temporal.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, bien?.id, claveFotos]);
   if (!isOpen || !bien) return null;
   const incompletos = camposIncompletos(bien);
   const Dato = ({ label, value }) => (
@@ -87,7 +116,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">
                 Evidencia fotográfica · {(bien.fotos || []).length}/5
               </p>
-              <label
+              {esAdmin && <label
                 className={`inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${subiendoFoto ? 'opacity-50 pointer-events-none bg-surface-3 dark:bg-surface-1/10 text-content-3' : 'bg-brand text-content-inverse hover:bg-brand-hover dark:bg-brand dark:hover:bg-brand-hover shadow-sm'}`}
                 title="Tomar o subir foto del estado físico"
               >
@@ -98,7 +127,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
                   disabled={subiendoFoto}
                   onChange={(e) => { if (e.target.files?.[0]) onAgregarFoto(e.target.files[0]); e.target.value = ''; }}
                 />
-              </label>
+              </label>}
             </div>
             {(bien.fotos || []).length === 0 ? (
               <p className="text-xs text-content-3 font-medium rounded-card border border-dashed border-line dark:border-zinc-800 p-5 text-center">
@@ -108,8 +137,8 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {(bien.fotos || []).map((f, i) => (
                   <div key={f.url || i} className="relative group/foto rounded-control overflow-hidden border border-line dark:border-zinc-800 bg-surface-3 dark:bg-surface-1/5 aspect-square">
-                    <IconButton titulo="Ampliar foto" icono="fa-expand" variante="ghost" tamano="sm" onClick={() => setFotoAmpliada(f.url)} className="w-full h-full absolute inset-0 bg-surface-1/30 dark:bg-white/5" />
-                    <img src={f.url} alt={`Foto ${i + 1} del bien`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                    <IconButton titulo="Ampliar foto" icono="fa-expand" variante="ghost" tamano="sm" onClick={() => setFotoAmpliada(urlsFotosPrivadas[f.ruta || f.url] || null)} disabled={!urlsFotosPrivadas[f.ruta || f.url]} className="w-full h-full absolute inset-0 bg-surface-1/30 dark:bg-white/5" />
+                    {urlsFotosPrivadas[f.ruta || f.url] ? <img src={urlsFotosPrivadas[f.ruta || f.url]} alt={`Foto ${i + 1} del bien`} loading="lazy" decoding="async" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} /> : <div className="flex h-full items-center justify-center text-content-3"><i className="fa-solid fa-lock" aria-label="Foto privada" /></div>}
                     {esAdmin && (
                       <IconButton
                         titulo="Eliminar foto"

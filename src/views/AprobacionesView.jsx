@@ -1,6 +1,8 @@
 // Vista de solicitudes de aprobación (bajas, firmas, etc.) - solo admin/desarrollador.
 // Incluye estados claros (Pendiente, Aprobado, Rechazado, En Revisión) y auditoría básica.
 import React, { useState } from 'react';
+import { normalizeStr } from '../utils/helpers';
+import FiltroCombo from '../components/FiltroCombo';
 import { Card, Chip, ChipGroup, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 
 const ESTADO_INFO = {
@@ -17,6 +19,11 @@ export default function AprobacionesView({
  
 }) {
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroDependencia, setFiltroDependencia] = useState('');
+  const [desde, setDesde] = useState('');
+  const [hasta, setHasta] = useState('');
   const [revisandoIds, setRevisandoIds] = useState(() => new Set());
 
   const iniciarRevision = async (solicitud) => {
@@ -41,9 +48,15 @@ export default function AprobacionesView({
     { PENDIENTE: 0, APROBADO: 0, RECHAZADO: 0, EN_REVISION: 0 }
   );
 
-  const listaFiltrada = filtroEstado === 'todos'
-    ? solicitudesBaja
-    : solicitudesBaja.filter(n => (n.estado || 'PENDIENTE') === filtroEstado);
+  const listaFiltrada = solicitudesBaja.filter(n => {
+    const estadoOK = filtroEstado === 'todos' || (n.estado || 'PENDIENTE') === filtroEstado;
+    const tipoOK = filtroTipo === 'todos' || n.tipo === filtroTipo;
+    const texto = normalizeStr(`${n.rotulo || ''} ${n.descripcion || ''} ${n.nombre || ''} ${n.cedula || ''} ${n.solicitante || ''} ${n.motivo || ''}`);
+    const fecha = String(n.created_at || n.fecha || '').slice(0, 10);
+    const dependenciaOK = !filtroDependencia || normalizeStr(n.dependencia) === normalizeStr(filtroDependencia);
+    return estadoOK && tipoOK && dependenciaOK && (!desde || fecha >= desde) && (!hasta || fecha <= hasta) && (!busqueda.trim() || texto.includes(normalizeStr(busqueda)));
+  });
+  const dependenciasSolicitud = [...new Set(solicitudesBaja.map(n => n.dependencia).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
 
   const ETAPAS = [
     { id: 'todos', label: 'Todos', n: solicitudesBaja.length },
@@ -83,6 +96,17 @@ export default function AprobacionesView({
             </ChipGroup>
           </div>
           </Toolbar>
+          <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(220px,1fr)_auto_auto_auto_auto]">
+            <label htmlFor="aprobaciones-search" className="sr-only">Buscar solicitud</label>
+            <input id="aprobaciones-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar por bien, funcionario, solicitante o motivo…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
+            <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Tipo de solicitud">
+              {[['todos', 'Todos'], ['BAJA_BIEN', 'Bienes'], ['BAJA_FUNCIONARIO', 'Funcionarios']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroTipo === id} onClick={() => setFiltroTipo(id)} className={`rounded px-3 text-xs font-semibold ${filtroTipo === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
+            </div>
+            <FiltroCombo valor={filtroDependencia} opciones={dependenciasSolicitud} onElegir={setFiltroDependencia} etiquetaTodos="Todas las dependencias" titulo="Filtrar por dependencia" ancho="min-w-[210px]" />
+            <label className="flex h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2 text-[10px] font-semibold text-content-3">Desde<input type="date" value={desde} max={hasta || undefined} onChange={e => setDesde(e.target.value)} aria-label="Solicitudes desde" className="w-[112px] bg-transparent text-xs text-content-1" /></label>
+            <label className="flex h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2 text-[10px] font-semibold text-content-3">Hasta<input type="date" value={hasta} min={desde || undefined} onChange={e => setHasta(e.target.value)} aria-label="Solicitudes hasta" className="w-[112px] bg-transparent text-xs text-content-1" /></label>
+            {(busqueda || filtroDependencia || desde || hasta || filtroTipo !== 'todos') && <button type="button" onClick={() => { setBusqueda(''); setFiltroDependencia(''); setDesde(''); setHasta(''); setFiltroTipo('todos'); }} className="h-10 rounded-control px-3 text-xs font-bold text-content-3 hover:bg-surface-2">Limpiar filtros</button>}
+          </div>
         </div>
       </Card>
 
@@ -119,6 +143,8 @@ export default function AprobacionesView({
                 const estado = notif.estado || 'PENDIENTE';
                 const info = ESTADO_INFO[estado] || ESTADO_INFO.PENDIENTE;
                 const estaResuelto = estado === 'APROBADO' || estado === 'RECHAZADO';
+                const fechaSolicitud = notif.created_at || notif.fecha;
+                const diasAbierta = fechaSolicitud ? Math.max(0, Math.floor((Date.now() - new Date(fechaSolicitud).getTime()) / 86400000)) : 0;
                 const historial = Array.isArray(notif.historial) && notif.historial.length
                   ? notif.historial
                   : [
@@ -180,7 +206,8 @@ export default function AprobacionesView({
                       </div>
                     </TD>
                     <TD className="px-4 py-4 align-top text-xs text-content-3 font-mono">
-                      {notif.created_at ? new Date(notif.created_at).toLocaleDateString() : 'Reciente'}
+                      {fechaSolicitud ? new Date(fechaSolicitud).toLocaleDateString('es-PY') : 'Reciente'}
+                      {!estaResuelto && diasAbierta >= 7 && <span className="mt-1 block rounded bg-warn-soft px-2 py-1 text-[10px] font-bold text-warn">{diasAbierta} días pendiente</span>}
                     </TD>
                     <TD className="px-4 py-4 align-top">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${info.color}`}>

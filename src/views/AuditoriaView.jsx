@@ -22,6 +22,14 @@ export default function AuditoriaView({
   actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
+  const aplicarRangoRapido = (dias) => {
+    const fin = new Date();
+    const inicio = new Date(fin);
+    inicio.setDate(fin.getDate() - dias + 1);
+    const aFecha = fecha => `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
+    setDesdeAud(aFecha(inicio));
+    setHastaAud(aFecha(fin));
+  };
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
       <Card className="p-0">
@@ -357,6 +365,9 @@ export default function AuditoriaView({
             Desde
             <input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Auditoría desde la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />
           </label>
+          <div className="flex gap-1" role="group" aria-label="Rangos rápidos de auditoría">
+            {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-10 rounded-control border border-line px-2.5 text-[10px] font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">{dias} días</button>)}
+          </div>
           <label className="flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">
             Hasta
             <input type="date" value={hastaAud} min={desdeAud || undefined} onChange={event => setHastaAud(event.target.value)} aria-label="Auditoría hasta la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />

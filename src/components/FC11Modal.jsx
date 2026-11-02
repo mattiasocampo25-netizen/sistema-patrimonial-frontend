@@ -20,6 +20,9 @@ export default function FC11Modal({
     const [restauradoFC, setRestauradoFC] = useState(null);
     const [formKeyFC, setFormKeyFC] = useState(0);
     const [errorValidacion, setErrorValidacion] = useState('');
+    const [destinoSeleccionado, setDestinoSeleccionado] = useState(fc11Editing?.dependenciaDestinataria || '');
+    const [areaRemitente, setAreaRemitente] = useState(fc11Editing?.areaRemitente || '');
+    const [areaDestinataria, setAreaDestinataria] = useState(fc11Editing?.areaDestinataria || '');
     const defectoFC = (campo, fb) => (restauradoFC && restauradoFC[campo] !== undefined && restauradoFC[campo] !== null ? restauradoFC[campo] : fb);
     const continuarBorradorFC = () => {
         if (!borradorFC) return;
@@ -130,14 +133,15 @@ export default function FC11Modal({
                                     </div>
                                     <div>
                                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Área Remitente</label>
-                                        <input name="areaRemitente" required defaultValue={defectoFC('areaRemitente', (fc11Editing?.areaRemitente))} className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Área o Dpto. de origen" />
+                                        <input name="areaRemitente" required value={areaRemitente || defectoFC('areaRemitente', '')} onChange={e => setAreaRemitente(e.target.value)} className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Área o Dpto. de origen" />
                                     </div>
                                     <div>
                                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Dependencia Destinataria</label>
                                         <FiltroCombo
                                             name="dependenciaDestinataria"
                                             required
-                                            valor={defectoFC('dependenciaDestinataria', (fc11Editing?.dependenciaDestinataria || ''))}
+                                            valor={destinoSeleccionado || defectoFC('dependenciaDestinataria', '')}
+                                            onElegir={setDestinoSeleccionado}
                                             opciones={todasDependencias}
                                             etiquetaTodos="Seleccione destino..."
                                             titulo="Dependencia destinataria"
@@ -146,14 +150,23 @@ export default function FC11Modal({
                                     </div>
                                     <div>
                                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Área Destinataria</label>
-                                        <input name="areaDestinataria" required defaultValue={defectoFC('areaDestinataria', (fc11Editing?.areaDestinataria))} className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Área o Dpto. de destino" />
+                                        <input name="areaDestinataria" required value={areaDestinataria || defectoFC('areaDestinataria', '')} onChange={e => setAreaDestinataria(e.target.value)} className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Área o Dpto. de destino" />
+                                        <button type="button" onClick={() => { setDestinoSeleccionado(dependenciaActual); setAreaDestinataria('Patrimonio / Depósito'); }} className="mt-2 inline-flex min-h-9 items-center gap-2 rounded-control border border-brand/25 bg-brand-soft/40 px-3 text-xs font-semibold text-brand-text hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                                          <i className="fa-solid fa-warehouse" aria-hidden="true" /> Devolución interna a Patrimonio
+                                        </button>
                                     </div>
                                 </div>
+                                <p className="mt-4 rounded-control border border-info/20 bg-info-soft/40 px-3 py-2 text-xs leading-relaxed text-content-2"><strong>Movimiento dentro de {dependenciaActual}:</strong> mantén la misma dependencia en origen y destino; detalla las áreas remitente y receptora. Para una devolución, usa el acceso rápido a Patrimonio / Depósito.</p>
                             </div>
                         </div>
 
                         {/* PASO 2: DETALLES ADICIONALES */}
                         <div id="step-2-fc11" className={step === 2 ? "block animate-fade-in" : "hidden"}>
+                            <div className="mb-5 rounded-control border border-brand/20 bg-brand-soft/30 p-3 text-xs text-content-2">
+                              <p className="font-bold text-content-1">Resumen de la ruta</p>
+                              <p className="mt-1">{dependenciaActual} · {areaRemitente || defectoFC('areaRemitente', 'Área remitente')} → {destinoSeleccionado || defectoFC('dependenciaDestinataria', 'Dependencia destinataria')} · {areaDestinataria || defectoFC('areaDestinataria', 'Área destinataria')}</p>
+                              <p className="mt-1 text-content-3">Verifica origen, destino y responsable receptor antes de guardar.</p>
+                            </div>
                             <div className="bg-surface-1 dark:bg-surface-1 p-7 rounded-[24px] border border-line/60 dark:border-line shadow-sm relative group/section">
                                 <div className="absolute top-0 left-0 w-1.5 h-full bg-ok rounded-l-[24px]"></div>
                                 <h3 className="text-sm font-black text-content-1 dark:text-white flex items-center gap-3 mb-6 uppercase tracking-wider">

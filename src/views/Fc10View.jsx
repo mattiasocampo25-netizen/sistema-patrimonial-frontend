@@ -14,7 +14,7 @@ export default function Fc10View({
   setIsConsolidatedFC10ModalOpen, handleExportFC10CSV,
   isLoading, bienes, handleGenerateFC10PDF, openFC10Modal,
   handleBulkFC10Zip,
-  isAdmin, setItemToDelete, setActiveTab, registrarFirmaFC10, registrarAmbasFirmas, firmandoId,
+  isAdmin, setItemToDelete, setActiveTab, openFichaBien, registrarFirmaFC10, registrarAmbasFirmas, firmandoId,
   ponerFC10EnTramite, poniendoEnTramite,
   actualizarEstadoFirma, currentUser
 }) {
@@ -300,9 +300,9 @@ export default function Fc10View({
                       <div className="mt-1 flex flex-col flex-1">
                       <h4 className="font-bold text-content-1 dark:text-white text-sm tracking-tight truncate" title={fc.funcionarioNombre}>{fc.funcionarioNombre || 'Sin responsable'}</h4>
                       <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 font-medium truncate">{fc.funcionarioCargo}{fc.funcionarioDoc ? ` · CI ${formatCI(fc.funcionarioDoc)}` : ''}</p>
-                      <p className="mt-2 rounded-lg bg-surface-2 px-2.5 py-1.5 text-[11px] font-semibold text-content-2 truncate" title={bien.descripcion || bien.rotulo || 'Bien sin rótulo'}>
-                        <i className="fa-solid fa-box mr-1.5 text-content-3" aria-hidden="true"></i>{bien.rotulo || 'Bien sin rótulo'}
-                      </p>
+                      <button type="button" onClick={() => bien.id && openFichaBien?.(bien)} disabled={!bien.id} className="mt-2 flex w-full items-center gap-2 rounded-lg bg-surface-2 px-2.5 py-1.5 text-left text-[11px] font-semibold text-content-2 hover:bg-brand-soft hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-default" title={bien.descripcion || bien.rotulo || 'Bien sin rótulo'}>
+                        <i className="fa-solid fa-box text-content-3" aria-hidden="true"></i><span className="min-w-0 flex-1 truncate">{bien.rotulo || 'Bien sin rótulo'}</span><i className="fa-solid fa-arrow-up-right-from-square text-[9px] text-content-3" aria-hidden="true" />
+                      </button>
 
                   {!isDevuelto && (
                     (fc.estadoFirma || pendiente) ? (

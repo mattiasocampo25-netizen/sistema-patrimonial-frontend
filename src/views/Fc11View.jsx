@@ -11,6 +11,15 @@ export default function Fc11View({
   handleGenerateFC11PDF, openFC11Modal, bienes, isAdmin, setItemToDelete,
   registrarFirmasFC11, registrandoFirmasFC11 = false
 }) {
+  const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [busqueda, setBusqueda] = useState('');
+  const listaVisible = filteredFC11.filter(fc => {
+    const pendiente = fc.estado === 'PENDIENTE_FIRMAS';
+    const estadoOK = filtroEstado === 'todos' || (filtroEstado === 'pendientes' ? pendiente : !pendiente);
+    const bienesTexto = (fc.bienesSnapshot || [fc.bienSnapshot]).filter(Boolean).map(b => `${b.rotulo || ''} ${b.descripcion || ''}`).join(' ');
+    const texto = `${fc.numeroFormulario || ''} ${fc.motivo || ''} ${fc.dependenciaRemitente || ''} ${fc.dependenciaDestinataria || ''} ${fc.receptorNombre || ''} ${fc.referenciaArchivo || ''} ${bienesTexto}`.toLocaleLowerCase('es');
+    return estadoOK && (!busqueda.trim() || texto.includes(busqueda.trim().toLocaleLowerCase('es')));
+  });
   const [movimientoParaCerrar, setMovimientoParaCerrar] = useState(null);
   const [fechaRegistro, setFechaRegistro] = useState(() => new Date().toISOString().slice(0, 10));
   const [errorRegistro, setErrorRegistro] = useState('');
@@ -34,13 +43,18 @@ export default function Fc11View({
             icono="fa-truck-fast"
             contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
-                {filteredFC11.length}
+                {listaVisible.length}
               </span>
             )}
           />
           <Toolbar className="mt-4">
           <div className="flex flex-wrap gap-2 items-center">
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
+            <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar FC-11 por estado">
+              {[['todos', 'Todos'], ['pendientes', 'Pendientes'], ['completados', 'Archivados']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroEstado === id} onClick={() => setFiltroEstado(id)} className={`rounded px-3 text-xs font-semibold ${filtroEstado === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
+            </div>
+            <label className="sr-only" htmlFor="fc11-search">Buscar FC-11</label>
+            <input id="fc11-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar bien, número, receptor…" className="h-10 min-w-[190px] flex-1 rounded-control border border-line bg-surface-1 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
             <Button variante="subtle" tamano="md" icono="fa-file-csv" onClick={handleExportFC11CSV}>
               Exportar CSV
             </Button>
@@ -49,11 +63,11 @@ export default function Fc11View({
         </div>
       </Card>
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] p-5 sm:p-6 rounded-panel border border-line/70 dark:border-white/10 shadow-sm min-h-[400px]">
-        {isLoading ? ( <SkeletonLoader /> ) : filteredFC11.length === 0 ? (
-          <EmptyState tipo="vacio" icono="fa-truck-fast" titulo="Sin traslados registrados" descripcion="No existen expedientes FC-11 procesados en el periodo seleccionado." />
+        {isLoading ? ( <SkeletonLoader /> ) : listaVisible.length === 0 ? (
+          <EmptyState tipo="busqueda" icono="fa-truck-fast" titulo={filteredFC11.length ? 'Sin coincidencias' : 'Sin traslados registrados'} descripcion={filteredFC11.length ? 'Cambia el filtro o prueba con otro texto.' : 'No existen expedientes FC-11 procesados en el periodo seleccionado.'} />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredFC11.map(fc => {
+            {listaVisible.map(fc => {
               const depRemitente = fc.dependenciaRemitente || fc.remitente || '';
               const depDestinataria = fc.dependenciaDestinataria || fc.destinatario || '';
               const esSalida = depRemitente === dependenciaActual;
@@ -85,6 +99,9 @@ export default function Fc11View({
                       <i className={`fa-solid ${esPendiente ? 'fa-file-signature' : 'fa-circle-check'}`} aria-hidden="true" />
                       {esPendiente ? 'Pendiente de firma de recepción' : esLegado ? 'Registro anterior al seguimiento de firmas' : 'Recepción firmada · archivada'}
                     </div>
+                    <ol aria-label="Progreso del FC-11" className="mb-3 grid grid-cols-4 gap-1 text-center text-[9px] font-semibold text-content-3">
+                      {['Registro', 'PDF', 'Firma', 'Archivo'].map((paso, i) => <li key={paso} className={`rounded px-1 py-1 ${esPendiente ? i === 0 ? 'bg-brand-soft text-brand-text' : 'bg-surface-2' : 'bg-ok-soft text-ok'}`}>{i + 1}. {paso}</li>)}
+                    </ol>
                     <div className="flex flex-col gap-1.5 mb-4 border-l-2 border-line dark:border-line pl-3 py-1">
                        <p className="text-xs text-content-3 dark:text-content-3"><span className="font-bold text-content-1 dark:text-zinc-100">{esSalida ? 'Hacia:' : 'Desde:'}</span> {esSalida ? depDestinataria : depRemitente}</p>
                     </div>

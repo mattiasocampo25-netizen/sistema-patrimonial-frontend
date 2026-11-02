@@ -101,6 +101,7 @@ export default function InventarioView({
     try { return localStorage.getItem('inv_densidad') || 'comoda'; } catch { return 'comoda'; }
   });
   const compacto = densidad === 'compacta';
+  const [rotuloCopiado, setRotuloCopiado] = useState('');
   const cambiarDensidad = () => {
     const v = compacto ? 'comoda' : 'compacta';
     setDensidad(v);
@@ -705,7 +706,7 @@ export default function InventarioView({
                     <div className="overflow-x-auto custom-scrollbar">
                       <Table sinContenedor minWidth={false} className="anim-rows w-full text-left border-collapse min-w-[900px]">
 
-                                                  <THead sticky={false}>
+                                                  <THead sticky>
                           <TRow className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
                             <TH className="py-4 pl-4 sm:pl-5 pr-1 w-[40px] align-middle">
                               <input
@@ -753,8 +754,9 @@ export default function InventarioView({
                                     </div>
                                     <div className="space-y-1">
                                       <div className="flex items-center gap-2">
-                                        <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">
+                                <span className="inline-flex items-center gap-1 rounded-lg bg-surface-3 px-2 py-0.5 font-mono text-xs font-semibold text-content-1 dark:bg-surface-3/20 dark:text-white">
                                           {item.rotulo || 'S/R'}
+                                          {item.rotulo && <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(String(item.rotulo)); setRotuloCopiado(item.id); window.setTimeout(() => setRotuloCopiado(actual => actual === item.id ? '' : actual), 1500); } catch { /* Copia manual disponible. */ } }} title={rotuloCopiado === item.id ? 'Rótulo copiado' : 'Copiar rótulo'} aria-label={`Copiar rótulo ${item.rotulo}`} className="rounded px-1 text-content-3 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className={`fa-solid ${rotuloCopiado === item.id ? 'fa-check text-ok' : 'fa-copy'}`} aria-hidden="true" /></button>}
                                         </span>
                                         {cols.fecha && item.fechaAdquisicion && (
                                           <span className="text-[10px] font-bold text-content-3 flex items-center gap-1">

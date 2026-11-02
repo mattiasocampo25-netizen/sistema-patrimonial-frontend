@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { PeriodSelector } from '../components/FilterComponents';
 import { Card, EmptyState, PageHeader, Toolbar, Button, IconButton } from '../components/ui';
@@ -8,6 +9,12 @@ export default function Fc04View({
   openFC04Modal, STYLES, isLoading, ORIGENES_FC04,
   handleGenerateFC04PDF, isAdmin, setItemToDelete
 }) {
+  const [busqueda, setBusqueda] = useState('');
+  const listaFC04 = useMemo(() => {
+    const q = busqueda.trim().toLocaleLowerCase('es');
+    if (!q) return filteredFC04;
+    return filteredFC04.filter(fc => [fc.numeroFormulario, fc.origenMovimiento, fc.observaciones, fc.id, ...(fc.bienes || []).map(b => `${b.rotulo || ''} ${b.descripcion || ''}`)].filter(Boolean).join(' ').toLocaleLowerCase('es').includes(q));
+  }, [filteredFC04, busqueda]);
   return (
     <div className="flex flex-col flex-1 space-y-6">
       <Card className="p-0">
@@ -25,6 +32,12 @@ export default function Fc04View({
           <Toolbar className="mt-4">
           <div className="flex flex-wrap gap-2 items-center">
             <PeriodSelector selectedYear={fc10Year} setSelectedYear={setFc10Year} selectedMonth={fc10Month} setSelectedMonth={setFc10Month} />
+            <div className="relative min-w-[220px] flex-1">
+              <label className="sr-only" htmlFor="fc04-search">Buscar FC-04</label>
+              <i className="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true" />
+              <input id="fc04-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar número, bien u observación…" className="h-10 w-full rounded-control border border-line bg-surface-1 pl-9 pr-9 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
+              {busqueda && <button type="button" onClick={() => setBusqueda('')} aria-label="Limpiar búsqueda FC-04" className="absolute right-2 top-1/2 h-7 w-7 -translate-y-1/2 rounded text-content-3 hover:bg-surface-3"><i className="fa-solid fa-xmark" /></button>}
+            </div>
             <Button variante="primary" tamano="md" icono="fa-plus" onClick={() => openFC04Modal(null)}>
               Redactar Planilla
             </Button>
@@ -34,11 +47,11 @@ export default function Fc04View({
       </Card>
 
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] p-5 sm:p-6 rounded-panel border border-line/70 dark:border-white/10 shadow-sm min-h-[400px]">
-        {isLoading ? ( <SkeletonLoader /> ) : filteredFC04.length === 0 ? (
-          <EmptyState tipo="busqueda" icono="fa-folder-open" titulo="Sin expedientes registrados" descripcion="No existen formularios FC-04 generados en el ciclo seleccionado." />
+        {isLoading ? ( <SkeletonLoader /> ) : listaFC04.length === 0 ? (
+          <EmptyState tipo="busqueda" icono={busqueda ? 'fa-filter-circle-xmark' : 'fa-folder-open'} titulo={busqueda ? 'Sin coincidencias' : 'Sin expedientes registrados'} descripcion={busqueda ? 'Prueba con otro texto o limpia la búsqueda.' : 'No existen formularios FC-04 generados en el ciclo seleccionado.'} accionLabel={busqueda ? 'Limpiar búsqueda' : undefined} onAccion={busqueda ? () => setBusqueda('') : undefined} />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredFC04.map(fc => {
+            {listaFC04.map(fc => {
               const origenObj = ORIGENES_FC04.find(o => o.id === fc.origenMovimiento);
               const isAlta = fc.origenMovimiento !== 'B';
               return (

@@ -1,10 +1,19 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
+import { useMemo, useState } from 'react';
+import { normalizeStr } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Badge, Button, Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
   esDesarrollador, currentUser, setItemToDelete, isLoading
 }) {
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroRol, setFiltroRol] = useState('todos');
+  const usuariosVisibles = useMemo(() => usuariosList.filter(u => {
+    const coincideTexto = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).includes(normalizeStr(busqueda));
+    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'desarrollador'].includes(u.cargo) : u.cargo === 'funcionario');
+    return coincideTexto && coincideRol;
+  }), [usuariosList, busqueda, filtroRol]);
   return (
     <div className="flex flex-col flex-1 space-y-6">
       <Card className="p-0">
@@ -15,7 +24,7 @@ export default function UsuariosView({
             icono="fa-users-gear"
             contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
-                {usuariosList.length}
+                {usuariosVisibles.length} / {usuariosList.length}
               </span>
             )}
           />
@@ -24,6 +33,13 @@ export default function UsuariosView({
             Nuevo Usuario
           </Button>
           </Toolbar>
+          <div className="mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <label className="sr-only" htmlFor="usuarios-search">Buscar usuarios</label>
+            <input id="usuarios-search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar por nombre, usuario o dependencia…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
+            <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar usuarios por rol">
+              {[['todos', 'Todos'], ['admin', 'Administración'], ['funcionario', 'Funcionarios']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroRol === id} onClick={() => setFiltroRol(id)} className={`rounded px-3 text-xs font-semibold ${filtroRol === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
+            </div>
+          </div>
         </div>
       </Card>
 
@@ -44,7 +60,7 @@ export default function UsuariosView({
                 </TRow>
               </THead>
               <TBody>
-                {usuariosList.map(u => (
+                {usuariosVisibles.map(u => (
                   <TRow key={u.username} className="hover:bg-surface-2 dark:hover:bg-darkbg-hover/50 transition-colors border-b border-zinc-50 dark:border-line/30">
                       <TD className="py-3 pl-6 pr-4 align-middle">
                           <div className="flex items-center gap-3">
@@ -81,13 +97,13 @@ export default function UsuariosView({
                       </TD>
                   </TRow>
                 ))}
-                {usuariosList.length === 0 && (
+                {usuariosVisibles.length === 0 && (
                   <TRow>
                     <TD colSpan="3">
                       <EmptyState
                         icon="fa-users-slash"
-                        titulo="Sin usuarios registrados"
-                        descripcion="Crea el primer usuario del sistema."
+                        titulo={usuariosList.length === 0 ? 'Sin usuarios registrados' : 'Sin coincidencias'}
+                        descripcion={usuariosList.length === 0 ? 'Crea el primer usuario del sistema.' : 'Prueba otra búsqueda o cambia el filtro de rol.'}
                       />
                     </TD>
                   </TRow>

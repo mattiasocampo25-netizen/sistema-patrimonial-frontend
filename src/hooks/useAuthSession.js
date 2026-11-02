@@ -269,14 +269,9 @@ const saveMantenimiento = async (data) => {
   }
 };
 
-  // Version visible del sistema.
-  //
-  // La fuente de verdad es `app_config.ultima_version` (la base), que es la
-  // que publica el script de aviso en cada despliegue. `APP_VERSION` queda
-  // como respaldo para cuando la configuracion todavia no cargo.
-  const versionApp = (typeof mantenimiento?.ultima_version === 'string' && mantenimiento.ultima_version.trim())
-    ? mantenimiento.ultima_version.trim()
-    : APP_VERSION;
+  // La versión visible acompaña al código desplegado. La versión de app_config
+  // se conserva para el panel de novedades, que puede tener su propio texto.
+  const versionApp = APP_VERSION;
 
   return {
     isAuthenticated, setIsAuthenticated, currentUser, setCurrentUser,

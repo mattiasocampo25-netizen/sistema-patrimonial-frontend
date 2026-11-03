@@ -6,7 +6,7 @@ import localforage from 'localforage';
 import { BIENES_SYNC_VERSION, debeResyncTotal, fusionarBienes, ahoraISO } from '../services/syncBienes';
 import { normalizeStr } from '../utils/helpers';
 import { processOfflineQueue, getOfflineQueueLength } from '../services/offlineSyncService';
-import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
+import { rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //
@@ -85,15 +85,38 @@ export function useRealtimeSync({
   // límite. Antes era `select('*')` de toda la tabla para todos.
   // Con useCallback: si no, seria una funcion nueva en cada render y los
   // effects que dependen de ella se reejecutarian sin parar.
-  const queryNotificacionesAcotadas = useCallback(() => {
-    const u = currentUser?.username
-      ? escaparFiltroPostgrest(currentUser.username)
-      : '';
-    const filtros = u
-      ? `data->>usuarioDestino.eq.${u},data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE,data->>tipo.eq.BAJA_BIEN,data->>tipo.eq.BAJA_FUNCIONARIO`
-      : `data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE,data->>tipo.eq.BAJA_BIEN,data->>tipo.eq.BAJA_FUNCIONARIO`;
-    return supabase.from('notificaciones').select('id, data, updated_at').or(filtros).order('updated_at', { ascending: false }).limit(500);
-  }, [currentUser?.username]);
+  const queryNotificacionesAcotadas = useCallback(async (limite = 500) => {
+    const consultaDestino = (destino) => supabase.from('notificaciones')
+      .select('id, data')
+      .eq('data->>usuarioDestino', destino)
+      .order('id', { ascending: false })
+      .limit(limite);
+    const consultas = [];
+    if (currentUser?.username) consultas.push(consultaDestino(currentUser.username));
+    consultas.push(consultaDestino('TODOS'));
+    // Las solicitudes solo se incluyen en la bandeja de administración.
+    // Se consultan por separado para evitar la expresión OR JSON compuesta,
+    // que PostgREST rechaza con 400 en algunos esquemas/versiones.
+    if (isAdmin) {
+      consultas.push(supabase.from('notificaciones').select('id, data')
+        .eq('data->>estado', 'PENDIENTE')
+        .in('data->>tipo', ['BAJA_BIEN', 'BAJA_FUNCIONARIO'])
+        .order('id', { ascending: false })
+        .limit(limite));
+    }
+    const respuestas = await Promise.all(consultas);
+    const error = respuestas.find(respuesta => respuesta.error)?.error;
+    if (error) return { data: null, error };
+    const unicas = new Map();
+    respuestas.flatMap(respuesta => respuesta.data || []).forEach(fila => unicas.set(fila.id, fila));
+    const fecha = fila => {
+      try {
+        const data = typeof fila.data === 'string' ? JSON.parse(fila.data) : (fila.data || {});
+        return new Date(data.fecha || data.created_at || data.resueltoFecha || 0).getTime() || 0;
+      } catch { return 0; }
+    };
+    return { data: [...unicas.values()].sort((a, b) => fecha(b) - fecha(a)).slice(0, limite), error: null };
+  }, [currentUser?.username, isAdmin]);
 
   // Purga local (throttle 2 días por usuario): borra leídas viejas,
   // anuncios globales totalmente leídos y solicitudes resueltas viejas.
@@ -616,13 +639,7 @@ export function useRealtimeSync({
   const sondearNotificaciones = async () => {
       try {
           if (typeof document !== 'undefined' && document.hidden) return;
-          const u = currentUser?.username
-            ? escaparFiltroPostgrest(currentUser.username)
-            : '';
-          const filtros = u
-            ? `data->>usuarioDestino.eq.${u},data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`
-            : `data->>usuarioDestino.eq.TODOS,data->>estado.eq.PENDIENTE`;
-          const { data, error } = await supabase.from('notificaciones').select('id, data, updated_at').or(filtros).order('updated_at', { ascending: false }).limit(POLL_NOTIF_ROWS);
+          const { data, error } = await queryNotificacionesAcotadas(POLL_NOTIF_ROWS);
           if (error || !data) return;
           const frescas = data.map(parseNotifRow);
           setNotificaciones(prev => {

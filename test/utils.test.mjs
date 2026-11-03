@@ -88,4 +88,17 @@ describe('búsqueda numérica del inventario', () => {
     const bien = { id: '2', rotulo: '2803-01-05-3441', descripcion: 'La teoría' };
     assert.equal(matchBienSearch(bien, '4778', [{ funcionarioDoc: '4778' }]), true);
   });
+
+  it('prioriza el último segmento exacto del rótulo en consultas numéricas', () => {
+    const correcto = { rotulo: '2803-01-05-2096' };
+    const contieneEnMedio = { rotulo: '2803-01-05-120960' };
+    const terminaEnOtro = { rotulo: '2803-01-05-32096' };
+    assert.equal(matchBienSearch(correcto, '2096', [], { codigoSolo: true, exactoFinal: true }), true);
+    assert.equal(matchBienSearch(contieneEnMedio, '2096', [], { codigoSolo: true, exactoFinal: true }), false);
+    assert.equal(matchBienSearch(terminaEnOtro, '2096', [], { codigoSolo: true, exactoFinal: true }), false);
+  });
+
+  it('compara el último segmento numérico sin ceros iniciales', () => {
+    assert.equal(matchBienSearch({ rotulo: '2803-01-05-002096' }, '2096', [], { codigoSolo: true, exactoFinal: true }), true);
+  });
 });

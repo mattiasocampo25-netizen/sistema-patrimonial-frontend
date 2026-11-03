@@ -441,13 +441,16 @@ useEffect(() => {
     if (debouncedSearchTerm && String(debouncedSearchTerm).trim()) {
       const tokens = normalizeStr(debouncedSearchTerm).split(' ').filter(Boolean);
       const consultaNumerica = tokens.length > 0 && tokens.every(token => /^[\d.,/#_-]+$/.test(token));
+      const porCodigoFinalExacto = consultaNumerica
+        ? filtered.filter(b => matchBienSearch(b, debouncedSearchTerm, [], { codigoSolo: true, exactoFinal: true }))
+        : [];
       const porCodigo = consultaNumerica
         ? filtered.filter(b => matchBienSearch(b, debouncedSearchTerm, [], { codigoSolo: true }))
         : [];
       // Si el número identifica un bien por su rótulo/código, mostrar esos
       // resultados. Buscar por CI/datos de acta queda como alternativa cuando
       // ningún código del inventario coincide.
-      filtered = porCodigo.length ? porCodigo : filtered.filter(b =>
+      filtered = porCodigoFinalExacto.length ? porCodigoFinalExacto : porCodigo.length ? porCodigo : filtered.filter(b =>
         matchBienSearch(b, debouncedSearchTerm, fc10PorBien.get(String(b.id)))
       );
     }

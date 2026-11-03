@@ -73,7 +73,7 @@ export const repairMojibake = (value) => {
 //
 // OJO: no cambiar la version a mano. Se cambia con:
 //   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
-export const APP_VERSION = '2.18.12';
+export const APP_VERSION = '2.18.13';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.
@@ -146,7 +146,7 @@ export const formatearMiles = (valor) => {
 
 // Búsqueda robusta de bienes: insensible a tildes/mayúsculas, multi-palabra (AND),
 // tolerante a ceros/guiones en rótulos y ampliada a más campos.
-export const matchBienSearch = (bien, query, registrosRelacionados = [], { codigoSolo = false } = {}) => {
+export const matchBienSearch = (bien, query, registrosRelacionados = [], { codigoSolo = false, exactoFinal = false } = {}) => {
   if (!query || !String(query).trim()) return true;
   const b = bien || {};
   const tokens = normalizeStr(query).split(' ').filter(Boolean);
@@ -162,6 +162,15 @@ export const matchBienSearch = (bien, query, registrosRelacionados = [], { codig
     const raw = String(campo ?? '').replace(/\D/g, '');
     return Boolean(raw && (raw.includes(digitos) || (raw.replace(/^0+/, '') || '0').includes(sinCeros)));
   };
+  if (esConsultaNumerica && exactoFinal) {
+    return tokens.every(token => {
+      const digitos = token.replace(/\D/g, '').replace(/^0+/, '') || '0';
+      return [b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial].some(campo => {
+        const final = String(campo ?? '').match(/(\d+)\D*$/)?.[1];
+        return final && (final.replace(/^0+/, '') || '0') === digitos;
+      });
+    });
+  }
   if (esConsultaNumerica && codigoSolo) {
     return tokens.every(token => camposCodigo.some(campo => coincideCodigo(campo, token)));
   }

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  conSello, debeResyncTotal, fusionarBienes, RESYNC_MS
+  BIENES_SYNC_VERSION, conSello, debeResyncTotal, fusionarBienes, RESYNC_MS
 } from '../src/services/syncBienes.js';
 
 describe('syncBienes', () => {
@@ -18,7 +18,11 @@ describe('syncBienes', () => {
   });
 
   it('debeResyncTotal: meta fresca pide delta', () => {
-    assert.equal(debeResyncTotal({ updated_at: '2026-10-01T00:00:00.000Z', actualizadoEn: Date.now() }), false);
+    assert.equal(debeResyncTotal({ version: BIENES_SYNC_VERSION, updated_at: '2026-10-01T00:00:00.000Z', actualizadoEn: Date.now() }), false);
+  });
+
+  it('fuerza descarga completa al cambiar la version de sincronizacion', () => {
+    assert.equal(debeResyncTotal({ version: BIENES_SYNC_VERSION - 1, updated_at: '2026-10-01T00:00:00.000Z', actualizadoEn: Date.now() }), true);
   });
 
   it('fusionarBienes: edita, agrega y saca lo que cambio de dependencia', () => {

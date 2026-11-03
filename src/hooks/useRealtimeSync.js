@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient';
 import { POLL_NOTIFICACIONES_MS, REALTIME_BENS_ACTIVO, REALTIME_NOTIF_ACTIVO, POLL_NOTIF_ROWS } from '../services/supabaseFreeTier';
 import { crearGuardaGeneracion } from '../utils/concurrencia';
 import localforage from 'localforage';
-import { debeResyncTotal, fusionarBienes, ahoraISO } from '../services/syncBienes';
+import { BIENES_SYNC_VERSION, debeResyncTotal, fusionarBienes, ahoraISO } from '../services/syncBienes';
 import { normalizeStr } from '../utils/helpers';
 import { processOfflineQueue, getOfflineQueueLength } from '../services/offlineSyncService';
 import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
@@ -272,40 +272,32 @@ export function useRealtimeSync({
           // Si ninguna fila trae sello (datos legacy), el punto de sync es "ahora":
           // desde aquí, toda edición ya sale sellada y entra en el delta.
           const fechaSync = Date.now();
-          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || ahoraISO(), actualizadoEn: fechaSync });
+          await localforage.setItem(META_BIENES, { version: BIENES_SYNC_VERSION, updated_at: maxUpdatedAt || ahoraISO(), actualizadoEn: fechaSync });
           if (!turnoVigente()) return;
           setBienes(inventarioFinal);
           setUltimoSyncBienes(fechaSync);
         } else {
           const fechaVacia = Date.now();
           await localforage.setItem(CACHE_BIENES, []);
-          await localforage.setItem(META_BIENES, { updated_at: ahoraISO(), actualizadoEn: fechaVacia });
+          await localforage.setItem(META_BIENES, { version: BIENES_SYNC_VERSION, updated_at: ahoraISO(), actualizadoEn: fechaVacia });
           if (!turnoVigente()) return;
           setBienes([]);
           setUltimoSyncBienes(fechaVacia);
         }
         } else {
           // Delta: solo filas tocadas desde la última sincronización (KB, no MB).
-          const deltaQuery = await supabase
-            .from('bens')
-            .select('id, data, updated_at')
-            .gt('updated_at', metaBienes.updated_at)
-            .order('updated_at', { ascending: true });
-          if (deltaQuery.error) throw deltaQuery.error;
-          const cambios = deltaQuery.data || [];
-          if (cambios.length >= 1000) {
-            // PostgREST limita por defecto a 1000 resultados; recorrer cada
-            // página evita truncar imports grandes durante sincronización delta.
-            const todosCambios = [...cambios];
-            for (let desde = 1000; ; desde += 1000) {
-              const pagina = await supabase.from('bens').select('id, data, updated_at')
-                .gt('updated_at', metaBienes.updated_at).order('updated_at', { ascending: true })
-                .range(desde, desde + 999);
-              if (pagina.error) throw pagina.error;
-              todosCambios.push(...(pagina.data || []));
-              if (!pagina.data || pagina.data.length < 1000) break;
-            }
-            cambios.splice(0, cambios.length, ...todosCambios);
+          // Pagina con orden total y estable. Muchos bienes creados en un
+          // mismo lote comparten updated_at; ordenar también por id evita que
+          // Postgres repita/salte filas entre páginas empatadas.
+          const cambios = [];
+          for (let desde = 0; ; desde += 1000) {
+            const pagina = await supabase.from('bens').select('id, data, updated_at')
+              .gt('updated_at', metaBienes.updated_at)
+              .order('updated_at', { ascending: true }).order('id', { ascending: true })
+              .range(desde, desde + 999);
+            if (pagina.error) throw pagina.error;
+            cambios.push(...(pagina.data || []));
+            if (!pagina.data || pagina.data.length < 1000) break;
           }
           const filasCambiosDependencia = cambios.filter(row => {
             const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
@@ -314,7 +306,7 @@ export function useRealtimeSync({
           const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, filasCambiosDependencia, dependenciaActual);
           await localforage.setItem(CACHE_BIENES, lista);
           const fechaSync = Date.now();
-          await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: fechaSync });
+          await localforage.setItem(META_BIENES, { version: BIENES_SYNC_VERSION, updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: fechaSync });
           if (!turnoVigente()) return;
           setBienes(lista);
           setUltimoSyncBienes(fechaSync);
@@ -495,6 +487,7 @@ export function useRealtimeSync({
                     const actualizadoEn = Date.now();
                     await localforage.setItem(`bienes_cache_${dependenciaActual}`, lista);
                     await localforage.setItem(`bienes_meta_${dependenciaActual}`, {
+                      version: BIENES_SYNC_VERSION,
                       updated_at: maxUpdatedAt || row.updated_at,
                       actualizadoEn
                     });

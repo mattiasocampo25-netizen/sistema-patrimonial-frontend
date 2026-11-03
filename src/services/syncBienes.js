@@ -11,6 +11,9 @@
 
 
 export const RESYNC_MS = 24 * 60 * 60 * 1000;
+// Incrementar cuando cambie la estrategia de paginación para reconstruir
+// automáticamente las cachés existentes en los navegadores.
+export const BIENES_SYNC_VERSION = 2;
 
 export const ahoraISO = () => new Date().toISOString();
 
@@ -20,7 +23,7 @@ export const conSello = (payload) => ({ ...payload, updated_at: ahoraISO() });
 // ¿Toca descarga total? Sin meta, sin marca, o meta vieja (>24 horas, válvula
 // de seguridad contra derivas: borrados externos, cambios de dependencia).
 export const debeResyncTotal = (meta, ahora = Date.now()) => {
-  if (!meta || !meta.actualizadoEn || !meta.updated_at) return true;
+  if (!meta || meta.version !== BIENES_SYNC_VERSION || !meta.actualizadoEn || !meta.updated_at) return true;
   return (ahora - meta.actualizadoEn) > RESYNC_MS;
 };
 

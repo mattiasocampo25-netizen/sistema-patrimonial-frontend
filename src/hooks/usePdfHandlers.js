@@ -519,7 +519,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   };
 
   const handleDownloadTemplateCSV = () => {
-      const csvContent = "\uFEFFCuenta Mayor;Sub-Cuenta;Analítico 1;Analítico 2;Descripción General;Fecha Adquisición (YYYY-MM-DD);Nº Rótulo;Valor Unitario (Sin puntos);Vida atil (Años)\n" +
+      const csvContent = "\uFEFFCuenta Mayor;Sub-Cuenta;Analítico 1;Analítico 2;Descripción General;Fecha Adquisición (YYYY-MM-DD);Nº Rótulo;Valor Unitario (Sin puntos);Vida útil (Años)\n" +
                           "2.6.1.01;01;01;01;\"Computadora HP i5\";2023-01-15;10001;4500000;5\n" +
                           ";;;;\"Escritorio de Madera\";2022-11-10;10002;1200000;10";
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

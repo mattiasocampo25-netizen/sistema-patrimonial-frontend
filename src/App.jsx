@@ -13,7 +13,7 @@ import { supabase } from './supabaseClient';
 import { generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia } from './utils/helpers';
 import { useIdioma } from './utils/i18n';
 import { conSello } from './services/syncBienes';
-import { mapearFilasBienes } from './utils/csvBienes';
+import { mapearFilasBienes, parsearArchivoCSVBienes, MAX_CSV_BIENES_BYTES } from './utils/csvBienes';
 import { useToasts } from './hooks/useToasts';
 import { useAuditoria } from './hooks/useAuditoria';
 import { usePdfHandlers } from './hooks/usePdfHandlers';
@@ -1160,6 +1160,16 @@ useEffect(() => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (!/\.csv$/i.test(file.name || '') && !['text/csv', 'application/vnd.ms-excel'].includes(file.type)) {
+      addToast('Selecciona un archivo CSV.', 'error');
+      e.target.value = '';
+      return;
+    }
+    if (!file.size || file.size > MAX_CSV_BIENES_BYTES) {
+      addToast(!file.size ? 'El archivo está vacío.' : 'El CSV supera el límite de 25 MB.', 'error');
+      e.target.value = '';
+      return;
+    }
     setPendingCSVImport({ type: 'bienes', file });
   };
 
@@ -1168,92 +1178,214 @@ useEffect(() => {
     if (!file) return;
     setIsProcessing({ active: true, text: 'Analizando planilla...' });
     try {
-      const { default: Papa } = await import('papaparse');
-      const { validos, duplicados, errores } = await new Promise((resolve, reject) => {
-        Papa.parse(file, {
-          header: true,
-          skipEmptyLines: true,
-          encoding: "UTF-8",
-          complete: (results) => resolve(mapearFilasBienes(results.data, results.meta.fields, bienes, dependenciaActual)),
-          error: (err) => reject(err)
-        });
+      const parsed = await parsearArchivoCSVBienes(file, (rows) => {
+        setIsProcessing({ active: true, text: `Leyendo ${rows.toLocaleString('es-PY')} filas para previsualizar...`, pct: 35 });
       });
-      setCsvPreviewData({ validos, duplicados, errores, tipo: 'bienes', file });
+      const mapped = mapearFilasBienes(parsed.rows, parsed.fields, bienes, dependenciaActual);
+      setCsvPreviewData({ ...parsed, ...mapped, tipo: 'bienes', file, fileName: file.name, fileSize: file.size, correcciones: {} });
       setIsCSVPreviewOpen(true);
-    } catch {
-      addToast("No se pudo leer el archivo CSV.", "error");
+    } catch (error) {
+      addToast(error?.message || 'No se pudo leer el archivo CSV.', 'error');
     } finally {
       setIsProcessing({ active: false, text: '' });
     }
   };
 
-  const executeProcessBienesCSV = async (file) => {
+  const executeProcessBienesCSV = async (preview, options = {}) => {
+    if (!preview?.rows || !preview?.fields) return addToast('La vista previa venció. Selecciona de nuevo el archivo.', 'error');
+    const mapped = mapearFilasBienes(preview.rows, preview.fields, bienes, dependenciaActual, options.correcciones || {});
+    const filasConError = [...mapped.errores, ...(preview.parseErrors || [])];
+    const dataActualizada = { ...preview, ...mapped, correcciones: options.correcciones || {}, modo: options.modo || 'agregar' };
+    if (mapped.problemasEncabezado.length) {
+      setCsvPreviewData(dataActualizada);
+      setIsCSVPreviewOpen(true);
+      addToast('Revisa los encabezados del CSV antes de importarlo.', 'error');
+      return;
+    }
+    if (filasConError.length && !options.omitirErrores) {
+      setCsvPreviewData(dataActualizada);
+      setIsCSVPreviewOpen(true);
+      addToast('Corrige las filas marcadas o confirma que se omitirán.', 'warning');
+      return;
+    }
 
-    setIsProcessing({ active: true, text: 'Leyendo planilla CSV...', pct: 0 });
+    setIsProcessing({ active: true, text: 'Importando bienes por lotes...', pct: 0 });
     setIsCSVPreviewOpen(false);
-    if (file) ultimoArchivoBienesRef.current = file;
+    if (preview.file) ultimoArchivoBienesRef.current = preview.file;
+    const exitosos = [];
+    const reportByLine = new Map();
+    for (const issue of filasConError) reportByLine.set(issue.linea, { linea: issue.linea, rotulo: issue.fila?.[mapped.columnasMapeadas.rotulo] || '', resultado: 'Error', detalle: issue.motivo });
 
-    // papaparse se carga bajo demanda: no entra al bundle inicial.
-    const { default: Papa } = await import('papaparse');
-    const filasCSV = [];
-    let camposCSV = [];
-    let ultimaActualizacionProgreso = 0;
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      encoding: "UTF-8",
-      worker: true,
-      step: (results) => {
-        if (!camposCSV.length) camposCSV = results.meta.fields || [];
-        filasCSV.push(results.data);
-        if (filasCSV.length % 150 === 0) {
-          const pct = file.size ? Math.min(95, ((results.meta.cursor || 0) / file.size) * 95) : 0;
-          setIsProcessing({ active: true, text: `Leyendo ${filasCSV.length.toLocaleString('es-PY')} filas...`, pct });
-          ultimaActualizacionProgreso = filasCSV.length;
-        }
-      },
-      complete: async () => {
-        if (filasCSV.length > ultimaActualizacionProgreso) {
-          setIsProcessing({ active: true, text: `Validando ${filasCSV.length.toLocaleString('es-PY')} filas...`, pct: 96 });
-        }
-        const { validos: newBienes, duplicados } = mapearFilasBienes(filasCSV, camposCSV, bienes, dependenciaActual);
-        const duplicatesSkipped = duplicados.length;
+    const existingDuplicates = mapped.duplicados.filter(d => d.existenteId && !d.repetidoEnArchivo);
+    const bienesPorId = new Map(bienes.map(b => [b.id, b]));
+    const updateExisting = dataActualizada.modo === 'actualizar';
+    for (const duplicate of mapped.duplicados) {
+      const shouldUpdate = updateExisting && duplicate.existenteId && !duplicate.repetidoEnArchivo;
+      if (!shouldUpdate) reportByLine.set(duplicate.linea, { linea: duplicate.linea, rotulo: duplicate.rotulo, resultado: 'Omitido', detalle: duplicate.motivo });
+    }
 
-        if (newBienes.length > 0) {
-          try {
-            setIsProcessing({ active: true, text: `Guardando ${newBienes.length.toLocaleString('es-PY')} bienes...`, pct: 98 });
-            const payload = newBienes.map(b => conSello({ id: b.id, data: b }));
-            const { error: errInsert } = await supabase.from('bens').insert(payload);
-            // supabase-js NO lanza en error de Postgres/RLS: resuelve con
-            // { error }. Sin esta comprobación el usuario veía "¡Éxito!" con
-            // los bienes sin guardar, y recién al recargar aparecían los
-            // bienes fantasma.
-            if (errInsert) throw errInsert;
-            // Actualización local dirigida (evita recargar todo el inventario)
-            setBienes(prev => [...newBienes, ...prev.filter(b => !newBienes.some(n => n.id === b.id))]);
-            try {
-              const cacheActual = await localforage.getItem(`bienes_cache_${dependenciaActual}`) || [];
-              await localforage.setItem(`bienes_cache_${dependenciaActual}`, [...newBienes, ...cacheActual.filter(b => !newBienes.some(n => n.id === b.id))]);
-            } catch {}
-            addToast(`¡Éxito! Se guardaron ${newBienes.length} bienes nuevos.${duplicatesSkipped > 0 ? ` Se omitieron ${duplicatesSkipped} duplicados.` : ''}`, "success");
-          } catch (error) {
-            addToast(`No se pudieron guardar los bienes: ${error?.message || 'error de la base de datos'}.`, "error", { action: { label: 'Reintentar', onClick: () => { if (ultimoArchivoBienesRef.current) executeProcessBienesCSV(ultimoArchivoBienesRef.current); } } });
-          }
-        } else {
-          addToast(`No se importó ningún bien. Se omitieron ${duplicatesSkipped} duplicados.`, "warning");
+    try {
+      const totalOperations = mapped.validos.length + (updateExisting ? existingDuplicates.length : 0);
+      let completed = 0;
+      for (let start = 0; start < mapped.validos.length; start += 100) {
+        const batch = mapped.validos.slice(start, start + 100);
+        const records = batch.map(({ linea: _linea, _columnasPresentes, ...bien }) => bien);
+        let error;
+        try {
+          ({ error } = await supabase.from('bens').insert(records.map(b => conSello({ id: b.id, data: b }))));
+        } catch (requestError) {
+          error = requestError;
         }
-
-        setIsProcessing({ active: false, text: '' });
-        // Resetea el input para permitir reimportar el mismo archivo.
-        // (Antes: `e.target.value` inexistente en este scope -> ReferenceError.)
-        if (fileInputRef.current) fileInputRef.current.value = null;
-      },
-      error: (err) => {
-        console.error(err);
-        addToast("Error al procesar el archivo CSV.", "error", { action: { label: 'Reintentar', onClick: () => { if (ultimoArchivoBienesRef.current) executeProcessBienesCSV(ultimoArchivoBienesRef.current); } } });
-        setIsProcessing({ active: false, text: '' });
+        for (let i = 0; i < batch.length; i++) {
+          const b = batch[i];
+          const row = error
+            ? { linea: b.linea, rotulo: b.rotulo, resultado: 'Fallido', detalle: error.message || 'No se pudo guardar el lote.', reintento: { tipo: 'crear', bien: records[i] } }
+            : { linea: b.linea, rotulo: b.rotulo, resultado: 'Creado', detalle: 'Registro incorporado.' };
+          reportByLine.set(b.linea, row);
+          if (!error) exitosos.push(records[i]);
+        }
+        completed += batch.length;
+        setIsProcessing({ active: true, text: `Guardando ${completed.toLocaleString('es-PY')} de ${totalOperations.toLocaleString('es-PY')} registros...`, pct: totalOperations ? Math.round(completed / totalOperations * 100) : 100 });
       }
-    });
+
+      if (updateExisting) {
+        for (let i = 0; i < existingDuplicates.length; i += 20) {
+          const batch = existingDuplicates.slice(i, i + 20);
+          const outcomes = await Promise.all(batch.map(async (duplicate) => {
+            const original = bienesPorId.get(duplicate.existenteId);
+            if (!original) return { duplicate, error: new Error('No se encontró el bien existente para actualizar.') };
+            const updated = { ...original };
+            for (const field of duplicate._columnasPresentes || []) updated[field] = duplicate[field];
+            let error;
+            try {
+              ({ error } = await supabase.from('bens').update(conSello({ data: updated })).eq('id', original.id));
+            } catch (requestError) {
+              error = requestError;
+            }
+            return { duplicate, updated, error };
+          }));
+          for (const outcome of outcomes) {
+            const { duplicate, updated, error } = outcome;
+            reportByLine.set(duplicate.linea, error
+              ? { linea: duplicate.linea, rotulo: duplicate.rotulo, resultado: 'Fallido', detalle: error.message || 'No se pudo actualizar.', reintento: { tipo: 'actualizar', id: duplicate.existenteId, bien: updated } }
+              : { linea: duplicate.linea, rotulo: duplicate.rotulo, resultado: 'Actualizado', detalle: 'Bien existente actualizado.' });
+            if (!error && updated) exitosos.push({ ...updated, id: duplicate.existenteId });
+          }
+          completed += batch.length;
+          setIsProcessing({ active: true, text: `Guardando ${completed.toLocaleString('es-PY')} de ${totalOperations.toLocaleString('es-PY')} registros...`, pct: totalOperations ? Math.round(completed / totalOperations * 100) : 100 });
+        }
+      }
+
+      if (exitosos.length) {
+        const idsExitosos = new Set(exitosos.map(b => b.id));
+        setBienes(prev => [...exitosos, ...prev.filter(b => !idsExitosos.has(b.id))]);
+        try {
+          const cache = await localforage.getItem(`bienes_cache_${dependenciaActual}`) || [];
+          const byId = new Map([...cache, ...exitosos].map(b => [b.id, b]));
+          await localforage.setItem(`bienes_cache_${dependenciaActual}`, [...byId.values()]);
+        } catch {}
+      }
+      const filasInformadas = [...reportByLine.values()].sort((a, b) => a.linea - b.linea);
+      const resumen = {
+        tipo: 'resultado', fileName: preview.fileName || preview.file?.name || 'importacion.csv',
+        fileSize: preview.fileSize || preview.file?.size || 0,
+        delimiter: preview.delimiter, encoding: preview.encoding,
+        creados: filasInformadas.filter(r => r.resultado === 'Creado').length,
+        actualizados: filasInformadas.filter(r => r.resultado === 'Actualizado').length,
+        omitidos: filasInformadas.filter(r => r.resultado === 'Omitido' || r.resultado === 'Error').length,
+        fallidos: filasInformadas.filter(r => r.resultado === 'Fallido').length,
+        resultados: filasInformadas
+      };
+      setCsvPreviewData(resumen);
+      setIsCSVPreviewOpen(true);
+      addToast(`Importación finalizada: ${resumen.creados} creados, ${resumen.actualizados} actualizados, ${resumen.omitidos} omitidos y ${resumen.fallidos} fallidos.`, resumen.fallidos ? 'warning' : 'success');
+    } catch (error) {
+      addToast(`Falló la importación: ${error?.message || 'error inesperado'}.`, 'error');
+    } finally {
+      setIsProcessing({ active: false, text: '' });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const reintentarCSVFallidos = async () => {
+    const reporteActual = csvPreviewData;
+    const fallidos = (reporteActual?.resultados || []).filter(row => row.resultado === 'Fallido' && row.reintento);
+    if (!fallidos.length) return;
+    setIsCSVPreviewOpen(false);
+    setIsProcessing({ active: true, text: `Reintentando ${fallidos.length} filas fallidas...`, pct: 0 });
+    const nuevosResultados = [...reporteActual.resultados];
+    const bienActualizados = [];
+    try {
+      const crear = fallidos.filter(row => row.reintento.tipo === 'crear');
+      for (let start = 0; start < crear.length; start += 100) {
+        const grupo = crear.slice(start, start + 100);
+        const payload = grupo.map(row => conSello({ id: row.reintento.bien.id, data: row.reintento.bien }));
+        let error;
+        try {
+          ({ error } = await supabase.from('bens').insert(payload));
+        } catch (requestError) {
+          error = requestError;
+        }
+        for (const row of grupo) {
+          const target = nuevosResultados.find(item => item.linea === row.linea);
+          if (target) {
+            target.resultado = error ? 'Fallido' : 'Creado';
+            target.detalle = error?.message || (error ? 'El reintento volvió a fallar.' : 'Registro incorporado en el reintento.');
+            if (!error) {
+              delete target.reintento;
+              bienActualizados.push(row.reintento.bien);
+            }
+          }
+        }
+      }
+      const actualizar = fallidos.filter(row => row.reintento.tipo === 'actualizar');
+      for (let start = 0; start < actualizar.length; start += 20) {
+        const grupo = actualizar.slice(start, start + 20);
+        const outcomes = await Promise.all(grupo.map(async row => {
+          const { id, bien } = row.reintento;
+          if (!id || !bien) return { row, error: new Error('No se pudo recuperar el bien que debía actualizarse.') };
+          let error;
+          try {
+            ({ error } = await supabase.from('bens').update(conSello({ data: bien })).eq('id', id));
+          } catch (requestError) {
+            error = requestError;
+          }
+          return { row, error, bien: { ...bien, id } };
+        }));
+        for (const outcome of outcomes) {
+          const target = nuevosResultados.find(item => item.linea === outcome.row.linea);
+          if (target) {
+            target.resultado = outcome.error ? 'Fallido' : 'Actualizado';
+            target.detalle = outcome.error?.message || (outcome.error ? 'El reintento volvió a fallar.' : 'Bien actualizado en el reintento.');
+            if (!outcome.error) {
+              delete target.reintento;
+              bienActualizados.push(outcome.bien);
+            }
+          }
+        }
+      }
+      if (bienActualizados.length) {
+        setBienes(prev => [...bienActualizados, ...prev.filter(b => !bienActualizados.some(updated => updated.id === b.id))]);
+        try {
+          const cache = await localforage.getItem(`bienes_cache_${dependenciaActual}`) || [];
+          const byId = new Map([...cache, ...bienActualizados].map(b => [b.id, b]));
+          await localforage.setItem(`bienes_cache_${dependenciaActual}`, [...byId.values()]);
+        } catch {}
+      }
+      const updatedReport = {
+        ...reporteActual,
+        resultados: nuevosResultados,
+        creados: nuevosResultados.filter(r => r.resultado === 'Creado').length,
+        actualizados: nuevosResultados.filter(r => r.resultado === 'Actualizado').length,
+        omitidos: nuevosResultados.filter(r => r.resultado === 'Omitido' || r.resultado === 'Error').length,
+        fallidos: nuevosResultados.filter(r => r.resultado === 'Fallido').length,
+      };
+      setCsvPreviewData(updatedReport);
+      setIsCSVPreviewOpen(true);
+      addToast(`Reintento finalizado: quedan ${updatedReport.fallidos} filas fallidas.`, updatedReport.fallidos ? 'warning' : 'success');
+    } finally {
+      setIsProcessing({ active: false, text: '' });
+    }
   };
   // --- BACKUP GENERAL DE PROTECCIÓN DEL SISTEMA (SOLO ADMINS) ---
 
@@ -1623,7 +1755,7 @@ if (publicBienId) {
 
       {/* Modales y componentes flotantes (carga diferida) */}
       <Suspense fallback={null}>
-      <AppModals STYLES={STYLES} isCSVPreviewOpen={isCSVPreviewOpen} setIsCSVPreviewOpen={setIsCSVPreviewOpen} confirmCSVImportFuncionarios={confirmCSVImportFuncionarios} csvPreviewData={csvPreviewData} isFuncionarioModalOpen={isFuncionarioModalOpen} setIsFuncionarioModalOpen={setIsFuncionarioModalOpen} funcionarioToEdit={funcionarioToEdit} saveFuncionarioEdit={saveFuncionarioEdit} ubicacionesDep={ubicacionesDep} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} setScanParaConteo={setScanParaConteo} scanParaConteo={scanParaConteo} conteoCodigos={conteoCodigos} isQRModalOpen={isQRModalOpen} setIsQRModalOpen={setIsQRModalOpen} isBulkQR={isBulkQR} qrTargetBien={qrTargetBien} handleDownloadLabelPNG={handleDownloadLabelPNG} handleDownloadSimpleQR={handleDownloadSimpleQR} handleBulkLabelPNGZip={handleBulkLabelPNGZip} handleBulkSimpleQRZip={handleBulkSimpleQRZip} setDarkMode={fijarTemaUsuario} setIsAtajosOpen={setIsAtajosOpen} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} repetirUltimaExportacion={repetirUltimaExportacion} ultimaExportacion={ultimaExportacion} isFC03ModalOpen={isFC03ModalOpen} setIsFC03ModalOpen={setIsFC03ModalOpen} fc03Config={fc03Config} setFc03Config={setFc03Config} fc03FuncionarioTexto={fc03FuncionarioTexto} setFc03FuncionarioTexto={setFc03FuncionarioTexto} showFC03FuncDropdown={showFC03FuncDropdown} setShowFC03FuncDropdown={setShowFC03FuncDropdown} ubicacionesUnicas={ubicacionesUnicas} funcionariosPadron={funcionariosPadron} dependenciaActual={dependenciaActual} executeGenerateFC03={executeGenerateFC03} isFC04ModalOpen={isFC04ModalOpen} setIsFC04ModalOpen={setIsFC04ModalOpen} fc04Editing={fc04Editing} saveFC04={saveFC04} fc10Month={fc10Month} fc10Year={fc10Year} ORIGENES_FC04={ORIGENES_FC04} fc04SinMovimiento={fc04SinMovimiento} setFc04SinMovimiento={setFc04SinMovimiento} handleAddFC04Item={handleAddFC04Item} fc04Items={fc04Items} handleFC04ItemChange={handleFC04ItemChange} handleRemoveFC04Item={handleRemoveFC04Item} isFC10ModalOpen={isFC10ModalOpen} setIsFC10ModalOpen={setIsFC10ModalOpen} fc10TargetBien={fc10TargetBien} fc10Editing={fc10Editing} saveFC10={saveFC10} funcionariosConDatos={funcionariosConDatos} estructurasDB={estructurasDB} isFC11ModalOpen={isFC11ModalOpen} setIsFC11ModalOpen={setIsFC11ModalOpen} fc11TargetBien={fc11TargetBien} fc11Editing={fc11Editing} saveFC11={saveFC11} todasDependencias={todasDependencias} isUsuarioModalOpen={isUsuarioModalOpen} isAdmin={isAdmin} setIsUsuarioModalOpen={setIsUsuarioModalOpen} usuarioEditing={usuarioEditing} saveUsuario={saveUsuario} esDesarrollador={esDesarrollador} isBienModalOpen={isBienModalOpen} setIsBienModalOpen={setIsBienModalOpen} bienEditing={bienEditing} setBienEditing={setBienEditing} bienFormRef={bienFormRef} saveBien={saveBien} isSaving={isSaving} ESTADOS_CONSERVACION={ESTADOS_CONSERVACION} sugerenciasBienesDep={sugerenciasBienesDep} padronDep={padronDep} fichaBien={fichaBien} setFichaBien={setFichaBien} setEventosAuditFicha={setEventosAuditFicha} eventosFicha={eventosFicha} subirFotoBien={subirFotoBien} eliminarFotoBien={eliminarFotoBien} subiendoFoto={subiendoFoto} tourPaso={tourPaso} pasosTour={pasosTour} setTourPaso={setTourPaso} cerrarTour={cerrarTour} setActiveTab={setActiveTab} cmdOpen={cmdOpen} setCmdOpen={setCmdOpen} bienes={bienes} irTabGlobal={irTabGlobal} isDependenciasModalOpen={isDependenciasModalOpen} setIsDependenciasModalOpen={setIsDependenciasModalOpen} dependenciasList={dependenciasList} DEPENDENCIAS_UNP={DEPENDENCIAS_UNP} dependenciasDetectadas={dependenciasDetectadas} conteosDependencia={conteosDependencia} guardarDependencia={guardarDependencia} eliminarDependencia={eliminarDependencia} fusionarDependencia={fusionarDependencia} isSavingDep={isSavingDep} verPadronDependencia={verPadronDependencia} ubicacionesList={ubicacionesList} conteosUbicacion={conteosUbicacion} guardarUbicacion={guardarUbicacion} eliminarUbicacion={eliminarUbicacion} asignarFuncionarioAUbicacion={asignarFuncionarioAUbicacion} isUbicacionesModalOpen={isUbicacionesModalOpen} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} isSavingUbicacion={isSavingUbicacion} isMantenimientoModalOpen={isMantenimientoModalOpen} setIsMantenimientoModalOpen={setIsMantenimientoModalOpen} mantenimiento={mantenimiento} saveMantenimiento={saveMantenimiento} isSavingMant={isSavingMant} showLogoutConfirm={showLogoutConfirm} setShowLogoutConfirm={setShowLogoutConfirm} handleLogout={handleLogout} resolucionBaja={resolucionBaja} setResolucionBaja={setResolucionBaja} submitResolucionBaja={submitResolucionBaja} motivoResolucion={motivoResolucion} setMotivoResolucion={setMotivoResolucion} itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} motivoSolicitudBaja={motivoSolicitudBaja} setMotivoSolicitudBaja={setMotivoSolicitudBaja} confirmDeleteAction={confirmDeleteAction} confirmBackupModal={confirmBackupModal} setConfirmBackupModal={setConfirmBackupModal} handleExportBackupGeneral={handleExportBackupGeneral} pendingCSVImport={pendingCSVImport} setPendingCSVImport={setPendingCSVImport} fileInputRef={fileInputRef} fileInputFuncionariosRef={fileInputFuncionariosRef} executeProcessBienesCSV={executeProcessBienesCSV} executeProcessFuncionariosCSV={executeProcessFuncionariosCSV} previsualizarCSVBienes={previsualizarCSVBienes} showChangelog={showChangelog} setShowChangelog={setShowChangelog} isConsolidatedFC10ModalOpen={isConsolidatedFC10ModalOpen} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleGenerateConsolidatedFC10PDF={handleGenerateConsolidatedFC10PDF} isNewFuncionarioModalOpen={isNewFuncionarioModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} handleSaveManualFuncionario={handleSaveManualFuncionario} showUnsavedChangesModal={showUnsavedChangesModal} setShowUnsavedChangesModal={setShowUnsavedChangesModal} showDependenciaConfirm={showDependenciaConfirm} setShowDependenciaConfirm={setShowDependenciaConfirm} confirmDependenciaChange={confirmDependenciaChange} pendingDependencia={pendingDependencia} clearAllFilters={clearAllFilters} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} openFC03Modal={openFC03Modal} openFC10Modal={openFC10Modal} fc10List={fc10List} fc11List={fc11List}  modoCampo={modoCampo} setModoCampo={setModoCampo} ultimoEscaneo={ultimoEscaneo} setUltimoEscaneo={setUltimoEscaneo} openFichaBien={openFichaBien} />
+      <AppModals STYLES={STYLES} isCSVPreviewOpen={isCSVPreviewOpen} setIsCSVPreviewOpen={setIsCSVPreviewOpen} confirmCSVImportFuncionarios={confirmCSVImportFuncionarios} csvPreviewData={csvPreviewData} isFuncionarioModalOpen={isFuncionarioModalOpen} setIsFuncionarioModalOpen={setIsFuncionarioModalOpen} funcionarioToEdit={funcionarioToEdit} saveFuncionarioEdit={saveFuncionarioEdit} ubicacionesDep={ubicacionesDep} isScannerOpen={isScannerOpen} setIsScannerOpen={setIsScannerOpen} setScanParaConteo={setScanParaConteo} scanParaConteo={scanParaConteo} conteoCodigos={conteoCodigos} isQRModalOpen={isQRModalOpen} setIsQRModalOpen={setIsQRModalOpen} isBulkQR={isBulkQR} qrTargetBien={qrTargetBien} handleDownloadLabelPNG={handleDownloadLabelPNG} handleDownloadSimpleQR={handleDownloadSimpleQR} handleBulkLabelPNGZip={handleBulkLabelPNGZip} handleBulkSimpleQRZip={handleBulkSimpleQRZip} setDarkMode={fijarTemaUsuario} setIsAtajosOpen={setIsAtajosOpen} handleExportInventarioCSV={exportarCSV} handleExportInventarioExcel={exportarExcel} repetirUltimaExportacion={repetirUltimaExportacion} ultimaExportacion={ultimaExportacion} isFC03ModalOpen={isFC03ModalOpen} setIsFC03ModalOpen={setIsFC03ModalOpen} fc03Config={fc03Config} setFc03Config={setFc03Config} fc03FuncionarioTexto={fc03FuncionarioTexto} setFc03FuncionarioTexto={setFc03FuncionarioTexto} showFC03FuncDropdown={showFC03FuncDropdown} setShowFC03FuncDropdown={setShowFC03FuncDropdown} ubicacionesUnicas={ubicacionesUnicas} funcionariosPadron={funcionariosPadron} dependenciaActual={dependenciaActual} executeGenerateFC03={executeGenerateFC03} isFC04ModalOpen={isFC04ModalOpen} setIsFC04ModalOpen={setIsFC04ModalOpen} fc04Editing={fc04Editing} saveFC04={saveFC04} fc10Month={fc10Month} fc10Year={fc10Year} ORIGENES_FC04={ORIGENES_FC04} fc04SinMovimiento={fc04SinMovimiento} setFc04SinMovimiento={setFc04SinMovimiento} handleAddFC04Item={handleAddFC04Item} fc04Items={fc04Items} handleFC04ItemChange={handleFC04ItemChange} handleRemoveFC04Item={handleRemoveFC04Item} isFC10ModalOpen={isFC10ModalOpen} setIsFC10ModalOpen={setIsFC10ModalOpen} fc10TargetBien={fc10TargetBien} fc10Editing={fc10Editing} saveFC10={saveFC10} funcionariosConDatos={funcionariosConDatos} estructurasDB={estructurasDB} isFC11ModalOpen={isFC11ModalOpen} setIsFC11ModalOpen={setIsFC11ModalOpen} fc11TargetBien={fc11TargetBien} fc11Editing={fc11Editing} saveFC11={saveFC11} todasDependencias={todasDependencias} isUsuarioModalOpen={isUsuarioModalOpen} isAdmin={isAdmin} setIsUsuarioModalOpen={setIsUsuarioModalOpen} usuarioEditing={usuarioEditing} saveUsuario={saveUsuario} esDesarrollador={esDesarrollador} isBienModalOpen={isBienModalOpen} setIsBienModalOpen={setIsBienModalOpen} bienEditing={bienEditing} setBienEditing={setBienEditing} bienFormRef={bienFormRef} saveBien={saveBien} isSaving={isSaving} ESTADOS_CONSERVACION={ESTADOS_CONSERVACION} sugerenciasBienesDep={sugerenciasBienesDep} padronDep={padronDep} fichaBien={fichaBien} setFichaBien={setFichaBien} setEventosAuditFicha={setEventosAuditFicha} eventosFicha={eventosFicha} subirFotoBien={subirFotoBien} eliminarFotoBien={eliminarFotoBien} subiendoFoto={subiendoFoto} tourPaso={tourPaso} pasosTour={pasosTour} setTourPaso={setTourPaso} cerrarTour={cerrarTour} setActiveTab={setActiveTab} cmdOpen={cmdOpen} setCmdOpen={setCmdOpen} bienes={bienes} irTabGlobal={irTabGlobal} isDependenciasModalOpen={isDependenciasModalOpen} setIsDependenciasModalOpen={setIsDependenciasModalOpen} dependenciasList={dependenciasList} DEPENDENCIAS_UNP={DEPENDENCIAS_UNP} dependenciasDetectadas={dependenciasDetectadas} conteosDependencia={conteosDependencia} guardarDependencia={guardarDependencia} eliminarDependencia={eliminarDependencia} fusionarDependencia={fusionarDependencia} isSavingDep={isSavingDep} verPadronDependencia={verPadronDependencia} ubicacionesList={ubicacionesList} conteosUbicacion={conteosUbicacion} guardarUbicacion={guardarUbicacion} eliminarUbicacion={eliminarUbicacion} asignarFuncionarioAUbicacion={asignarFuncionarioAUbicacion} isUbicacionesModalOpen={isUbicacionesModalOpen} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} isSavingUbicacion={isSavingUbicacion} isMantenimientoModalOpen={isMantenimientoModalOpen} setIsMantenimientoModalOpen={setIsMantenimientoModalOpen} mantenimiento={mantenimiento} saveMantenimiento={saveMantenimiento} isSavingMant={isSavingMant} showLogoutConfirm={showLogoutConfirm} setShowLogoutConfirm={setShowLogoutConfirm} handleLogout={handleLogout} resolucionBaja={resolucionBaja} setResolucionBaja={setResolucionBaja} submitResolucionBaja={submitResolucionBaja} motivoResolucion={motivoResolucion} setMotivoResolucion={setMotivoResolucion} itemToDelete={itemToDelete} setItemToDelete={setItemToDelete} motivoSolicitudBaja={motivoSolicitudBaja} setMotivoSolicitudBaja={setMotivoSolicitudBaja} confirmDeleteAction={confirmDeleteAction} confirmBackupModal={confirmBackupModal} setConfirmBackupModal={setConfirmBackupModal} handleExportBackupGeneral={handleExportBackupGeneral} pendingCSVImport={pendingCSVImport} setPendingCSVImport={setPendingCSVImport} fileInputRef={fileInputRef} fileInputFuncionariosRef={fileInputFuncionariosRef} executeProcessBienesCSV={executeProcessBienesCSV} reintentarCSVFallidos={reintentarCSVFallidos} executeProcessFuncionariosCSV={executeProcessFuncionariosCSV} previsualizarCSVBienes={previsualizarCSVBienes} showChangelog={showChangelog} setShowChangelog={setShowChangelog} isConsolidatedFC10ModalOpen={isConsolidatedFC10ModalOpen} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleGenerateConsolidatedFC10PDF={handleGenerateConsolidatedFC10PDF} isNewFuncionarioModalOpen={isNewFuncionarioModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} handleSaveManualFuncionario={handleSaveManualFuncionario} showUnsavedChangesModal={showUnsavedChangesModal} setShowUnsavedChangesModal={setShowUnsavedChangesModal} showDependenciaConfirm={showDependenciaConfirm} setShowDependenciaConfirm={setShowDependenciaConfirm} confirmDependenciaChange={confirmDependenciaChange} pendingDependencia={pendingDependencia} clearAllFilters={clearAllFilters} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} openFC03Modal={openFC03Modal} openFC10Modal={openFC10Modal} fc10List={fc10List} fc11List={fc11List}  modoCampo={modoCampo} setModoCampo={setModoCampo} ultimoEscaneo={ultimoEscaneo} setUltimoEscaneo={setUltimoEscaneo} openFichaBien={openFichaBien} />
       </Suspense>
       <AtajosModal isOpen={isAtajosOpen} onClose={() => setIsAtajosOpen(false)} STYLES={STYLES} />
       <RestoreBackupModal restore={restore} />

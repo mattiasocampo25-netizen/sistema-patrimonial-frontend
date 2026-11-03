@@ -24,6 +24,7 @@ import MantenimientoModal from './modals/MantenimientoModal';
 import CampoResultado from './CampoResultado';
 import Dialogo from './ui/Dialogo';
 import { formatCurrency, formatDateText, formatCI, matchSearchWords, normalizeStr } from '../utils/helpers';
+import { descargarReporteImportacionCSV } from '../utils/csvBienes';
 
 // Cableado de modales y flotantes (extraído de App.jsx, Fase 6).
 // Componente presentacional: todo llega por props, sin estado propio.
@@ -167,6 +168,7 @@ export default function AppModals({
   fileInputRef,
   fileInputFuncionariosRef,
   executeProcessBienesCSV,
+  reintentarCSVFallidos,
   executeProcessFuncionariosCSV,
   previsualizarCSVBienes,
   showChangelog,
@@ -198,7 +200,9 @@ export default function AppModals({
               <CSVPreviewModal
                   isOpen={isCSVPreviewOpen}
                   onClose={() => setIsCSVPreviewOpen(false)}
-                  onConfirm={() => { if (csvPreviewData?.tipo === 'bienes' && csvPreviewData?.file) executeProcessBienesCSV(csvPreviewData.file); else confirmCSVImportFuncionarios(); }}
+                  onConfirm={(options) => { if (csvPreviewData?.tipo === 'bienes' && csvPreviewData?.file) executeProcessBienesCSV(csvPreviewData, options); else confirmCSVImportFuncionarios(); }}
+                  onRetryFailed={reintentarCSVFallidos}
+                  onDownloadReport={() => descargarReporteImportacionCSV(csvPreviewData?.resultados, `Informe_${String(csvPreviewData?.fileName || 'importacion').replace(/[^\w.-]+/g, '_')}.csv`)}
                   data={csvPreviewData}
                   STYLES={STYLES}
               />
@@ -738,6 +742,7 @@ export default function AppModals({
                 <div className="bg-surface-2 dark:bg-surface-3/50 p-4 rounded-card border border-line/60 dark:border-zinc-700/60 text-left mb-6 space-y-1.5">
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider">Archivo seleccionado:</p>
                   <p className="text-xs font-mono font-bold text-content-1 dark:text-zinc-200 truncate">{pendingCSVImport.file?.name}</p>
+                  <p className="text-[11px] text-content-3">{pendingCSVImport.file?.size ? `${(pendingCSVImport.file.size / (1024 * 1024)).toFixed(1)} MB` : '0 KB'} · Máximo 25 MB y 100.000 filas</p>
                   <p className="text-[11px] font-bold text-content-3 uppercase tracking-wider pt-1">Destino:</p>
                   <p className="text-xs font-bold text-ok dark:text-emerald-400">{dependenciaActual}</p>
                 </div>

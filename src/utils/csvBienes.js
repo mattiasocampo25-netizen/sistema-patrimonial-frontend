@@ -2,6 +2,7 @@ import { normalizeStr, generateId } from './helpers.js';
 
 export const MAX_CSV_BIENES_BYTES = 25 * 1024 * 1024;
 export const MAX_CSV_BIENES_FILAS = 100_000;
+const CSV_CHUNK_SIZE = 1024 * 1024;
 
 export const ALIAS_COLUMNAS_BIENES = {
   rotulo: ['Nº RÓTULO', 'N° RÓTULO', 'N ROTULO', 'ROTULO', 'RÓTULO', 'CÓDIGO', 'CODIGO', 'ETIQUETA'],
@@ -61,6 +62,11 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
   text = text.replace(/^\uFEFF/, '');
 
   const { default: Papa } = await import('papaparse');
+  // Let the browser FileStreamer read asynchronously in 1 MB pieces. Papa's
+  // built-in worker blob fails under the app's bundled deployment runtime.
+  const parseInput = typeof FileReader !== 'undefined' && typeof Blob !== 'undefined'
+    ? new Blob([text], { type: 'text/csv;charset=utf-8' })
+    : text;
   const rows = [];
   const parseErrors = [];
   const seenParseErrors = new Set();
@@ -69,13 +75,12 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
   let tooManyRows = false;
   let headerParsed = false;
   await new Promise((resolve, reject) => {
-    Papa.parse(text, {
-      // Parse as arrays so worker options contain only cloneable values.
-      // A transformHeader callback here causes postMessage DataCloneError.
+    Papa.parse(parseInput, {
       header: false,
       skipEmptyLines: 'greedy',
       delimiter: '',
-      worker: typeof Worker !== 'undefined',
+      worker: false,
+      chunkSize: CSV_CHUNK_SIZE,
       step: (result, parser) => {
         if (!headerParsed) {
           fields = (Array.isArray(result.data) ? result.data : [result.data])
@@ -86,6 +91,7 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
         }
         if (rows.length >= MAX_CSV_BIENES_FILAS) {
           tooManyRows = true;
+          reject(new Error('El archivo supera el límite de 100.000 filas. Divídelo en varios CSV.'));
           parser.abort();
           return;
         }

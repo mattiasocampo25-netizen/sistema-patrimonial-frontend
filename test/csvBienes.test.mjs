@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { mapearFilasBienes, parsearArchivoCSVBienes, validarEncabezadosBienes, MAX_CSV_BIENES_BYTES } from '../src/utils/csvBienes.js';
+import { mapearFilasBienes, parsearArchivoCSVBienes, validarEncabezadosBienes, MAX_CSV_BIENES_BYTES, MAX_CSV_BIENES_FILAS } from '../src/utils/csvBienes.js';
 
 describe('mapearFilasBienes', () => {
   const campos = ['Rótulo', 'Descripción'];
@@ -109,5 +109,15 @@ describe('mapearFilasBienes', () => {
       arrayBuffer: async () => { throw new Error('No debería leerse el archivo.'); }
     };
     await assert.rejects(parsearArchivoCSVBienes(file), /25 MB/);
+  });
+
+  it('rechaza más de 100.000 filas sin dejar el parseo colgado', async () => {
+    const text = `Rótulo;Descripción\n${Array.from({ length: MAX_CSV_BIENES_FILAS + 1 }, (_, i) => `R-${i};Bien`).join('\n')}`;
+    const bytes = new TextEncoder().encode(text);
+    const file = {
+      name: 'demasiadas-filas.csv', type: 'text/csv', size: bytes.byteLength,
+      arrayBuffer: async () => bytes.buffer
+    };
+    await assert.rejects(parsearArchivoCSVBienes(file), /100\.000 filas/);
   });
 });

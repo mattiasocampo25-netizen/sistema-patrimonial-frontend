@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { normalizeStr, parseDateInfo, matchBienSearch } from '../utils/helpers';
+import { normalizeStr, parseDateInfo, matchBienSearch, toInputDateFormat } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
 import { aplicarSeleccionRango, construirLinkInventario, idsEntre } from '../utils/inventarioInteracciones';
 
@@ -48,9 +48,10 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Orden de la tabla: null = orden natural por rótulo; si no { campo, dir }.
+  // El inventario abre ordenado por rótulo ascendente; el usuario puede cambiar
+  // a fecha/año o invertir el orden desde los controles existentes.
   // campo: 'rotulo' | 'valor' | 'fecha'. dir: 'asc' | 'desc'.
-  const [orden, setOrden] = useState(null);
+  const [orden, setOrden] = useState({ campo: 'rotulo', dir: 'asc' });
   // Tamaño de página configurable (10/20/50) + selección múltiple + vista.
   const [itemsPorPagina, setItemsPorPagina] = useState(() => {
     // Solo se aceptan los tamaños soportados: un valor sucio en localStorage
@@ -107,7 +108,7 @@ useEffect(() => {
     setFiltroFuncionario(''); setFiltroUbicacion(''); setFiltroAnio('');
     setFiltroMes(''); setFiltroSubcuenta(''); setFiltroAnalitico1('');
     setFiltroAnalitico2(''); setFiltroQR('ALL'); setFiltroFC10('ALL');
-    setFiltroEstado('ALL'); setFiltroPendiente(''); setSearchInput(''); setSearchTerm(''); setOrden(null); setCurrentPage(1);
+    setFiltroEstado('ALL'); setFiltroPendiente(''); setSearchInput(''); setSearchTerm(''); setOrden({ campo: 'rotulo', dir: 'asc' }); setCurrentPage(1);
     setSeleccionados([]);
   }, []);
 
@@ -458,19 +459,22 @@ useEffect(() => {
           return orden.dir === 'desc' ? vb - va : va - vb;
         }
         if (orden?.campo === 'fecha') {
-          const fa = String(a.fechaAdquisicion || '');
-          const fb = String(b.fechaAdquisicion || '');
+          const fa = toInputDateFormat(a.fechaAdquisicion);
+          const fb = toInputDateFormat(b.fechaAdquisicion);
+          // Las fechas faltantes van al final en ambos sentidos.
+          if (!fa && fb) return 1;
+          if (fa && !fb) return -1;
           return orden.dir === 'desc' ? fb.localeCompare(fa) : fa.localeCompare(fb);
         }
         if (orden?.campo === 'rotulo') {
-          const c = String(a.rotulo || '').localeCompare(String(b.rotulo || ''));
+          const c = String(a.rotulo || '').localeCompare(String(b.rotulo || ''), 'es', { numeric: true, sensitivity: 'base' });
           return orden.dir === 'desc' ? -c : c;
         }
         const getSuffixNum = (rot) => { const str = String(rot || '').trim(); const match = str.match(/\d+$/); return match ? parseInt(match[0], 10) : 0; };
         const numA = getSuffixNum(a.rotulo);
         const numB = getSuffixNum(b.rotulo);
         if (numA !== numB) return numA - numB;
-        return String(a.rotulo || '').localeCompare(String(b.rotulo || ''));
+        return String(a.rotulo || '').localeCompare(String(b.rotulo || ''), 'es', { numeric: true, sensitivity: 'base' });
     });
 
     return filtered;

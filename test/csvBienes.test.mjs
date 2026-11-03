@@ -39,6 +39,14 @@ describe('mapearFilasBienes', () => {
     assert.ok(ambiguous.issues.some(issue => issue.campo === 'rotulo' && /varias columnas/.test(issue.motivo)));
   });
 
+  it('marca filas con menos columnas como incompletas', () => {
+    const result = mapearFilasBienes([
+      { 'Rótulo': 'A-10', 'Descripción': '', __missing_fields: ['Descripción'] }
+    ], campos, [], 'Rectorado');
+    assert.equal(result.validos.length, 0);
+    assert.ok(result.errores.some(issue => issue.campo === 'fila' && /no incluye valores/.test(issue.motivo)));
+  });
+
   it('valida fechas y montos, y permite corregir valores por número de fila', () => {
     const fields = ['Rótulo', 'Descripción', 'Fecha Adquisición', 'Valor Unitario', 'Vida Útil'];
     const rows = [{

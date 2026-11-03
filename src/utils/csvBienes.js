@@ -67,17 +67,22 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
   let fields = [];
   let delimiter = ';';
   let tooManyRows = false;
+  let headerParsed = false;
   await new Promise((resolve, reject) => {
     Papa.parse(text, {
-      header: true,
+      // Parse as arrays so worker options contain only cloneable values.
+      // A transformHeader callback here causes postMessage DataCloneError.
+      header: false,
       skipEmptyLines: 'greedy',
       delimiter: '',
       worker: typeof Worker !== 'undefined',
-      transformHeader: (header) => String(header ?? '').replace(/^\uFEFF/, '').trim(),
       step: (result, parser) => {
-        if (!fields.length) {
-          fields = result.meta.fields || [];
+        if (!headerParsed) {
+          fields = (Array.isArray(result.data) ? result.data : [result.data])
+            .map(header => String(header ?? '').replace(/^\uFEFF/, '').trim());
           delimiter = result.meta.delimiter || delimiter;
+          headerParsed = true;
+          return;
         }
         if (rows.length >= MAX_CSV_BIENES_FILAS) {
           tooManyRows = true;
@@ -85,7 +90,12 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
           return;
         }
         const linea = rows.length + 2;
-        rows.push(result.data);
+        const values = Array.isArray(result.data) ? result.data : [result.data];
+        const row = {};
+        fields.forEach((field, index) => { row[field] = values[index] ?? ''; });
+        if (values.length > fields.length) row.__parsed_extra = values.slice(fields.length);
+        if (values.length < fields.length) row.__missing_fields = fields.slice(values.length);
+        rows.push(row);
         for (const err of result.errors || []) {
           const errorLine = Number.isInteger(err.row) ? err.row + 2 : linea;
           const key = `${errorLine}:${err.code || ''}:${err.message || ''}`;
@@ -97,8 +107,8 @@ export const parsearArchivoCSVBienes = async (file, onProgress) => {
         if (rows.length % 1000 === 0) onProgress?.(rows.length, result.meta.cursor || 0, text.length);
       },
       complete: (results) => {
-        if (!fields.length && results?.meta?.fields) {
-          fields = results.meta.fields;
+        if (!headerParsed && Array.isArray(results?.data?.[0])) {
+          fields = results.data[0].map(header => String(header ?? '').replace(/^\uFEFF/, '').trim());
           delimiter = results.meta.delimiter || delimiter;
         }
         resolve();
@@ -179,6 +189,7 @@ export const mapearFilasBienes = (rows, fields, bienes, dependenciaActual, corre
     };
     const rowErrors = [];
     if (row?.__parsed_extra?.length) rowErrors.push({ campo: 'fila', motivo: 'La fila tiene más valores que encabezados; revisa el separador o las comillas.' });
+    if (row?.__missing_fields?.length) rowErrors.push({ campo: 'fila', motivo: `La fila no incluye valores para: ${row.__missing_fields.join(', ')}.` });
     if (!item.rotulo) rowErrors.push({ campo: 'rotulo', motivo: 'Falta el rótulo.' });
     else if (item.rotulo.length > 100) rowErrors.push({ campo: 'rotulo', motivo: 'El rótulo supera 100 caracteres.' });
     if (!item.descripcion) rowErrors.push({ campo: 'descripcion', motivo: 'Falta la descripción.' });

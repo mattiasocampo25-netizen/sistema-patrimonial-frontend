@@ -12,7 +12,7 @@ import { supabase } from './supabaseClient';
 // Modales pesados: carga diferida para acelerar el arranque
 import { generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, colorPorDependencia } from './utils/helpers';
 import { useIdioma } from './utils/i18n';
-import { conSello } from './services/syncBienes';
+import { conSello, ahoraISO } from './services/syncBienes';
 import { mapearFilasBienes, parsearArchivoCSVBienes, MAX_CSV_BIENES_BYTES } from './utils/csvBienes';
 import { useToasts } from './hooks/useToasts';
 import { useAuditoria } from './hooks/useAuditoria';
@@ -1232,7 +1232,23 @@ useEffect(() => {
         const records = batch.map(({ linea: _linea, _columnasPresentes, ...bien }) => bien);
         let error;
         try {
-          ({ error } = await supabase.from('bens').insert(records.map(b => conSello({ id: b.id, data: b }))));
+          const payload = records.map(b => conSello({ id: b.id, data: b }));
+          const result = await supabase.from('bens').insert(payload).select('id, data, updated_at');
+          error = result.error;
+          if (!error && (result.data || []).length !== batch.length) {
+            error = new Error(`La base confirmó ${(result.data || []).length} de ${batch.length} bienes del lote.`);
+          }
+          if (!error) {
+            const persistedById = new Map(result.data.map(row => [row.id, row]));
+            for (let i = 0; i < records.length; i++) {
+              const persisted = persistedById.get(records[i].id);
+              if (!persisted) continue;
+              records[i] = { ...records[i], updated_at: persisted.updated_at };
+              // La dependencia almacenada debe coincidir con el filtro exacto
+              // de la carga inicial, además de ser legible en la interfaz.
+              records[i].dependencia = persisted.data?.dependencia || records[i].dependencia;
+            }
+          }
         } catch (requestError) {
           error = requestError;
         }
@@ -1240,7 +1256,7 @@ useEffect(() => {
           const b = batch[i];
           const row = error
             ? { linea: b.linea, rotulo: b.rotulo, resultado: 'Fallido', detalle: error.message || 'No se pudo guardar el lote.', reintento: { tipo: 'crear', bien: records[i] } }
-            : { linea: b.linea, rotulo: b.rotulo, resultado: 'Creado', detalle: 'Registro incorporado.' };
+            : { linea: b.linea, rotulo: b.rotulo, resultado: 'Creado', detalle: 'Registro confirmado en la base de datos.' };
           reportByLine.set(b.linea, row);
           if (!error) exitosos.push(records[i]);
         }
@@ -1258,7 +1274,10 @@ useEffect(() => {
             for (const field of duplicate._columnasPresentes || []) updated[field] = duplicate[field];
             let error;
             try {
-              ({ error } = await supabase.from('bens').update(conSello({ data: updated })).eq('id', original.id));
+              const result = await supabase.from('bens').update(conSello({ data: updated })).eq('id', original.id).select('id, data, updated_at').maybeSingle();
+              error = result.error;
+              if (!error && !result.data) error = new Error('No se encontró el bien en la base de datos para actualizar.');
+              if (!error) return { duplicate, updated: { id: result.data.id, ...result.data.data, updated_at: result.data.updated_at }, error: null };
             } catch (requestError) {
               error = requestError;
             }
@@ -1280,10 +1299,27 @@ useEffect(() => {
         const idsExitosos = new Set(exitosos.map(b => b.id));
         setBienes(prev => [...exitosos, ...prev.filter(b => !idsExitosos.has(b.id))]);
         try {
-          const cache = await localforage.getItem(`bienes_cache_${dependenciaActual}`) || [];
+          const cacheKey = `bienes_cache_${dependenciaActual}`;
+          const metaKey = `bienes_meta_${dependenciaActual}`;
+          const cache = await localforage.getItem(cacheKey) || [];
           const byId = new Map([...cache, ...exitosos].map(b => [b.id, b]));
-          await localforage.setItem(`bienes_cache_${dependenciaActual}`, [...byId.values()]);
+          await localforage.setItem(cacheKey, [...byId.values()]);
+          // El delta compara updated_at contra un high-watermark. Los CSV
+          // pueden tener muchos sellos iguales o relojes adelantados; conservar
+          // el marcador anterior puede hacer que el siguiente delta omita filas
+          // recién importadas. Adelántalo con el mayor sello del lote guardado.
+          const meta = await localforage.getItem(metaKey);
+          const maxImportado = exitosos.reduce((max, bien) =>
+            bien.updated_at && (!max || bien.updated_at > max) ? bien.updated_at : max, meta?.updated_at || null);
+          await localforage.setItem(metaKey, {
+            updated_at: maxImportado || ahoraISO(),
+            actualizadoEn: Date.now()
+          });
         } catch {}
+        // Invalidar la vigencia de la descarga total: la próxima carga relee la
+        // dependencia completa desde la fuente de verdad, incluso si hubo
+        // diferencias de reloj, filtros o escrituras parciales en un lote.
+        try { await localforage.removeItem(`bienes_meta_${dependenciaActual}`); } catch {}
       }
       const filasInformadas = [...reportByLine.values()].sort((a, b) => a.linea - b.linea);
       const resumen = {

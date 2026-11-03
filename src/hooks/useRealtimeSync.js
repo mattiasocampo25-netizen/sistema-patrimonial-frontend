@@ -230,16 +230,19 @@ export function useRealtimeSync({
         let from = 0;
         let to = rangeSize - 1;
         let keepFetchingBienes = true;
+        let errorCargaBienes = null;
 
         while (keepFetchingBienes) {
           let query = supabase
             .from('bens')
-            .select('id, data, updated_at')
-            .eq('data->>dependencia', dependenciaActual);
+            .select('id, data, updated_at');
 
-          const { data: batch, error } = await query.range(from, to);
+          const { data: batch, error } = await query.order('id', { ascending: true }).range(from, to);
 
-          if (error || !batch || batch.length === 0) {
+          if (error) {
+            errorCargaBienes = error;
+            keepFetchingBienes = false;
+          } else if (!batch || batch.length === 0) {
             keepFetchingBienes = false;
           } else {
             for (const item of batch) todosLosNuevosBienes.push(item);
@@ -252,7 +255,18 @@ export function useRealtimeSync({
           }
         }
 
-        const { lista: inventarioFinal, maxUpdatedAt } = fusionarBienes([], todosLosNuevosBienes, dependenciaActual);
+        if (errorCargaBienes) throw errorCargaBienes;
+        // Filtrar en cliente con la misma normalización del desglose. El
+        // filtro JSONB exacto en PostgREST excluía diferencias de mayúsculas,
+        // tildes o espacios que el contador por dependencia sí acepta.
+        const filasDependencia = todosLosNuevosBienes.filter(row => {
+          try {
+            const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+            return normalizeStr(data.dependencia || '') === normalizeStr(dependenciaActual || '');
+          } catch { return false; }
+        });
+
+        const { lista: inventarioFinal, maxUpdatedAt } = fusionarBienes([], filasDependencia, dependenciaActual);
         if (inventarioFinal.length > 0) {
           await localforage.setItem(CACHE_BIENES, inventarioFinal);
           // Si ninguna fila trae sello (datos legacy), el punto de sync es "ahora":
@@ -272,13 +286,32 @@ export function useRealtimeSync({
         }
         } else {
           // Delta: solo filas tocadas desde la última sincronización (KB, no MB).
-          const { data: cambios, error: errorDelta } = await supabase
+          const deltaQuery = await supabase
             .from('bens')
             .select('id, data, updated_at')
-            .eq('data->>dependencia', dependenciaActual)
-            .gt('updated_at', metaBienes.updated_at);
-          if (errorDelta) throw errorDelta;
-          const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, cambios || [], dependenciaActual);
+            .gt('updated_at', metaBienes.updated_at)
+            .order('updated_at', { ascending: true });
+          if (deltaQuery.error) throw deltaQuery.error;
+          const cambios = deltaQuery.data || [];
+          if (cambios.length >= 1000) {
+            // PostgREST limita por defecto a 1000 resultados; recorrer cada
+            // página evita truncar imports grandes durante sincronización delta.
+            const todosCambios = [...cambios];
+            for (let desde = 1000; ; desde += 1000) {
+              const pagina = await supabase.from('bens').select('id, data, updated_at')
+                .gt('updated_at', metaBienes.updated_at).order('updated_at', { ascending: true })
+                .range(desde, desde + 999);
+              if (pagina.error) throw pagina.error;
+              todosCambios.push(...(pagina.data || []));
+              if (!pagina.data || pagina.data.length < 1000) break;
+            }
+            cambios.splice(0, cambios.length, ...todosCambios);
+          }
+          const filasCambiosDependencia = cambios.filter(row => {
+            const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+            return normalizeStr(data.dependencia || '') === normalizeStr(dependenciaActual || '');
+          });
+          const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, filasCambiosDependencia, dependenciaActual);
           await localforage.setItem(CACHE_BIENES, lista);
           const fechaSync = Date.now();
           await localforage.setItem(META_BIENES, { updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: fechaSync });

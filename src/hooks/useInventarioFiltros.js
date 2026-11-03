@@ -201,6 +201,11 @@ useEffect(() => {
     if (refSeleccionCompartidaAplicada.current) return;
     let params;
     try { params = new URLSearchParams(window.location.search); } catch { return; }
+    // Los filtros de inventario se reflejan en la URL. No dejes que un filtro
+    // antiguo oculto por la interfaz sobreviva a una importación masiva y haga
+    // parecer que los bienes no existen.
+    const hayFiltrosURL = Object.keys(leerUrl()).length > 0;
+    if (!hayFiltrosURL && hasFilters) clearAllFilters();
     const idsCompartidos = (params.get('sel') || '').split(',').filter(Boolean);
     if (!idsCompartidos.length) {
       refSeleccionCompartidaAplicada.current = true;
@@ -215,7 +220,7 @@ useEffect(() => {
     }
     if (!Array.isArray(bienes) || bienes.length === 0) return;
     const disponibles = new Set(bienes
-      .filter(b => !dependenciaActual || b.dependencia === dependenciaActual)
+      .filter(b => !dependenciaActual || normalizeStr(b.dependencia) === normalizeStr(dependenciaActual))
       .map(b => String(b.id)));
     setSeleccionados(idsCompartidos.filter(id => disponibles.has(id)));
     refSeleccionCompartidaAplicada.current = true;
@@ -290,7 +295,7 @@ useEffect(() => {
   // Un único conjunto base por dependencia evita filtrar y normalizar toda la
   // lista de bienes por separado para cada selector y cada métrica.
   const bienesDependencia = useMemo(
-    () => bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
+    () => bienes.filter(b => !dependenciaActual || normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
     [bienes, dependenciaActual]
   );
   const bienesPorId = useMemo(() => new Map(bienes.map(b => [String(b.id), b])), [bienes]);

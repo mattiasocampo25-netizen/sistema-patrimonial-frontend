@@ -1,6 +1,9 @@
 import { lazy } from 'react';
+import { APP_VERSION } from './helpers.js';
 
-const CLAVE_REINTENTO = 'chunk_reintentado';
+// Un fallo de una versión anterior no debe impedir el único reintento de la
+// versión recién desplegada en la misma pestaña.
+const CLAVE_REINTENTO = `chunk_reintentado_${APP_VERSION}`;
 
 /**
  * Importa un módulo con auto-recuperación: si el chunk falla (deploy

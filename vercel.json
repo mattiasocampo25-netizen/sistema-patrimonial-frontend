@@ -4,6 +4,18 @@
   "framework": "vite",
   "headers": [
     {
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
@@ -17,9 +29,14 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/escaner", "destination": "/index.html" },
+    { "source": "/inventario", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/index.html" },
+    { "source": "/usuarios", "destination": "/index.html" },
+    { "source": "/ayuda", "destination": "/index.html" },
+    { "source": "/auditoria", "destination": "/index.html" },
+    { "source": "/panel", "destination": "/index.html" },
+    { "source": "/kiosco", "destination": "/index.html" }
   ]
 }

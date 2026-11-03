@@ -1,8 +1,11 @@
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { cargarConReintento } from '../src/utils/lazyConReintento.js';
+import { APP_VERSION } from '../src/utils/helpers.js';
 
-// Regresión: el flag 'chunk_reintentado' se borraba en cada montaje de la app,
+const claveReintento = `chunk_reintentado_${APP_VERSION}`;
+
+// Regresión: el flag de reintento se borraba en cada montaje de la app,
 // así que un chunk que fallaba (404 tras un deploy) provocaba un bucle de
 // recarga infinito: montar -> borrar flag -> fallar -> recargar -> montar...
 
@@ -46,12 +49,12 @@ describe('lazyConReintento', () => {
 
     await assert.rejects(() => cargarConReintento(falla), /chunk 404/);
     assert.equal(recargas, 1, 'debe recargar una vez');
-    assert.ok(storage.get('chunk_reintentado'), 'debe marcar el reintento');
+    assert.ok(storage.get(claveReintento), 'debe marcar el reintento para esta versión');
   });
 
   it('NO vuelve a recargar si ya se reintento en esta sesion', async () => {
     // Simula el estado tras una recarga: el flag sigue puesto.
-    storage.set('chunk_reintentado', String(Date.now()));
+    storage.set(claveReintento, String(Date.now()));
 
     const falla = async () => {
       throw new Error('chunk 404');
@@ -59,6 +62,12 @@ describe('lazyConReintento', () => {
 
     await assert.rejects(() => cargarConReintento(falla), /chunk 404/);
     assert.equal(recargas, 0, 'no debe recargar otra vez (seria un bucle)');
+  });
+
+  it('permite reintentar aunque exista una marca de una versión anterior', async () => {
+    storage.set('chunk_reintentado_2.18.11', String(Date.now()));
+    await assert.rejects(() => cargarConReintento(async () => { throw new Error('chunk 404'); }), /chunk 404/);
+    assert.equal(recargas, 1);
   });
 
   it('no entra en bucle tras varios intentos seguidos', async () => {

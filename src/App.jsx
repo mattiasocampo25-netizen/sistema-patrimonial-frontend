@@ -748,7 +748,7 @@ export default function App() {
   const [pendingCSVImport, setPendingCSVImport] = useState(null);
   // Dominio de funcionarios/padrón: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { setCurrentPaginaFuncionarios, isFuncionarioModalOpen, setIsFuncionarioModalOpen, funcionarioToEdit, isNewFuncionarioModalOpen, setIsNewFuncionarioModalOpen, isCSVPreviewOpen, setIsCSVPreviewOpen, csvPreviewData, setCsvPreviewData, searchFuncionarioInput, setSearchFuncionarioInput, funcionariosPurosDependencia, funcionariosPaginados, funcionariosConDatos, filtroCargo, setFiltroCargo, cargosFuncionarios, sincronizarBienesConPadron, handleFileUploadFuncionarios, executeProcessFuncionariosCSV, handleSaveManualFuncionario, confirmCSVImportFuncionarios, handleDeleteFuncionario, handleEditFuncionario, saveFuncionarioEdit, renderPaginationFuncionarios } = useFuncionarios({
-    funcionariosPadron, setFuncionariosPadron, dependenciaActual,
+    funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias,
     bienes, setBienes, fc10List, currentUser, isAdmin,
     notify: addToast, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
     setPendingCSVImport
@@ -814,7 +814,7 @@ useEffect(() => {
   // Ficha 360: la lee el realtime (H5) anterior a H8, vive en App.
   // Sincronización de datos: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { isOnline, colaOffline, notificaciones, setNotificaciones, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount, ultimoSyncBienes, isLoadingDocumentos } = useRealtimeSync({
-    notify: addToast, currentUser, setCurrentUser, dependenciaActual, activeTab, isAuthenticated, isAdmin,
+    notify: addToast, currentUser, setCurrentUser, dependenciaActual, setDependenciaActual, clearAllFilters, activeTab, isAuthenticated, isAdmin,
     handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
     setEstructurasDB, setUsuariosList, setFuncionariosPadron,
     setDbError, setIsLoading, setFichaBien

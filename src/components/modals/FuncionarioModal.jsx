@@ -1,11 +1,47 @@
 // src/components/modals/FuncionarioModal.jsx
 import FiltroCombo from '../FiltroCombo';
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Dialogo from '../ui/Dialogo';
-import { formatCI } from '../../utils/helpers';
+import { formatCI, normalizeStr } from '../../utils/helpers';
 
-export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, saveFuncionarioEdit, ubicaciones = [], STYLES }) {
+export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, saveFuncionarioEdit, dependencias = [], ubicaciones = [], ubicacionesTodas = [], STYLES }) {
+    const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState('');
+    const [ubicacionSeleccionada, setUbicacionSeleccionada] = useState('');
+    useEffect(() => {
+        setDependenciaSeleccionada(funcionarioToEdit?.dependencia || '');
+        setUbicacionSeleccionada(funcionarioToEdit?.ubicacion || '');
+    }, [funcionarioToEdit, isOpen]);
+
+    const opcionesDependencia = useMemo(() => {
+        const lista = [...dependencias];
+        if (funcionarioToEdit?.dependencia && !lista.some(nombre => normalizeStr(nombre) === normalizeStr(funcionarioToEdit.dependencia))) {
+            lista.push(funcionarioToEdit.dependencia);
+        }
+        return [...new Set(lista.filter(Boolean))].map(nombre => ({ label: nombre, value: nombre }));
+    }, [dependencias, funcionarioToEdit?.dependencia]);
+
+    const opcionesUbicacion = useMemo(() => {
+        const lista = ubicacionesTodas.length
+            ? ubicacionesTodas.filter(u => normalizeStr(u.dependencia) === normalizeStr(dependenciaSeleccionada)).map(u => u.nombre).filter(Boolean)
+            : normalizeStr(dependenciaSeleccionada) === normalizeStr(funcionarioToEdit?.dependencia) ? [...ubicaciones] : [];
+        if (ubicacionSeleccionada && !lista.some(nombre => normalizeStr(nombre) === normalizeStr(ubicacionSeleccionada))) {
+            lista.push(ubicacionSeleccionada);
+        }
+        return lista;
+    }, [ubicacionesTodas, ubicaciones, dependenciaSeleccionada, funcionarioToEdit?.dependencia, ubicacionSeleccionada]);
+
     if (!isOpen || !funcionarioToEdit) return null;
+
+    const elegirDependencia = (nombre) => {
+        setDependenciaSeleccionada(nombre);
+        const ubicacionValida = ubicacionesTodas.some(u =>
+            normalizeStr(u.dependencia) === normalizeStr(nombre) &&
+            normalizeStr(u.nombre) === normalizeStr(ubicacionSeleccionada)
+        );
+        if (normalizeStr(nombre) !== normalizeStr(funcionarioToEdit.dependencia) && !ubicacionValida) {
+            setUbicacionSeleccionada('');
+        }
+    };
 
     return (
         <Dialogo className={STYLES.modalOverlay}>
@@ -49,16 +85,25 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                         </div>
 
                         <div className="space-y-2">
+                            <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Dependencia</label>
+                            <FiltroCombo
+                                name="dependencia"
+                                valor={dependenciaSeleccionada}
+                                onElegir={elegirDependencia}
+                                opciones={opcionesDependencia}
+                                titulo="Dependencia del funcionario"
+                                etiquetaTodos="Seleccionar dependencia"
+                                required
+                            />
+                        </div>
+
+                        <div className="space-y-2">
                             <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Ubicación asignada</label>
                             <FiltroCombo
                                 name="ubicacion"
-                                valor={funcionarioToEdit.ubicacion || ''}
-                                opciones={[
-                                    ...ubicaciones,
-                                    ...(funcionarioToEdit.ubicacion && !ubicaciones.includes(funcionarioToEdit.ubicacion)
-                                        ? [{ label: `${funcionarioToEdit.ubicacion} (actual)`, value: funcionarioToEdit.ubicacion }]
-                                        : []),
-                                ]}
+                                valor={ubicacionSeleccionada}
+                                onElegir={setUbicacionSeleccionada}
+                                opciones={opcionesUbicacion}
                                 etiquetaTodos="Sin ubicación asignada"
                                 titulo="Ubicación asignada"
                             />

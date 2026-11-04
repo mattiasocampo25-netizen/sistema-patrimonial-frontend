@@ -213,7 +213,9 @@ export default function AppModals({
         onClose={() => setIsFuncionarioModalOpen(false)}
         funcionarioToEdit={funcionarioToEdit}
         saveFuncionarioEdit={saveFuncionarioEdit}
+        dependencias={todasDependencias?.length ? todasDependencias : DEPENDENCIAS_UNP}
         ubicaciones={ubicacionesDep}
+        ubicacionesTodas={ubicacionesList || []}
         STYLES={STYLES}
     />
           <ScannerModal

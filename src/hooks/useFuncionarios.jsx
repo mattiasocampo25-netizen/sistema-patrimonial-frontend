@@ -17,7 +17,7 @@ export const ITEMS_POR_PAGINA_FUNCS = 20;
 // - setItemToDelete: modal de borrado. fileInputFuncionariosRef: input oculto.
 // - setPendingCSVImport: staging del CSV de bienes (vive en App, se comparte).
 export function useFuncionarios({
-  funcionariosPadron, setFuncionariosPadron, dependenciaActual,
+  funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias = [],
   bienes, setBienes, fc10List, _currentUser, isAdmin,
   notify, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
   setPendingCSVImport
@@ -358,28 +358,37 @@ export function useFuncionarios({
       setIsFuncionarioModalOpen(true);  
     };  
   
-    const saveFuncionarioEdit = async (e) => {  
-      e.preventDefault();  
-      const formData = new FormData(e.target);  
-      const nuevoNombre = formData.get('nombre').trim();  
-      const nuevoCargo = formData.get('cargo').trim();  
-      const nuevaUbicacion = String(formData.get('ubicacion') || '').trim();  
-    
-      try {  
-          const { error } = await supabase  
-            .from('funcionarios')  
-            .update({ nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion })  
-            .eq('id', funcionarioToEdit.id);  
-    
-          if (error) throw error;  
-          setFuncionariosPadron(prev => prev.map(f => f.id === funcionarioToEdit.id ? { ...f, nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion } : f));  
-          notify("Funcionario actualizado exitosamente", "success");  
-          setIsFuncionarioModalOpen(false);  
-      } catch {  
-          notify("Error al actualizar el funcionario", "error");  
-      }  
-    };  
-  
+    const saveFuncionarioEdit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const nuevoNombre = String(formData.get('nombre') || '').trim();
+      const nuevoCargo = String(formData.get('cargo') || '').trim();
+      const nuevaUbicacion = String(formData.get('ubicacion') || '').trim();
+      const dependenciaIngresada = String(formData.get('dependencia') || '').trim();
+      const dependenciaCatalogada = todasDependencias.find(nombre => normalizeStr(nombre) === normalizeStr(dependenciaIngresada));
+      const nuevaDependencia = dependenciaCatalogada || (
+        normalizeStr(dependenciaIngresada) === normalizeStr(funcionarioToEdit?.dependencia)
+          ? funcionarioToEdit.dependencia
+          : ''
+      );
+      if (!nuevaDependencia) {
+        notify('Selecciona una dependencia válida del catálogo.', 'warning');
+        return;
+      }
+      try {
+          const { error } = await supabase
+            .from('funcionarios')
+            .update({ nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion, dependencia: nuevaDependencia })
+            .eq('id', funcionarioToEdit.id);
+          if (error) throw error;
+          setFuncionariosPadron(prev => prev.map(f => f.id === funcionarioToEdit.id ? { ...f, nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion, dependencia: nuevaDependencia } : f));
+          notify("Funcionario actualizado exitosamente", "success");
+          setIsFuncionarioModalOpen(false);
+      } catch {
+          notify("Error al actualizar el funcionario", "error");
+      }
+    };
+
     const renderPaginationFuncionarios = () => (
       <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-4 border-t border-line dark:border-line shrink-0 bg-surface-1 dark:bg-surface-1">
         <span className="text-sm text-content-3 font-medium">

@@ -28,7 +28,7 @@ import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../uti
 //   setUsuariosList, setFuncionariosPadron, setDbError, setIsLoading,
 //   setFichaBien: setters que viven en App.
 export function useRealtimeSync({
-  notify, currentUser, setCurrentUser, dependenciaActual, activeTab, isAuthenticated, isAdmin,
+  notify, currentUser, setCurrentUser, dependenciaActual, setDependenciaActual, clearAllFilters, activeTab, isAuthenticated, isAdmin,
   handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
   setEstructurasDB, setUsuariosList, setFuncionariosPadron,
   setDbError, setIsLoading, setFichaBien
@@ -193,6 +193,23 @@ export function useRealtimeSync({
           setCurrentUser(actualizado);
           try { localStorage.setItem('current_user', JSON.stringify(actualizado)); } catch { /* ignore */ }
         }
+
+        // La dependencia efectiva de un usuario normal debe seguir el perfil
+        // autoritativo de `usuarios`. Si un admin reasigna al funcionario
+        // mientras su sesión sigue abierta, el inventario previo queda activo
+        // hasta el próximo inicio de sesión y aparenta estar incompleto.
+        if (!isAdmin && dbUser.dependencia &&
+            normalizeStr(dependenciaActual) !== normalizeStr(dbUser.dependencia)) {
+          // La caché está separada por dependencia, pero pudo haberse creado
+          // antes de la reasignación o con una carga incompleta. Rehacer una
+          // descarga completa una sola vez evita conservar un total viejo.
+          try { await localforage.removeItem(`bienes_meta_${dbUser.dependencia}`); } catch {}
+          if (clearAllFilters) clearAllFilters();
+          setDependenciaActual(dbUser.dependencia);
+          // El cambio de dependencia inicia una carga nueva con su propio
+          // turno; no consultes esta vez la dependencia anterior.
+          return;
+        }
       }
     // --- FIN DE VALIDACIÓN DE ROL ---
 
@@ -222,7 +239,19 @@ export function useRealtimeSync({
         // mientras llega la sincronización para evitar una pantalla vacía al
         // iniciar o al volver a una dependencia conocida.
         if (Array.isArray(cacheBienes) && cacheBienes.length > 0 && turnoVigente()) setBienes(cacheBienes);
-        const descargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes);
+        // Conteo ligero (sin transferir registros) para detectar cachés que
+        // quedaron parciales en equipos concretos. Si el servidor informa más
+        // filas que el navegador, se reconstruye la caché con la paginación.
+        let cantidadRemota = null;
+        try {
+          const { count, error } = await supabase.from('bens')
+            .select('id', { count: 'exact', head: true })
+            .eq('data->>dependencia', dependenciaActual);
+          if (!error && Number.isInteger(count)) cantidadRemota = count;
+        } catch {}
+        const cacheIncompleta = Array.isArray(cacheBienes) && cantidadRemota !== null
+          && cacheBienes.length !== cantidadRemota;
+        const descargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes) || cacheIncompleta;
 
         // Inicia las consultas de actas y catálogos junto con la descarga de
         // bienes. Antes empezaban después de bajar el inventario completo, lo
@@ -383,7 +412,7 @@ export function useRealtimeSync({
         // no debe apagar el estado de carga de la que está realmente corriendo.
         if (guardaGen.vigente(turno)) setIsLoading(false);
     }
-  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser,
+  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser, setDependenciaActual, clearAllFilters, isAdmin,
     queryNotificacionesAcotadas,
     setBienes, setFc10List, setFc11List, setFc04List, setEstructurasDB,
     setUsuariosList, setFuncionariosPadron, setIsLoading, setDbError,

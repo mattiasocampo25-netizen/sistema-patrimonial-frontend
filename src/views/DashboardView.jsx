@@ -130,6 +130,12 @@ export default function DashboardView({
     .sort((a, b) => (a.pendiente.orden - b.pendiente.orden)
       || String(a.fc.entregadoFecha || '').localeCompare(String(b.fc.entregadoFecha || ''))), [fc10List, bienes]);
 
+  const bienesSinFuncionario = Number((pendientes || []).find(p => p.id === 'sinFuncionario')?.count) || 0;
+  const bienesVinculadosFuncionario = Math.max(0, (Number(stats?.totalItems) || 0) - bienesSinFuncionario);
+  const porcentajeVinculadoFuncionario = stats?.totalItems
+    ? (bienesVinculadosFuncionario / stats.totalItems) * 100
+    : 0;
+
   const irInventario = (aplicar) => {
     clearAllFilters();
     if (aplicar) aplicar();
@@ -506,7 +512,7 @@ export default function DashboardView({
             <span className="text-[10px] font-bold text-content-3 uppercase tracking-wider bg-surface-3 dark:bg-surface-1/5 px-2.5 py-1 rounded-lg border border-line dark:border-white/5">Metas</span>
           </div>
 
-          <div className="flex flex-1 flex-col gap-8 justify-center">
+          <div className="flex flex-1 flex-col gap-6 justify-center">
             <div>
               <div className="flex justify-between items-end mb-3">
                 <div>
@@ -517,6 +523,20 @@ export default function DashboardView({
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
                 <div className="h-full bg-emerald-500 rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-end mb-3">
+                <div>
+                  <p className="text-xs font-bold text-content-1 dark:text-white uppercase tracking-wider">Asignación a funcionarios</p>
+                  <p className="text-[11px] text-content-3 font-medium mt-1">{bienesVinculadosFuncionario.toLocaleString('es-PY')} de {Number(stats.totalItems || 0).toLocaleString('es-PY')} bienes activos vinculados a funcionario</p>
+                  <p className="text-[10px] text-content-3 mt-0.5">Basado en el responsable del inventario; independiente del FC-10.</p>
+                </div>
+                <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{porcentajeVinculadoFuncionario.toFixed(1)}%</span>
+              </div>
+              <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
+                <div className="h-full bg-info rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-info/40" style={{ width: `${Math.max(1.5, porcentajeVinculadoFuncionario)}%` }}></div>
               </div>
             </div>
 

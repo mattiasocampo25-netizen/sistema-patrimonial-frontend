@@ -258,7 +258,11 @@ export function useRealtimeSync({
         while (keepFetchingBienes) {
           let query = supabase
             .from('bens')
-            .select('id, data, updated_at');
+            .select('id, data, updated_at')
+            // La dependencia se filtra en Postgres antes de paginar: un admin
+            // no necesita descargar el inventario completo de toda la UNP al
+            // cambiar de sección. El índice idx_bens_dependencia acelera esto.
+            .eq('data->>dependencia', dependenciaActual);
 
           const { data: batch, error } = await query.order('id', { ascending: true }).range(from, to);
 
@@ -279,17 +283,7 @@ export function useRealtimeSync({
         }
 
         if (errorCargaBienes) throw errorCargaBienes;
-        // Filtrar en cliente con la misma normalización del desglose. El
-        // filtro JSONB exacto en PostgREST excluía diferencias de mayúsculas,
-        // tildes o espacios que el contador por dependencia sí acepta.
-        const filasDependencia = todosLosNuevosBienes.filter(row => {
-          try {
-            const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
-            return normalizeStr(data.dependencia || '') === normalizeStr(dependenciaActual || '');
-          } catch { return false; }
-        });
-
-        const { lista: inventarioFinal, maxUpdatedAt } = fusionarBienes([], filasDependencia, dependenciaActual);
+        const { lista: inventarioFinal, maxUpdatedAt } = fusionarBienes([], todosLosNuevosBienes, dependenciaActual);
         if (inventarioFinal.length > 0) {
           await localforage.setItem(CACHE_BIENES, inventarioFinal);
           // Si ninguna fila trae sello (datos legacy), el punto de sync es "ahora":
@@ -315,6 +309,7 @@ export function useRealtimeSync({
           const cambios = [];
           for (let desde = 0; ; desde += 1000) {
             const pagina = await supabase.from('bens').select('id, data, updated_at')
+              .eq('data->>dependencia', dependenciaActual)
               .gt('updated_at', metaBienes.updated_at)
               .order('updated_at', { ascending: true }).order('id', { ascending: true })
               .range(desde, desde + 999);
@@ -322,11 +317,7 @@ export function useRealtimeSync({
             cambios.push(...(pagina.data || []));
             if (!pagina.data || pagina.data.length < 1000) break;
           }
-          const filasCambiosDependencia = cambios.filter(row => {
-            const data = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
-            return normalizeStr(data.dependencia || '') === normalizeStr(dependenciaActual || '');
-          });
-          const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, filasCambiosDependencia, dependenciaActual);
+          const { lista, maxUpdatedAt } = fusionarBienes(cacheBienes, cambios, dependenciaActual);
           await localforage.setItem(CACHE_BIENES, lista);
           const fechaSync = Date.now();
           await localforage.setItem(META_BIENES, { version: BIENES_SYNC_VERSION, updated_at: maxUpdatedAt || metaBienes.updated_at, actualizadoEn: fechaSync });

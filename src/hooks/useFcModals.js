@@ -533,6 +533,25 @@ export function useFcModals({
     const funcNombre = String(formData.get('funcionario') ?? '').trim();
     let funcDoc = formData.get('funcionarioDoc')?.trim() || '';
     let funcCargo = formData.get('funcionarioCargo')?.trim() || '';
+    let funcionarioAlternativo = String(formData.get('funcionarioAlternativo') ?? '').trim();
+    let funcionarioAlternativoDoc = String(formData.get('funcionarioAlternativoDoc') ?? '').trim();
+    let funcionarioAlternativoCargo = String(formData.get('funcionarioAlternativoCargo') ?? '').trim();
+
+    // El segundo responsable es solo una referencia operativa por turnos en
+    // facultades; no constituye una segunda asignación FC-10.
+    if (!normalizeStr(dependenciaActual).startsWith('FACULTAD')) {
+        funcionarioAlternativo = '';
+        funcionarioAlternativoDoc = '';
+        funcionarioAlternativoCargo = '';
+    } else if (funcionarioAlternativo && (
+        normalizeStr(funcionarioAlternativo) === normalizeStr(funcNombre) ||
+        (funcionarioAlternativoDoc && funcDoc && funcionarioAlternativoDoc.replace(/\D/g, '') === funcDoc.replace(/\D/g, ''))
+    )) {
+        notify('El responsable alternativo debe ser una persona distinta del custodio principal.', 'warning');
+        setIsSaving(false);
+        setIsProcessing({ active: false, text: '' });
+        return false;
+    }
 
     if (funcNombre) {
         const matchPadron = funcionariosPadron.find(f => 
@@ -543,6 +562,24 @@ export function useFcModals({
             funcDoc = matchPadron.cedula;
             funcCargo = matchPadron.cargo || funcCargo;
         }
+    }
+    if (funcionarioAlternativo) {
+        const matchAlternativo = funcionariosPadron.find(f =>
+            normalizeStr(f.nombre) === normalizeStr(funcionarioAlternativo) ||
+            String(f.cedula || '').trim() === funcionarioAlternativoDoc.replace(/\./g, '')
+        );
+        if (!matchAlternativo) {
+            notify('Selecciona al funcionario alternativo del padrón de esta facultad.', 'warning');
+            setIsSaving(false);
+            setIsProcessing({ active: false, text: '' });
+            return false;
+        }
+        funcionarioAlternativo = matchAlternativo.nombre;
+        funcionarioAlternativoDoc = matchAlternativo.cedula || funcionarioAlternativoDoc;
+        funcionarioAlternativoCargo = matchAlternativo.cargo || funcionarioAlternativoCargo;
+    } else {
+        funcionarioAlternativoDoc = '';
+        funcionarioAlternativoCargo = '';
     }
     
     // Duplicado: bienEditing sin id se trata como alta nueva.
@@ -561,6 +598,9 @@ export function useFcModals({
         funcionario: funcNombre, 
         funcionarioDoc: funcDoc, 
         funcionarioCargo: funcCargo, 
+        funcionarioAlternativo,
+        funcionarioAlternativoDoc,
+        funcionarioAlternativoCargo,
         ubicacion: String(formData.get('ubicacion') ?? '').trim(), 
         estadoConservacion: formData.get('estadoConservacion') || 'Muy bueno', 
         vidaUtil: formData.get('vidaUtil') || '', 

@@ -475,6 +475,7 @@ export default function AppModals({
             isSaving={isSaving}
             ESTADOS_CONSERVACION={ESTADOS_CONSERVACION}
             ubicacionesUnicas={ubicacionesUnicas}
+            dependenciaActual={dependenciaActual}
             STYLES={STYLES}
             funcionariosPadron={padronDep}
             ubicaciones={ubicacionesDep}

@@ -313,10 +313,12 @@ useEffect(() => {
 
   const funcionariosUnicos = useMemo(() => {
       const funcMap = new Map();
-      bienesDependencia.filter(b => b.funcionario && String(b.funcionario).trim() !== "").forEach(b => {
-          const val = String(b.funcionario).trim();
+      bienesDependencia.forEach(b => {
+        [b.funcionario, b.funcionarioAlternativo].filter(val => val && String(val).trim()).forEach(nombre => {
+          const val = String(nombre).trim();
           const key = normalizeStr(val);
           if(!funcMap.has(key)) funcMap.set(key, val);
+        });
       });
       return Array.from(funcMap.values()).sort();
   }, [bienesDependencia]);
@@ -403,7 +405,7 @@ useEffect(() => {
     // Compara ignorando mayúsculas, tildes y espacios extra (antes el ===
     // exacto partía los resultados si el nombre tenía variantes de carga)
     let filtered = [...bienesDependencia];
-    if (filtroFuncionario) filtered = filtered.filter(b => normalizeStr(b.funcionario || '') === normalizeStr(filtroFuncionario));
+    if (filtroFuncionario) filtered = filtered.filter(b => [b.funcionario, b.funcionarioAlternativo].some(nombre => normalizeStr(nombre || '') === normalizeStr(filtroFuncionario)));
     if (filtroUbicacion) filtered = filtered.filter(b => normalizeStr(b.ubicacion || '') === normalizeStr(filtroUbicacion));
     if (filtroAnio) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).year === filtroAnio);
     if (filtroMes) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).month === filtroMes);

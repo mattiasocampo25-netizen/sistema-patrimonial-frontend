@@ -519,9 +519,9 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
   };
 
   const handleDownloadTemplateCSV = () => {
-      const csvContent = "\uFEFFCuenta Mayor;Sub-Cuenta;Analítico 1;Analítico 2;Descripción General;Fecha Adquisición (YYYY-MM-DD);Nº Rótulo;Valor Unitario (Sin puntos);Vida útil (Años)\n" +
-                          "2.6.1.01;01;01;01;\"Computadora HP i5\";2023-01-15;10001;4500000;5\n" +
-                          ";;;;\"Escritorio de Madera\";2022-11-10;10002;1200000;10";
+      const csvContent = "\uFEFFCuenta Mayor;Sub-Cuenta;Analítico 1;Analítico 2;Descripción General;Fecha Adquisición (YYYY-MM-DD);Nº Rótulo;Valor Unitario (Sin puntos);Vida útil (Años);Funcionario Alternativo (opcional, facultades)\n" +
+                          "2.6.1.01;01;01;01;\"Computadora HP i5\";2023-01-15;10001;4500000;5;\n" +
+                          ";;;;\"Escritorio de Madera\";2022-11-10;10002;1200000;10;";
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       if (window.saveAs) window.saveAs(blob, "Plantilla_Carga_Masiva_Bienes.csv");
       notify("Plantilla Excel (CSV) base descargada", "success");
@@ -645,13 +645,13 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
       setIsProcessing({ active: true, text: 'Generando Reporte Excel...' });
       setTimeout(async () => {
-          let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
+          let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
           const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
           registros.forEach(b => {
               const row = [
                   b.cuenta || '-', b.subcuenta || '-', b.analitico1 || '-', b.analitico2 || '-',
                   b.rotulo || '-', b.descripcion || '',
-                  b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-',
+                  b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-', b.funcionarioAlternativo || '-',
                   formatDateText(b.fechaAdquisicion) || '-', b.valorUnitario || '0',
                   b.estadoConservacion || '-', b.vidaUtil || '-',
                   b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
@@ -663,9 +663,18 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
             const sufijo = registros.length !== filteredBienes.length ? '_Seleccion' : '';
             const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
             if (nombre) window.saveAs(blob, nombre);
+            else { setIsProcessing({ active: false, text: '' }); return; }
+          } else {
+            const nombre = `Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.csv`;
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = nombre;
+            anchor.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
           }
           setIsProcessing({ active: false, text: '' });
-          notify("Reporte Excel descargado exitosamente", "success");
+          notify(`CSV descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, "success");
       }, 100);
   };
 
@@ -681,6 +690,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
                   'Rótulo': b.rotulo || '-', 'Descripción': b.descripcion || '-',
                   'Dependencia': b.dependencia || '-', 'Ubicación': b.ubicacion || '-',
                   'Funcionario': b.funcionario || '-',
+                  'Funcionario alternativo (sin FC-10 propio)': b.funcionarioAlternativo || '-',
                   'Fecha Adquisición': formatDateText(b.fechaAdquisicion) || '-',
                   'Valor Unitario (Gs.)': parseInt(String(b.valorUnitario || '0').replace(/\D/g, ''), 10) || 0,
                   'Estado': b.estadoConservacion || '-', 'Vida Útil': b.vidaUtil || '-',
@@ -688,7 +698,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               }));
               const wb = window.XLSX.utils.book_new();
               const ws = window.XLSX.utils.json_to_sheet(filas);
-              ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 55 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 16 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 8 }, { wch: 8 }];
+              ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 55 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 34 }, { wch: 16 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 8 }, { wch: 8 }];
               ws['!autofilter'] = { ref: ws['!ref'] };
               const totalValor = filas.reduce((a, r) => a + (r['Valor Unitario (Gs.)'] || 0), 0);
               const porEstado = {};
@@ -708,7 +718,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               window.XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
               const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.xlsx`);
               if (nombre) window.XLSX.writeFile(wb, nombre);
-              notify("Excel generado exitosamente", "success");
+              notify(`Excel descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, "success");
           } catch {
               notify("Error al generar el Excel.", "error");
           } finally {

@@ -12,6 +12,7 @@ export default function CompararBienesModal({ bienes = [], onClose, STYLES }) {
     ['Cuenta', b => [b.cuenta, b.subcuenta, b.analitico1, b.analitico2].filter(Boolean).join(' · ') || '-'],
     ['Valor (Gs.)', b => (b.valorUnitario ? formatCurrency(b.valorUnitario) : '-')],
     ['Custodio', b => b.funcionario || 'Sin asignación'],
+    ['Responsable alternativo por turnos', b => b.funcionarioAlternativo || 'No indicado'],
     ['Ubicación', b => b.ubicacion || 'Sin ubicación'],
     ['Estado', b => b.estadoConservacion || '-'],
     ['Adquisición', b => (b.fechaAdquisicion ? formatDateText(b.fechaAdquisicion) : '-')],

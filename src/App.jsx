@@ -90,6 +90,17 @@ function CargaModulo() {
   );
 }
 
+function AccesoModuloRestringido({ volver }) {
+  return (
+    <section role="alert" className="mx-auto my-8 w-full max-w-xl rounded-panel border border-warn/25 bg-surface-1 p-8 text-center shadow-card">
+      <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-panel bg-warn-soft text-warn"><i className="fa-solid fa-lock text-xl" aria-hidden="true" /></span>
+      <h1 className="mt-4 text-xl font-bold text-content-1">Acceso restringido</h1>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-content-2">Tu cuenta no tiene permiso para abrir este módulo. Si necesitas acceso, solicita al administrador que revise tu rol.</p>
+      <button type="button" onClick={volver} className="mt-5 inline-flex h-10 items-center gap-2 rounded-control bg-brand px-4 text-sm font-semibold text-content-inverse hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-arrow-left" aria-hidden="true" />Volver al panel</button>
+    </section>
+  );
+}
+
 export default function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const publicBienId = urlParams.get('id') || urlParams.get('bienId');
@@ -167,7 +178,43 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
-  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(window.location.search).get('tab') === 'inventario' ? 'inventario' : 'dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    return ['dashboard', 'resumen', 'inventario', 'funcionarios', 'fc04', 'fc10', 'fc11', 'aprobaciones', 'auditoria', 'usuarios', 'anuncios', 'ayuda'].includes(tab) ? tab : 'dashboard';
+  });
+  // Mantiene el módulo en la URL para que actualizar/compartir conserve el
+  // contexto y para que Atrás/Adelante recorran las secciones visitadas.
+  const tabUrlInicializada = useRef(false);
+  useEffect(() => {
+    if (publicBienId || publicShareToken) return undefined;
+    const sincronizarTabDesdeUrl = () => {
+      const tab = new URLSearchParams(window.location.search).get('tab');
+      if (tab && ['dashboard', 'resumen', 'inventario', 'funcionarios', 'fc04', 'fc10', 'fc11', 'aprobaciones', 'auditoria', 'usuarios', 'anuncios', 'ayuda'].includes(tab)) {
+        setActiveTab(tab);
+      } else if (!tab) {
+        setActiveTab('dashboard');
+      }
+    };
+    window.addEventListener('popstate', sincronizarTabDesdeUrl);
+    return () => window.removeEventListener('popstate', sincronizarTabDesdeUrl);
+  }, [publicBienId, publicShareToken]);
+  useEffect(() => {
+    if (publicBienId || publicShareToken) return;
+    const url = new URL(window.location.href);
+    const tabEnUrl = url.searchParams.get('tab');
+    if (tabEnUrl === activeTab) {
+      tabUrlInicializada.current = true;
+      return;
+    }
+    if (!tabUrlInicializada.current) {
+      tabUrlInicializada.current = true;
+      url.searchParams.set('tab', activeTab);
+      window.history.replaceState({ ...window.history.state, tab: activeTab }, '', url);
+      return;
+    }
+    url.searchParams.set('tab', activeTab);
+    window.history.pushState({ ...window.history.state, tab: activeTab }, '', url);
+  }, [activeTab, publicBienId, publicShareToken]);
   const [isLoading, setIsLoading] = useState(true);
   // Modo mantenimiento: aviso global que bloquea el uso para todos
   // Aviso "Sistema Actualizado": una vez por versión, para todo usuario autenticado
@@ -1785,6 +1832,9 @@ if (publicBienId) {
                 {activeTab === 'fc10' && (<Fc10View filteredFC10={filteredFC10} conteosFC10PorMes={conteosFC10PorMes} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} setIsConsolidatedFC10ModalOpen={setIsConsolidatedFC10ModalOpen} handleExportFC10CSV={handleExportFC10CSV} handleBulkFC10Zip={handleBulkFC10Zip} isLoading={isLoading} bienes={bienes} handleGenerateFC10PDF={handleGenerateFC10PDF} openFC10Modal={openFC10Modal} openFichaBien={openFichaBien} isAdmin={isAdmin} setItemToDelete={setItemToDelete} setActiveTab={setActiveTab} registrarFirmaFC10={firmarConBloqueo} registrarAmbasFirmas={firmarAmbasConBloqueo} firmandoId={firmandoId} ponerFC10EnTramite={ponerEnTramiteConBloqueo} poniendoEnTramite={poniendoEnTramite} actualizarEstadoFirma={actualizarEstadoFirma} currentUser={currentUser} />)}
                 {activeTab === 'fc11' && (<Fc11View filteredFC11={filteredFC11} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} STYLES={STYLES} handleExportFC11CSV={handleExportFC11CSV} isLoading={isLoading || isLoadingDocumentos} dependenciaActual={dependenciaActual} handleGenerateFC11PDF={handleGenerateFC11PDF} openFC11Modal={openFC11Modal} bienes={bienes} isAdmin={isAdmin} setItemToDelete={setItemToDelete} registrarFirmasFC11={registrarFirmasFC11} registrandoFirmasFC11={isSaving} />)}
                 {activeTab === 'ayuda' && (<AyudaView setTourPaso={setTourPaso} STYLES={STYLES} version={versionApp} />)}
+                {(['aprobaciones', 'auditoria', 'usuarios'].includes(activeTab) && !isAdmin) || (activeTab === 'anuncios' && !esDesarrollador)
+                  ? <AccesoModuloRestringido volver={() => setActiveTab('dashboard')} />
+                  : null}
             </div>
             </Suspense>
       </AppShell>

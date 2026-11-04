@@ -14,6 +14,7 @@ export const ALIAS_COLUMNAS_BIENES = {
   fechaAdquisicion: ['FECHA ADQUISICIÓN (YYYY-MM-DD)', 'FECHA ADQUISICION', 'FECHA ADQUISICIÓN', 'FECHA'],
   valorUnitario: ['VALOR UNITARIO (SIN PUNTOS)', 'VALOR UNITARIO', 'VALOR', 'PRECIO', 'COSTO'],
   vidaUtil: ['VIDA ÚTIL (AÑOS)', 'VIDA ATIL (AÑOS)', 'VIDA ÚTIL', 'VIDA UTIL', 'VIDA'],
+  funcionarioAlternativo: ['FUNCIONARIO ALTERNO', 'FUNCIONARIO ALTERNATIVO', 'RESPONSABLE ALTERNATIVO', 'CUSTODIO ALTERNATIVO'],
 };
 
 const normHeader = (value) => normalizeStr(String(value ?? '').replace(/^\uFEFF/, '').trim());
@@ -190,7 +191,7 @@ export const mapearFilasBienes = (rows, fields, bienes, dependenciaActual, corre
       descripcion: val(row, 'descripcion', linea),
       fechaAdquisicion: val(row, 'fechaAdquisicion', linea),
       valorUnitario: val(row, 'valorUnitario', linea), vidaUtil: val(row, 'vidaUtil', linea),
-      funcionario: '', ubicacion: '', hasFC10: false, hasQR: false,
+      funcionario: '', funcionarioAlternativo: normalizeStr(dependenciaActual).startsWith('FACULTAD') ? val(row, 'funcionarioAlternativo', linea) : '', ubicacion: '', hasFC10: false, hasQR: false,
       estadoConservacion: 'Muy bueno'
     };
     const rowErrors = [];

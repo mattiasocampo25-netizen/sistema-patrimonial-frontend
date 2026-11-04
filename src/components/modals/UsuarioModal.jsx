@@ -1,12 +1,19 @@
 // src/components/modals/UsuarioModal.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Dialogo from '../ui/Dialogo';
 import FiltroCombo from '../FiltroCombo';
 
 const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
 
 export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsuario, todasDependencias, esDesarrollador, STYLES }) {
+    const [rolSeleccionado, setRolSeleccionado] = useState(usuarioEditing?.cargo || 'user');
+    useEffect(() => { setRolSeleccionado(usuarioEditing?.cargo || 'user'); }, [usuarioEditing, isOpen]);
     if (!isOpen) return null;
+    const permisosPorRol = {
+      user: ['Gestionar bienes y funcionarios de su dependencia', 'Crear y consultar formularios FC-04, FC-10 y FC-11', 'Enviar solicitudes para revisión administrativa'],
+      admin: ['Gestionar bienes y movimientos de las dependencias', 'Revisar solicitudes e informes administrativos', 'Administrar usuarios, catálogos y auditoría'],
+      desarrollador: ['Incluye permisos de administrador', 'Gestionar avisos y mantenimiento del sistema']
+    };
 
     return (
         <Dialogo className={STYLES.modalOverlay}>
@@ -77,9 +84,14 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                       { label: 'Administrador General (control total)', value: 'admin' },
                       ...(esDesarrollador ? [{ label: 'Desarrollador del sistema', value: 'desarrollador' }] : []),
                     ]}
+                    onElegir={setRolSeleccionado}
                     etiquetaTodos="Funcionario Local"
                     titulo="Rol de sistema"
                   />
+                  <div className="mt-2 rounded-control border border-line bg-surface-2 px-3 py-2.5" aria-live="polite">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">Permisos que tendrá este usuario</p>
+                    <ul className="mt-1.5 space-y-1">{(permisosPorRol[rolSeleccionado] || permisosPorRol.user).map(permiso => <li key={permiso} className="flex items-start gap-1.5 text-[11px] text-content-2"><i className="fa-solid fa-check mt-0.5 text-ok" aria-hidden="true" />{permiso}</li>)}</ul>
+                  </div>
                 </div>
 
                 <div>

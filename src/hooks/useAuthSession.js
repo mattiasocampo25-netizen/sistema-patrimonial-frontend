@@ -185,6 +185,7 @@ useEffect(() => {
   if (!isAuthenticated) return;
 
   let inactivityTimer;
+  let warningTimer;
   vencimientoProcesadoRef.current = false;
 
   const handleInactivityLogout = () => {
@@ -201,6 +202,14 @@ useEffect(() => {
     }
     registrarActividadLocal();
     if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (warningTimer) clearTimeout(warningTimer);
+    warningTimer = setTimeout(() => {
+      if (sesionLocalExpirada()) return;
+      notify('Tu sesión se cerrará pronto por inactividad. Guarda tu trabajo y continúa usando el sistema para mantenerla activa.', 'warning', {
+        duration: 50000,
+        action: { label: 'Mantener sesión', onClick: resetTimer }
+      });
+    }, Math.max(0, INACTIVITY_LIMIT_MS - 60000));
     inactivityTimer = setTimeout(handleInactivityLogout, INACTIVITY_LIMIT_MS);
   };
 
@@ -212,6 +221,7 @@ useEffect(() => {
 
   return () => {
     if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (warningTimer) clearTimeout(warningTimer);
     events.forEach(event => window.removeEventListener(event, resetTimer));
     document.removeEventListener('visibilitychange', resetTimer);
   };

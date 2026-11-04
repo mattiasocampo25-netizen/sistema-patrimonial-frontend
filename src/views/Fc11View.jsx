@@ -73,6 +73,14 @@ export default function Fc11View({
               const esSalida = depRemitente === dependenciaActual;
               const esPendiente = fc.estado === 'PENDIENTE_FIRMAS';
               const esLegado = !fc.estado;
+              const snapshotBienes = fc.bienesSnapshot?.length ? fc.bienesSnapshot : [fc.bienSnapshot].filter(Boolean);
+              const bienesConDatosCambiados = snapshotBienes.filter(snapshot => {
+                const actual = bienes.find(b => String(b.id) === String(snapshot.id || fc.bienId));
+                if (!actual) return false;
+                return ['rotulo', 'descripcion', 'funcionario', 'ubicacion', 'estadoConservacion'].some(campo =>
+                  String(actual[campo] || '').trim() !== String(snapshot[campo] || '').trim()
+                );
+              });
               return (
                 <div key={fc.id} className={`${STYLES.card} p-6 flex flex-col hover:border-brand/50 motion group relative overflow-hidden`}>
                   <div className={`absolute top-0 left-0 w-full h-1 ${esSalida ? 'bg-zinc-500' : 'bg-brand'}`}></div>
@@ -99,6 +107,7 @@ export default function Fc11View({
                       <i className={`fa-solid ${esPendiente ? 'fa-file-signature' : 'fa-circle-check'}`} aria-hidden="true" />
                       {esPendiente ? 'Pendiente de firma de recepción' : esLegado ? 'Registro anterior al seguimiento de firmas' : 'Recepción firmada · archivada'}
                     </div>
+                    {esPendiente && bienesConDatosCambiados.length > 0 && <div role="status" className="mb-3 rounded-control border border-warn/25 bg-warn-soft px-3 py-2 text-[11px] leading-relaxed text-warn"><i className="fa-solid fa-triangle-exclamation mr-1.5" aria-hidden="true" />{bienesConDatosCambiados.length} bien{bienesConDatosCambiados.length === 1 ? '' : 'es'} cambió desde que se registró este FC-11. Verifica rótulo, custodio, ubicación y estado antes de firmar.</div>}
                     <ol aria-label="Progreso del FC-11" className="mb-3 grid grid-cols-4 gap-1 text-center text-[9px] font-semibold text-content-3">
                       {['Registro', 'PDF', 'Firma', 'Archivo'].map((paso, i) => <li key={paso} className={`rounded px-1 py-1 ${esPendiente ? i === 0 ? 'bg-brand-soft text-brand-text' : 'bg-surface-2' : 'bg-ok-soft text-ok'}`}>{i + 1}. {paso}</li>)}
                     </ol>
@@ -106,11 +115,11 @@ export default function Fc11View({
                        <p className="text-xs text-content-3 dark:text-content-3"><span className="font-bold text-content-1 dark:text-zinc-100">{esSalida ? 'Hacia:' : 'Desde:'}</span> {esSalida ? depDestinataria : depRemitente}</p>
                     </div>
                     <div className="mt-auto max-h-40 overflow-y-auto bg-surface-2/80 dark:bg-surface-2/80 p-3.5 rounded-control border border-line/60 dark:border-line">
-                      {(fc.bienesSnapshot?.length ? fc.bienesSnapshot : [fc.bienSnapshot]).filter(Boolean).map((bien, index) => <div key={bien.id || index} className="py-1.5">
+                      {snapshotBienes.map((bien, index) => <div key={bien.id || index} className="py-1.5">
                         <p className="text-xs font-bold text-content-1 dark:text-zinc-100 mb-1 font-mono"><i className="fa-solid fa-tag text-content-3 mr-1.5"></i> {bien.rotulo || 'Sin rótulo'}</p>
                         <p className="text-xs text-content-3 dark:text-content-3 line-clamp-1">{bien.descripcion || 'Especificación omitida'} · Estado: {bien.estadoConservacion || 'Sin registrar'}</p>
                       </div>)}
-                      <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-content-3">{fc.bienesSnapshot?.length || 1} bien{(fc.bienesSnapshot?.length || 1) === 1 ? '' : 'es'} en el expediente</p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-content-3">{snapshotBienes.length} bien{snapshotBienes.length === 1 ? '' : 'es'} en el expediente</p>
                     </div>
                     {fc.estado === 'COMPLETADO' && fc.firmasExternas?.receptor && <p className="mt-2 text-[11px] text-content-2">Recibió: {fc.firmasExternas.receptor.nombre} · C.I. {fc.firmasExternas.receptor.documento} · {fc.firmasExternas.receptor.cargo} · {fc.firmasExternas.receptor.fecha}</p>}
                     {fc.estado === 'COMPLETADO' && fc.referenciaArchivo && <p className="mt-1 break-words text-[11px] text-content-3">Archivo: {fc.referenciaArchivo}</p>}

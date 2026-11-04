@@ -620,7 +620,7 @@ export default function InventarioView({
                                   <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar bien (Mayús + clic para seleccionar un rango)" aria-label={`Seleccionar ${item.rotulo || item.descripcion}`} className="mt-1 h-4 w-4 shrink-0 rounded border-line-strong text-brand-text cursor-pointer" />
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 gap-2 rounded-control bg-surface-2 p-3">
-                                  <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-user-check mt-0.5 w-4 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Responsable</span><span className="block truncate font-semibold text-content-1">{item.funcionario || 'Sin asignar'}</span></span></div>
+                                  <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-user-check mt-0.5 w-4 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Responsable</span><span className="block truncate font-semibold text-content-1">{item.funcionario || 'Sin asignar'}</span>{item.funcionarioAlternativo && <span className="block truncate text-[10px] text-content-3">Otro turno: {item.funcionarioAlternativo}</span>}</span></div>
                                   <div className="flex min-w-0 items-start gap-2 text-body"><i className="fa-solid fa-location-dot mt-0.5 w-4 shrink-0 text-danger" aria-hidden="true" /><span className="min-w-0"><span className="block text-label font-semibold uppercase tracking-wide text-content-3">Ubicación</span><span className="block truncate font-semibold text-content-1">{item.ubicacion || 'Sin ubicación'}</span></span></div>
                                 </div>
                                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -656,6 +656,7 @@ export default function InventarioView({
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
                                 <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
+                                {item.funcionarioAlternativo && <p className="text-[10px] text-content-3 truncate"><i className="fa-solid fa-user-clock mr-1"></i>Otro turno: {item.funcionarioAlternativo}</p>}
                                 <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
                               </div>
                             </div>
@@ -786,6 +787,7 @@ export default function InventarioView({
                                     <div className="flex items-center gap-2 text-xs font-bold text-content-1 dark:text-zinc-200">
                                       <i className="fa-solid fa-user-check text-ok text-xs shrink-0"></i>
                                       <InlineInventoryField bien={item} campo="funcionario" etiqueta="Responsable" valor={item.funcionario} onSave={onEditarCampoBien} />
+                                      {item.funcionarioAlternativo && <div className="pl-5 text-[10px] text-content-3" title="Responsable alternativo por turnos; no tiene FC-10 propio">Otro turno: {item.funcionarioAlternativo}</div>}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs font-semibold text-content-3 dark:text-content-3">
                                       <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>

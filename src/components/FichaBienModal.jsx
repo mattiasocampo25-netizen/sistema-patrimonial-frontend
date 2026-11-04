@@ -108,6 +108,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
             <Dato label="Vida útil" value={bien.vidaUtil ? `${bien.vidaUtil} años` : null} />
             <Dato label="Ubicación" value={bien.ubicacion} />
             <Dato label="Responsable" value={bien.funcionario} />
+            {bien.funcionarioAlternativo && <Dato label="Responsable alternativo · sin FC-10 propio" value={bien.funcionarioAlternativo} />}
             <Dato label="Dependencia" value={bien.dependencia} />
           </div>
 

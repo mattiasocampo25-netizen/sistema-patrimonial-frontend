@@ -17,6 +17,7 @@ export default function BienModal({
     ESTADOS_CONSERVACION,
 
     ubicacionesUnicas,
+    dependenciaActual = bienEditing?.dependencia || '',
     funcionariosPadron = [],
     ubicaciones = [],
     sugerenciasBienes = [],
@@ -27,6 +28,10 @@ export default function BienModal({
     const [custodioTexto, setCustodioTexto] = useState(bienEditing?.funcionario || '');
     const [showCustodioDropdown, setShowCustodioDropdown] = useState(false);
     const custodioDropdownRef = useRef(null);
+    const [custodioAlternativoTexto, setCustodioAlternativoTexto] = useState(bienEditing?.funcionarioAlternativo || '');
+    const [showAlternativoDropdown, setShowAlternativoDropdown] = useState(false);
+    const alternativoDropdownRef = useRef(null);
+    const permitirCustodioAlternativo = normalizeStr(dependenciaActual).startsWith('FACULTAD');
 
     // Estado para ubicación operativa
     const [ubicacionTexto, setUbicacionTexto] = useState(bienEditing?.ubicacion || '');
@@ -41,6 +46,7 @@ export default function BienModal({
     const [formKey, setFormKey] = useState(0);
     const [rotuloError, setRotuloError] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
+    const [cambiosParaConfirmar, setCambiosParaConfirmar] = useState(null);
     const defecto = (campo, fb) => (restaurado && restaurado[campo] !== undefined && restaurado[campo] !== null ? restaurado[campo] : fb);
     const validarRotulo = (valor) => {
         const v = String(valor || "").trim();
@@ -54,10 +60,50 @@ export default function BienModal({
         const hoy = new Date().toISOString().split("T")[0];
         setFechaAviso(valor > hoy ? 'La fecha es futura. Verifica que sea la adquisición real.' : '');
     };
+    const camposRevision = [
+        ['rotulo', 'Rótulo'], ['descripcion', 'Descripción'], ['ubicacion', 'Ubicación'],
+        ['funcionario', 'Responsable principal'], ['funcionarioAlternativo', 'Responsable alternativo'],
+        ['funcionarioDoc', 'C.I. del responsable principal'], ['funcionarioCargo', 'Cargo del responsable principal'],
+        ['funcionarioAlternativoDoc', 'C.I. del responsable alternativo'], ['funcionarioAlternativoCargo', 'Cargo del responsable alternativo'],
+        ['estadoConservacion', 'Estado de conservación'], ['fechaAdquisicion', 'Fecha de adquisición'],
+        ['valorUnitario', 'Valor de adquisición'], ['vidaUtil', 'Vida útil'], ['hasQR', 'Etiqueta QR'],
+        ['cuenta', 'Cuenta'], ['subcuenta', 'Subcuenta'], ['analitico1', 'Analítico 1'], ['analitico2', 'Analítico 2']
+    ];
+    const guardarConRevision = async (evento, mantenerAbierto = false) => {
+        evento?.preventDefault?.();
+        const form = bienFormRef.current;
+        if (!form?.reportValidity()) return false;
+        if (bienEditing?.id) {
+            const fd = new FormData(form);
+            const cambios = camposRevision.flatMap(([campo, etiqueta]) => {
+                const anterior = campo === 'hasQR' ? (bienEditing.hasQR ? 'Sí' : 'No') : String(bienEditing[campo] ?? '');
+                const nuevo = campo === 'hasQR' ? (fd.has(campo) ? 'Sí' : 'No') : String(fd.get(campo) ?? '').trim();
+                const norm = valor => campo === 'valorUnitario' ? String(valor).replace(/\D/g, '') : String(valor).trim();
+                return norm(anterior) === norm(nuevo) ? [] : [{ campo, etiqueta, anterior: anterior || '—', nuevo: nuevo || '—' }];
+            });
+            if (cambios.length) {
+                setCambiosParaConfirmar({ cambios, mantenerAbierto });
+                return false;
+            }
+        }
+        const ok = await saveBien({ preventDefault() {} }, mantenerAbierto);
+        if (ok) limpiarBorrador();
+        return ok;
+    };
+    const confirmarCambios = async () => {
+        if (!cambiosParaConfirmar) return;
+        const mantenerAbierto = cambiosParaConfirmar.mantenerAbierto;
+        const ok = await saveBien({ preventDefault() {} }, mantenerAbierto);
+        if (ok) {
+            limpiarBorrador();
+            setCambiosParaConfirmar(null);
+        }
+    };
     const continuarBorrador = () => {
         if (!borrador) return;
         setRestaurado(borrador);
         if (borrador.funcionario) setCustodioTexto(borrador.funcionario);
+        if (borrador.funcionarioAlternativo) setCustodioAlternativoTexto(borrador.funcionarioAlternativo);
         if (borrador.ubicacion) setUbicacionTexto(borrador.ubicacion);
         if (borrador.descripcion) setDescTexto(borrador.descripcion);
         setFormKey(k => k + 1);
@@ -108,6 +154,9 @@ export default function BienModal({
         const handleClickOutside = (event) => {
             if (custodioDropdownRef.current && !custodioDropdownRef.current.contains(event.target)) {
                 setShowCustodioDropdown(false);
+            }
+            if (alternativoDropdownRef.current && !alternativoDropdownRef.current.contains(event.target)) {
+                setShowAlternativoDropdown(false);
             }
             if (ubicacionDropdownRef.current && !ubicacionDropdownRef.current.contains(event.target)) {
                 setShowUbicacionDropdown(false);
@@ -162,6 +211,12 @@ export default function BienModal({
         return normalizeStr(u).includes(normalizeStr(ubicacionTexto));
     }).slice(0, 10);
 
+    const filteredAlternativos = funcionariosPadron.filter(f => {
+        if (!custodioAlternativoTexto) return true;
+        const query = normalizeStr(custodioAlternativoTexto);
+        return normalizeStr(f.nombre).includes(query) || String(f.cedula || '').includes(query);
+    }).filter(f => normalizeStr(f.nombre) !== normalizeStr(custodioTexto)).slice(0, 10);
+
     const autocompletarDesdeFuncionario = (f) => {
         if (!bienFormRef.current || !f) return;
         const inputFunc = bienFormRef.current.elements['funcionario'];
@@ -182,6 +237,27 @@ export default function BienModal({
         setCustodioTexto(f.nombre);
         setShowCustodioDropdown(false);
         autocompletarDesdeFuncionario(f);
+    };
+
+    const handleSelectCustodioAlternativo = (f) => {
+        setCustodioAlternativoTexto(f.nombre);
+        setShowAlternativoDropdown(false);
+        if (!bienFormRef.current) return;
+        bienFormRef.current.elements['funcionarioAlternativo'].value = f.nombre || '';
+        bienFormRef.current.elements['funcionarioAlternativoDoc'].value = f.cedula || '';
+        bienFormRef.current.elements['funcionarioAlternativoCargo'].value = f.cargo || '';
+    };
+
+    const handleAlternativoChange = (e) => {
+        const valor = e.target.value;
+        setCustodioAlternativoTexto(valor);
+        setShowAlternativoDropdown(true);
+        if (!bienFormRef.current) return;
+        const match = funcionariosPadron.find(f => normalizeStr(f.nombre) === normalizeStr(valor) || String(f.cedula || '').trim() === valor.trim());
+        const inputDoc = bienFormRef.current.elements['funcionarioAlternativoDoc'];
+        const inputCargo = bienFormRef.current.elements['funcionarioAlternativoCargo'];
+        if (inputDoc) inputDoc.value = match?.cedula || '';
+        if (inputCargo) inputCargo.value = match?.cargo || '';
     };
 
     const handleSelectUbicacion = (ub) => {
@@ -249,7 +325,7 @@ export default function BienModal({
                 </Button>
               </div>
             )}
-            <form key={formKey} ref={bienFormRef} onSubmit={async (e) => { const ok = await saveBien(e, false); if (ok) limpiarBorrador(); }} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
+            <form key={formKey} ref={bienFormRef} onSubmit={(e) => guardarConRevision(e, false)} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
               <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
                 {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
 
@@ -437,6 +513,33 @@ export default function BienModal({
                     </div>
                   </div>
 
+                  {permitirCustodioAlternativo && <section className="mb-4 rounded-card border border-info/20 bg-info-soft/40 p-4" aria-label="Responsable alternativo por turnos">
+                    <div className="mb-3 flex items-start gap-2">
+                      <i className="fa-solid fa-people-arrows mt-0.5 text-info" aria-hidden="true" />
+                      <div>
+                        <p className="text-xs font-bold text-content-1">Responsable alternativo por turnos <span className="font-medium text-content-3">(opcional)</span></p>
+                        <p className="mt-0.5 text-[11px] leading-relaxed text-content-2">Para bienes compartidos en distintos turnos de una facultad. El FC-10 y la responsabilidad principal siguen a nombre del custodio designado arriba; este dato alternativo no genera otro FC-10.</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+                      <div className="relative" ref={alternativoDropdownRef}>
+                        <label htmlFor="funcionarioAlternativo" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-content-3">Funcionario del otro turno</label>
+                        <input id="funcionarioAlternativo" name="funcionarioAlternativo" value={custodioAlternativoTexto} onChange={handleAlternativoChange} onFocus={() => setShowAlternativoDropdown(true)} autoComplete="off" className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Escribe o selecciona funcionario…" />
+                        {showAlternativoDropdown && filteredAlternativos.length > 0 && <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-card border border-line bg-surface-1 py-1 shadow-2xl">
+                          {filteredAlternativos.map(f => <button key={f.id || f.cedula || f.nombre} type="button" onClick={() => handleSelectCustodioAlternativo(f)} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                            <span className="min-w-0"><span className="block truncate text-xs font-semibold text-content-1">{f.nombre}</span><span className="block truncate text-[10px] text-content-3">{f.cargo || 'Funcionario'}</span></span>
+                            {f.cedula && <span className="shrink-0 font-mono text-[10px] text-content-3">{f.cedula}</span>}
+                          </button>)}
+                        </div>}
+                      </div>
+                      <div>
+                        <label htmlFor="funcionarioAlternativoDoc" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-content-3">C.I. alternativo</label>
+                        <input id="funcionarioAlternativoDoc" name="funcionarioAlternativoDoc" defaultValue={defecto('funcionarioAlternativoDoc', bienEditing?.funcionarioAlternativoDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 text-content-3`} placeholder="Auto-completado" />
+                      </div>
+                      <input name="funcionarioAlternativoCargo" type="hidden" defaultValue={defecto('funcionarioAlternativoCargo', bienEditing?.funcionarioAlternativoCargo)} />
+                    </div>
+                  </section>}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Cargo Funcional</label>
@@ -488,7 +591,7 @@ export default function BienModal({
                 </Button>
 
                 {!esNuevo && (
-                  <Button variante="subtle" tamano="md" disabled={isSaving} onClick={async (e) => { const ok = await saveBien(e, true); if (ok) limpiarBorrador(); }}>
+                  <Button variante="subtle" tamano="md" disabled={isSaving} onClick={(e) => guardarConRevision(e, true)}>
                     + Guardar y Añadir Otro
                   </Button>
                 )}
@@ -506,6 +609,15 @@ export default function BienModal({
 
             </form>
           </div>
+          {cambiosParaConfirmar && <Dialogo className={STYLES.modalOverlay} onCerrar={() => setCambiosParaConfirmar(null)}>
+            <section role="alertdialog" aria-modal="true" aria-labelledby="bien-cambios-titulo" className="w-full max-w-xl rounded-panel border border-line bg-surface-1 p-5 shadow-pop sm:p-6">
+              <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-info-soft text-info"><i className="fa-solid fa-arrows-rotate" aria-hidden="true" /></span><div><h3 id="bien-cambios-titulo" className="text-base font-bold text-content-1">Revisa los cambios antes de guardar</h3><p className="mt-1 text-xs text-content-3">Se actualizará este bien. Confirma que los datos sean correctos.</p></div></div>
+              <ul className="mt-4 max-h-64 space-y-2 overflow-y-auto">
+                {cambiosParaConfirmar.cambios.map(c => <li key={c.campo} className="rounded-control border border-line bg-surface-2 p-3 text-xs"><p className="font-bold text-content-1">{c.etiqueta}</p><p className="mt-1 break-words text-content-3">Antes: {c.anterior || '—'}</p><p className="mt-0.5 break-words text-content-1">Ahora: {c.nuevo || '—'}</p></li>)}
+              </ul>
+              <div className="mt-5 flex justify-end gap-2"><Button variante="ghost" onClick={() => setCambiosParaConfirmar(null)}>Volver a editar</Button><Button variante="primary" disabled={isSaving} cargando={isSaving} onClick={confirmarCambios}>Confirmar y guardar</Button></div>
+            </section>
+          </Dialogo>}
         </Dialogo>
     );
 }

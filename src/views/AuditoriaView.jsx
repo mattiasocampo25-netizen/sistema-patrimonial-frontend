@@ -411,7 +411,21 @@ export default function AuditoriaView({
                         {r.accion || 'OTROS'}
                       </span>
                     </TD>
-                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">{r.titulo || '-'}</TD>
+                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">
+                      <div>{r.titulo || '-'}</div>
+                      {r.bienid && /BIEN/i.test(r.titulo || '') && <button type="button" onClick={() => {
+                        const existe = bienes.some(b => String(b.id) === String(r.bienid));
+                        if (!existe) return;
+                        clearAllFilters();
+                        setSearchTerm(String(r.bienid));
+                        setSearchInput(String(r.bienid));
+                        setCurrentPage(1);
+                        setActiveTab('inventario');
+                      }} disabled={!bienes.some(b => String(b.id) === String(r.bienid))} className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-brand-text hover:underline disabled:cursor-not-allowed disabled:text-content-3" title={bienes.some(b => String(b.id) === String(r.bienid)) ? 'Abrir el bien relacionado' : 'El bien relacionado ya no está en el inventario'}>
+                        <i className={`fa-solid ${bienes.some(b => String(b.id) === String(r.bienid)) ? 'fa-arrow-up-right-from-square' : 'fa-circle-exclamation'}`} aria-hidden="true" />
+                        {bienes.some(b => String(b.id) === String(r.bienid)) ? 'Abrir bien relacionado' : 'Bien relacionado no disponible'}
+                      </button>}
+                    </TD>
                     <TD className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px]">
                       <button type="button" onClick={() => setEventoExpandido(expandido ? null : r.id)} disabled={!campos.length} aria-expanded={expandido} className="max-w-full inline-flex items-center gap-2 text-left truncate disabled:cursor-default enabled:hover:text-brand-text">
                         <span className="truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</span>

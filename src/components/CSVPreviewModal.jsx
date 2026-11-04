@@ -4,6 +4,7 @@ import Dialogo from './ui/Dialogo';
 const FIELD_LABELS = {
   rotulo: 'Rótulo', descripcion: 'Descripción', fechaAdquisicion: 'Fecha adquisición',
   valorUnitario: 'Valor unitario', vidaUtil: 'Vida útil',
+  funcionarioAlternativo: 'Funcionario alternativo',
 };
 const sizeLabel = (bytes = 0) => bytes < 1024 * 1024
   ? `${Math.max(1, Math.round(bytes / 1024))} KB`

@@ -3,6 +3,9 @@ import { useIdioma } from '../../utils/i18n';
 import FiltroCombo from '../FiltroCombo';
 import { IconButton } from '../ui';
 import { agruparNotificacionesPorDia } from '../../utils/notificationGroups';
+import useScopedPreference from '../../hooks/useScopedPreference';
+
+const preferenciaBooleana = value => value === true;
 
 /**
  * AppTopbar — barra superior del sistema.
@@ -48,37 +51,26 @@ export default function AppTopbar({
   const [filtroNotif, setFiltroNotif] = useState('todas');
   const { lang, setLang, t } = useIdioma();
   const [menuApariencia, setMenuApariencia] = useState(false);
-  const [textoGrande, setTextoGrande] = useState(() => {
-    try { return localStorage.getItem('ap_texto_grande') === '1'; } catch { return false; }
-  });
-  const [contrasteAlto, setContrasteAlto] = useState(() => {
-    try { return localStorage.getItem('ap_contraste') === '1'; } catch { return false; }
-  });
-  const [reducirAnim, setReducirAnim] = useState(() => {
-    try { return localStorage.getItem('ap_reduce_motion') === '1'; } catch { return false; }
-  });
-  const [densidadCompacta, setDensidadCompacta] = useState(() => {
-    try { return localStorage.getItem('ap_densidad_compacta') === '1'; } catch { return false; }
-  });
+  const identidadUsuario = currentUser?.username || currentUser?.id || 'anon';
+  const [textoGrande, setTextoGrande] = useScopedPreference('ap_texto_grande', identidadUsuario, false, preferenciaBooleana);
+  const [contrasteAlto, setContrasteAlto] = useScopedPreference('ap_contraste', identidadUsuario, false, preferenciaBooleana);
+  const [reducirAnim, setReducirAnim] = useScopedPreference('ap_reduce_motion', identidadUsuario, false, preferenciaBooleana);
+  const [densidadCompacta, setDensidadCompacta] = useScopedPreference('ap_densidad_compacta', identidadUsuario, false, preferenciaBooleana);
 
   useEffect(() => {
     document.documentElement.classList.toggle('font-lg', textoGrande);
-    try { localStorage.setItem('ap_texto_grande', textoGrande ? '1' : '0'); } catch { /* ignore */ }
   }, [textoGrande]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('contrast-more', contrasteAlto);
-    try { localStorage.setItem('ap_contraste', contrasteAlto ? '1' : '0'); } catch { /* ignore */ }
   }, [contrasteAlto, darkMode]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('reduce-motion', reducirAnim);
-    try { localStorage.setItem('ap_reduce_motion', reducirAnim ? '1' : '0'); } catch { /* ignore */ }
   }, [reducirAnim]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('density-compact', densidadCompacta);
-    try { localStorage.setItem('ap_densidad_compacta', densidadCompacta ? '1' : '0'); } catch { /* ignore */ }
   }, [densidadCompacta]);
 
   const notifsVisibles =

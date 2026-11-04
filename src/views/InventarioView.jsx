@@ -11,6 +11,13 @@ import { useIdioma } from '../utils/i18n';
 import Dialogo from '../components/ui/Dialogo';
 import InlineInventoryField from '../components/InlineInventoryField';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, IconButton } from '../components/ui';
+import useScopedPreference from '../hooks/useScopedPreference';
+
+const COLUMNAS_INICIALES = { fecha: true, cuenta: true, qr: true };
+const VISTAS_RECIENTES_INICIALES = [];
+const normalizarDensidad = value => value === 'compacta' ? 'compacta' : 'comoda';
+const normalizarColumnas = value => ({ ...COLUMNAS_INICIALES, ...(value && typeof value === 'object' ? value : {}) });
+const normalizarRecientes = value => Array.isArray(value) ? value.filter(x => typeof x === 'string').slice(0, 6) : VISTAS_RECIENTES_INICIALES;
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
 // Es la vista más grande del sistema; recibe todo por props.
@@ -95,42 +102,33 @@ export default function InventarioView({
   onExportarProgramado,
   STYLES,
   isLoading,
-  hasInventoryData = false
+  hasInventoryData = false,
+  username = 'anon'
 }) {
-  // Densidad y columnas visibles (preferencia local por usuario)
-  const [densidad, setDensidad] = useState(() => {
-    try { return localStorage.getItem('inv_densidad') || 'comoda'; } catch { return 'comoda'; }
-  });
+  // Densidad, columnas y búsquedas recientes por persona en equipos compartidos.
+  const [densidad, setDensidad] = useScopedPreference('inv_densidad', username, 'comoda', normalizarDensidad);
   const compacto = densidad === 'compacta';
   const [rotuloCopiado, setRotuloCopiado] = useState('');
   const cambiarDensidad = () => {
     const v = compacto ? 'comoda' : 'compacta';
     setDensidad(v);
-    try { localStorage.setItem('inv_densidad', v); } catch {}
   };
-  const [cols, setCols] = useState(() => {
-    try { return { fecha: true, cuenta: true, qr: true, ...JSON.parse(localStorage.getItem('inv_columnas') || '{}') }; }
-    catch { return { fecha: true, cuenta: true, qr: true }; }
-  });
+  const [cols, setCols] = useScopedPreference('inv_columnas', username, COLUMNAS_INICIALES, normalizarColumnas);
   const alternarCol = (k) => {
     setCols(prev => {
-      const n = { ...prev, [k]: !prev[k] };
-      try { localStorage.setItem('inv_columnas', JSON.stringify(n)); } catch {}
-      return n;
+      return { ...prev, [k]: !prev[k] };
     });
   };
   const [menuCols, setMenuCols] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [mostrarFiltrosAvanzados, setMostrarFiltrosAvanzados] = useState(false);
   const filtrosAvanzadosActivos = [filtroSubcuenta, filtroAnalitico1, filtroAnalitico2].filter(Boolean).length;
-  const [recientes, setRecientes] = useState(() => { try { return JSON.parse(localStorage.getItem('inv_recientes') || '[]'); } catch { return []; } });
+  const [recientes, setRecientes] = useScopedPreference('inv_recientes', username, VISTAS_RECIENTES_INICIALES, normalizarRecientes);
   const guardarReciente = (texto) => {
     const v = String(texto || '').trim();
     if (!v) return;
     setRecientes(prev => {
-      const next = [v, ...prev.filter(x => x !== v)].slice(0, 6);
-      try { localStorage.setItem('inv_recientes', JSON.stringify(next)); } catch {}
-      return next;
+      return [v, ...prev.filter(x => x !== v)].slice(0, 6);
     });
   };
   const ORDENES = [
@@ -278,7 +276,7 @@ export default function InventarioView({
           ))}
           <button
             type="button" onMouseDown={(e) => e.preventDefault()}
-            onClick={() => { setRecientes([]); try { localStorage.removeItem('inv_recientes'); } catch {} }}
+            onClick={() => setRecientes([])}
             className="w-full px-4 py-1.5 text-left text-[11px] font-bold text-content-3 hover:text-danger transition-colors cursor-pointer"
           >
             Borrar historial

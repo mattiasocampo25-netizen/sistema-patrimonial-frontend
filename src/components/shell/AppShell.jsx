@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
+import useScopedPreference from '../../hooks/useScopedPreference';
+
+const preferenciaBooleana = value => value === true;
 
 /**
  * AppShell — el armazon de la aplicacion.
@@ -52,13 +55,8 @@ export default function AppShell({
   // Contenido
   errorBanner
 }) {
-  const [sidebarCompacta, setSidebarCompacta] = useState(() => {
-    try { return localStorage.getItem('sidebar_compacta_v1') === '1'; } catch { return false; }
-  });
-
-  useEffect(() => {
-    try { localStorage.setItem('sidebar_compacta_v1', sidebarCompacta ? '1' : '0'); } catch { /* almacenamiento opcional */ }
-  }, [sidebarCompacta]);
+  const identidadUsuario = currentUser?.username || currentUser?.id || 'anon';
+  const [sidebarCompacta, setSidebarCompacta] = useScopedPreference('sidebar_compacta_v1', identidadUsuario, false, preferenciaBooleana);
 
   useEffect(() => {
     if (!isSidebarOpen) return undefined;

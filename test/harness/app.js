@@ -95,6 +95,7 @@ export async function montarApp({ usuario = null, datos = {}, conTour = false } 
   try {
     localStorage.removeItem('current_user');
     localStorage.removeItem('is_logged_in');
+    localStorage.removeItem('unp_session_last_activity');
     localStorage.removeItem('sb-' + refProyecto + '-auth-token');
     // El tour guiado se abre solo la primera vez (a los 900 ms) y tapa la
     // aplicacion, interceptando los clics. En los tests molesta: se marca como
@@ -102,6 +103,7 @@ export async function montarApp({ usuario = null, datos = {}, conTour = false } 
     if (!conTour) localStorage.setItem('tour_visto_v1', '1');
     else localStorage.removeItem('tour_visto_v1');
     if (usuario) {
+      localStorage.setItem('unp_session_last_activity', String(Date.now()));
       localStorage.setItem('current_user', JSON.stringify(usuario));
       localStorage.setItem('is_logged_in', 'true');
       localStorage.setItem(

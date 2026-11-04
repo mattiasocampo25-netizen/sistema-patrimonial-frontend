@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch, toInputDateFormat } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
 import { aplicarSeleccionRango, construirLinkInventario, idsEntre } from '../utils/inventarioInteracciones';
+import useScopedPreference from './useScopedPreference';
 
 // Claves del query string para los filtros compartibles por URL.
 // A scope de modulo: es una constante pura. Dentro del hook seria un objeto
@@ -13,6 +14,8 @@ const URL_KEYS = {
   a1: 'filtroAnalitico1', a2: 'filtroAnalitico2',
   qr: 'filtroQR', fc10: 'filtroFC10', est: 'filtroEstado', pend: 'filtroPendiente'
 };
+const normalizarTamPagina = value => [10, 20, 50].includes(Number(value)) ? Number(value) : 10;
+const normalizarVistaInventario = value => ['tabla', 'tarjetas', 'kanban', 'galeria'].includes(value) ? value : 'galeria';
 
 // Filtros, búsqueda, paginación y derivados del inventario (extraído de
 // App.jsx, Fase 3 del split). La UI sigue usando los mismos nombres vía
@@ -53,28 +56,18 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
   // campo: 'rotulo' | 'valor' | 'fecha'. dir: 'asc' | 'desc'.
   const [orden, setOrden] = useState({ campo: 'rotulo', dir: 'asc' });
   // Tamaño de página configurable (10/20/50) + selección múltiple + vista.
-  const [itemsPorPagina, setItemsPorPagina] = useState(() => {
-    // Solo se aceptan los tamaños soportados: un valor sucio en localStorage
-    // (p. ej. -5) producía slice() negativo y totalPages inválido.
-    try {
-      const n = parseInt(localStorage.getItem('inv_page_size') || '10', 10);
-      return [10, 20, 50].includes(n) ? n : 10;
-    } catch { return 10; }
-  });
+  // Tamaño y modo de vista por persona: útil en equipos compartidos por turnos.
+  const [itemsPorPagina, setItemsPorPagina] = useScopedPreference('inv_page_size', username || 'anon', 10, normalizarTamPagina);
   const [seleccionados, setSeleccionados] = useState([]);
   const anclaSeleccionRef = useRef(null);
-  const [vistaInv, setVistaInv] = useState(() => {
-    try { return localStorage.getItem('inv_vista') || 'galeria'; } catch { return 'galeria'; }
-  });
+  const [vistaInv, setVistaInv] = useScopedPreference('inv_vista', username || 'anon', 'galeria', normalizarVistaInventario);
   const cambiarPaginaTam = useCallback((n) => {
     setItemsPorPagina(n);
-    try { localStorage.setItem('inv_page_size', String(n)); } catch {}
     setCurrentPage(1);
-  }, []);
+  }, [setItemsPorPagina]);
   const cambiarVistaInv = useCallback((v) => {
     setVistaInv(v);
-    try { localStorage.setItem('inv_vista', v); } catch {}
-  }, []);
+  }, [setVistaInv]);
   const toggleSeleccion = useCallback((id, opciones = {}) => {
     const { shiftKey = false, visibles = [], seleccionado } = opciones;
     if (shiftKey && anclaSeleccionRef.current && visibles.includes(anclaSeleccionRef.current)) {

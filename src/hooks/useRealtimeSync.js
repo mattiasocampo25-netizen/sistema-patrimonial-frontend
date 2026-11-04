@@ -6,7 +6,7 @@ import localforage from 'localforage';
 import { BIENES_SYNC_VERSION, debeResyncTotal, fusionarBienes, ahoraISO } from '../services/syncBienes';
 import { normalizeStr } from '../utils/helpers';
 import { processOfflineQueue, getOfflineQueueLength } from '../services/offlineSyncService';
-import { rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
+import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //

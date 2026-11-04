@@ -5,6 +5,7 @@ import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Card, Chip, ChipGroup, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 import { descargarInformeSolicitudBaja } from '../utils/informeBaja';
+import useScopedPreference from '../hooks/useScopedPreference';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-warn-soft dark:bg-amber-950/20 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/30', dot: 'bg-amber-500' },
@@ -12,6 +13,8 @@ const ESTADO_INFO = {
   RECHAZADO: { label: 'Rechazado', color: 'bg-danger-soft dark:bg-rose-950/20 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/30', dot: 'bg-rose-500' },
   EN_REVISION: { label: 'En Revisión', color: 'bg-info-soft dark:bg-sky-950/20 text-info dark:text-sky-400 border border-info/25 dark:border-sky-900/30', dot: 'bg-sky-500' }
 };
+const normalizarBandeja = value => ['todos', 'mis_pendientes', 'sin_asignar'].includes(value) ? value : 'todos';
+const normalizarVistaAprobaciones = value => value && typeof value === 'object' ? value : null;
 
 export default function AprobacionesView({
   dependenciaActual,
@@ -25,8 +28,9 @@ export default function AprobacionesView({
   const [filtroDependencia, setFiltroDependencia] = useState('');
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
-  const [bandeja, setBandeja] = useState(() => { try { return localStorage.getItem('aprobaciones_bandeja') || 'todos'; } catch { return 'todos'; } });
-  const [vistaGuardada, setVistaGuardada] = useState(() => { try { return JSON.parse(localStorage.getItem('aprobaciones_vista') || 'null'); } catch { return null; } });
+  const identidadUsuario = currentUser?.username || currentUser?.id || 'anon';
+  const [bandeja, setBandeja] = useScopedPreference('aprobaciones_bandeja', identidadUsuario, 'todos', normalizarBandeja);
+  const [vistaGuardada, setVistaGuardada] = useScopedPreference('aprobaciones_vista', identidadUsuario, null, normalizarVistaAprobaciones);
   const [detalleId, setDetalleId] = useState(null);
   const [responsables, setResponsables] = useState({});
   const [asignandoId, setAsignandoId] = useState(null);
@@ -84,7 +88,6 @@ export default function AprobacionesView({
   };
   const guardarVistaActual = () => {
     const vista = { filtroEstado, filtroTipo, filtroDependencia, desde, hasta, bandeja };
-    try { localStorage.setItem('aprobaciones_vista', JSON.stringify(vista)); } catch {}
     setVistaGuardada(vista);
   };
   const aplicarVista = () => { if (!vistaGuardada) return; setFiltroEstado(vistaGuardada.filtroEstado || 'todos'); setFiltroTipo(vistaGuardada.filtroTipo || 'todos'); setFiltroDependencia(vistaGuardada.filtroDependencia || ''); setDesde(vistaGuardada.desde || ''); setHasta(vistaGuardada.hasta || ''); setBandeja(vistaGuardada.bandeja || 'todos'); };
@@ -137,7 +140,7 @@ export default function AprobacionesView({
           </Toolbar>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <label className="sr-only" htmlFor="aprobaciones-bandeja">Bandeja de solicitudes</label>
-            <select id="aprobaciones-bandeja" value={bandeja} onChange={e => { setBandeja(e.target.value); try { localStorage.setItem('aprobaciones_bandeja', e.target.value); } catch {} }} className="h-9 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-1"><option value="todos">Todas las solicitudes</option><option value="mis_pendientes">Mis pendientes / sin asignar</option><option value="sin_asignar">Pendientes sin responsable</option></select>
+            <select id="aprobaciones-bandeja" value={bandeja} onChange={e => setBandeja(e.target.value)} className="h-9 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-1"><option value="todos">Todas las solicitudes</option><option value="mis_pendientes">Mis pendientes / sin asignar</option><option value="sin_asignar">Pendientes sin responsable</option></select>
             <button type="button" onClick={guardarVistaActual} className="h-9 rounded-control border border-line px-3 text-xs font-semibold text-content-2 hover:bg-surface-2">Guardar filtros</button>
             {vistaGuardada && <button type="button" onClick={aplicarVista} className="h-9 rounded-control border border-brand/25 px-3 text-xs font-semibold text-brand-text hover:bg-brand/5">Aplicar filtros guardados</button>}
             <button type="button" onClick={exportarCSV} className="h-9 rounded-control border border-line px-3 text-xs font-semibold text-content-2 hover:bg-surface-2"><i className="fa-solid fa-download mr-1.5"/>Exportar CSV ({listaFiltrada.length})</button>

@@ -37,6 +37,7 @@ test('JSON corrupto se limpia y no explota', () => {
 test('sesionMarcadaLocal exige bandera y perfil', () => {
   localStorage.setItem('current_user', JSON.stringify({ username: 'admin' }));
   localStorage.setItem('is_logged_in', 'true');
+  localStorage.setItem('unp_session_last_activity', String(Date.now()));
   assert.equal(sesionMarcadaLocal(), true);
   localStorage.setItem('is_logged_in', 'false');
   assert.equal(sesionMarcadaLocal(), false);

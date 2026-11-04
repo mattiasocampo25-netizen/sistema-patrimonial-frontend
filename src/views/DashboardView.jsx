@@ -6,7 +6,14 @@ import { pendienteDeFirma } from '../utils/fc10Firmas';
 import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
+import useScopedPreference from '../hooks/useScopedPreference';
 import { crearEventosAgenda, fechaAgenda } from '../utils/agenda';
+
+const WIDGETS_INICIALES = { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true };
+const ACCESOS_INICIALES = ['nuevo', 'importar', 'exportar', 'qr', 'fc03'];
+const WIDGETS_DASHBOARD = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias'], ['agenda', 'Agenda']];
+const normalizarWidgets = value => ({ ...WIDGETS_INICIALES, ...(value && typeof value === 'object' ? value : {}) });
+const normalizarAccesos = value => Array.isArray(value) ? value.filter(id => ACCESOS_INICIALES.includes(id)) : ACCESOS_INICIALES;
 
 function claveDia(fecha) {
   return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
@@ -130,10 +137,8 @@ export default function DashboardView({
     setActiveTab('inventario');
   };
 
-  const [widgets, setWidgets] = useState(() => {
-    try { return { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true, ...JSON.parse(localStorage.getItem('dash_widgets') || '{}') }; }
-    catch { return { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true }; }
-  });
+  const identidadUsuario = currentUser?.username || currentUser?.id || 'anon';
+  const [widgets, setWidgets] = useScopedPreference('dash_widgets', identidadUsuario, WIDGETS_INICIALES, normalizarWidgets);
   const [menuWidgets, setMenuWidgets] = useState(false);
   const widgetButtonRef = useRef(null);
   const [widgetMenuStyle, setWidgetMenuStyle] = useState(null);
@@ -157,26 +162,16 @@ export default function DashboardView({
     return () => { window.removeEventListener('resize', posicionar); window.removeEventListener('scroll', posicionar, true); document.removeEventListener('keydown', escapar); };
   }, [menuWidgets]);
   const alternarWidget = (k) => {
-    setWidgets(prev => {
-      const n = { ...prev, [k]: !prev[k] };
-      try { localStorage.setItem('dash_widgets', JSON.stringify(n)); } catch {}
-      return n;
-    });
+    setWidgets(prev => ({ ...prev, [k]: !prev[k] }));
   };
-  const WIDGETS = [['metricas', 'Métricas'], ['pendientes', 'Pendientes'], ['accesos', 'Accesos'], ['tendencias', 'Tendencias'], ['agenda', 'Agenda']];
   const ACCESOS = [
     ['nuevo', 'Nuevo registro'], ['importar', 'Importar CSV'], ['exportar', 'Exportar CSV'],
     ['qr', 'Lote de QRs'], ['fc03', 'Reporte FC-03'],
   ];
-  const [accesosVisibles, setAccesosVisibles] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('dash_accesos') || 'null') || ACCESOS.map(([id]) => id); }
-    catch { return ACCESOS.map(([id]) => id); }
-  });
+  const [accesosVisibles, setAccesosVisibles] = useScopedPreference('dash_accesos', identidadUsuario, ACCESOS_INICIALES, normalizarAccesos);
   const [menuAccesos, setMenuAccesos] = useState(false);
   const alternarAcceso = (id) => setAccesosVisibles((prev) => {
-    const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-    try { localStorage.setItem('dash_accesos', JSON.stringify(next)); } catch {}
-    return next;
+    return prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
   });
 
   // Tarjetas de métrica con diseño consistente y simétrico.
@@ -276,7 +271,7 @@ export default function DashboardView({
                 <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)}></button>
                 <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
                   <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
-                  {WIDGETS.map(([k, label]) => (
+                  {WIDGETS_DASHBOARD.map(([k, label]) => (
                     <button
                       key={k} onClick={() => alternarWidget(k)}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"

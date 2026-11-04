@@ -102,7 +102,7 @@ const DATOS = {
       tipoRegistro: 'AUDITORIA',
       usuario: 'admin',
       dependencia: 'Rectorado',
-      fecha: '2026-01-01',
+      fecha: new Date().toISOString(),
       mensaje: 'prueba',
       titulo: 'prueba'
     }
@@ -221,7 +221,7 @@ describe('smoke por modulo', () => {
   test('modulo FC-04: renderiza y abre la planilla', async () => {
     await entrar();
     await app.clickTour('nav-fc04');
-    await app.esperar('FC-04', 3000);
+    await app.esperar('Redactar Planilla', 3000);
     assert.ok(app.tiene('FC-04'), 'debe mostrar el modulo FC-04');
 
     await app.clickSiExiste('Redactar Planilla');
@@ -296,7 +296,7 @@ describe('smoke por modulo', () => {
   test('modulo Auditoría: lista la traza y abre el escáner', async () => {
     await entrar();
     await app.clickTour('nav-auditoria');
-    await app.esperar('Auditoría', 4000);
+    await app.esperar('MODIFICACION', 4000);
     assert.ok(app.tiene('Auditoría'), 'debe mostrar el libro de auditoria');
 
     // La lista tiene que traer el evento del mock: prueba que el modulo

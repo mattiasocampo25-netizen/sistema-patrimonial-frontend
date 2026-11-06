@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { toInputDateFormat, formatearMiles, normalizeStr } from '../utils/helpers';
+import { SECTION, FORM } from '../constants/designTokens';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
 import Button, { IconButton } from './ui/Button';
@@ -331,9 +332,9 @@ export default function BienModal({
 
                 {/* 1. IMPUTACIÓN CONTABLE Y RÓTULO */}
                 <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
-                  <div className="flex items-center gap-2 mb-4">
-                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">1</span>
-                     <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Imputación y Código Patrimonial</h3>
+                  <div className={`${SECTION.header}`}>
+                     <span className={`${SECTION.number}`}>1</span>
+                     <h3 className={`${SECTION.title}`}>Imputación y Código Patrimonial</h3>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -368,9 +369,9 @@ export default function BienModal({
 
                 {/* 2. IDENTIFICACIÓN FÍSICA Y ESTADO */}
                 <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
-                  <div className="flex items-center gap-2 mb-4">
-                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">2</span>
-                     <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Especificaciones del Activo</h3>
+                  <div className={`${SECTION.header}`}>
+                     <span className={`${SECTION.number}`}>2</span>
+                     <h3 className={`${SECTION.title}`}>Especificaciones del Activo</h3>
                   </div>
 
                   <div className="mb-4 relative" ref={descDropdownRef}>
@@ -428,9 +429,9 @@ export default function BienModal({
 
                 {/* 3. VALORIZACIÓN Y CONTABILIDAD */}
                 <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
-                  <div className="flex items-center gap-2 mb-4">
-                     <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">3</span>
-                     <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Valor y Fecha de Incorporación</h3>
+                  <div className={`${SECTION.header}`}>
+                     <span className={`${SECTION.number}`}>3</span>
+                     <h3 className={`${SECTION.title}`}>Valor y Fecha de Incorporación</h3>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -438,15 +439,13 @@ export default function BienModal({
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Valor de Adquisición (Gs.)</label>
                         <input type="text" inputMode="numeric" name="valorUnitario" defaultValue={defecto('valorUnitario', bienEditing?.valorUnitario) ? formatearMiles(defecto('valorUnitario', bienEditing?.valorUnitario)) : ''} onInput={(e) => { e.target.value = formatearMiles(e.target.value); }} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 1.500.000" />
                     </div>
-                    <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Fecha de Adquisición</label>
+                    <div className="flex flex-col gap-1">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-1">Fecha de Adquisición</label>
                         <input type="date" name="fechaAdquisicion" defaultValue={toInputDateFormat(bienEditing?.fechaAdquisicion)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}  onBlur={(e) => validarFecha(e.target.value)}/>
+                        {fechaAviso && (<p className="animate-fade-in mt-0.5 flex items-center gap-1 text-[10px] font-bold text-warn dark:text-amber-400"><i className="fa-solid fa-triangle-exclamation text-[9px]"></i>{fechaAviso}</p>)}
                     </div>
-                    <div>
-                        {fechaAviso && (<p className="animate-fade-in mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-warn dark:text-amber-400"><i className="fa-solid fa-triangle-exclamation text-[10px]"></i>{fechaAviso}</p>)}
-                    </div>
-                    <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Vida Útil (Años)</label>
+                    <div className="flex flex-col">
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-1">Vida Útil (Años)</label>
                         <input type="number" name="vidaUtil" defaultValue={defecto('vidaUtil', bienEditing?.vidaUtil)} className={`${STYLES.input} tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej: 5 o 10" />
                     </div>
                   </div>
@@ -454,10 +453,10 @@ export default function BienModal({
 
                 {/* 4. ASIGNACIÓN, CUSTODIA Y UBICACIÓN */}
                 <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className={`${SECTION.header} justify-between`}>
                       <div className="flex items-center gap-2">
-                         <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-surface-3 dark:bg-surface-1/5 text-content-1 dark:text-white text-xs font-bold">4</span>
-                         <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Custodio y Ubicación</h3>
+                         <span className={`${SECTION.number}`}>4</span>
+                         <h3 className={`${SECTION.title}`}>Custodio y Ubicación</h3>
                       </div>
 
                       <label className="flex items-center gap-2 text-xs font-semibold text-content-2 dark:text-content-3 cursor-pointer">

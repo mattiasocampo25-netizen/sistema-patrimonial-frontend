@@ -792,4 +792,74 @@ html.font-lg { font-size: 18px; }
   html {
     scroll-behavior: auto;
   }
+
+  /* ============================================================================
+   * MODO IMPRESIÓN — Actas y fichas limpias para papel oficio
+   * ============================================================================ */
+  @media print {
+    body {
+      background-color: #ffffff !important;
+      overflow: visible !important;
+    }
+    /* Ocultar elementos de interfaz que no se imprimen */
+    .sidebar-premium,
+    .topbar-premium,
+    .modalOverlay,
+    .skip-link,
+    .no-print,
+    .print-hide,
+    button[title*="Cerrar sesión"],
+    button[title*="Escanear código QR"],
+    button[title*="Alternar tema"],
+    button[title*="Notificaciones"],
+    button[title*="Personalizar"],
+    button[title*="Abrir menú"] {
+      display: none !important;
+    }
+    /* Mostrar solo el contenido del main */
+    #contenido,
+    .workspace-main {
+      position: static !important;
+      overflow: visible !important;
+      height: auto !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      background: white !important;
+      width: 100% !important;
+    }
+    /* Tarjetas sin sombras ni fondos de color en impresión */
+    .rounded-card,
+    .rounded-panel {
+      border: 1px solid #cccccc !important;
+      box-shadow: none !important;
+      background: white !important;
+    }
+    /* Tablas sin zebra */
+    table {
+      border-collapse: collapse !important;
+    }
+    th,
+    td {
+      border: 1px solid #cccccc !important;
+      color: #000000 !important;
+      background: white !important;
+    }
+    /* Tamaño de hoja oficio (216 x 330 mm) */
+    @page {
+      size: 216mm 330mm;
+      margin: 15mm;
+    }
+    /* Enlaces sin colores de marca en papel */
+    a {
+      color: #000000 !important;
+      text-decoration: none !important;
+    }
+    /* Iconos decorativos no se imprimen */
+    .fa-print,
+    .no-print-icon {
+      display: none !important;
+    }
+  }
 }

@@ -4,6 +4,7 @@ import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
 import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
+import Hotspot from '../components/ui/Hotspot';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 import useScopedPreference from '../hooks/useScopedPreference';
@@ -473,9 +474,13 @@ export default function DashboardView({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-              {accesosVisibles.includes('nuevo') && <button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
+              {accesosVisibles.includes('nuevo') && (
+<Hotspot texto="Crea un bien patrimonial nuevo en el inventario de tu dependencia.">
+<button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
                   <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
-              </button>}
+              </button>
+</Hotspot>
+              )}
               {accesosVisibles.includes('importar') && <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
                   <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i> Importar
               </button>}

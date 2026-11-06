@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import Dialogo from '../ui/Dialogo';
 import FiltroCombo from '../FiltroCombo';
+import { FORM } from '../constants/designTokens';
 
-const LABEL = "block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2";
+const LABEL = FORM.label;
 
 export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsuario, todasDependencias, esDesarrollador, STYLES }) {
     const [rolSeleccionado, setRolSeleccionado] = useState(usuarioEditing?.cargo || 'user');
@@ -41,70 +42,74 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
 
             <form onSubmit={saveUsuario} className="flex flex-col h-full overflow-hidden">
               <div className="p-6 overflow-y-auto space-y-4 custom-scrollbar">
-                <div>
-                  <label className={LABEL}>Usuario (Login / ID)</label>
-                  <div className="relative">
-                    <i className="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
-                    <input
-                      type="text"
-                      name="username"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className={LABEL}>Usuario (Login / ID)</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
+                      <input
+                        type="text"
+                        name="username"
+                        required
+                        defaultValue={usuarioEditing?.username}
+                        disabled={!!usuarioEditing}
+                        className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${usuarioEditing ? 'bg-surface-3 dark:bg-surface-1/80 cursor-not-allowed text-content-3' : ''}`}
+                        placeholder="Ej. mocampo"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className={LABEL}>Nombre Completo</label>
+                    <div className="relative">
+                      <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
+                      <input
+                        type="text"
+                        name="nombre"
+                        required
+                        defaultValue={usuarioEditing?.nombre}
+                        className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                        placeholder="Ej. Matías Ocampo"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className={LABEL}>Rol de Sistema</label>
+                    <FiltroCombo
+                      name="cargo"
                       required
-                      defaultValue={usuarioEditing?.username}
-                      disabled={!!usuarioEditing}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${usuarioEditing ? 'bg-surface-3 dark:bg-surface-1/80 cursor-not-allowed text-content-3' : ''}`}
-                      placeholder="Ej. mocampo"
+                      valor={usuarioEditing?.cargo || 'user'}
+                      opciones={[
+                        { label: 'Funcionario Local (lectura y creación)', value: 'user' },
+                        { label: 'Administrador General (control total)', value: 'admin' },
+                        ...(esDesarrollador ? [{ label: 'Desarrollador del sistema', value: 'desarrollador' }] : []),
+                      ]}
+                      onElegir={setRolSeleccionado}
+                      etiquetaTodos="Funcionario Local"
+                      titulo="Rol de sistema"
+                    />
+                    <div className="mt-2 rounded-control border border-line bg-surface-2 px-3 py-2.5" aria-live="polite">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">Permisos que tendrá este usuario</p>
+                      <ul className="mt-1.5 space-y-1">{(permisosPorRol[rolSeleccionado] || permisosPorRol.user).map(permiso => <li key={permiso} className="flex items-start gap-1.5 text-[11px] text-content-2"><i className="fa-solid fa-check mt-0.5 text-ok" aria-hidden="true" />{permiso}</li>)}</ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className={LABEL}>Dependencia Asignada</label>
+                    <FiltroCombo
+                      name="dependencia"
+                      required
+                      valor={usuarioEditing?.dependencia || 'Rectorado'}
+                      opciones={todasDependencias}
+                      etiquetaTodos="Elegí dependencia"
+                      titulo="Dependencia asignada"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className={LABEL}>Nombre Completo</label>
-                  <div className="relative">
-                    <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-xs"></i>
-                    <input
-                      type="text"
-                      name="nombre"
-                      required
-                      defaultValue={usuarioEditing?.nombre}
-                      className={`${STYLES.input} pl-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
-                      placeholder="Ej. Matías Ocampo"
-                    />
-                  </div>
-                </div>
-
-
-                <div>
-                  <label className={LABEL}>Rol de Sistema</label>
-                  <FiltroCombo
-                    name="cargo"
-                    required
-                    valor={usuarioEditing?.cargo || 'user'}
-                    opciones={[
-                      { label: 'Funcionario Local (lectura y creación)', value: 'user' },
-                      { label: 'Administrador General (control total)', value: 'admin' },
-                      ...(esDesarrollador ? [{ label: 'Desarrollador del sistema', value: 'desarrollador' }] : []),
-                    ]}
-                    onElegir={setRolSeleccionado}
-                    etiquetaTodos="Funcionario Local"
-                    titulo="Rol de sistema"
-                  />
-                  <div className="mt-2 rounded-control border border-line bg-surface-2 px-3 py-2.5" aria-live="polite">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-content-3">Permisos que tendrá este usuario</p>
-                    <ul className="mt-1.5 space-y-1">{(permisosPorRol[rolSeleccionado] || permisosPorRol.user).map(permiso => <li key={permiso} className="flex items-start gap-1.5 text-[11px] text-content-2"><i className="fa-solid fa-check mt-0.5 text-ok" aria-hidden="true" />{permiso}</li>)}</ul>
-                  </div>
-                </div>
-
-                <div>
-                  <label className={LABEL}>Dependencia Asignada</label>
-                  <FiltroCombo
-                    name="dependencia"
-                    required
-                    valor={usuarioEditing?.dependencia || 'Rectorado'}
-                    opciones={todasDependencias}
-                    etiquetaTodos="Elegí dependencia"
-                    titulo="Dependencia asignada"
-                  />
-                </div>
               </div>
 
               <div className="mx-6 sm:mx-8 mb-5 -mt-1 rounded-card bg-blue-500/[0.07] border border-blue-500/20 px-4 py-3 flex items-start gap-2.5">

@@ -209,6 +209,9 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               Ver en inventario
             </Button>
           )}
+          <Button variante="subtle" tamano="md" icono="fa-print" onClick={() => window.print()} className="no-print">
+            Imprimir ficha
+          </Button>
           <Button variante="primary" tamano="md" onClick={onClose}>
             Cerrar
           </Button>

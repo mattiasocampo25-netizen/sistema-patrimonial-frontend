@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
-import Breadcrumbs from './ui/Breadcrumbs';
+import Breadcrumbs from '../ui/Breadcrumbs';
 import useScopedPreference from '../../hooks/useScopedPreference';
 
 const preferenciaBooleana = value => value === true;

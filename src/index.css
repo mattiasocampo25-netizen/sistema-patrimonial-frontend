@@ -813,6 +813,48 @@ html.font-lg { font-size: 18px; }
     button[title*="Abrir menú"] {
       display: none !important;
     }
+    /* La ficha de un bien es una excepción: se imprime como documento propio. */
+    .ficha-bien-overlay {
+      display: block !important;
+      position: static !important;
+      inset: auto !important;
+      padding: 0 !important;
+      background: transparent !important;
+      overflow: visible !important;
+    }
+    body:has(.ficha-bien-overlay) .workspace-main {
+      display: none !important;
+    }
+    .ficha-bien-dialog {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      max-height: none !important;
+      overflow: visible !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: #ffffff !important;
+      color: #111827 !important;
+    }
+    .ficha-bien-dialog,
+    .ficha-bien-dialog * {
+      color: #111827 !important;
+    }
+    .ficha-bien-contenido {
+      overflow: visible !important;
+      padding: 8mm 0 !important;
+    }
+    .ficha-bien-footer,
+    .ficha-bien-overlay > button,
+    .ficha-bien-overlay .no-print {
+      display: none !important;
+    }
+    .ficha-bien-qr {
+      break-inside: avoid;
+      color: #111827 !important;
+      background: #ffffff !important;
+    }
     /* Mostrar solo el contenido del main */
     #contenido,
     .workspace-main {

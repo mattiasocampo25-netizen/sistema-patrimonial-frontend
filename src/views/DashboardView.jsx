@@ -393,12 +393,15 @@ export default function DashboardView({
 
       {/* 2B. BANDEJA DE PENDIENTES */}
       {widgets.pendientes && (
-      <div className="bg-surface-1 rounded-panel border border-line shadow-card p-4 sm:p-5" data-tour="dash-pendientes">
+      <div className="bg-surface-1 rounded-panel border border-line shadow-card p-4 sm:p-5" data-tour="dash-pendientes" aria-label="Mi bandeja de trabajo">
           <div className="flex items-center justify-between gap-3 mb-4">
               <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-list-check text-content-3"></i> Atención requerida
+                  <i className="fa-solid fa-list-check text-content-3" aria-hidden="true"></i> Mi bandeja de trabajo
               </h2>
-              {pendientes.every(p => p.count === 0) && (
+              {(actasPorFirmar.length > 0 || pendientes.some(item => item.count > 0)) && <span className="text-[11px] font-semibold text-content-3">
+                {actasPorFirmar.length} firmas · {pendientes.reduce((total, item) => total + Number(item.count || 0), 0).toLocaleString('es-PY')} acciones de inventario
+              </span>}
+              {pendientes.every(p => p.count === 0) && actasPorFirmar.length === 0 && (
                   <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-ok dark:text-emerald-400">
                       <i className="fa-solid fa-circle-check"></i> Todo al día
                   </span>

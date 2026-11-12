@@ -109,6 +109,7 @@ export default function InventarioView({
   const [densidad, setDensidad] = useScopedPreference('inv_densidad', username, 'comoda', normalizarDensidad);
   const compacto = densidad === 'compacta';
   const [rotuloCopiado, setRotuloCopiado] = useState('');
+  const [observacionAbierta, setObservacionAbierta] = useState(null);
   const cambiarDensidad = () => {
     const v = compacto ? 'comoda' : 'compacta';
     setDensidad(v);
@@ -762,20 +763,17 @@ export default function InventarioView({
                                           {item.rotulo && <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(String(item.rotulo)); setRotuloCopiado(item.id); window.setTimeout(() => setRotuloCopiado(actual => actual === item.id ? '' : actual), 1500); } catch { /* Copia manual disponible. */ } }} title={rotuloCopiado === item.id ? 'Rótulo copiado' : 'Copiar rótulo'} aria-label={`Copiar rótulo ${item.rotulo}`} className="rounded px-1 text-content-3 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className={`fa-solid ${rotuloCopiado === item.id ? 'fa-check text-ok' : 'fa-copy'}`} aria-hidden="true" /></button>}
                                         </span>
                                         {String(item.observaciones || '').trim() && (
-                                          <span className="group/observacion relative inline-flex">
+                                          <span className="inline-flex">
                                             <button
                                               type="button"
                                               aria-label={`Ver observación del bien ${item.rotulo || ''}`}
                                               title={String(item.observaciones).trim()}
+                                              onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones).trim() })}
                                               className="inline-flex h-7 items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 text-[10px] font-bold text-amber-800 shadow-sm transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200 dark:hover:bg-amber-400/20"
                                             >
                                               <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
                                               Observado
                                             </button>
-                                            <span role="tooltip" className="pointer-events-none absolute left-0 top-full z-30 mt-2 hidden w-72 whitespace-normal rounded-xl border border-line bg-surface-1 p-3 text-left text-xs font-medium leading-relaxed text-content-1 shadow-xl group-hover/observacion:block group-focus-within/observacion:block dark:bg-surface-1">
-                                              <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Observación</span>
-                                              {String(item.observaciones).trim()}
-                                            </span>
                                           </span>
                                         )}
                                         {cols.fecha && item.fechaAdquisicion && (
@@ -1007,6 +1005,26 @@ export default function InventarioView({
               <button onClick={() => { setConfirmaBajaMasiva(false); if (onBajaMasiva) onBajaMasiva(seleccionados); }} className="flex-1 h-10 px-5 rounded-control text-[13px] font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer">Confirmar</button>
             </div>
           </div>
+        </Dialogo>
+      )}
+
+      {observacionAbierta && (
+        <Dialogo className={STYLES.modalOverlay} onCerrar={() => setObservacionAbierta(null)}>
+          <section className={`${STYLES.modalContent} max-w-xl`} role="dialog" aria-modal="true" aria-labelledby="observacion-bien-titulo" onClick={(event) => event.stopPropagation()}>
+            <header className="flex items-start justify-between gap-4 border-b border-line bg-surface-2 px-5 py-4 sm:px-6">
+              <div className="min-w-0">
+                <h2 id="observacion-bien-titulo" className="text-base font-bold text-content-1">Observación del bien</h2>
+                <p className="mt-1 text-xs text-content-3">Rótulo: {observacionAbierta.rotulo}</p>
+              </div>
+              <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setObservacionAbierta(null)} />
+            </header>
+            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] overflow-y-auto overscroll-contain whitespace-pre-wrap break-words px-5 py-5 text-sm leading-relaxed text-content-1 custom-scrollbar sm:px-6">
+              {observacionAbierta.texto}
+            </div>
+            <footer className="flex justify-end border-t border-line bg-surface-2 px-5 py-3 sm:px-6">
+              <Button variante="primary" tamano="md" onClick={() => setObservacionAbierta(null)}>Cerrar</Button>
+            </footer>
+          </section>
         </Dialogo>
       )}
 

@@ -25,6 +25,9 @@ const TIPO_ICONO = {
 export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
   const [urlsFotosPrivadas, setUrlsFotosPrivadas] = useState({});
+  const [qrFicha, setQrFicha] = useState('');
+  const bienId = bien?.id;
+  const bienRotulo = bien?.rotulo;
   const fotos = bien?.fotos || [];
   const claveFotos = fotos.map(f => f.ruta || f.url || '').join('|');
   useEffect(() => {
@@ -52,6 +55,29 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
   // `claveFotos` representa las rutas que deben solicitar URL temporal.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, bien?.id, claveFotos]);
+  useEffect(() => {
+    let vigente = true;
+    if (!isOpen || (!bienId && !bienRotulo)) {
+      setQrFicha('');
+      return () => { vigente = false; };
+    }
+    const generarQR = async () => {
+      try {
+        const { default: QRCode } = await import('qrcode');
+        const valor = bienId || bienRotulo || 'UNP';
+        const origen = window.location.origin && !window.location.origin.includes('localhost')
+          ? window.location.origin
+          : 'https://sigep-inventario.vercel.app';
+        const url = `${origen}/?id=${encodeURIComponent(valor)}`;
+        const dataUrl = await QRCode.toDataURL(url, { errorCorrectionLevel: 'M', margin: 1, width: 180 });
+        if (vigente) setQrFicha(dataUrl);
+      } catch {
+        if (vigente) setQrFicha('');
+      }
+    };
+    generarQR();
+    return () => { vigente = false; };
+  }, [isOpen, bienId, bienRotulo]);
   if (!isOpen || !bien) return null;
   const incompletos = camposIncompletos(bien);
   const Dato = ({ label, value }) => (
@@ -62,8 +88,8 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
   );
 
   return (
-    <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
-      <div className={STYLES.modalContent + " max-w-2xl"} onClick={(e) => e.stopPropagation()}>
+    <Dialogo className={`${STYLES.modalOverlay} ficha-bien-overlay`} onCerrar={onClose}>
+      <div className={STYLES.modalContent + " ficha-bien-dialog max-w-2xl"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-2 dark:bg-surface-1/5 text-content-1 dark:text-content-1">
@@ -90,7 +116,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
           <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={onClose} />
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
+        <div className="ficha-bien-contenido p-6 space-y-6 overflow-y-auto custom-scrollbar">
           {incompletos.length > 0 && (
             <section aria-label="Datos incompletos del bien" className="rounded-card border border-warn/25 bg-warn-soft px-4 py-3.5">
               <div className="flex items-start gap-3">
@@ -102,6 +128,14 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               </div>
             </section>
           )}
+          {String(bien.observaciones || '').trim() && (
+            <section aria-label="Observaciones del bien" className="rounded-card border border-amber-300 bg-amber-50 px-4 py-3.5 dark:border-amber-400/30 dark:bg-amber-400/10">
+              <h3 className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
+                <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Observación registrada
+              </h3>
+              <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-amber-950 dark:text-amber-100">{bien.observaciones}</p>
+            </section>
+          )}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             <Dato label="Cuenta" value={[bien.cuenta, bien.subcuenta, bien.analitico1, bien.analitico2].filter(Boolean).join('.')} />
             <Dato label="Adquisición" value={bien.fechaAdquisicion ? formatDateText(bien.fechaAdquisicion) : null} />
@@ -111,6 +145,15 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
             {bien.funcionarioAlternativo && <Dato label="Responsable alternativo · sin FC-10 propio" value={bien.funcionarioAlternativo} />}
             <Dato label="Dependencia" value={bien.dependencia} />
           </div>
+
+          <section className="ficha-bien-qr flex items-center gap-4 rounded-card border border-line bg-surface-2 p-4" aria-label="Código QR del bien">
+            {qrFicha ? <img src={qrFicha} alt={`Código QR del bien ${bien.rotulo || ''}`} className="h-24 w-24 shrink-0 rounded-lg bg-white p-1 print:h-28 print:w-28" /> : <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-content-3"><i className="fa-solid fa-qrcode text-2xl" aria-hidden="true" /></span>}
+            <div className="min-w-0">
+              <h3 className="text-sm font-bold text-content-1">Ficha del bien · QR</h3>
+              <p className="mt-1 break-all text-xs text-content-2">Rótulo: {bien.rotulo || 'Sin rótulo'}</p>
+              <p className="mt-1 text-[11px] text-content-3">El código permite localizar este registro desde el sistema.</p>
+            </div>
+          </section>
 
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -203,7 +246,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
+        <div className="ficha-bien-footer flex justify-end gap-2 px-6 py-5 border-t border-line dark:border-zinc-800/80 shrink-0">
           {onVerEnInventario && (
             <Button variante="subtle" tamano="md" icono="fa-boxes-stacked" onClick={() => onVerEnInventario(bien)}>
               Ver en inventario

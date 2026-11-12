@@ -18,7 +18,7 @@ const CARD_RADIOS = {
 export function Card({ className = '', children, como: Tag = 'div', tamaño = 'md', ...resto }) {
   return (
     <Tag
-      className={`bg-surface-1 border border-line ${CARD_RADIOS[tamaño] || CARD_RADIOS.md} shadow-card ${className}`}
+      className={`bg-surface-1 border border-line/80 ${CARD_RADIOS[tamaño] || CARD_RADIOS.md} shadow-[0_2px_12px_rgba(15,23,42,0.045)] ${className}`}
       {...resto}
     >
       {children}

@@ -1844,7 +1844,7 @@ if (publicBienId) {
         ) : null}
       >
             <Suspense fallback={<CargaModulo />}>
-            <div key={activeTab} className={`tab-enter mx-auto w-full ${activeTab === 'dashboard' ? 'max-w-[1600px]' : 'max-w-[1440px]'} px-4 py-6 sm:px-6 lg:px-10 min-h-full flex flex-col`}>
+            <div key={activeTab} className="tab-enter mx-auto flex min-h-full w-full max-w-[1600px] flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-10">
                 {activeTab === 'dashboard' && (<DashboardView requestDependenciaChange={requestDependenciaChange} currentUser={currentUser} dependenciaActual={dependenciaActual} saludoBienvenida={saludoBienvenida} stats={stats} pendientes={pendientes} isLoading={isLoading} timeStats={timeStats} clearAllFilters={clearAllFilters} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setFiltroAnio={setFiltroAnio} setCurrentPage={setCurrentPage} setBienEditing={setBienEditing} setIsBienModalOpen={setIsBienModalOpen} fileInputRef={fileInputRef} handleExportInventarioCSV={handleExportInventarioCSV} setIsBulkQR={setIsBulkQR} setQrTargetBien={setQrTargetBien} setIsQRModalOpen={setIsQRModalOpen} openFC03Modal={openFC03Modal} setFc10Year={setFc10Year} setFc10Month={setFc10Month} fc10List={fc10List} bienes={bienes} />)}
 
                 {activeTab === 'resumen' && (<ResumenView dependenciaActual={dependenciaActual} stats={stats} pendientes={pendientes} fc10List={fc10List} timeStats={timeStats} setActiveTab={setActiveTab} setFiltroQR={setFiltroQR} setFiltroFC10={setFiltroFC10} setFiltroPendiente={setFiltroPendiente} setCurrentPage={setCurrentPage} clearAllFilters={clearAllFilters} setFc10Year={setFc10Year} setFc10Month={setFc10Month} />)}

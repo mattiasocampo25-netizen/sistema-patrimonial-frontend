@@ -10,15 +10,9 @@ import ProgressRing from './ProgressRing';
  * las ocho dependencias siempre salgan distintas.
  */
 
-const PALETA = [
-  'bg-pastel-1',
-  'bg-pastel-2',
-  'bg-pastel-3',
-  'bg-pastel-4',
-  'bg-pastel-5',
-  'bg-pastel-6',
-  'bg-pastel-7',
-  'bg-pastel-8'
+const ACENTOS = [
+  'before:bg-brand', 'before:bg-info', 'before:bg-ok', 'before:bg-warn',
+  'before:bg-violet-500', 'before:bg-cyan-500', 'before:bg-emerald-500', 'before:bg-pink-500'
 ];
 
 export default function Tile({
@@ -32,14 +26,14 @@ export default function Tile({
   accion,
   className = ''
 }) {
-  const fondo = PALETA[indice % PALETA.length];
+  const acento = ACENTOS[indice % ACENTOS.length];
   const Etiqueta = onClick ? 'button' : 'div';
 
   return (
     <Etiqueta
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`group flex flex-col gap-3 rounded-card ${fondo} p-4 text-left border border-black/[0.04] dark:border-white/[0.06] shadow-sm transition-[transform,box-shadow] duration-[var(--dur-base)] ease-[var(--ease-out)] ${ onClick ? 'hover:-translate-y-1 hover:shadow-panel cursor-pointer' : '' } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${className}`}
+      className={`group relative flex flex-col gap-3 overflow-hidden rounded-2xl border border-line/80 bg-surface-1 p-4 text-left shadow-sm transition-[border-color,box-shadow] duration-[var(--dur-base)] before:absolute before:inset-x-0 before:top-0 before:h-1 ${acento} ${ onClick ? 'hover:border-brand/30 hover:shadow-md cursor-pointer' : '' } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

@@ -39,11 +39,11 @@ export default function StatTile({
     <Contenedor
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`flex flex-col gap-2 p-4 rounded-panel bg-surface-1 border border-line shadow-card text-left w-full ${ onClick ? 'hover:-translate-y-0.5 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
+      className={`flex min-h-[142px] flex-col gap-2.5 rounded-2xl border border-line/80 bg-surface-1 p-4 text-left shadow-[0_2px_12px_rgba(15,23,42,0.045)] w-full ${ onClick ? 'hover:border-brand/30 hover:shadow-md motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
     >
       <div className="flex items-center justify-between gap-3">
         {icono ? (
-          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control ${t.fondo} ${t.icono}`} aria-hidden="true">
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${t.fondo} ${t.icono}`} aria-hidden="true">
             <i className={`fa-solid ${icono}`} />
           </span>
         ) : null}

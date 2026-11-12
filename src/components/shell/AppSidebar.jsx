@@ -84,10 +84,10 @@ function ItemNav({ item, activo, onIr, solicitudes, t, compacta, favorito = fals
       onFocus={ubicarTooltip}
       onBlur={() => setTooltip(null)}
       data-tour={`nav-${item.id}`}
-      className={`group relative flex min-w-0 flex-1 items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-control text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-gradient-to-r from-brand to-blue-700 text-white font-semibold shadow-md shadow-brand/20 dark:to-indigo-600' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
+      className={`group relative flex min-w-0 flex-1 items-center ${compacta ? 'gap-3 px-3 lg:justify-center lg:px-0' : 'gap-3 px-3'} h-10 rounded-xl text-body transition-[color,background-color,transform,box-shadow] duration-[var(--dur-fast)] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo ? 'bg-brand-soft text-brand-text font-bold shadow-sm dark:bg-brand/15 dark:text-brand before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-r-full before:bg-brand' : 'text-sidebar-content-2 font-normal hover:bg-brand/5 dark:hover:bg-surface-1/[0.07] hover:text-sidebar-content' }`}
     >
       <span className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-[var(--dur-fast)] group-hover:scale-110 ${activo ? 'text-brand-text' : 'text-sidebar-content-2 group-hover:text-sidebar-content'}`}>
-        <i className={`fa-solid ${item.icon} text-[13px] ${activo ? 'text-white' : ''}`} aria-hidden="true" />
+        <i className={`fa-solid ${item.icon} text-[13px] ${activo ? 'text-brand-text dark:text-brand' : ''}`} aria-hidden="true" />
       </span>
       <span className={`flex-1 text-left tracking-tight truncate ${compacta ? 'lg:hidden' : ''}`}>{t(item.label)}</span>
 

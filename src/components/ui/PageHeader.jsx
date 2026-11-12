@@ -27,12 +27,12 @@ export default function PageHeader({
 }) {
   return (
     <header
-      className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6 animate-fade-up ${className}`}
+      className={`relative flex flex-col gap-4 rounded-2xl border border-line bg-surface-1 px-4 py-4 shadow-sm sm:rounded-3xl sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 animate-fade-up ${className}`}
     >
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {icono ? (
           <span
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text border border-brand/10 shadow-xs"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-text ring-1 ring-inset ring-brand/10"
             aria-hidden="true"
           >
             <i className={`fa-solid ${icono}`} />
@@ -41,11 +41,11 @@ export default function PageHeader({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-title font-bold text-content-1 tracking-tight leading-tight">{titulo}</h1>
+            <h1 className="text-xl font-black leading-tight tracking-tight text-content-1 sm:text-2xl">{titulo}</h1>
             {contador}
           </div>
           {descripcion ? (
-            <p className="text-body text-content-2 mt-1 leading-relaxed">{descripcion}</p>
+            <p className="mt-1 text-sm leading-relaxed text-content-2">{descripcion}</p>
           ) : null}
           {children}
         </div>
@@ -53,7 +53,7 @@ export default function PageHeader({
 
       {acciones ? (
         // flex-wrap + min-w-0: si no entran, bajan de línea en vez de salirse.
-        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 lg:w-auto lg:shrink-0 lg:justify-end">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-2 lg:w-auto lg:max-w-[55%] lg:shrink-0 lg:justify-end">
           {acciones}
         </div>
       ) : null}

@@ -300,6 +300,12 @@ html.density-compact table th { letter-spacing: 0.035em; }
   overflow: hidden;
 }
 
+/* El buscador del inventario tiene su propio botón de limpiar; oculta el nativo de Chromium. */
+.inventory-search-input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* Superficies interactivas: foco visible coherente y filas de lectura cómodas. */
 .dashboard-metric-card:focus-visible,
 .inventory-item-card:focus-within {

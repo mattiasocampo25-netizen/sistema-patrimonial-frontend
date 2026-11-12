@@ -260,7 +260,7 @@ export default function InventarioView({
         onFocus={() => setShowHistorial(true)}
         onBlur={() => setTimeout(() => setShowHistorial(false), 150)}
         onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) { guardarReciente(searchTerm); setShowHistorial(false); } }}
-        className="block h-12 w-full min-w-0 rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
+        className="inventory-search-input block h-12 w-full min-w-0 rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
       />
       {showHistorial && !searchTerm && recientes.length > 0 && (
         <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">

@@ -27,12 +27,12 @@ export default function PageHeader({
 }) {
   return (
     <header
-      className={`relative flex flex-col gap-4 rounded-2xl border border-line bg-surface-1 px-4 py-4 shadow-sm sm:rounded-3xl sm:px-6 sm:py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 animate-fade-up ${className}`}
+      className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 animate-fade-up ${className}`}
     >
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {icono ? (
           <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-text ring-1 ring-inset ring-brand/10"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-text ring-1 ring-inset ring-brand/10 sm:h-14 sm:w-14"
             aria-hidden="true"
           >
             <i className={`fa-solid ${icono}`} />
@@ -41,7 +41,7 @@ export default function PageHeader({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-xl font-black leading-tight tracking-tight text-content-1 sm:text-2xl">{titulo}</h1>
+            <h1 className="font-display text-xl font-extrabold leading-tight tracking-tight text-content-1 sm:text-2xl">{titulo}</h1>
             {contador}
           </div>
           {descripcion ? (

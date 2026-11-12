@@ -7,9 +7,9 @@ html {
 }
 
 @theme {
-  /* Open Sans es la única tipografía del sistema. */
-  --font-sans: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Open Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Tipografía renovada: DM Sans para lectura y Manrope para encabezados. */
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   /* La monoespaciada es de verdad monoespaciada: los rótulos, las cédulas y
      las cifras con tabular-nums tienen que alinearse en columna. Antes
      apuntaba a la sans y tabular-nums no hacía nada. */
@@ -27,7 +27,7 @@ html {
 }
 
 body { 
-  font-family: 'Open Sans', 'Inter', system-ui, sans-serif; 
+  font-family: 'DM Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   background-color: var(--canvas, #f3f2ee); 
@@ -156,43 +156,39 @@ html.density-compact table th { letter-spacing: 0.035em; }
   background: rgb(255 255 255 / 0.3);
 }
 
-/* Sidebar institucional con profundidad cromática y brillo de marca sutil. */
+/* Sistema visual institucional: navegación oscura y superficies cálidas claras. */
 .sidebar-premium {
   background-color: var(--sidebar);
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.08), transparent 50%),
-    linear-gradient(165deg, #ffffff 0%, #ffffff 70%, #f8faff 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 15%, transparent), transparent 52%),
+    linear-gradient(165deg, var(--sidebar) 0%, color-mix(in srgb, var(--sidebar) 88%, #07131d) 100%);
   border-color: var(--sidebar-line);
-  box-shadow: 0 20px 60px rgb(15 23 42 / 0.12), 0 8px 20px rgb(15 23 42 / 0.06);
+  box-shadow: 0 16px 40px rgb(8 25 39 / 0.2), 0 4px 12px rgb(8 25 39 / 0.09);
   border-width: 1px;
 }
 
 .topbar-premium {
   background-color: var(--surface-1);
-  background-image:
-    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 5%, transparent), transparent 48%),
-    linear-gradient(165deg, var(--surface-1) 0%, var(--surface-1) 72%, color-mix(in srgb, var(--surface-2) 70%, var(--surface-1)) 100%);
+  background-image: linear-gradient(135deg, var(--surface-1), color-mix(in srgb, var(--surface-2) 50%, var(--surface-1)));
   border-color: var(--line);
 }
 
 .dark .topbar-premium {
-  background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.16), transparent 48%),
-    linear-gradient(165deg, #14243b 0%, #111e31 58%, var(--surface-1) 100%);
+  background-image: linear-gradient(135deg, var(--surface-1), color-mix(in srgb, var(--surface-2) 65%, var(--surface-1)));
 }
 
 .dark .sidebar-premium {
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.3), transparent 48%),
-    linear-gradient(165deg, #14243b 0%, #101d30 48%, #0e1828 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 20%, transparent), transparent 48%),
+    linear-gradient(165deg, var(--sidebar) 0%, #0a1723 100%);
   border-color: var(--sidebar-line);
-  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5), 0 8px 20px rgb(0 0 0 / 0.25);
+  box-shadow: 0 18px 42px rgb(0 0 0 / 0.3), 0 5px 14px rgb(0 0 0 / 0.16);
 }
 
 .dark .sidebar-premium {
   background-image:
-    radial-gradient(ellipse at 0% 0%, rgb(59 130 246 / 0.2), transparent 48%),
-    linear-gradient(165deg, #14243b 0%, #101d30 48%, #0e1828 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 48%),
+    linear-gradient(165deg, var(--sidebar) 0%, #0a1723 100%);
   border-color: var(--sidebar-line);
 }
 
@@ -205,7 +201,7 @@ html.density-compact table th { letter-spacing: 0.035em; }
   background-image:
     radial-gradient(ellipse at 8% 0%, color-mix(in srgb, var(--brand) 2.5%, transparent), transparent 40%),
     radial-gradient(ellipse at 96% 18%, color-mix(in srgb, var(--brand) 1.5%, transparent), transparent 36%);
-  border-radius: var(--radius-panel);
+  border-radius: 0;
 }
 
 /* Mejoras globales de interfaz premium */
@@ -234,23 +230,10 @@ html.density-compact table th { letter-spacing: 0.035em; }
   }
 
   /* Mejora de botones primarios */
-  .bg-brand {
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--brand) 25%, transparent);
-  }
-
-  .bg-brand:hover {
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 35%, transparent);
-  }
-
   /* Mejora de tarjetas en hover */
   .card-lift:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-panel);
-  }
-
-  /* Mejora de modales */
-  .rounded-panel {
-    backdrop-filter: blur(8px);
   }
 
   /* Mejora de badges */
@@ -281,6 +264,21 @@ html.density-compact table th { letter-spacing: 0.035em; }
   :focus-visible {
     outline: 2px solid var(--brand);
     outline-offset: 2px;
+  }
+}
+
+/* Unifica botones principales antiguos que aún usan utilidades zinc/salvia.
+   Las acciones secundarias y destructivas conservan sus variantes propias. */
+@layer utilities {
+  button.bg-zinc-900:not(:disabled),
+  button.bg-slate-900:not(:disabled) {
+    background-color: var(--brand) !important;
+    color: #ffffff !important;
+    border-color: transparent;
+  }
+  button.bg-zinc-900:hover:not(:disabled),
+  button.bg-slate-900:hover:not(:disabled) {
+    background-color: var(--brand-hover) !important;
   }
 }
 

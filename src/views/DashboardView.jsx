@@ -246,17 +246,17 @@ export default function DashboardView({
     <div className="dashboard-stagger space-y-6 sm:space-y-7 pb-16">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card p-0">
+      <Card className="dashboard-welcome-card overflow-hidden border-0 bg-gradient-to-br from-[#123149] via-[#14566a] to-[#147a7e] p-0 text-white shadow-panel">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6">
         <div className="flex items-center gap-4 min-w-0">
-          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-card bg-brand-soft text-brand-text font-bold text-xl sm:text-2xl shadow-card dep-accent-ring">
+          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-xl font-extrabold text-white shadow-sm ring-4 ring-white/5 sm:text-2xl">
             {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3 truncate">
-              Panel General · {dependenciaActual}
+            <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-teal-100/80 sm:text-[11px]">
+              Gestión patrimonial · {dependenciaActual}
             </p>
-            <h3 className="text-xl sm:text-2xl font-black text-content-1 dark:text-white tracking-tight truncate mt-0.5">
+            <h3 className="mt-1 truncate font-display text-xl font-extrabold tracking-tight text-white sm:text-3xl">
               {saludoBienvenida}, {currentUser?.nombre || 'Usuario'}!
             </h3>
           </div>
@@ -268,7 +268,7 @@ export default function DashboardView({
               ref={widgetButtonRef}
               onClick={() => setMenuWidgets(v => !v)}
               title="Personalizar panel" aria-label="Personalizar panel"
-              className="flex items-center gap-2 h-11 px-4 rounded-card bg-surface-1 dark:bg-surface-1/5 border border-line/80 dark:border-white/10 shadow-sm text-[13px] font-bold text-content-2 dark:text-content-3 hover:bg-surface-2 dark:hover:bg-surface-1/10 motion cursor-pointer"
+              className="flex h-10 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 text-[12px] font-bold text-white shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               <i className="fa-solid fa-sliders text-xs"></i> <span className="hidden sm:inline">Personalizar</span>
             </button>
@@ -292,14 +292,14 @@ export default function DashboardView({
               </>, document.body
             )}
           </div>
-          <div className="flex items-center gap-2.5 rounded-card bg-surface-1 dark:bg-surface-1/5 px-4 py-2.5 border border-line/80 dark:border-white/10 shadow-sm">
+          <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 shadow-sm">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-content-1 dark:text-white leading-tight">Sistema Sincronizado</span>
-              <span className="text-[10px] font-medium text-content-3 dark:text-content-3 leading-tight">Conexión activa</span>
+              <span className="text-xs font-bold leading-tight text-white">Sistema sincronizado</span>
+              <span className="text-[10px] font-medium leading-tight text-teal-100/75">Conexión activa</span>
             </div>
           </div>
         </div>

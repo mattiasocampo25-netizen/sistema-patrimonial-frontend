@@ -21,7 +21,7 @@ export default function FuncionariosView({
     <div className="flex flex-col flex-1 space-y-6 pb-12">
 
       {/* CABECERA DE SECCIÓN */}
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] p-5 sm:p-6 rounded-panel border border-line/70 dark:border-white/10 shadow-sm">
+      <div className="space-y-4">
         <Card className="p-0">
           <div className="p-5 sm:p-6">
             <PageHeader
@@ -63,21 +63,21 @@ export default function FuncionariosView({
         </Card>
 
         {/* Barra de búsqueda del padrón */}
-        <div className="mt-4 pt-4 border-t border-line dark:border-white/10">
-  <div className="relative w-full">
-    <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
-    <input
-      type="text"
-      aria-label="Buscar funcionario por nombre, cargo o número de cédula"
-      placeholder="Buscar funcionario por nombre, apellido o número de cédula..."
-      value={searchFuncionarioInput}
-      onChange={(e) => {
-        setSearchFuncionarioInput(e.target.value);
-        setCurrentPaginaFuncionarios(1); // Resetea la paginación para mostrar resultados desde la página 1
-      }}
-      className="w-full rounded-control border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 h-11 pl-11 pr-4 text-sm font-medium text-content-1 dark:text-white placeholder:text-content-3 focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 outline-none transition-all"
-    />
-  </div>
+        <Card className="p-4">
+          <div className="relative w-full">
+            <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
+            <input
+              type="text"
+              aria-label="Buscar funcionario por nombre, cargo o número de cédula"
+              placeholder="Buscar funcionario por nombre, apellido o número de cédula..."
+              value={searchFuncionarioInput}
+              onChange={(e) => {
+                setSearchFuncionarioInput(e.target.value);
+                setCurrentPaginaFuncionarios(1);
+              }}
+              className="w-full rounded-control border border-line bg-surface-2 h-11 pl-11 pr-4 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/15 outline-none transition-all"
+            />
+          </div>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
             <FiltroCombo
               valor={filtroCargo}
@@ -92,7 +92,7 @@ export default function FuncionariosView({
             </button>
           </div>
           <p className="mt-2 text-[11px] text-content-3">Las cédulas se ocultan inicialmente para reducir su exposición en pantalla.</p>
-</div>
+        </Card>
 
       </div>
 

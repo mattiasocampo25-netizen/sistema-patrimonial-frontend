@@ -29,17 +29,17 @@ export const TYPO = {
   field: 'text-sm font-medium text-content-1 dark:text-white',
   fieldSm: 'text-[11px] font-medium text-content-1 dark:text-white',
   caption: 'text-[11px] text-content-3 dark:text-content-3',
-  heading: 'text-lg font-black tracking-tight text-content-1 dark:text-white',
-  headingSm: 'text-sm font-bold tracking-tight text-content-1 dark:text-white',
+  heading: 'font-display text-lg font-extrabold tracking-tight text-content-1 dark:text-white',
+  headingSm: 'font-display text-sm font-bold tracking-tight text-content-1 dark:text-white',
 };
 
 // Modales
 export const MODAL = {
-  header: 'px-5 sm:px-6 py-4 border-b border-line dark:border-line bg-surface-1 dark:bg-surface-1 shrink-0 z-10',
+  header: 'px-5 sm:px-6 py-4 border-b border-line bg-surface-2 shrink-0 z-10',
   body: 'p-5 sm:p-6 overflow-y-auto space-y-5 bg-surface-1 custom-scrollbar',
   bodyCompact: 'p-4 sm:p-5 overflow-y-auto space-y-4 bg-surface-1 custom-scrollbar',
-  footer: 'flex flex-wrap justify-end gap-2 px-5 sm:px-6 py-4 border-t border-line dark:border-line bg-surface-2 dark:bg-surface-1/[0.02] shrink-0 z-10',
-  overlay: 'fixed inset-0 bg-slate-950/55 dark:bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 z-[300] transition-opacity animate-fade-in',
+  footer: 'flex flex-wrap justify-end gap-2 px-5 sm:px-6 py-4 border-t border-line bg-surface-2 shrink-0 z-10',
+  overlay: 'fixed inset-0 bg-[#0c2030]/60 backdrop-blur-md flex items-center justify-center p-4 z-[300] transition-opacity animate-fade-in',
   content: 'bg-surface-1 rounded-panel shadow-pop w-full max-h-[90dvh] flex flex-col border border-line overflow-hidden relative animate-slide-up',
   contentWide: 'bg-surface-1 rounded-panel shadow-pop w-full max-h-[90dvh] flex flex-col border border-line overflow-hidden relative animate-slide-up max-w-6xl',
   contentNarrow: 'bg-surface-1 rounded-panel shadow-pop w-full max-h-[90dvh] flex flex-col border border-line overflow-hidden relative animate-slide-up max-w-md',

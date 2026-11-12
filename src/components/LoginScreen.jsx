@@ -53,24 +53,24 @@ export default function LoginScreen({
       {/* Fondo decorativo sutil con tonos de marca */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-950/75 via-slate-950/60 to-brand/45" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#071a29]/88 via-[#0d3445]/70 to-brand/45" />
         <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-brand/20 blur-[100px]" />
         <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-cyan-400/10 blur-[100px]" />
       </div>
 
-      <div className="relative z-10 flex w-full items-center justify-center max-w-5xl">
-        <div className="login-card-in grid w-full overflow-hidden rounded-3xl border border-line bg-surface-1 shadow-pop md:grid-cols-[0.95fr_1.05fr]">
-          <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-slate-950 p-10 text-white md:flex lg:p-14">
+      <div className="relative z-10 flex w-full items-center justify-center max-w-6xl">
+        <div className="login-card-in grid w-full overflow-hidden rounded-[28px] border border-white/40 bg-surface-1 shadow-pop md:grid-cols-[1fr_1fr]">
+            <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-[#102b40] p-10 text-white md:flex lg:p-14">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-65" />
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-950/40 to-slate-950/90" />
-              <div className="absolute -right-32 -top-28 h-96 w-96 rounded-full bg-blue-500/20 blur-3xl" />
-              <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-cyan-400/10 blur-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#092033]/65 via-[#0b2b3e]/45 to-[#071a29]/95" />
+              <div className="absolute -right-32 -top-28 h-96 w-96 rounded-full bg-brand/25 blur-3xl" />
+              <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-teal-300/15 blur-3xl" />
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:42px_42px]" />
             </div>
             <div className="relative z-10 flex items-center gap-3">
               <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-2 shadow-card">
-                {appLogo ? <img src={appLogo} alt="Logo institucional UNP" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-xl text-blue-200" aria-hidden="true" />}
+                {appLogo ? <img src={appLogo} alt="Logo institucional UNP" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-xl text-teal-100" aria-hidden="true" />}
               </span>
               <span>
                 <span className="block text-sm font-bold tracking-wide">UNP · PATRIMONIO</span>
@@ -79,7 +79,7 @@ export default function LoginScreen({
             </div>
 
             <div className="relative z-10 my-12">
-              <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1.5 text-label font-semibold text-blue-100">
+              <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-teal-200/20 bg-teal-300/10 px-3 py-1.5 text-label font-semibold text-teal-100">
                 <i className="fa-solid fa-shield-halved" aria-hidden="true" /> Plataforma institucional
               </span>
               <h1 className="max-w-md text-3xl font-bold leading-tight tracking-tight lg:text-4xl">Tu gestión patrimonial, en un solo lugar.</h1>
@@ -259,7 +259,7 @@ export default function LoginScreen({
       {showRecoveryModal && (
         <Dialogo className="fixed inset-0 z-[400] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-fade-in" onCerrar={() => setShowRecoveryModal(false)}>
           <div className="w-full max-w-sm rounded-2xl bg-surface-1 p-6 shadow-pop border border-line text-center text-content-1 animate-slide-up">
-            <div className="h-12 w-12 rounded-xl bg-blue-500/10 text-brand-text dark:text-brand border border-blue-500/20 flex items-center justify-center mx-auto mb-4">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-brand/20 bg-brand-soft text-brand-text">
               <i className="fa-solid fa-headset text-xl"></i>
             </div>
             <h3 className="text-lg font-bold text-content-1 tracking-tight">Recuperar acceso</h3>
@@ -267,7 +267,7 @@ export default function LoginScreen({
               Para restablecer tu contraseña, solicita ayuda al equipo de soporte patrimonial. Incluye tu nombre de usuario para identificar la cuenta.
             </p>
             <div className="mt-4 p-3 rounded-xl bg-surface-2 dark:bg-surface-3/50 border border-line text-sm font-bold text-content-1 dark:text-content-3">
-              <i className="fa-solid fa-envelope mr-2 text-brand-text dark:text-blue-400" aria-hidden="true"></i>
+              <i className="fa-solid fa-envelope mr-2 text-brand-text" aria-hidden="true"></i>
               <a href="mailto:patrimonio@unp.edu.py?subject=Recuperar%20acceso%20al%20sistema" className="text-brand-text underline-offset-2 hover:underline dark:text-brand">patrimonio@unp.edu.py</a>
             </div>
             <button

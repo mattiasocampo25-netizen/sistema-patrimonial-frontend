@@ -95,7 +95,7 @@ export default function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in-fast"
+      className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-[#0c2030]/65 backdrop-blur-md animate-fade-in-fast"
       onMouseDown={(e) => {
         if (cerrarAlPulsarFuera && e.target === e.currentTarget && onCerrar) onCerrar();
       }}
@@ -110,7 +110,7 @@ export default function Modal({
         className={`w-full ${TAMANOS[tamano] || TAMANOS.md} bg-surface-1 text-content-1 rounded-t-panel sm:rounded-panel border border-line shadow-pop flex flex-col max-h-[92dvh] outline-none animate-scale-in ${className}`}
       >
         {(titulo || onCerrar) && (
-          <div className="flex items-start justify-between gap-4 px-5 sm:px-6 py-4 border-b border-line bg-surface-1 shrink-0">
+          <div className="flex items-start justify-between gap-4 px-5 sm:px-6 py-4 border-b border-line bg-surface-2/70 shrink-0">
             <div className="flex items-start gap-3 min-w-0">
               {icono ? (
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text" aria-hidden="true">
@@ -118,7 +118,7 @@ export default function Modal({
                 </span>
               ) : null}
               <div className="min-w-0">
-                {titulo ? <h2 className="text-title font-bold text-content-1 truncate">{titulo}</h2> : null}
+                {titulo ? <h2 className="font-display text-title font-extrabold text-content-1 truncate">{titulo}</h2> : null}
                 {descripcion ? <p className="text-label text-content-2 mt-0.5">{descripcion}</p> : null}
               </div>
             </div>

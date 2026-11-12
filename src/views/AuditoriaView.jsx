@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { PageHeader, Button, StatTile } from '../components/ui';
+import { Card, PageHeader, Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
 import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 
@@ -34,6 +34,7 @@ export default function AuditoriaView({
   };
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
+      <Card className="p-5 sm:p-6">
       <PageHeader
         titulo="Auditoría"
         descripcion="Consulta quién hizo cada cambio y compara los valores anteriores con los nuevos."
@@ -41,6 +42,7 @@ export default function AuditoriaView({
         contador={<span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-bold text-violet-700 dark:text-violet-300">Solo administradores</span>}
         acciones={<Button variante="secondary" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Actualizar historial">{isLoadingAud ? 'Actualizando…' : 'Actualizar'}</Button>}
       />
+      </Card>
 
       <nav className="grid grid-cols-3 gap-2 rounded-2xl border border-line bg-surface-1 p-2 shadow-sm" role="tablist" aria-label="Secciones de auditoría">
         {[

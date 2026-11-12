@@ -29,20 +29,36 @@ export default function DependenciasModal({
   const [editUbicId, setEditUbicId] = useState(null);
   const [editUbicNombre, setEditUbicNombre] = useState('');
   const [buscaFunc, setBuscaFunc] = useState('');
+  const [vistaDetalle, setVistaDetalle] = useState('departamentos');
+  const inicializadaRef = useRef(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
+      inicializadaRef.current = false;
+      return;
+    }
+    // Inicializar solo al abrir el modal. App recrea algunos arrays en cada
+    // render; usarlos como disparador borraba la búsqueda durante la escritura.
+    if (!inicializadaRef.current) {
+      inicializadaRef.current = true;
       setBusqueda('');
       setEditandoDep(false);
       setNuevo('');
       setNuevaUbicacion('');
       setEditUbicId(null);
       setBuscaFunc('');
+      setVistaDetalle('departamentos');
       const actual = dependencias.find(d => d.nombre === dependenciaActual);
       setSelId(actual ? actual.id : (dependencias[0]?.id || null));
       setSelDetectada(null);
     }
   }, [isOpen, dependencias, dependenciaActual]);
+
+  useEffect(() => {
+    if (!isOpen || selDetectada || (selId && dependencias.some(d => d.id === selId))) return;
+    const actual = dependencias.find(d => d.nombre === dependenciaActual);
+    setSelId(actual?.id || dependencias[0]?.id || null);
+  }, [isOpen, dependencias, dependenciaActual, selId, selDetectada]);
 
   const q = useMemo(() => normalizeStr(busqueda), [busqueda]);
   const qfBusca = useMemo(() => normalizeStr(buscaFunc), [buscaFunc]);
@@ -141,89 +157,88 @@ export default function DependenciasModal({
 
   return (
     <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
-      <div className={STYLES.modalContent + " max-w-5xl !max-h-[90dvh]"} onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center gap-3 px-6 py-4 border-b border-line dark:border-line shrink-0">
+      <div className={STYLES.modalContent + " max-w-7xl !max-h-[94dvh] overflow-hidden !rounded-[28px] shadow-2xl"} onClick={(e) => e.stopPropagation()}>
+        <div className="relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-line bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 px-5 py-5 text-white sm:px-7">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
-              <i className="fa-solid fa-building-columns text-base"></i>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-inner">
+              <i className="fa-solid fa-sitemap text-lg" aria-hidden="true"></i>
             </div>
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-content-1 dark:text-white tracking-tight truncate">Dependencias y departamentos</h2>
-              <p className="text-xs text-content-3 dark:text-content-3 mt-0.5 hidden sm:block">Elige a la izquierda · gestiona a la derecha</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-200">Estructura institucional</p>
+              <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Dependencias</h2>
+              <p className="mt-0.5 text-xs text-slate-300">Organiza departamentos y funcionarios en un solo lugar</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="relative hidden md:block">
-              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <div className="relative min-w-0 flex-1 sm:w-[min(36vw,420px)] sm:flex-none">
+              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none" aria-hidden="true"></i>
               <input
                 type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
                 placeholder="Buscar dependencia, departamento o funcionario..."
-                className="rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 w-64"
+                className="h-11 w-full rounded-2xl border border-white/15 bg-white/10 pl-10 pr-3 text-[13px] font-medium text-white outline-none placeholder:text-slate-400 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-300/30"
               />
             </div>
-            <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 dark:hover:text-zinc-200 hover:bg-surface-3 dark:hover:bg-surface-1/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
               <i className="fa-solid fa-xmark text-base"></i>
             </button>
           </div>
         </div>
 
-        <div className="md:hidden px-6 pt-4 shrink-0">
-          <div className="relative">
-            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
-            <input
-              type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-              placeholder="Buscar..."
-              className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-hidden">
+        <div className="grid min-h-0 flex-1 overflow-hidden bg-surface-2/50 dark:bg-surface-2/30 md:grid-cols-[300px_minmax(0,1fr)]">
           {/* Panel izquierdo: lista de dependencias */}
-          <div className="md:w-80 shrink-0 border-b md:border-b-0 md:border-r border-line dark:border-line p-3 space-y-1 overflow-y-auto custom-scrollbar max-h-48 md:max-h-none">
-            <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">
-              Oficiales ({depsFiltradas.length})
+          <div className="flex max-h-52 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r">
+            <div className="mb-3 flex items-center justify-between gap-2 px-1">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">Catálogo</p>
+                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Unidades</h3>
+              </div>
+              <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-bold tabular-nums text-brand-text">{depsFiltradas.length}</span>
             </div>
-            {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
+            <div className="min-h-0 flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+              {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
             {detFiltradas.length > 0 && (
               <>
-                <div className="px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-warn dark:text-amber-400 border-t border-warn/25/30 mt-2">
-                  Posibles duplicados ({detFiltradas.length})
+                <div className="mt-3 border-t border-line px-2 pt-3 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-warn dark:text-amber-400">
+                  Detectadas ({detFiltradas.length})
                 </div>
                 {detFiltradas.map(d => <ItemDep key={'det-' + d.nombre} d={d} detectada />)}
               </>
             )}
             {(depsFiltradas.length + detFiltradas.length) === 0 && (
-              <p className="p-4 text-center text-xs font-semibold text-content-3">Sin coincidencias.</p>
+              <div className="flex min-h-28 flex-col items-center justify-center rounded-2xl border border-dashed border-line px-4 text-center">
+                <i className="fa-solid fa-magnifying-glass text-content-3" aria-hidden="true" />
+                <p className="mt-2 text-xs font-semibold text-content-3">No hay coincidencias</p>
+              </div>
             )}
-            <div className="px-3 pb-6 pt-3 space-y-2">
-              <div className="flex items-center gap-1.5">
+            </div>
+            <div className="mt-3 rounded-2xl border border-line bg-surface-2/70 p-3 dark:bg-surface-2">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-content-3">Nueva dependencia</p>
+              <div className="grid grid-cols-[minmax(0,1fr)_72px_40px] gap-2">
                 <input
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
-                  placeholder="Nueva dependencia..."
-                  className="flex-1 min-w-[110px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-surface-2 px-3 h-9 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 dark:placeholder:text-content-3 outline-none focus:border-brand focus:ring-1 focus:ring-brand"
+                  placeholder="Nombre"
+                  className="h-10 min-w-0 rounded-xl border border-line bg-surface-1 px-3 text-xs font-medium text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 dark:bg-surface-1/5 dark:text-white"
                 />
                 <input
                   type="text" value={nuevoCod} onChange={(e) => setNuevoCod(e.target.value)}
                   placeholder="Código"
-                  className="min-w-[56px] max-w-[92px] rounded-control border border-line dark:border-zinc-700 bg-surface-2 dark:bg-surface-2 px-2 h-9 text-[10px] font-mono font-bold text-center text-content-1 dark:text-white outline-none focus:border-brand focus:ring-1 focus:ring-brand"
+                  className="h-10 min-w-0 rounded-xl border border-line bg-surface-1 px-2 text-center font-mono text-[10px] font-bold text-content-1 outline-none focus:border-brand dark:bg-surface-1/5 dark:text-white"
                 />
                 <button
                   onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
-                  className="flex h-9 w-9 items-center justify-center rounded-control bg-brand text-content-inverse cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand-hover motion active:scale-95"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-content-inverse shadow-sm transition hover:bg-brand-hover active:scale-95 disabled:opacity-40"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
-              <p className="text-[10px] text-content-3 dark:text-content-3 leading-none">Presiona Enter para guardar.</p>
             </div>
           </div>
 
           {/* Panel derecho: detalle y gestión */}
-          <div className="flex-1 min-w-0 overflow-y-auto custom-scrollbar p-5 sm:p-6">
+          <div className="min-w-0 overflow-y-auto custom-scrollbar p-4 sm:p-6">
             {detSel ? (
               <div className="space-y-6">
                 {/* Banner de posible duplicado */}
@@ -257,8 +272,9 @@ export default function DependenciasModal({
                 </div>
               </div>
             ) : depSel ? (
-              <div className="space-y-6">
-                <div className="flex items-start justify-between gap-3">
+              <div className="space-y-5">
+                <div className="rounded-3xl border border-line bg-surface-1 p-5 shadow-sm dark:bg-surface-1/80 sm:p-6">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
                     {editandoDep ? (
                       <div className="flex items-center gap-1.5">
@@ -286,7 +302,7 @@ export default function DependenciasModal({
                         </button>
                       </div>
                     ) : (
-                      <h3 className="text-base font-bold text-content-1 dark:text-white tracking-tight text-balance" title={depSel.nombre}>
+                      <h3 className="text-xl font-black tracking-tight text-content-1 dark:text-white sm:text-2xl" title={depSel.nombre}>
                         {depSel.nombre}
                         {depSel.codigo && (
                           <span className="flex-shrink-0 font-mono text-[10px] font-bold text-content-3 dark:text-content-3 ml-1.5">
@@ -295,44 +311,67 @@ export default function DependenciasModal({
                         )}
                       </h3>
                     )}
-                    <p className="text-xs text-content-3 dark:text-content-3 mt-1 tabular-nums">
-                      {(conteos[depSel.nombre]?.bienes || 0)} bienes · {(conteos[depSel.nombre]?.funcionarios || 0)} funcionarios · {ubicsDeSel.length} departamentos
-                    </p>
+                    <p className="mt-1 text-xs text-content-3">Dependencia activa en el catálogo institucional</p>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-9 px-3.5 items-center gap-2 rounded-control text-xs font-bold text-content-2 dark:text-content-3 hover:bg-surface-3 dark:hover:bg-surface-1/10 motion cursor-pointer">
-                      <i className="fa-solid fa-users"></i><span className="hidden sm:inline">Padrón</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 dark:text-content-3">
+                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i><span>Padrón</span>
                     </button>
-                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-content-1 hover:bg-surface-3 dark:hover:text-white dark:hover:bg-surface-1/10 motion cursor-pointer">
+                    <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-10 w-10 items-center justify-center rounded-xl border border-line text-content-3 transition hover:bg-surface-2 hover:text-content-1 dark:hover:text-white">
                       <i className="fa-solid fa-pen text-xs"></i>
                     </button>
-                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-9 w-9 items-center justify-center rounded-control text-content-3 hover:text-danger hover:bg-danger-soft dark:hover:text-rose-400 dark:hover:bg-rose-500/10 motion cursor-pointer">
+                    <button onClick={() => onDelete(depSel.id, depSel.nombre)} title="Eliminar (solo si está vacía)" aria-label="Eliminar (solo si está vacía)" className="flex h-10 w-10 items-center justify-center rounded-xl border border-line text-content-3 transition hover:border-danger/30 hover:bg-danger-soft hover:text-danger dark:hover:text-rose-400">
                       <i className="fa-solid fa-trash-can text-xs"></i>
                     </button>
                   </div>
                 </div>
 
-                <div>
+                <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+                  {[
+                    { label: 'Bienes', value: conteos[depSel.nombre]?.bienes || 0, icon: 'fa-boxes-stacked', tone: 'text-brand-text bg-brand-soft' },
+                    { label: 'Funcionarios', value: conteos[depSel.nombre]?.funcionarios || 0, icon: 'fa-users', tone: 'text-info bg-info-soft' },
+                    { label: 'Departamentos', value: ubicsDeSel.length, icon: 'fa-diagram-project', tone: 'text-ok bg-ok-soft' }
+                  ].map(m => (
+                    <div key={m.label} className="min-w-0 rounded-2xl border border-line bg-surface-2/60 p-3 dark:bg-surface-2 sm:p-4">
+                      <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${m.tone}`}><i className={`fa-solid ${m.icon} text-xs`} aria-hidden="true" /></span>
+                      <p className="mt-2 truncate text-[10px] font-semibold uppercase tracking-wide text-content-3 sm:text-[11px]">{m.label}</p>
+                      <p className="mt-0.5 text-lg font-black tabular-nums text-content-1 dark:text-white">{Number(m.value).toLocaleString('es-PY')}</p>
+                    </div>
+                  ))}
+                </div>
+                </div>
+
+                <div className="flex gap-2 rounded-2xl border border-line bg-surface-1 p-1.5 dark:bg-surface-1/80" role="tablist" aria-label="Contenido de la dependencia">
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                    <i className="fa-solid fa-diagram-project" aria-hidden="true" /> Departamentos <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{ubicsDeSel.length}</span>
+                  </button>
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'funcionarios'} onClick={() => setVistaDetalle('funcionarios')} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'funcionarios' ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                    <i className="fa-solid fa-users" aria-hidden="true" /> Funcionarios <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{funcsDeSel.length}</span>
+                  </button>
+                </div>
+
+                {vistaDetalle === 'departamentos' && <div className="rounded-3xl border border-line bg-surface-1 p-4 shadow-sm dark:bg-surface-1/80 sm:p-5">
                   <div className="flex items-center gap-2 mb-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">Departamentos ({ubicsFiltradas.length})</p>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-diagram-project" aria-hidden="true" /></span>
+                    <div><h4 className="text-sm font-black text-content-1 dark:text-white">Departamentos</h4><p className="text-[11px] text-content-3">Espacios dentro de esta dependencia</p></div>
                   </div>
                   <div className="flex items-center gap-2 mb-2.5">
                     <input
                       type="text" value={nuevaUbic} onChange={(e) => setNuevaUbicacion(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter' && nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
                       placeholder={`Nuevo departamento en ${depSel.nombre}...`}
-                      className="flex-1 rounded-control border border-dashed border-line-strong dark:border-zinc-700 bg-transparent px-3 h-10 text-[13px] font-medium outline-none focus:border-brand placeholder:text-content-3"
+                      className="h-11 flex-1 rounded-xl border border-line bg-surface-2 px-4 text-[13px] font-medium outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15 placeholder:text-content-3 dark:bg-surface-2"
                     />
                     <button
                       onClick={() => { if (nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
                       disabled={isSaving || !nuevaUbic.trim()}
                       title="Agregar departamento" aria-label="Agregar departamento"
-                      className="flex h-10 w-10 items-center justify-center rounded-control bg-brand text-content-inverse cursor-pointer shrink-0 disabled:opacity-40 disabled:hover:bg-brand transition-colors"
+                      className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand text-content-inverse shadow-sm transition hover:bg-brand-hover active:scale-95 disabled:opacity-40"
                     >
                       <i className="fa-solid fa-plus text-xs"></i>
                     </button>
                   </div>
-                  <div className="space-y-2">
+                  <div className="grid gap-3 xl:grid-cols-2">
                     {ubicsFiltradas.map(u => (
                       <TarjetaDepartamento
                         key={u.id}
@@ -354,24 +393,28 @@ export default function DependenciasModal({
                       <p className="text-xs text-content-3 font-medium text-center py-3">Sin departamentos aquí. Agrega el primero arriba.</p>
                     )}
                   </div>
-                </div>
+                </div>}
 
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3 mb-2.5">
-                    Funcionarios ({funcsDeSel.length})
-                  </p>
-                  <div className="relative mb-2.5">
+                {vistaDetalle === 'funcionarios' && <div className="rounded-3xl border border-line bg-surface-1 p-4 shadow-sm dark:bg-surface-1/80 sm:p-5">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-info-soft text-info"><i className="fa-solid fa-users" aria-hidden="true" /></span>
+                      <div><h4 className="text-sm font-black text-content-1 dark:text-white">Funcionarios</h4><p className="text-[11px] text-content-3">Asigna a cada persona a un departamento</p></div>
+                    </div>
+                    <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-bold tabular-nums text-content-2">{funcsFiltrados.length} visibles</span>
+                  </div>
+                  <div className="relative mb-3">
                     <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
                     <input
                       type="text" value={buscaFunc} onChange={(e) => setBuscaFunc(e.target.value)}
                       placeholder="Buscar funcionario por nombre o cédula..."
-                      className="w-full rounded-control border border-line dark:border-zinc-800 bg-surface-2 dark:bg-surface-2 h-10 pl-10 pr-3 text-[13px] font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 placeholder:text-content-3"
+                      className="h-11 w-full rounded-xl border border-line bg-surface-2 pl-10 pr-3 text-[13px] font-medium outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15 placeholder:text-content-3 dark:bg-surface-2"
                     />
                   </div>
-                  <div className="max-h-56 overflow-y-auto custom-scrollbar rounded-card border border-line/60 dark:border-white/10 divide-y divide-zinc-100 dark:divide-white/5">
+                  <div className="max-h-[52vh] overflow-y-auto custom-scrollbar rounded-2xl border border-line divide-y divide-line/60 dark:divide-white/5">
                     {funcsFiltrados.slice(0, 60).map(f => (
-                      <div key={f.id} className="flex items-center gap-2.5 px-3.5 py-2">
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 font-bold text-xs">
+                      <div key={f.id} className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-surface-2/60">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-info-soft text-info font-black text-sm">
                           {(f.nombre || '?').charAt(0).toUpperCase()}
                         </span>
                         <span className="min-w-0 flex-1">
@@ -396,7 +439,7 @@ export default function DependenciasModal({
                       <p className="px-3.5 py-4 text-xs font-semibold text-content-3 text-center">Sin coincidencias.</p>
                     )}
                   </div>
-                </div>
+                </div>}
               </div>
             ) : (
               <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center p-8">
@@ -408,8 +451,8 @@ export default function DependenciasModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-line shrink-0">
-          <button onClick={onClose} className="h-10 px-5 rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-content-1 font-bold text-[13px] hover:bg-zinc-700 dark:hover:bg-surface-3 motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+        <div className="flex justify-end gap-2 border-t border-line bg-surface-1 px-5 py-3 dark:bg-surface-1/80 sm:px-7">
+          <button onClick={onClose} className="h-10 rounded-xl bg-slate-900 px-5 text-[13px] font-bold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200">
             Listo
           </button>
         </div>

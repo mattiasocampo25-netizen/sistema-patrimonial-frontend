@@ -186,7 +186,7 @@ export function useFcModals({
                 b.cuenta || '', b.subcuenta || '', b.analitico1 || '', b.analitico2 || '', 
                 b.descripcion || '', b.ubicacion || '-', b.funcionario || 'Sin Asignar', 
                 formatDateText(b.fechaAdquisicion) || '', b.rotulo || 'S/Rótulo', '1', 
-                formatCurrency(valor), formatCurrency(valor), 'C', getEstadoAbbr(b.estadoConservacion), '', ''
+                formatCurrency(valor), formatCurrency(valor), 'C', getEstadoAbbr(b.estadoConservacion), '', String(b.observaciones || '').trim()
             ];
         });
 
@@ -240,6 +240,7 @@ export function useFcModals({
             ], 
             body: tableRows, rowPageBreak: 'avoid',
             styles: { fontSize: 6, cellPadding: 1, textColor: [0, 0, 0], lineColor: [0, 0, 0], lineWidth: 0.15 }, 
+            columnStyles: { 14: { cellWidth: 13 }, 15: { cellWidth: 30, overflow: 'linebreak' } },
             headStyles: { fillColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', textColor: [0,0,0], lineWidth: 0.3 }, 
             didDrawPage: function(_data) {
                 doc.addImage(logoPlano, 'PNG', 12, 6, 18, 18); 
@@ -633,6 +634,7 @@ export function useFcModals({
         funcionarioAlternativoCargo,
         ubicacion: String(formData.get('ubicacion') ?? '').trim(), 
         estadoConservacion: formData.get('estadoConservacion') || 'Muy bueno', 
+        observaciones: String(formData.get('observaciones') || '').trim(),
         vidaUtil: formData.get('vidaUtil') || '', 
         hasFC10: esEdicion ? bienEditing.hasFC10 : false, 
         hasQR: formData.get('hasQR') === 'on',

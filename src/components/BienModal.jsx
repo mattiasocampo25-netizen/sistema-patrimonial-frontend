@@ -67,7 +67,7 @@ export default function BienModal({
         ['funcionarioDoc', 'C.I. del responsable principal'], ['funcionarioCargo', 'Cargo del responsable principal'],
         ['funcionarioAlternativoDoc', 'C.I. del responsable alternativo'], ['funcionarioAlternativoCargo', 'Cargo del responsable alternativo'],
         ['estadoConservacion', 'Estado de conservación'], ['fechaAdquisicion', 'Fecha de adquisición'],
-        ['valorUnitario', 'Valor de adquisición'], ['vidaUtil', 'Vida útil'], ['hasQR', 'Etiqueta QR'],
+        ['valorUnitario', 'Valor de adquisición'], ['vidaUtil', 'Vida útil'], ['observaciones', 'Observaciones'], ['hasQR', 'Etiqueta QR'],
         ['cuenta', 'Cuenta'], ['subcuenta', 'Subcuenta'], ['analitico1', 'Analítico 1'], ['analitico2', 'Analítico 2']
     ];
     const guardarConRevision = async (evento, mantenerAbierto = false) => {
@@ -425,6 +425,22 @@ export default function BienModal({
                       titulo="Estado de conservación"
                     />
                   </div>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-line bg-surface-1 p-4 dark:bg-surface-1/40">
+                  <label htmlFor="bien-observaciones" className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">
+                    <i className="fa-solid fa-clipboard-list text-brand-text" aria-hidden="true" /> Observaciones del bien
+                  </label>
+                  <textarea
+                    id="bien-observaciones"
+                    name="observaciones"
+                    rows={3}
+                    maxLength={2000}
+                    defaultValue={defecto('observaciones', bienEditing?.observaciones || '')}
+                    className={`${STYLES.input} min-h-24 resize-y leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
+                    placeholder="Describe el estado o cualquier detalle útil. Ej.: pantalla rota, requiere reparación, falta un accesorio..."
+                  />
+                  <p className="mt-1.5 text-[10px] text-content-3">Esta nota se guardará con el bien y aparecerá en la columna Observaciones del FC-03.</p>
                 </div>
 
                 {/* 3. VALORIZACIÓN Y CONTABILIDAD */}

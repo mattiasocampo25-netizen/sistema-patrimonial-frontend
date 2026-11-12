@@ -4,7 +4,6 @@ import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
 import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
-import Hotspot from '../components/ui/Hotspot';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 import useScopedPreference from '../hooks/useScopedPreference';
@@ -458,12 +457,15 @@ export default function DashboardView({
 
       {/* 3. ACCESOS DIRECTOS */}
       {widgets.accesos && (
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm p-5 sm:p-6">
-          <div className="mb-3 flex items-center justify-between gap-3 px-2">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-content-3 dark:text-content-3">Accesos directos</p>
+      <div className="rounded-panel border border-line/70 bg-surface-1 p-5 shadow-sm dark:border-white/10 dark:bg-surface-1/[0.04] sm:p-6">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-bolt" aria-hidden="true" /></span>
+              <div><p className="text-sm font-black text-content-1 dark:text-white">Accesos directos</p><p className="mt-0.5 text-[11px] text-content-3">Atajos para tareas frecuentes</p></div>
+            </div>
             <div className="relative">
-              <button type="button" aria-expanded={menuAccesos} onClick={() => setMenuAccesos((v) => !v)} className="rounded-control px-2.5 py-1.5 text-label font-semibold text-content-3 hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-                <i className="fa-solid fa-sliders mr-1.5" aria-hidden="true" />Personalizar
+              <button type="button" aria-expanded={menuAccesos} onClick={() => setMenuAccesos((v) => !v)} className="flex h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <i className="fa-solid fa-sliders" aria-hidden="true" /><span className="hidden sm:inline">Personalizar</span>
               </button>
               {menuAccesos && <div className="absolute right-0 z-30 mt-2 w-56 rounded-card border border-line bg-surface-1 p-2 shadow-pop" role="group" aria-label="Personalizar accesos directos">
                 {ACCESOS.map(([id, label]) => <label key={id} className="flex cursor-pointer items-center gap-2 rounded-control px-2.5 py-2 text-label font-medium text-content-1 hover:bg-surface-2">
@@ -473,25 +475,23 @@ export default function DashboardView({
               </div>}
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-2 items-stretch gap-2.5 sm:grid-cols-3 xl:grid-cols-5">
               {accesosVisibles.includes('nuevo') && (
-<Hotspot texto="Crea un bien patrimonial nuevo en el inventario de tu dependencia.">
-<button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex items-center gap-2 px-5 py-3 rounded-control bg-brand hover:bg-brand-hover text-content-inverse font-bold text-body transition-[background-color,transform,box-shadow] duration-[var(--dur-fast)] shadow-card active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 cursor-pointer">
-                  <i className="fa-solid fa-plus text-xs"></i> Nuevo registro
+<button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-brand/20 bg-brand-soft px-3 py-3 text-left font-bold text-brand-text transition hover:border-brand/40 hover:bg-brand/10 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-sm"><i className="fa-solid fa-plus text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Nuevo registro</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Agregar un bien</span></span>
               </button>
-</Hotspot>
               )}
-              {accesosVisibles.includes('importar') && <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-file-import text-ok dark:text-emerald-400"></i> Importar
+              {accesosVisibles.includes('importar') && <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ok-soft text-ok dark:text-emerald-400"><i className="fa-solid fa-file-import text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Importar CSV</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Cargar inventario</span></span>
               </button>}
-              {accesosVisibles.includes('exportar') && <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-file-export text-sky-600 dark:text-sky-400"></i> Exportar
+              {accesosVisibles.includes('exportar') && <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-info-soft text-info"><i className="fa-solid fa-file-export text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Exportar CSV</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Descargar datos</span></span>
               </button>}
-              {accesosVisibles.includes('qr') && <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-qrcode text-violet-600 dark:text-violet-400"></i> Lote QRs
+              {accesosVisibles.includes('qr') && <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400"><i className="fa-solid fa-qrcode text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Lote de QRs</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Etiquetas masivas</span></span>
               </button>}
-              {accesosVisibles.includes('fc03') && <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex items-center gap-2 px-4 py-3 rounded-card border border-transparent hover:border-line dark:hover:border-white/10 text-content-2 dark:text-content-3 font-semibold text-[13px] motion active:scale-95 cursor-pointer hover:bg-surface-2 dark:hover:bg-surface-1/5">
-                  <i className="fa-solid fa-print text-warn dark:text-amber-400"></i> FC-03
+              {accesosVisibles.includes('fc03') && <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-warn-soft text-warn dark:text-amber-400"><i className="fa-solid fa-print text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Reporte FC-03</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Inventario oficial</span></span>
               </button>}
               {accesosVisibles.length === 0 && <p className="px-3 py-2 text-label text-content-3">No hay accesos visibles. Usa “Personalizar” para agregar alguno.</p>}
           </div>

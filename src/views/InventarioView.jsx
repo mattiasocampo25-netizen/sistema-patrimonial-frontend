@@ -428,7 +428,7 @@ export default function InventarioView({
 
   {/* 3. TABLA Y LISTADO DE BIENES CON MATRIZ COMPLETA DE ACCIONES */}
   {/* Chips de filtros + controles de vista */}
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="relative z-20 flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
           {chips.length === 0 && (
             <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-2">Sin filtros</span>

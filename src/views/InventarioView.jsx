@@ -413,7 +413,8 @@ export default function InventarioView({
               autoFocus
               className="h-8 w-40 rounded-control border border-line dark:border-zinc-700/30 bg-surface-1 dark:bg-surface-3/50 px-3 text-xs font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400"
             />
-            <button onClick={guardarVistaActual} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-zinc-100 cursor-pointer">
+            <button onClick={guardarVistaActual} title="Guardar" aria-label="Guardar" className="flex h-8 w-8 items-center justify-center rounded-control bg-zinc-900 dark:bg-surface-1 text-white dark:text-zinc-100 cursor-pointer"
+>
               <i className="fa-solid fa-check text-[11px]"></i>
             </button>
           </span>
@@ -760,6 +761,23 @@ export default function InventarioView({
                                           {item.rotulo || 'S/R'}
                                           {item.rotulo && <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(String(item.rotulo)); setRotuloCopiado(item.id); window.setTimeout(() => setRotuloCopiado(actual => actual === item.id ? '' : actual), 1500); } catch { /* Copia manual disponible. */ } }} title={rotuloCopiado === item.id ? 'Rótulo copiado' : 'Copiar rótulo'} aria-label={`Copiar rótulo ${item.rotulo}`} className="rounded px-1 text-content-3 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className={`fa-solid ${rotuloCopiado === item.id ? 'fa-check text-ok' : 'fa-copy'}`} aria-hidden="true" /></button>}
                                         </span>
+                                        {String(item.observaciones || '').trim() && (
+                                          <span className="group/observacion relative inline-flex">
+                                            <button
+                                              type="button"
+                                              aria-label={`Ver observación del bien ${item.rotulo || ''}`}
+                                              title={String(item.observaciones).trim()}
+                                              className="inline-flex h-7 items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 text-[10px] font-bold text-amber-800 shadow-sm transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200 dark:hover:bg-amber-400/20"
+                                            >
+                                              <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
+                                              Observado
+                                            </button>
+                                            <span role="tooltip" className="pointer-events-none absolute left-0 top-full z-30 mt-2 hidden w-72 whitespace-normal rounded-xl border border-line bg-surface-1 p-3 text-left text-xs font-medium leading-relaxed text-content-1 shadow-xl group-hover/observacion:block group-focus-within/observacion:block dark:bg-surface-1">
+                                              <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Observación</span>
+                                              {String(item.observaciones).trim()}
+                                            </span>
+                                          </span>
+                                        )}
                                         {cols.fecha && item.fechaAdquisicion && (
                                           <span className="text-[10px] font-bold text-content-3 flex items-center gap-1">
                                             <i className="fa-regular fa-calendar text-[9px]"></i>

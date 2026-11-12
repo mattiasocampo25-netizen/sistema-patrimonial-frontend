@@ -489,6 +489,8 @@ export default function AppModals({
             onClose={() => { setFichaBien(null); setEventosAuditFicha([]); }}
             bien={fichaBien}
             eventos={eventosFicha}
+            fc10List={fc10List}
+            fc11List={fc11List}
             formatCurrency={formatCurrency}
             formatDateText={formatDateText}
             onAgregarFoto={subirFotoBien}

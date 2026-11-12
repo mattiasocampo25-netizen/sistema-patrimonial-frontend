@@ -329,6 +329,20 @@ useEffect(() => {
       return Array.from(ubiMap.values()).sort();
   }, [bienesDependencia, fc10List, dependenciaActual]);
 
+  // El filtro representa ubicaciones que hoy tienen bienes. Los lugares del
+  // formulario FC-10 (por ejemplo, sus valores iniciales "Pilar" y
+  // "Rectorado") no son ubicaciones del inventario si ningún bien las usa.
+  const ubicacionesConBienes = useMemo(() => {
+      const ubiMap = new Map();
+      bienesDependencia.forEach(b => {
+          const val = String(b.ubicacion || '').trim();
+          if (!val) return;
+          const key = normalizeStr(val);
+          if (!ubiMap.has(key)) ubiMap.set(key, val);
+      });
+      return Array.from(ubiMap.values()).sort((a, b) => a.localeCompare(b, 'es'));
+  }, [bienesDependencia]);
+
   const aniosUnicos = useMemo(() => { const years = bienesDependencia.filter(b => b.fechaAdquisicion).map(b => parseDateInfo(b.fechaAdquisicion).year).filter(y => y && !isNaN(parseInt(y))); return [...new Set(years)].sort((a, b) => b - a); }, [bienesDependencia]);
 
   const subcuentasUnicas = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.subcuenta || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
@@ -498,7 +512,7 @@ useEffect(() => {
     clearAllFilters, hasFilters,
     vistasGuardadas, nombreVista, setNombreVista, mostrarGuardarVista, setMostrarGuardarVista,
     guardarVistaActual, aplicarVista, eliminarVista,
-    funcionariosUnicos, ubicacionesUnicas, aniosUnicos,
+    funcionariosUnicos, ubicacionesUnicas, ubicacionesConBienes, aniosUnicos,
     subcuentasUnicas, analiticos1Unicos, analiticos2Unicos,
     stats, pendientes, filteredBienes, paginatedBienes, itemsPaginados, totalPages,
     itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion,

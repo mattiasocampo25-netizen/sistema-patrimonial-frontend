@@ -283,7 +283,7 @@ html.density-compact table th { letter-spacing: 0.035em; }
 }
 
 .dashboard-welcome-card {
-  background-image: radial-gradient(ellipse at 100% 0%, rgb(255 255 255 / 12%), transparent 42%), linear-gradient(135deg, #123149, #14566a 58%, #147a7e);
+  background-image: radial-gradient(ellipse at 100% 0%, rgb(255 255 255 / 12%), transparent 42%), linear-gradient(135deg, color-mix(in srgb, var(--brand) 55%, #0c2030), color-mix(in srgb, var(--brand-hover) 75%, #0c2030) 58%, color-mix(in srgb, var(--brand) 78%, #07141f));
   color: #fff;
 }
 

@@ -28,14 +28,6 @@ export const toInputDateFormat = (val) => {
   return '';
 };
 export const getEstadoAbbr = (estado) => { if(!estado) return '-'; const e = String(estado).toLowerCase(); if(e.includes('muy')) return 'MB'; if(e.includes('bueno')) return 'B'; if(e.includes('regular')) return 'R'; if(e.includes('malo')) return 'M'; if(e.includes('inutilizable')) return 'I'; if(e.includes('baja')) return 'DB'; return estado; };
-// Acento de color por dependencia (hash estable del nombre -> tono HSL).
-// Se usa como variable CSS --dep-accent para detalles de identidad.
-export const colorPorDependencia = (dependencia) => {
-  const s = String(dependencia || 'UNP');
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 360;
-  return `hsl(${h}, 65%, 45%)`;
-};
 export const normalizeStr = (str) =>
   String(str || '')
     .normalize('NFD')
@@ -43,6 +35,34 @@ export const normalizeStr = (str) =>
     .trim()
     .toUpperCase()
     .replace(/\s+/g, ' ');
+
+// Colores institucionales estables por facultad. Se usan en marca y acciones
+// de la interfaz, no en estados semánticos como error, advertencia o éxito.
+const PALETAS_DEPENDENCIA = [
+  { clave: 'CIENCIAS APLICADAS', claro: ['#4338ca', '#3730a3', '#eef2ff', '#3730a3'], oscuro: ['#a5b4fc', '#c7d2fe', '#24214a', '#c7d2fe'] },
+  { clave: 'HUMANIDADES', claro: ['#6d28d9', '#5b21b6', '#f5f3ff', '#5b21b6'], oscuro: ['#c4b5fd', '#ddd6fe', '#32204f', '#ddd6fe'] },
+  { clave: 'CONTABLES', claro: ['#047857', '#065f46', '#ecfdf5', '#065f46'], oscuro: ['#6ee7b7', '#a7f3d0', '#123b32', '#a7f3d0'] },
+  { clave: 'DERECHO', claro: ['#be123c', '#9f1239', '#fff1f2', '#9f1239'], oscuro: ['#fda4af', '#fecdd3', '#471c2b', '#fecdd3'] },
+  { clave: 'AGROPECUARIAS', claro: ['#4d7c0f', '#3f6212', '#f7fee7', '#3f6212'], oscuro: ['#bef264', '#d9f99d', '#303c1e', '#d9f99d'] },
+  { clave: 'BIOMEDICAS', claro: ['#0e7490', '#155e75', '#ecfeff', '#155e75'], oscuro: ['#67e8f9', '#a5f3fc', '#123c49', '#a5f3fc'] },
+  { clave: 'TECNOLOGIAS Y ARTES', claro: ['#c2410c', '#9a3412', '#fff7ed', '#9a3412'], oscuro: ['#fdba74', '#fed7aa', '#4b2c1d', '#fed7aa'] }
+];
+
+export const coloresPorDependencia = (dependencia, darkMode = false) => {
+  const nombre = normalizeStr(dependencia);
+  const paleta = PALETAS_DEPENDENCIA.find(item => nombre.includes(item.clave));
+  const [accent, hover, soft, text] = (darkMode ? paleta?.oscuro : paleta?.claro)
+    || (darkMode ? ['#5bb8c0', '#79cbd0', '#123944', '#8cdae0'] : ['#14728a', '#105d72', '#e6f3f5', '#11596e']);
+  return {
+    '--dep-accent': accent,
+    '--brand': accent,
+    '--brand-hover': hover,
+    '--brand-soft': soft,
+    '--brand-text': text
+  };
+};
+
+export const colorPorDependencia = (dependencia) => coloresPorDependencia(dependencia)['--dep-accent'];
 
 // Repara texto UTF-8 que fue interpretado como Windows-1252/Latin-1 al
 // importar datos antiguos (por ejemplo, "PedagÃ³gicas"). Solo se aplica al
@@ -73,7 +93,7 @@ export const repairMojibake = (value) => {
 //
 // OJO: no cambiar la version a mano. Se cambia con:
 //   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
-export const APP_VERSION = '2.19.1';
+export const APP_VERSION = '2.19.2';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.

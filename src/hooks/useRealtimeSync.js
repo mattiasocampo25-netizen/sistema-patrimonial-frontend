@@ -232,8 +232,12 @@ export function useRealtimeSync({
         const META_BIENES = `bienes_meta_${dependenciaActual}`;
         let metaBienes = null;
         let cacheBienes = null;
-        try { metaBienes = await localforage.getItem(META_BIENES); } catch {}
-        try { cacheBienes = await localforage.getItem(CACHE_BIENES); } catch {}
+        const [metaLeida, cacheLeida] = await Promise.allSettled([
+          localforage.getItem(META_BIENES),
+          localforage.getItem(CACHE_BIENES)
+        ]);
+        if (metaLeida.status === 'fulfilled') metaBienes = metaLeida.value;
+        if (cacheLeida.status === 'fulfilled') cacheBienes = cacheLeida.value;
         // La carga ya pasó la validación de sesión. Muestra el inventario local
         // mientras llega la sincronización para evitar una pantalla vacía al
         // iniciar o al volver a una dependencia conocida.
@@ -241,16 +245,16 @@ export function useRealtimeSync({
         // Conteo ligero (sin transferir registros) para detectar cachés que
         // quedaron parciales en equipos concretos. Si el servidor informa más
         // filas que el navegador, se reconstruye la caché con la paginación.
-        let cantidadRemota = null;
-        try {
-          const { count, error } = await supabase.from('bens')
+        // El conteo remoto comienza en paralelo con las consultas de apoyo,
+        // pero se conserva como validación obligatoria antes de aceptar caché.
+        const requiereDescargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes);
+        const cantidadRemotaPromise = requiereDescargaTotal
+          ? Promise.resolve(null)
+          : supabase.from('bens')
             .select('id', { count: 'exact', head: true })
-            .eq('data->>dependencia', dependenciaActual);
-          if (!error && Number.isInteger(count)) cantidadRemota = count;
-        } catch {}
-        const cacheIncompleta = Array.isArray(cacheBienes) && cantidadRemota !== null
-          && cacheBienes.length !== cantidadRemota;
-        const descargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes) || cacheIncompleta;
+            .eq('data->>dependencia', dependenciaActual)
+            .then(({ count, error }) => !error && Number.isInteger(count) ? count : null)
+            .catch(() => null);
 
         // Inicia las consultas de actas y catálogos junto con la descarga de
         // bienes. Antes empezaban después de bajar el inventario completo, lo
@@ -274,6 +278,11 @@ export function useRealtimeSync({
           traerPaginas(() => supabase.from('usuarios').select('username, nombre, cargo, dependencia'), 'username'),
           traerPaginas(() => supabase.from('funcionarios').select('*'))
         ]).then(value => ({ value }), error => ({ error }));
+
+        const cantidadRemota = await cantidadRemotaPromise;
+        const cacheIncompleta = Array.isArray(cacheBienes) && cantidadRemota !== null
+          && cacheBienes.length !== cantidadRemota;
+        const descargaTotal = requiereDescargaTotal || cacheIncompleta;
 
         if (descargaTotal) {
         let todosLosNuevosBienes = [];

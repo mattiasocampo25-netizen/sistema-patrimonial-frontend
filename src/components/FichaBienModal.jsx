@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, IconButton, Badge } from './ui';
 import { camposIncompletos } from '../utils/dataCompleteness';
 import { supabase } from '../supabaseClient';
+import { crearExpedienteAuditoria } from '../utils/expedienteAuditoria';
 
 const TIPO_TONO = {
   alta: 'ok',
@@ -22,10 +23,12 @@ const TIPO_ICONO = {
   otro: 'fa-circle-info',
 };
 
-export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
+export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10List = [], fc11List = [], formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
   const [urlsFotosPrivadas, setUrlsFotosPrivadas] = useState({});
   const [qrFicha, setQrFicha] = useState('');
+  const [exportandoExpediente, setExportandoExpediente] = useState(false);
+  const [errorExpediente, setErrorExpediente] = useState('');
   const bienId = bien?.id;
   const bienRotulo = bien?.rotulo;
   const fotos = bien?.fotos || [];
@@ -80,6 +83,46 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
   }, [isOpen, bienId, bienRotulo]);
   if (!isOpen || !bien) return null;
   const incompletos = camposIncompletos(bien);
+  const descargarExpediente = async () => {
+    if (exportandoExpediente) return;
+    setExportandoExpediente(true);
+    setErrorExpediente('');
+    try {
+      const fotosExpediente = await Promise.all(fotos.map(async (foto) => {
+        let url = urlsFotosPrivadas[foto.ruta || foto.url];
+        let ruta = foto.ruta;
+        if (!ruta && foto.url) {
+          try {
+            const pathname = new URL(foto.url).pathname;
+            const inicio = pathname.indexOf('/fotos-bienes/');
+            if (inicio >= 0) ruta = decodeURIComponent(pathname.slice(inicio + '/fotos-bienes/'.length));
+          } catch {}
+        }
+        if (!url && ruta) {
+          const { data, error } = await supabase.storage.from('fotos-bienes').createSignedUrl(ruta, 3600);
+          if (!error) url = data?.signedUrl || '';
+        }
+        return { url };
+      }));
+      const resultado = await crearExpedienteAuditoria({
+        bien,
+        eventos: eventos || [],
+        fc10: bien.id == null ? [] : fc10List.filter(registro => String(registro.bienId) === String(bien.id)),
+        fc11: bien.id == null ? [] : fc11List.filter(registro => String(registro.bienId) === String(bien.id)),
+        fotos: fotosExpediente
+      });
+      const url = URL.createObjectURL(resultado.blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = resultado.filename;
+      enlace.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } catch (error) {
+      setErrorExpediente(error?.message || 'No se pudo generar el expediente.');
+    } finally {
+      setExportandoExpediente(false);
+    }
+  };
   const Dato = ({ label, value }) => (
     <div className="rounded-control bg-surface-2 dark:bg-surface-1/5 border border-line/60 dark:border-white/10 px-3 py-2.5">
       <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">{label}</p>
@@ -252,6 +295,9 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
               Ver en inventario
             </Button>
           )}
+          <Button variante="subtle" tamano="md" icono={exportandoExpediente ? 'fa-spinner fa-spin' : 'fa-file-zipper'} onClick={descargarExpediente} disabled={exportandoExpediente} className="no-print">
+            {exportandoExpediente ? 'Preparando expediente…' : 'Descargar expediente'}
+          </Button>
           <Button variante="subtle" tamano="md" icono="fa-print" onClick={() => window.print()} className="no-print">
             Imprimir ficha
           </Button>
@@ -259,6 +305,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, formatC
             Cerrar
           </Button>
         </div>
+        {errorExpediente && <p role="alert" className="no-print border-t border-danger/20 bg-danger-soft px-6 py-3 text-xs font-semibold text-danger">{errorExpediente}</p>}
       </div>
       {fotoAmpliada && (
         <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-surface-1/90 backdrop-blur-xl animate-fade-in" onClick={() => setFotoAmpliada(null)}>

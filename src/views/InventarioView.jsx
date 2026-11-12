@@ -50,6 +50,7 @@ export default function InventarioView({
   filtroUbicacion,
   setFiltroUbicacion,
   ubicacionesUnicas,
+  ubicacionesParaFiltro = ubicacionesUnicas,
   filtroAnio,
   setFiltroAnio,
   aniosUnicos,
@@ -320,7 +321,7 @@ export default function InventarioView({
       {/* Ubicaciones */}
       <FiltroCombo
         valor={filtroUbicacion}
-        opciones={ubicacionesUnicas}
+        opciones={ubicacionesParaFiltro}
         onElegir={(v) => { setFiltroUbicacion(v); setCurrentPage(1); }}
         etiquetaTodos="Ubicación: Todas"
         titulo="Filtrar por ubicación"

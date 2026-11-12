@@ -14,9 +14,10 @@ export default function FuncionariosView({
   filtroCargo = '', setFiltroCargo = () => {}, cargosFuncionarios = [],
   setCurrentPaginaFuncionarios, funcionariosPaginados,
   handleEditFuncionario, handleDeleteFuncionario, renderPaginationFuncionarios,
-  isLoading
+  isLoading, bienesDependenciaCount = 0
 }) {
   const [mostrarCedulas, setMostrarCedulas] = useState(false);
+  const funcionariosVisibles = funcionariosPurosDependencia?.length || 0;
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
 
@@ -29,9 +30,16 @@ export default function FuncionariosView({
               descripcion={<>Directorio oficial de personal asignado a <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong></>}
               icono="fa-address-book"
               contador={(
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
-                  {funcionariosPurosDependencia.length}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
+                    {funcionariosVisibles.toLocaleString('es-PY')} funcionarios
+                  </span>
+                  {Number.isFinite(bienesDependenciaCount) && (
+                    <span className="px-2.5 py-1 rounded-full text-xs font-semibold tabular-nums bg-brand-soft text-brand-text border border-brand/15">
+                      {bienesDependenciaCount.toLocaleString('es-PY')} bienes en la dependencia
+                    </span>
+                  )}
+                </div>
               )}
             />
             <Toolbar className="mt-4">

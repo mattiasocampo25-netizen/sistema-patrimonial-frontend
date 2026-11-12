@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import localforage from 'localforage';
 import { conSello } from '../services/syncBienes';
@@ -17,7 +17,7 @@ export const ITEMS_POR_PAGINA_FUNCS = 20;
 // - setItemToDelete: modal de borrado. fileInputFuncionariosRef: input oculto.
 // - setPendingCSVImport: staging del CSV de bienes (vive en App, se comparte).
 export function useFuncionarios({
-  funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias = [],
+  funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias = [], ubicacionesDependencia = [],
   bienes, setBienes, fc10List, _currentUser, isAdmin,
   notify, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
   setPendingCSVImport
@@ -32,12 +32,13 @@ export function useFuncionarios({
   const [searchFuncionarioInput, setSearchFuncionarioInput] = useState('');
   const [filtroCargo, setFiltroCargo] = useState('');
   const cargosFuncionarios = useMemo(() => [...new Set(funcionariosPadron
-    .filter(f => f.dependencia === dependenciaActual)
+    .filter(f => normalizeStr(f.dependencia) === normalizeStr(dependenciaActual))
     .map(f => String(f.cargo || '').trim())
     .filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')), [funcionariosPadron, dependenciaActual]);
 
     const funcionariosPurosDependencia = useMemo(() => {  
-        let lista = funcionariosPadron.filter(f => f.dependencia === dependenciaActual);  
+        let lista = funcionariosPadron.filter(f => normalizeStr(f.dependencia) === normalizeStr(dependenciaActual));
+  
     
         if (searchFuncionarioInput.trim() !== '') {  
             const tokens = normalizeStr(searchFuncionarioInput).split(' ').filter(Boolean);  
@@ -56,6 +57,15 @@ export function useFuncionarios({
     
         return lista.sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || '')));  
     }, [funcionariosPadron, dependenciaActual, searchFuncionarioInput, filtroCargo]);
+
+    useEffect(() => {
+      const ultimaPagina = Math.max(1, Math.ceil(funcionariosPurosDependencia.length / ITEMS_POR_PAGINA_FUNCS));
+      if (currentPaginaFuncionarios > ultimaPagina) setCurrentPaginaFuncionarios(ultimaPagina);
+    }, [funcionariosPurosDependencia.length, currentPaginaFuncionarios]);
+
+    useEffect(() => {
+      setCurrentPaginaFuncionarios(1);
+    }, [dependenciaActual, searchFuncionarioInput, filtroCargo]);
   
   
     const totalPagesFuncs = Math.ceil(funcionariosPurosDependencia.length / ITEMS_POR_PAGINA_FUNCS);  
@@ -289,7 +299,13 @@ export function useFuncionarios({
             dependencia: dependenciaActual  
         };  
     
-        if (!nuevoFunc.cedula || !nuevoFunc.nombre) return notify("Cédula y Nombre son obligatorios.", "warning");  
+        if (!nuevoFunc.cedula || !nuevoFunc.nombre) return notify("Cédula y Nombre son obligatorios.", "warning");
+        const cedulaNormalizada = nuevoFunc.cedula.replace(/\D/g, '');
+        if (funcionariosPadron.some(f =>
+          normalizeStr(f.dependencia) === normalizeStr(dependenciaActual) &&
+          String(f.cedula || '').replace(/\D/g, '') === cedulaNormalizada
+        )) return notify('Ya existe un funcionario con esa cédula en esta dependencia.', 'warning');
+  
     
         try {  
             const { error } = await supabase.from('funcionarios').insert([nuevoFunc]);  
@@ -375,7 +391,22 @@ export function useFuncionarios({
         notify('Selecciona una dependencia válida del catálogo.', 'warning');
         return;
       }
+      if (!nuevoNombre) {
+        notify('El nombre del funcionario es obligatorio.', 'warning');
+        return;
+      }
+      if (!funcionarioToEdit?.id) {
+        notify('No se encontró el funcionario que intentas editar. Cierra y vuelve a abrir el formulario.', 'error');
+        return;
+      }
       try {
+          const ubicacionValida = !nuevaUbicacion || ubicacionesDependencia.some(u =>
+            normalizeStr(u.nombre) === normalizeStr(nuevaUbicacion) && normalizeStr(u.dependencia) === normalizeStr(nuevaDependencia)
+          );
+          if (!ubicacionValida) {
+            notify('El departamento seleccionado no pertenece a la dependencia elegida.', 'warning');
+            return;
+          }
           const { error } = await supabase
             .from('funcionarios')
             .update({ nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion, dependencia: nuevaDependencia })

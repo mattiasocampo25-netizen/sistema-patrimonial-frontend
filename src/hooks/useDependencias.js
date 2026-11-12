@@ -76,6 +76,16 @@ export function useDependencias({
   }, [dependenciasList]);
 
   const guardarDependencia = async (id, nombre, codigo = '', activa = true) => {
+    nombre = String(nombre || '').trim().replace(/\s+/g, ' ');
+    codigo = String(codigo || '').trim();
+    if (!nombre) {
+      addToast('Escribe el nombre de la dependencia.', 'warning');
+      return false;
+    }
+    if (dependenciasList.some((d) => d.id !== id && normalizeStr(d.nombre) === normalizeStr(nombre))) {
+      addToast('Ya existe una dependencia con ese nombre.', 'warning');
+      return false;
+    }
     setIsSavingDep(true);
     try {
       if (!id) {
@@ -191,56 +201,82 @@ export function useDependencias({
   };
 
   const fusionarDependencia = async (origenNombre, destinoNombre) => {
+    const destino = String(destinoNombre || '').trim();
+    if (!origenNombre || !destino || normalizeStr(origenNombre) === normalizeStr(destino)) {
+      addToast('Selecciona una dependencia de destino distinta.', 'warning');
+      return;
+    }
     setIsSavingDep(true);
     try {
       const mover = async (lista, tabla, campo, setLista, esJSON) => {
         const afectados = lista.filter(
           (r) => normalizeStr(r[campo] || '') === normalizeStr(origenNombre)
         );
+        let movidos = 0;
+        let fallidos = 0;
+        const clavesMovidas = new Set();
         for (let i = 0; i < afectados.length; i += 10) {
           const chunk = afectados.slice(i, i + 10);
-          await Promise.all(
+          const resultados = await Promise.all(
             chunk.map((r) => {
               const payload = esJSON
-                ? { data: { ...r, [campo]: destinoNombre } }
-                : { [campo]: destinoNombre };
+                ? tabla === 'bens'
+                  ? conSello({ data: { ...r, [campo]: destino } })
+                  : { data: { ...r, [campo]: destino } }
+                : { [campo]: destino };
               const q = supabase.from(tabla).update(payload);
               return r.id ? q.eq('id', r.id) : q.eq('username', r.username);
             })
           );
+          resultados.forEach((resultado, index) => {
+            if (resultado?.error) fallidos++;
+            else {
+              movidos++;
+              const r = chunk[index];
+              clavesMovidas.add(r.id || r.username);
+            }
+          });
         }
-        if (afectados.length > 0) {
-          const ids = new Set(afectados.map((r) => r.id || r.username));
+        if (movidos > 0) {
           setLista((prev) =>
             prev.map((r) =>
-              (ids.has(r.id) || ids.has(r.username)) ? { ...r, [campo]: destinoNombre } : r
+              (clavesMovidas.has(r.id) || clavesMovidas.has(r.username)) ? { ...r, [campo]: destino } : r
             )
           );
         }
-        return afectados.length;
+        return { movidos, fallidos };
       };
 
-      const total =
-        (await mover(bienes, 'bens', 'dependencia', setBienes, true)) +
-        (await mover(funcionariosPadron, 'funcionarios', 'dependencia', setFuncionariosPadron, false)) +
-        (await mover(
+      const resultados = await Promise.all([
+        mover(bienes, 'bens', 'dependencia', setBienes, true),
+        mover(funcionariosPadron, 'funcionarios', 'dependencia', setFuncionariosPadron, false),
+        mover(
           ubicacionesListRef.current,
           'ubicaciones',
           'dependencia',
           setUbicacionesList,
           false
-        )) +
-        (await mover(fc10List, 'fc10', 'dependencia', setFc10List, true)) +
-        (await mover(fc11List, 'fc11', 'dependenciaRemitente', setFc11List, true)) +
-        (await mover(fc04List, 'fc04', 'dependencia', setFc04List, true));
+        ),
+        mover(fc10List, 'fc10', 'dependencia', setFc10List, true),
+        mover(fc11List, 'fc11', 'dependenciaRemitente', setFc11List, true),
+        mover(fc04List, 'fc04', 'dependencia', setFc04List, true),
+      ]);
+      const total = resultados.reduce((s, r) => s + r.movidos, 0);
+      const fallidos = resultados.reduce((s, r) => s + r.fallidos, 0);
 
-      if (normalizeStr(dependenciaActual) === normalizeStr(origenNombre)) {
+      if (!fallidos && normalizeStr(dependenciaActual) === normalizeStr(origenNombre)) {
         setDependenciaActual(destinoNombre);
         clearAllFilters();
       }
-      addToast(`"${origenNombre}" fusionada en "${destinoNombre}" (${total} registros).`, 'success');
-    } catch {
-      addToast('No se pudo fusionar.', 'error');
+      addToast(
+        fallidos
+          ? `Fusión parcial: ${total} registros movidos y ${fallidos} con error. Revisa la dependencia antes de continuar.`
+          : `"${origenNombre}" fusionada en "${destino}" (${total} registros).`,
+        fallidos ? 'warning' : 'success'
+      );
+    } catch (error) {
+      console.error('Error al fusionar dependencias:', error);
+      addToast('No se pudo completar la fusión. Revisa los permisos y la conexión e inténtalo de nuevo.', 'error');
     } finally {
       setIsSavingDep(false);
     }
@@ -287,46 +323,61 @@ export function useDependencias({
     if (!funcId) return;
     try {
       const func = funcionariosPadron.find((f) => f.id === funcId);
+      const ubicacion = String(ubicacionNombre || '').trim();
+      if (ubicacion && !ubicacionesListRef.current.some((u) =>
+        normalizeStr(u.nombre) === normalizeStr(ubicacion) && normalizeStr(u.dependencia) === normalizeStr(func?.dependencia)
+      )) {
+        addToast('Ese departamento no pertenece a la dependencia del funcionario.', 'warning');
+        return;
+      }
       const { error } = await supabase
         .from('funcionarios')
-        .update({ ubicacion: ubicacionNombre || '' })
+        .update({ ubicacion })
         .eq('id', funcId);
       if (error) throw error;
       setFuncionariosPadron((prev) =>
-        prev.map((f) => (f.id === funcId ? { ...f, ubicacion: ubicacionNombre || '' } : f))
+        prev.map((f) => (f.id === funcId ? { ...f, ubicacion } : f))
       );
 
       let movidos = 0;
-      if (ubicacionNombre && func) {
+      let fallidosBien = 0;
+      if (ubicacion && func) {
         const cedFunc = String(func.cedula || '').replace(/\D/g, '');
         const nomFunc = normalizeStr(func.nombre || '');
         const afectados = bienes.filter((b) => {
-          if (b.dependencia !== dependenciaActual) return false;
-          if (normalizeStr(b.ubicacion || '') === normalizeStr(ubicacionNombre)) return false;
+          if (normalizeStr(b.dependencia) !== normalizeStr(func.dependencia)) return false;
+          if (normalizeStr(b.ubicacion || '') === normalizeStr(ubicacion)) return false;
           const cedBien = String(b.funcionarioDoc || '').replace(/\D/g, '');
           if (cedFunc && cedBien && cedFunc === cedBien) return true;
           return nomFunc && normalizeStr(b.funcionario || '') === nomFunc;
         });
-        for (const b of afectados) {
-          const actualizado = { ...b, ubicacion: ubicacionNombre };
-          const { error: eBien } = await supabase
-            .from('bens')
-            .update(conSello({ data: actualizado }))
-            .eq('id', b.id);
-          if (!eBien) movidos++;
+        const idsActualizados = new Set();
+        for (let i = 0; i < afectados.length; i += 10) {
+          const lote = afectados.slice(i, i + 10);
+          const resultados = await Promise.all(lote.map((b) =>
+            supabase.from('bens').update(conSello({ data: { ...b, ubicacion } })).eq('id', b.id)
+          ));
+          resultados.forEach((resultado, index) => {
+            if (resultado?.error) fallidosBien++;
+            else {
+              movidos++;
+              idsActualizados.add(lote[index].id);
+            }
+          });
         }
         if (movidos > 0) {
-          const ids = new Set(afectados.map((b) => b.id));
           setBienes((prev) =>
-            prev.map((b) => (ids.has(b.id) ? { ...b, ubicacion: ubicacionNombre } : b))
+            prev.map((b) => (idsActualizados.has(b.id) ? { ...b, ubicacion } : b))
           );
         }
       }
       addToast(
-        ubicacionNombre
-          ? movidos > 0
-            ? `Funcionario asignado. ${movidos} bien(es) actualizados.`
-            : 'Funcionario asignado a la ubicación.'
+        ubicacion
+          ? fallidosBien > 0
+            ? `Funcionario asignado; ${movidos} bienes actualizados y ${fallidosBien} pendientes de sincronización.`
+            : movidos > 0
+              ? `Funcionario asignado. ${movidos} bien(es) actualizados.`
+              : 'Funcionario asignado al departamento.'
           : 'Funcionario sin ubicación.',
         'success'
       );
@@ -389,6 +440,19 @@ export function useDependencias({
   }, [ubicacionesDep, bienes, funcionariosPadron, dependenciaActual]);
 
   const guardarUbicacion = async (id, nombre, dependencia = dependenciaActual) => {
+    nombre = String(nombre || '').trim().replace(/\s+/g, ' ');
+    dependencia = String(dependencia || '').trim();
+    if (!nombre || !dependencia) {
+      addToast('Escribe el nombre y selecciona la dependencia del departamento.', 'warning');
+      return;
+    }
+    const ubicacionDuplicada = ubicacionesList.some((u) =>
+      u.id !== id && normalizeStr(u.dependencia) === normalizeStr(dependencia) && normalizeStr(u.nombre) === normalizeStr(nombre)
+    );
+    if (ubicacionDuplicada) {
+      addToast('Ya existe un departamento con ese nombre en esta dependencia.', 'warning');
+      return;
+    }
     setIsSavingUbicacion(true);
     try {
       if (!id) {

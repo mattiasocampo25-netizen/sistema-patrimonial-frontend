@@ -117,8 +117,16 @@ export function useFcModals({
     setFichaBien(bien);
     setEventosAuditFicha([]);
     try {
-      const { data, error } = await supabase.from('auditoria').select('*').eq('bienid', bien.id).order('fecha', { ascending: false }).limit(100);
-      if (!error && data) setEventosAuditFicha(data);
+      const eventos = [];
+      for (let desde = 0; ; desde += 500) {
+        const { data, error } = await supabase.from('auditoria').select('*')
+          .eq('bienid', bien.id).order('fecha', { ascending: false})
+          .range(desde, desde + 499);
+        if (error) throw error;
+        eventos.push(...(data || []));
+        if (!data || data.length < 500) break;
+      }
+      setEventosAuditFicha(eventos);
     } catch {}
   };
 
@@ -133,7 +141,13 @@ export function useFcModals({
     if (!window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return notify("Cargando librerías PDF...", "warning");
     
     const idsSeleccionados = Array.isArray(selectedIds) ? new Set(selectedIds) : null;
-    let bienesToPrint = filteredBienes.filter(b => b.estadoConservacion !== 'De Baja' && (!idsSeleccionados || idsSeleccionados.has(b.id)));
+    // Una selección puede incluir bienes que ya no coinciden con la búsqueda
+    // activa. Para FC-03 se resuelve contra el inventario completo de la
+    // dependencia; la selección se conserva entre páginas y filtros.
+    let bienesToPrint = (idsSeleccionados
+      ? bienes.filter(b => normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) && idsSeleccionados.has(b.id))
+      : filteredBienes
+    ).filter(b => b.estadoConservacion !== 'De Baja');
     
     let repText = idsSeleccionados ? 'SELECCIÓN DE ACTIVOS' : "INVENTARIO GENERAL";
     let funcText = "TODOS LOS RESPONSABLES";
@@ -336,7 +350,10 @@ export function useFcModals({
 
   const marcarSolicitudEnRevision = async (solicitud) => {
       if (!isAdmin) return notify('Solo administración puede cambiar el estado de una solicitud.', 'error');
-      if (!solicitud?.id || solicitud.estado !== 'PENDIENTE') return;
+      if (!solicitud?.id || solicitud.estado !== 'PENDIENTE') {
+          notify('La solicitud ya no está pendiente o no es válida.', 'warning');
+          return false;
+      }
       const actor = currentUser?.username || 'Admin';
       const fecha = new Date().toISOString();
       const historial = Array.isArray(solicitud.historial) && solicitud.historial.length
@@ -363,9 +380,11 @@ export function useFcModals({
               detalles: { tipo: solicitud.tipo, bienId: solicitud.bienId || solicitud.bien_id, funcionarioId: solicitud.funcionarioId, solicitante: solicitud.solicitante }
           });
           notify('Solicitud marcada En Revisión.', 'success');
+          return true;
       } catch (error) {
           console.error('No se pudo marcar la solicitud en revisión:', error);
           notify(`No se pudo actualizar la solicitud: ${error.message || 'Error de conexión.'}`, 'error');
+          return false;
       } finally {
           setIsProcessing({ active: false, text: '' });
       }
@@ -373,11 +392,22 @@ export function useFcModals({
 
   const actualizarSolicitud = async (solicitud) => {
       if (!isAdmin) return notify('Solo administración puede actualizar solicitudes.', 'error');
-      if (!solicitud?.id) return;
+      if (!solicitud?.id || !String(solicitud.responsable || '').trim()) {
+          notify('Selecciona un responsable válido para la solicitud.', 'warning');
+          return false;
+      }
       try {
-          const { error } = await supabase.from('notificaciones').update({ data: solicitud }).eq('id', solicitud.id);
+          const { data: fila, error: errorLectura } = await supabase.from('notificaciones').select('data').eq('id', solicitud.id).maybeSingle();
+          if (errorLectura) throw errorLectura;
+          const actual = fila?.data ? (typeof fila.data === 'string' ? JSON.parse(fila.data) : fila.data) : null;
+          if (!actual || !['PENDIENTE', 'EN_REVISION'].includes(actual.estado || 'PENDIENTE')) {
+              notify('La solicitud ya fue resuelta; actualiza la bandeja.', 'warning');
+              return false;
+          }
+          const versionActualizada = { ...actual, responsable: String(solicitud.responsable).trim(), asignadoPor: currentUser?.username || 'Admin', asignadoEn: new Date().toISOString(), historial: Array.isArray(solicitud.historial) ? solicitud.historial : actual.historial || [] };
+          const { error } = await supabase.from('notificaciones').update({ data: versionActualizada }).eq('id', solicitud.id);
           if (error) throw error;
-          setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? solicitud : item));
+          setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? versionActualizada : item));
           await registrarAuditoria({
               usuario: currentUser?.username || 'Admin',
               dependencia: solicitud.dependencia || dependenciaActual,
@@ -747,6 +777,10 @@ export function useFcModals({
 
   const saveUsuario = async (e) => {
     e.preventDefault();
+    if (!isAdmin) {
+      notify('Solo administración puede guardar perfiles de usuario.', 'error');
+      return false;
+    }
     const f = new FormData(e.target);
     const userData = Object.fromEntries(f.entries());
     // La clave vive en Supabase Auth: nunca guardar texto plano en la tabla
@@ -778,6 +812,19 @@ export function useFcModals({
         const res = { error, data: guardado };
         
         if (!res.error) {
+            await registrarAuditoria({
+              usuario: currentUser?.username || 'Admin',
+              dependencia: userData.dependencia || dependenciaActual,
+              accion: usuarioEditing ? 'MODIFICACION_USUARIO' : 'CREACION_USUARIO',
+              entidad: 'USUARIO',
+              entidadId: usuarioEditing?.username || userData.username,
+              detalles: {
+                username: usuarioEditing?.username || userData.username,
+                cambios: usuarioEditing
+                  ? { anterior: { nombre: usuarioEditing.nombre, cargo: usuarioEditing.cargo, dependencia: usuarioEditing.dependencia }, nuevo: { nombre: userData.nombre, cargo: userData.cargo, dependencia: userData.dependencia } }
+                  : { nuevo: { nombre: userData.nombre, cargo: userData.cargo, dependencia: userData.dependencia } }
+              }
+            });
             notify(usuarioEditing ? "Usuario actualizado" : "Usuario creado", "success");
             setIsUsuarioModalOpen(false);
             if (usuarioEditing) {
@@ -787,9 +834,12 @@ export function useFcModals({
             }
         } else {
             notify(res.error.message || "Error al procesar la solicitud", "error");
+            return false;
         }
+        return true;
     } catch {
         notify("Error de conexión.", "error");
+        return false;
     }
   };
 
@@ -1202,15 +1252,41 @@ export function useFcModals({
 
   const submitResolucionBaja = async (e) => {
       e.preventDefault();
+      if (!isAdmin) {
+          notify('Solo administración puede resolver solicitudes.', 'error');
+          return;
+      }
       const { bien, accion, notifOrigen } = resolucionBaja;
       const motivoFinal = motivoResolucion.trim();
+      if (!['aprobar', 'rechazar'].includes(accion)) {
+          notify('La resolución seleccionada no es válida.', 'warning');
+          return;
+      }
+      if (accion === 'rechazar' && !motivoFinal) {
+          notify('Indica el motivo del rechazo para dejar constancia.', 'warning');
+          return;
+      }
       setIsProcessing({ active: true, text: accion === "aprobar" ? "Aprobando baja..." : "Rechazando solicitud..." });
 
       try {
           // Encontrar la notificación de solicitud de baja pendiente asociada
-          const notifPendiente = notifOrigen || notificaciones.find(
-              n => n.tipo === "BAJA_BIEN" && (n.bienId === bien.id || n.bien_id === bien.id) && (n.estado === "PENDIENTE" || n.estado === "EN_REVISION")
+          let notifPendiente = notifOrigen || notificaciones.find(
+              n => n.tipo === "BAJA_BIEN" && (n.bienId === bien?.id || n.bien_id === bien?.id) && (n.estado === "PENDIENTE" || n.estado === "EN_REVISION")
           );
+
+          if (!notifPendiente?.id || !['PENDIENTE', 'EN_REVISION'].includes(notifPendiente.estado || 'PENDIENTE')) {
+              throw new Error('La solicitud ya fue resuelta o no está disponible. Actualiza la bandeja.');
+          }
+          const { data: filaSolicitud, error: errorSolicitud } = await supabase
+              .from('notificaciones').select('data').eq('id', notifPendiente.id).maybeSingle();
+          if (errorSolicitud) throw errorSolicitud;
+          const solicitudActual = filaSolicitud?.data
+              ? (typeof filaSolicitud.data === 'string' ? JSON.parse(filaSolicitud.data) : filaSolicitud.data)
+              : null;
+          if (!solicitudActual || !['PENDIENTE', 'EN_REVISION'].includes(solicitudActual.estado || 'PENDIENTE')) {
+              throw new Error('La solicitud ya fue resuelta por otro usuario. Actualiza la bandeja.');
+          }
+          notifPendiente = { ...solicitudActual, id: notifPendiente.id };
 
           const estadoNuevo = accion === "aprobar" ? "APROBADO" : "RECHAZADO";
           const fechaResolucion = new Date().toISOString();

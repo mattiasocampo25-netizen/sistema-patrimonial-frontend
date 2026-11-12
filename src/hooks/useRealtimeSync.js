@@ -94,12 +94,11 @@ export function useRealtimeSync({
     const consultas = [];
     if (currentUser?.username) consultas.push(consultaDestino(currentUser.username));
     consultas.push(consultaDestino('TODOS'));
-    // Las solicitudes solo se incluyen en la bandeja de administración.
-    // Se consultan por separado para evitar la expresión OR JSON compuesta,
-    // que PostgREST rechaza con 400 en algunos esquemas/versiones.
+    // El centro de aprobaciones conserva el historial completo de solicitudes,
+    // incluidas las que están en revisión y las resueltas. Se consulta por
+    // separado para evitar OR JSON compuestas incompatibles con PostgREST.
     if (isAdmin) {
       consultas.push(supabase.from('notificaciones').select('id, data')
-        .eq('data->>estado', 'PENDIENTE')
         .in('data->>tipo', ['BAJA_BIEN', 'BAJA_FUNCIONARIO'])
         .order('id', { ascending: false })
         .limit(limite));
@@ -556,50 +555,54 @@ export function useRealtimeSync({
       const user = currentUser?.username;
       if (esAnuncioGlobal(notif)) {
           const leidos = Array.isArray(notif.leidos) ? notif.leidos : [];
-          if (!user || leidos.includes(user)) return;
-          const { leido: _ign, ...base } = notif;
-          const updated = { ...base, leidos: [...leidos, user] };
-          setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
+          if (!user) return false;
+          if (leidos.some(nombre => normalizeStr(nombre) === normalizeStr(user))) return true;
           try {
-              await supabase.from('notificaciones').update({ data: updated }).eq('id', notif.id);
-          } catch {}
-          return;
+              const { error } = await supabase.rpc('marcar_anuncio_leido', { p_id: String(notif.id) });
+              if (error) throw error;
+              const updated = { ...notif, leidos: [...leidos, user], leido: true };
+              setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
+              return true;
+          } catch (error) {
+              console.error('No se pudo registrar la lectura del anuncio:', error);
+              return false;
+          }
       }
-      if(notif.leido) return;
+      if (notif.leido) return true;
       const updated = {...notif, leido: true};
-      setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
-      try { 
-          await supabase.from('notificaciones').update({ data: updated }).eq('id', notif.id);
-      } catch {}
+      try {
+          const { error } = await supabase.from('notificaciones').update({ data: updated }).eq('id', notif.id);
+          if (error) throw error;
+          setNotificaciones(prev => prev.map(n => n.id === notif.id ? updated : n));
+          return true;
+      } catch (error) {
+          console.error('No se pudo marcar la notificación como leída:', error);
+          return false;
+      }
   };
 
   const markAllAsRead = async () => {
       const user = currentUser?.username;
       const pendientes = misNotificaciones.filter(n => !n.leido);
       if (pendientes.length === 0) return;
-      const ids = new Set(pendientes.map(n => n.id));
-      setNotificaciones(prev => prev.map(n => {
-          if (!ids.has(n.id)) return n;
-          if (esAnuncioGlobal(n)) {
-              const leidos = Array.isArray(n.leidos) ? n.leidos : [];
-              return (user && !leidos.includes(user)) ? { ...n, leidos: [...leidos, user] } : n;
+      const resultados = await Promise.allSettled(pendientes.map(async n => {
+          const base = notificaciones.find(x => x.id === n.id) || n;
+          if (esAnuncioGlobal(base)) {
+              const { error } = await supabase.rpc('marcar_anuncio_leido', { p_id: String(base.id) });
+              if (error) throw error;
+              return { ...base, leidos: [...(Array.isArray(base.leidos) ? base.leidos : []).filter(x => normalizeStr(x) !== normalizeStr(user)), user].filter(Boolean), leido: true };
           }
-          return { ...n, leido: true };
+          const actualizado = { ...base, leido: true };
+          const { error } = await supabase.from('notificaciones').update({ data: actualizado }).eq('id', base.id);
+          if (error) throw error;
+          return actualizado;
       }));
-      try {
-          await Promise.all(pendientes.map(n => {
-              const base = notificaciones.find(x => x.id === n.id) || n;
-              let payload;
-              if (esAnuncioGlobal(base)) {
-                  const { leido: _ign, ...sinLeido } = base;
-                  const leidos = Array.isArray(base.leidos) ? base.leidos : [];
-                  payload = user && !leidos.includes(user) ? { ...sinLeido, leidos: [...leidos, user] } : null;
-              } else {
-                  payload = { ...n, leido: true };
-              }
-              return payload ? supabase.from('notificaciones').update({ data: payload }).eq('id', n.id) : Promise.resolve();
-          }));
-      } catch {}
+      const actualizados = new Map();
+      resultados.forEach((resultado, index) => {
+          if (resultado.status === 'fulfilled') actualizados.set(pendientes[index].id, resultado.value);
+          else console.error('No se pudo actualizar una notificación:', resultado.reason);
+      });
+      if (actualizados.size) setNotificaciones(prev => prev.map(n => actualizados.get(n.id) || n));
   };
 
   const misNotificaciones = useMemo(() => { 

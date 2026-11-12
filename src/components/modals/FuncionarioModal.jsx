@@ -84,29 +84,30 @@ export default function FuncionarioModal({ isOpen, onClose, funcionarioToEdit, s
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Dependencia</label>
-                            <FiltroCombo
-                                name="dependencia"
-                                valor={dependenciaSeleccionada}
-                                onElegir={elegirDependencia}
-                                opciones={opcionesDependencia}
-                                titulo="Dependencia del funcionario"
-                                etiquetaTodos="Seleccionar dependencia"
-                                required
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Ubicación asignada</label>
-                            <FiltroCombo
-                                name="ubicacion"
-                                valor={ubicacionSeleccionada}
-                                onElegir={setUbicacionSeleccionada}
-                                opciones={opcionesUbicacion}
-                                etiquetaTodos="Sin ubicación asignada"
-                                titulo="Ubicación asignada"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Dependencia</label>
+                                <FiltroCombo
+                                    name="dependencia"
+                                    valor={dependenciaSeleccionada}
+                                    onElegir={elegirDependencia}
+                                    opciones={opcionesDependencia}
+                                    titulo="Dependencia del funcionario"
+                                    etiquetaTodos="Seleccionar dependencia"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="block text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Ubicación asignada</label>
+                                <FiltroCombo
+                                    name="ubicacion"
+                                    valor={ubicacionSeleccionada}
+                                    onElegir={setUbicacionSeleccionada}
+                                    opciones={opcionesUbicacion}
+                                    etiquetaTodos="Sin ubicación asignada"
+                                    titulo="Ubicación asignada"
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-2">

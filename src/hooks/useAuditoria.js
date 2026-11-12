@@ -74,39 +74,14 @@ export function useAuditoria({
     } catch { /* guardado local opcional */ }
   }, [conteoDraftKey, borradorConteoCargado, conteoCodigos, conteoUbicacion]);
   const limpiarBusquedaAud = (texto) => String(texto || '').replace(/[%(),.]/g, ' ').replace(/\s+/g, ' ').trim();
-  // Higiene de auditoría: retención de 5 días. Se ejecuta como máximo una
-  // vez al día al entrar al libro (solo admin). Borra eventos con fecha
-  // anterior al corte, en lotes para no saturar. Se conservan siempre las
-  // bajas, aprobaciones/rechazos y eliminaciones (rastro legal).
-  const RETENCION_AUD_MS = 5 * 24 * 3600 * 1000;
-  const ACCIONES_SENSIBLES = /BAJA|APROB|RECHAZ|ELIMIN/;
-  const purgarAuditoriaVieja = async () => {
-    try {
-      const key = 'aud_purge_ts';
-      const last = parseInt(localStorage.getItem(key) || '0', 10) || 0;
-      if (Date.now() - last < 24 * 3600 * 1000) return;
-      localStorage.setItem(key, String(Date.now()));
-      const corte = new Date(Date.now() - RETENCION_AUD_MS).toISOString();
-      for (;;) {
-        const { data, error } = await supabase.from('auditoria').select('id,accion').lt('fecha', corte).limit(500);
-        if (error || !data || data.length === 0) break;
-        const ids = data.filter(r => !ACCIONES_SENSIBLES.test(String(r.accion || ''))).map(r => r.id);
-        // Si el lote entero es de acciones sensibles (rastro legal) no se borra
-        // nada: seguir iterando devolvería las mismas 500 filas para siempre.
-        if (ids.length === 0) break;
-        const { error: errDel } = await supabase.from('auditoria').delete().in('id', ids);
-        if (errDel) break;
-        if (data.length < 500) break;
-      }
-    } catch {}
-  };
   // Con useCallback: si no, seria una funcion nueva en cada render y los
   // effects que dependen de ella se reejecutarian sin parar.
   const fetchAuditoria = useCallback(async (pagina = 1) => {
     const pag = Number.isInteger(pagina) && pagina > 0 ? pagina : 1;
     setIsLoadingAud(true);
     try {
-      await purgarAuditoriaVieja();
+      // El libro de auditoría es parte de la trazabilidad institucional; no se
+      // purgan automáticamente eventos históricos desde una consulta de UI.
       let q = supabase.from('auditoria').select('*', { count: 'exact' }).order('fecha', { ascending: false });
       if (alcanceAud === 'dep') q = q.eq('dependencia', dependenciaActual);
       if (filtroAccionAud) q = q.eq('accion', filtroAccionAud);

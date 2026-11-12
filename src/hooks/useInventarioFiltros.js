@@ -79,15 +79,13 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
     anclaSeleccionRef.current = id;
   }, []);
   const limpiarSeleccion = useCallback(() => { anclaSeleccionRef.current = null; setSeleccionados([]); }, []);
-  // Al cambiar los filtros o la dependencia, la selección vieja no aplica.
-// Todas las variables de filtrado van en la lista: faltaban filtroMes,
-// filtroAnalitico1/2, filtroQR y filtroPendiente, así que al marcar un chip de
-// la bandeja (por ejemplo "Sin QR") la barra seguía diciendo "N seleccionados"
-// y la baja masiva daba de baja bienes que ya no se veían en pantalla.
+  // La selección pertenece al usuario, no al filtro/página visible: se conserva
+  // al buscar o paginar para poder construir un FC-03 con bienes de varias
+  // páginas. Sí se limpia al cambiar de dependencia para evitar mezclar áreas.
 useEffect(() => {
     setSeleccionados([]);
     anclaSeleccionRef.current = null;
-  }, [dependenciaActual, searchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroFC10, filtroEstado, filtroQR, filtroPendiente]);
+  }, [dependenciaActual]);
   const alternarOrden = useCallback((campo) => {
     setOrden(prev => {
       if (!prev || prev.campo !== campo) return { campo, dir: campo === 'valor' ? 'desc' : 'asc' };

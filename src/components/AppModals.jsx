@@ -834,6 +834,7 @@ export default function AppModals({
         onClose={() => setIsNewFuncionarioModalOpen(false)}
         onSave={handleSaveManualFuncionario}
         dependenciaActual={dependenciaActual}
+        dependencias={todasDependencias?.length ? todasDependencias : DEPENDENCIAS_UNP}
         ubicaciones={ubicacionesDep}
         STYLES={STYLES}
     />

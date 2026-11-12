@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Dialogo from '../ui/Dialogo';
 import FiltroCombo from '../FiltroCombo';
-import { FORM } from '../constants/designTokens';
+import { FORM } from '../../constants/designTokens';
 
 const LABEL = FORM.label;
 
@@ -110,6 +110,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                       titulo="Dependencia asignada"
                     />
                   </div>
+                </div>
               </div>
 
               <div className="mx-6 sm:mx-8 mb-5 -mt-1 rounded-card bg-blue-500/[0.07] border border-blue-500/20 px-4 py-3 flex items-start gap-2.5">

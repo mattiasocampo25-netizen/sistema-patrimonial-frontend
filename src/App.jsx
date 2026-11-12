@@ -344,6 +344,11 @@ export default function App() {
       } catch {}
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? final : b)));
       setFichaBien(final);
+      await registrarAuditoria({
+        usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+        accion: 'MODIFICACION_FOTOS', entidad: 'BIEN', entidadId: fichaBien.id,
+        detalles: { rotulo: fichaBien.rotulo, archivoAgregado: nombre, cantidadFotos: fotos.length }
+      });
       const kb = Math.round(blob.size / 1024);
       addToast(`Foto agregada (${kb} KB).`, 'success');
     } catch {
@@ -367,6 +372,11 @@ export default function App() {
       }
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? actualizado : b)));
       setFichaBien(actualizado);
+      await registrarAuditoria({
+        usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
+        accion: 'ELIMINACION_FOTO', entidad: 'BIEN', entidadId: fichaBien.id,
+        detalles: { rotulo: fichaBien.rotulo, archivoEliminado: foto.ruta || 'URL externa', cantidadFotos: actualizado.fotos.length }
+      });
       addToast('Foto eliminada.', 'success');
     } catch {
       addToast('No se pudo eliminar la foto.', 'error');
@@ -519,7 +529,24 @@ export default function App() {
         await registrarAuditoria({
           usuario: currentUser?.username || 'Usuario', dependencia: dependenciaActual,
           accion: 'MODIFICACION_MASIVA', entidad: 'BIEN', entidadId: `${guardados.length} bienes`,
-          detalles: { cantidad: guardados.length, ids: guardados.map(b => b.id), funcionario, ubicacion }
+          detalles: {
+            cantidad: guardados.length,
+            cambios: guardados.map(bienNuevo => {
+              const bienAnterior = objetivo.find(b => b.id === bienNuevo.id) || {};
+              return {
+                bienId: bienNuevo.id,
+                rotulo: bienNuevo.rotulo || '',
+                anterior: {
+                  ...(funcionario !== undefined ? { funcionario: bienAnterior.funcionario || '' } : {}),
+                  ...(ubicacion !== undefined ? { ubicacion: bienAnterior.ubicacion || '' } : {})
+                },
+                nuevo: {
+                  ...(funcionario !== undefined ? { funcionario: bienNuevo.funcionario || '' } : {}),
+                  ...(ubicacion !== undefined ? { ubicacion: bienNuevo.ubicacion || '' } : {})
+                }
+              };
+            })
+          }
         });
         limpiarSeleccion();
       }
@@ -819,6 +846,9 @@ useEffect(() => {
     setEstructurasDB, setUsuariosList, setFuncionariosPadron,
     setDbError, setIsLoading, setFichaBien
   });
+  const anuncioPendienteLectura = isAuthenticated
+    ? misNotificaciones.find(n => n.accion === 'anuncio' && !n.leido)
+    : null;
   // Modales de fichas y formularios: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { isBulkQR, setIsBulkQR, qrTargetBien, setQrTargetBien, isQRModalOpen, setIsQRModalOpen, isBienModalOpen, setIsBienModalOpen, bienEditing, setBienEditing, bienFormRef, isFC10ModalOpen, setIsFC10ModalOpen, fc10TargetBien, fc10Editing, isFC11ModalOpen, setIsFC11ModalOpen, fc11TargetBien, fc11Editing, isFC04ModalOpen, setIsFC04ModalOpen, fc04Editing, fc04Items, fc04SinMovimiento, setFc04SinMovimiento, isFC03ModalOpen, setIsFC03ModalOpen, fc03Config, setFc03Config, fc03FuncionarioTexto, setFc03FuncionarioTexto, showFC03FuncDropdown, setShowFC03FuncDropdown, isUsuarioModalOpen, setIsUsuarioModalOpen, usuarioEditing, setUsuarioEditing, isSaving, confirmBackupModal, setConfirmBackupModal, resolucionBaja, setResolucionBaja, motivoResolucion, setMotivoResolucion, fileInputRef, showUnsavedChangesModal, setShowUnsavedChangesModal, scanParaConteo, setScanParaConteo, modoCampo, setModoCampo, ultimoEscaneo, setUltimoEscaneo, openFichaBien, openFC03Modal, executeGenerateFC03, openResolucionModal, marcarSolicitudEnRevision, actualizarSolicitud, openFC10Modal, openFC11Modal, openFC04Modal, handleAddFC04Item, handleRemoveFC04Item, handleFC04ItemChange, handleScanSuccess, saveBien, saveUsuario, saveFC11, registrarFirmasFC11, saveFC04, saveFC10, registrarFirmaFC10, registrarAmbasFirmasFC10, ponerFC10EnTramite, submitResolucionBaja, confirmDeleteAction } = useFcModals({
     notify: addToast, setIsProcessing, appLogo,
@@ -1851,6 +1881,39 @@ if (publicBienId) {
         onAceptar={(nombre) => { solicitudNombreArchivo?.aceptar(nombre); setSolicitudesNombreArchivo(actuales => actuales.slice(1)); }}
         onUsarSugerido={() => resolverNombreArchivo('usarSugerido')}
       />
+      {anuncioPendienteLectura && (
+        <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-black/65 p-4" role="presentation">
+          <section role="dialog" aria-modal="true" aria-labelledby="anuncio-obligatorio-titulo" aria-describedby="anuncio-obligatorio-mensaje" className="w-full max-w-lg overflow-hidden rounded-panel border border-line bg-surface-1 shadow-pop">
+            <div className="flex items-start gap-3 border-b border-line bg-info-soft/50 p-5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-info-soft text-info"><i className="fa-solid fa-bullhorn" aria-hidden="true" /></span>
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-info">Anuncio institucional · Confirmación requerida</p>
+                <h2 id="anuncio-obligatorio-titulo" className="mt-1 text-lg font-black text-content-1">{anuncioPendienteLectura.titulo || 'Aviso del sistema'}</h2>
+              </div>
+            </div>
+            <div id="anuncio-obligatorio-mensaje" className="max-h-[45vh] overflow-y-auto whitespace-pre-wrap p-5 text-sm leading-relaxed text-content-2">{anuncioPendienteLectura.mensaje}</div>
+            <div className="flex justify-end border-t border-line p-5">
+              <button
+                type="button"
+                onClick={async (event) => {
+                  const boton = event.currentTarget;
+                  boton.disabled = true;
+                  const confirmado = await markAsRead(anuncioPendienteLectura);
+                  if (!confirmado) {
+                    addToast('No se pudo registrar la lectura. Comprueba tu conexión e inténtalo de nuevo.', 'error');
+                    boton.disabled = false;
+                    return;
+                  }
+                  addToast('Lectura del anuncio registrada.', 'success');
+                }}
+                className="inline-flex h-10 items-center gap-2 rounded-control bg-brand px-5 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+              >
+                <i className="fa-solid fa-check" aria-hidden="true" /> Leí y acepto
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { detectarBienesSimilares } from '../utils/inventarioInteracciones';
 export default function BienModal({
     setIsBienModalOpen,
     bienEditing,
+    isOnline = true,
 
     bienFormRef,
     saveBien,
@@ -48,6 +49,8 @@ export default function BienModal({
     const [rotuloError, setRotuloError] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
     const [cambiosParaConfirmar, setCambiosParaConfirmar] = useState(null);
+    const [offlineConfirmado, setOfflineConfirmado] = useState(false);
+    useEffect(() => { if (isOnline) setOfflineConfirmado(false); }, [isOnline]);
     const defecto = (campo, fb) => (restaurado && restaurado[campo] !== undefined && restaurado[campo] !== null ? restaurado[campo] : fb);
     const validarRotulo = (valor) => {
         const v = String(valor || "").trim();
@@ -72,6 +75,7 @@ export default function BienModal({
     ];
     const guardarConRevision = async (evento, mantenerAbierto = false) => {
         evento?.preventDefault?.();
+        if (!isOnline && !offlineConfirmado) return false;
         const form = bienFormRef.current;
         if (!form?.reportValidity()) return false;
         if (bienEditing?.id) {
@@ -93,6 +97,7 @@ export default function BienModal({
     };
     const confirmarCambios = async () => {
         if (!cambiosParaConfirmar) return;
+        if (!isOnline && !offlineConfirmado) return;
         const mantenerAbierto = cambiosParaConfirmar.mantenerAbierto;
         const ok = await saveBien({ preventDefault() {} }, mantenerAbierto);
         if (ok) {
@@ -328,6 +333,21 @@ export default function BienModal({
             )}
             <form key={formKey} ref={bienFormRef} onSubmit={(e) => guardarConRevision(e, false)} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
               <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
+                {!isOnline && (
+                  <section role="alert" className="rounded-2xl border border-amber-500/40 bg-amber-50 p-4 text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
+                    <div className="flex items-start gap-3">
+                      <i className="fa-solid fa-wifi-slash mt-0.5 text-lg text-amber-600 dark:text-amber-300" aria-hidden="true" />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-extrabold">Estás sin conexión</h3>
+                        <p className="mt-1 text-xs leading-relaxed">El bien se guardará solo en este dispositivo. Otros usuarios no lo verán hasta que vuelva Internet y se complete la sincronización.</p>
+                        <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-xs font-bold">
+                          <input type="checkbox" checked={offlineConfirmado} onChange={e => setOfflineConfirmado(e.target.checked)} className="mt-0.5 h-4 w-4 accent-amber-600" />
+                          <span>Entiendo que este registro quedará pendiente de sincronización.</span>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+                )}
                 {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
 
                 {/* 1. IMPUTACIÓN CONTABLE Y RÓTULO */}
@@ -606,7 +626,7 @@ export default function BienModal({
                 </Button>
 
                 {!esNuevo && (
-                  <Button variante="subtle" tamano="md" disabled={isSaving} onClick={(e) => guardarConRevision(e, true)}>
+                  <Button variante="subtle" tamano="md" disabled={isSaving || (!isOnline && !offlineConfirmado)} onClick={(e) => guardarConRevision(e, true)}>
                     + Guardar y Añadir Otro
                   </Button>
                 )}
@@ -615,10 +635,10 @@ export default function BienModal({
                   type="submit"
                   variante="primary"
                   tamano="md"
-                  disabled={isSaving}
+                  disabled={isSaving || (!isOnline && !offlineConfirmado)}
                   cargando={isSaving}
                 >
-                  {isSaving ? 'Guardando...' : (esNuevo ? '+ Guardar Registro' : 'Actualizar Bien')}
+                  {isSaving ? 'Guardando...' : (!isOnline ? (esNuevo ? 'Guardar pendiente' : 'Guardar cambios pendientes') : (esNuevo ? '+ Guardar Registro' : 'Actualizar Bien'))}
                 </Button>
               </div>
 

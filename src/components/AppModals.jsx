@@ -103,6 +103,7 @@ export default function AppModals({
   bienFormRef,
   saveBien,
   isSaving,
+  isOnline,
   ESTADOS_CONSERVACION,
   sugerenciasBienesDep,
   padronDep,
@@ -475,6 +476,7 @@ export default function AppModals({
             bienFormRef={bienFormRef}
             saveBien={saveBien}
             isSaving={isSaving}
+            isOnline={isOnline}
             ESTADOS_CONSERVACION={ESTADOS_CONSERVACION}
             ubicacionesUnicas={ubicacionesUnicas}
             dependenciaActual={dependenciaActual}

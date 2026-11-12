@@ -8,7 +8,7 @@ import { extraerCodigoQR } from '../utils/qr';
 import { ESTADOS_FC10, ESTADO_NUEVO_FC10, estadoInicialFC10, pendienteDeFirma, registrarFirma, registrarAmbasFirmas, habilitaFC10EnBien, ESTADO_INFO, esFC10Legado, iniciarTramiteFC10 } from '../utils/fc10Firmas';
 import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
-import { enqueueOfflineAction } from '../services/offlineSyncService';
+import { enqueueOfflineAction, esFalloDeConexion } from '../services/offlineSyncService';
 import { detectarCambios, detectarConflictos, fusionarSobreFresco, describirCampos } from '../services/escrituraSegura';
 import { FORMATO_PDF } from '../constants/appConstants';
 
@@ -644,20 +644,19 @@ export function useFcModals({
     
     let bienGuardado = bienData;
     let camposEnConflicto = [];
+    const guardarBienPendiente = async (mensaje = 'Sin conexión detectada') => {
+        await enqueueOfflineAction({ type: 'SAVE_BIEN', payload: bienData });
+        setBienes(prev => [bienData, ...prev.filter(b => b.id !== bienData.id)]);
+        const cacheActual = (await localforage.getItem(`bienes_cache_${dependenciaActual}`)) || [];
+        await localforage.setItem(`bienes_cache_${dependenciaActual}`, [bienData, ...cacheActual.filter(b => b.id !== bienData.id)]);
+        if (!keepOpen) setIsBienModalOpen(false);
+        notify(`${mensaje}. El bien quedó guardado en este dispositivo y aún no aparece en el inventario compartido. Se sincronizará al recuperar conexión.`, 'warning');
+        return true;
+    };
     try { 
         // xÓ AQUÍ SE INTERCEPTA EL MODO OFFLINE
         if (!navigator.onLine) {
-            await enqueueOfflineAction({ type: 'SAVE_BIEN', payload: bienData });
-            
-            // Actualizamos el estado de la app y la caché IndexedDB
-            setBienes(prev => [bienData, ...prev.filter(b => b.id !== bienData.id)]);
-            const cacheActual = (await localforage.getItem(`bienes_cache_${dependenciaActual}`)) || [];
-            await localforage.setItem(`bienes_cache_${dependenciaActual}`, [bienData, ...cacheActual.filter(b => b.id !== bienData.id)]);
-
-            setIsBienModalOpen(false);
-            setIsSaving(false);
-            setIsProcessing({ active: false, text: '' });
-            return notify(`Guardado localmente. Se sincronizará al recuperar la señal.`, "warning");
+            return await guardarBienPendiente('No hay conexión a Internet');
         }
 
         let res;
@@ -766,6 +765,15 @@ export function useFcModals({
         }
     } catch (error) {
         console.error('No se pudo guardar el bien:', error);
+        if (esFalloDeConexion(error)) {
+            try {
+                return await guardarBienPendiente('Se perdió la conexión durante el guardado');
+            } catch (errorCola) {
+                console.error('No se pudo proteger el bien en la cola local:', errorCola);
+                notify(errorCola?.message || 'No se pudo guardar localmente. Mantén el formulario abierto e inténtalo otra vez.', 'error');
+                return false;
+            }
+        }
         notify(error?.message || "Error al guardar.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });
         return false;
     } finally {

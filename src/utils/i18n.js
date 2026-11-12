@@ -140,6 +140,9 @@ const STRINGS = {
     'off.sinc': 'Sincronizando',
     'off.pendiente': 'pendiente',
     'off.pendientes': 'pendientes',
+    'off.solo_dispositivo': 'Sin Internet: los cambios quedan solo en este dispositivo',
+    'off.cambios_pendientes': 'cambio(s) guardado(s) en este dispositivo y pendiente(s) de sincronizar.',
+    'off.reintentar': 'Reintentar',
     'app.saltar': 'Saltar al contenido',
   },
   gn: {
@@ -273,6 +276,9 @@ const STRINGS = {
     'off.sinc': 'Oñesincroniza',
     'off.pendiente': 'pendiente',
     'off.pendientes': 'pendientes',
+    'off.solo_dispositivo': 'Internet’ỹre: umi cambio ko dispositivo-pe añoite oñeñongatu',
+    'off.cambios_pendientes': 'cambio oñeñongatúva ko dispositivo-pe ha oñesincroniza hag̃ua',
+    'off.reintentar': 'Eha’ãjey',
     'app.saltar': 'Jaha contenidope',
   },
 };

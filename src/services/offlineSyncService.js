@@ -7,10 +7,17 @@ import {
 
 const QUEUE_KEY = 'pending_offline_actions';
 
+export const esFalloDeConexion = (error) => {
+  const texto = `${error?.name || ''} ${error?.message || error || ''}`.toLowerCase();
+  return error instanceof TypeError || /failed to fetch|networkerror|network request failed|load failed|fetch failed|internet disconnected|connection (?:was )?lost/.test(texto);
+};
+
 // Mutex: impide que dos sincronizados corran a la vez. El evento 'online' y el
 // intervalo de reintento pueden dispararse casi juntos y, sin esto, el segundo
 // leería la cola con la del primero todavía en curso.
 let sincronizando = false;
+let reintentarDespuesDe = 0;
+let esperaReintentoMs = 5000;
 
 // Encolar acción localmente.
 export const enqueueOfflineAction = async (action) => {
@@ -19,9 +26,12 @@ export const enqueueOfflineAction = async (action) => {
     // Se vuelve a leer y a escribir la cola completa: si hay un sincronizado en
     // curso, su escritura final solo quita lo que él procesó, así que la acción
     // nueva sobrevive.
-    await localforage.setItem(QUEUE_KEY, encolarAccion(actual, action));
+    const nueva = encolarAccion(actual, action);
+    await localforage.setItem(QUEUE_KEY, nueva);
+    return nueva.length;
   } catch (error) {
     console.error('❌ Error al guardar en cola offline:', error);
+    throw new Error('No se pudo guardar el cambio pendiente en este dispositivo. Mantén el formulario abierto e inténtalo otra vez.');
   }
 };
 
@@ -42,14 +52,22 @@ export const getOfflineQueueLength = async () => {
  * "restante" calculada al principio, y cualquier acción que el usuario hubiera
  * encolado durante la espera se perdía en silencio.
  */
-export const processOfflineQueue = async (onSuccessCallback) => {
-  if (!navigator.onLine) return;
-  if (sincronizando) return; // ya hay una pasada en curso
+export const processOfflineQueue = async (onComplete, { force = false } = {}) => {
+  if (!navigator.onLine) return { exitosas: 0, fallidas: 0, pendientes: await getOfflineQueueLength(), ocupado: false };
+  if (sincronizando) return { exitosas: 0, fallidas: 0, pendientes: await getOfflineQueueLength(), ocupado: true };
+  if (!force && Date.now() < reintentarDespuesDe) {
+    const pendientes = await getOfflineQueueLength();
+    return { exitosas: 0, fallidas: pendientes, pendientes, ocupado: false, reintentoEn: reintentarDespuesDe };
+  }
 
   sincronizando = true;
   try {
     const cola = (await localforage.getItem(QUEUE_KEY)) || [];
-    if (cola.length === 0) return;
+    if (cola.length === 0) {
+      reintentarDespuesDe = 0;
+      esperaReintentoMs = 5000;
+      return { exitosas: 0, fallidas: 0, pendientes: 0, ocupado: false };
+    }
 
     const enviar = async (item) => {
       if (item.type === 'SAVE_BIEN') {
@@ -76,12 +94,26 @@ export const processOfflineQueue = async (onSuccessCallback) => {
       await localforage.setItem(QUEUE_KEY, quitarExitosas(vigente, exitosas));
     }
 
-    if (fallidas.length > 0) {
-      console.warn(`⚠️ ${fallidas.length} acción(es) offline siguen pendientes.`);
+    const pendientes = await getOfflineQueueLength();
+    const resumen = { exitosas: exitosas.length, fallidas: pendientes, pendientes, ocupado: false };
+    if (resumen.pendientes > 0) {
+      reintentarDespuesDe = Date.now() + esperaReintentoMs;
+      esperaReintentoMs = Math.min(esperaReintentoMs * 2, 120000);
+      console.warn(`⚠️ ${resumen.fallidas} acción(es) offline siguen pendientes.`);
+    } else {
+      reintentarDespuesDe = 0;
+      esperaReintentoMs = 5000;
     }
-    if (exitosas.length > 0 && onSuccessCallback) onSuccessCallback(exitosas.length);
+    if (onComplete) onComplete(resumen);
+    return resumen;
   } catch (error) {
     console.error('❌ Error general procesando la cola offline:', error);
+    reintentarDespuesDe = Date.now() + esperaReintentoMs;
+    esperaReintentoMs = Math.min(esperaReintentoMs * 2, 120000);
+    const pendientes = await getOfflineQueueLength();
+    const resumen = { exitosas: 0, fallidas: pendientes, pendientes, ocupado: false, error };
+    if (onComplete) onComplete(resumen);
+    return resumen;
   } finally {
     sincronizando = false;
   }

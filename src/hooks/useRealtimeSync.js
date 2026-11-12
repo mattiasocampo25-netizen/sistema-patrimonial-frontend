@@ -712,18 +712,41 @@ export function useRealtimeSync({
 
   // xÓ Escuchador de estado de red (Offline / Online)
   const [colaOffline, setColaOffline] = useState(0);
+  const reintentarSincronizacion = useCallback(async () => {
+    const resumen = await processOfflineQueue((resultado) => {
+      setColaOffline(resultado.pendientes);
+      if (resultado.exitosas > 0) {
+        notify(`Se sincronizaron ${resultado.exitosas} cambios guardados en este dispositivo.`, 'success');
+        fetchData(true);
+      } else if (resultado.pendientes > 0) {
+        notify(`${resultado.pendientes} cambio(s) siguen pendientes. La app continuará reintentando.`, 'warning');
+      }
+    }, { force: true });
+    setColaOffline(resumen?.pendientes ?? await getOfflineQueueLength());
+    return resumen;
+  }, [fetchData, notify]);
   const refrescarColaOffline = async () => {
     try { setColaOffline(await getOfflineQueueLength()); } catch {}
   };
   useEffect(() => {
+    let vigente = true;
+    const sincronizarColaPendiente = (avisarFallos = false, force = false) => {
+      processOfflineQueue((resumen) => {
+        if (!vigente) return;
+        setColaOffline(resumen.pendientes);
+        if (resumen.exitosas > 0) {
+          notify(`Se sincronizaron ${resumen.exitosas} cambios guardados en este dispositivo.`, 'success');
+          fetchData(true);
+        } else if (avisarFallos && resumen.pendientes > 0) {
+          notify(`Internet volvió, pero ${resumen.pendientes} cambio(s) siguen pendientes. La app volverá a intentar automáticamente.`, 'warning');
+        }
+      }, { force });
+    };
     const handleOnline = () => {
       setIsOnline(true);
-      // Cuando regresa internet, vaciamos la cola guardada localmente
-      processOfflineQueue((count) => {
-        notify(`Se sincronizaron ${count} operaciones guardadas en modo local.`, "success");
-        fetchData(true); // Recargamos los datos para reflejar los cambios reales de Supabase
-        refrescarColaOffline();
-      });
+      // Al volver la conexión se intenta de inmediato; los siguientes intentos
+      // usan espera creciente para no insistir contra Supabase si sigue caído.
+      sincronizarColaPendiente(true, true);
     };
 
     const handleOffline = () => {
@@ -740,9 +763,15 @@ export function useRealtimeSync({
       handleOnline();
     }
     refrescarColaOffline();
-    const tCola = setInterval(() => { refrescarColaOffline(); }, 15000);
+    const tCola = setInterval(async () => {
+      const pendientes = await getOfflineQueueLength();
+      if (!vigente) return;
+      setColaOffline(pendientes);
+      if (navigator.onLine && pendientes > 0) sincronizarColaPendiente(false, false);
+    }, 15000);
 
     return () => {
+      vigente = false;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
       clearInterval(tCola);
@@ -757,7 +786,7 @@ export function useRealtimeSync({
   // competing sobre la misma caché de IndexedDB.
 
   return {
-    isOnline, colaOffline, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
+    isOnline, colaOffline, reintentarSincronizacion, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
     fetchData, cargarNotificaciones, sondearNotificaciones, fusionarNotificacion,
     markAsRead, markAllAsRead, misNotificaciones, unreadCount
   };

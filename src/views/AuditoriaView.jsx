@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, StatTile } from '../components/ui';
+import { PageHeader, Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
+import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -22,6 +23,7 @@ export default function AuditoriaView({
   actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
+  const [seccionAuditoria, setSeccionAuditoria] = useState('actividad');
   const aplicarRangoRapido = (dias) => {
     const fin = new Date();
     const inicio = new Date(fin);
@@ -32,28 +34,28 @@ export default function AuditoriaView({
   };
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
-          <PageHeader
-            titulo={'Auditoría'}
-            descripcion={'Trazabilidad, conciliación física y verificación por muestreo'}
-            icono="fa-magnifying-glass-chart"
-            contador={(
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-500/20">
-                Solo administradores
-              </span>
-            )}
-          />
-          <Toolbar className="mt-4">
-          <div className="flex flex-wrap items-center gap-2">
-          <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Recargar libro de auditoría">
-            {isLoadingAud ? 'Actualizando…' : 'Actualizar'}
-          </Button>
-          </div>
-          </Toolbar>
-        </div>
-      </Card>
+      <PageHeader
+        titulo="Auditoría"
+        descripcion="Consulta quién hizo cada cambio y compara los valores anteriores con los nuevos."
+        icono="fa-magnifying-glass-chart"
+        contador={<span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-bold text-violet-700 dark:text-violet-300">Solo administradores</span>}
+        acciones={<Button variante="secondary" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Actualizar historial">{isLoadingAud ? 'Actualizando…' : 'Actualizar'}</Button>}
+      />
 
+      <nav className="grid grid-cols-3 gap-2 rounded-2xl border border-line bg-surface-1 p-2 shadow-sm" role="tablist" aria-label="Secciones de auditoría">
+        {[
+          { id: 'actividad', titulo: 'Actividad', descripcion: 'Historial de cambios', icono: 'fa-clock-rotate-left' },
+          { id: 'calidad', titulo: 'Calidad de datos', descripcion: 'Alertas y recursos', icono: 'fa-shield-halved' },
+          { id: 'conteo', titulo: 'Verificación física', descripcion: 'Conteo y muestreo', icono: 'fa-clipboard-check' },
+        ].map(tab => (
+          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`flex min-h-[66px] items-center gap-2 rounded-xl px-2.5 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-2 hover:bg-surface-2'}`}>
+            <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:flex ${seccionAuditoria === tab.id ? 'bg-white/15 dark:bg-slate-900/10' : 'bg-brand-soft text-brand-text'}`}><i className={`fa-solid ${tab.icono}`} aria-hidden="true" /></span>
+            <span className="min-w-0"><span className="block truncate text-xs font-bold sm:text-sm">{tab.titulo}</span><span className={`mt-0.5 hidden truncate text-[10px] sm:block ${seccionAuditoria === tab.id ? 'text-white/70 dark:text-slate-600' : 'text-content-3'}`}>{tab.descripcion}</span></span>
+          </button>
+        ))}
+      </nav>
+
+      {seccionAuditoria === 'actividad' && <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-tour="aud-kpis">
         <StatTile etiqueta="Eventos (30 días)" valor={kpisAud.total} icono="fa-bolt" tono="brand" animado />
         <StatTile etiqueta="Altas registradas" valor={kpisAud.altas} icono="fa-plus" tono="ok" animado />
@@ -89,7 +91,9 @@ export default function AuditoriaView({
               ))}
           </div>
       </div>
+      </>}
 
+      {seccionAuditoria === 'calidad' && <>
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
@@ -181,7 +185,9 @@ export default function AuditoriaView({
               </div>
           )}
       </div>
+      </>}
 
+      {seccionAuditoria === 'conteo' && <>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2 mb-1">
@@ -316,146 +322,107 @@ export default function AuditoriaView({
           )}
         </div>
       </div>
+      </>}
 
+      {seccionAuditoria === 'actividad' &&
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-5 border-b border-line dark:border-white/10">
-          <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2 mr-auto">
-            <i className="fa-solid fa-book-open text-content-3"></i> Libro de auditoría
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-3 dark:text-content-3">{totalAud} eventos</span>
-          </h3>
-          <div className="flex rounded-control bg-surface-3 dark:bg-surface-1/5 p-1 gap-1" role="tablist" aria-label="Alcance del libro">
-            {[
-              { id: 'dep', label: dependenciaActual },
-              { id: 'todas', label: 'Todas' }
-            ].map(o => (
-              <button
-                key={o.id}
-                onClick={() => setAlcanceAud(o.id)}
-                className={`h-8 px-3 rounded-lg text-[11px] font-bold transition-all cursor-pointer truncate max-w-[160px] ${alcanceAud === o.id ? 'bg-surface-1 dark:bg-surface-3 text-content-1 dark:text-white shadow-sm' : 'text-content-3 dark:text-content-3 hover:text-content-1 dark:hover:text-zinc-200'}`}
-                title={o.id === 'dep' ? 'Solo eventos de esta dependencia' : 'Eventos de todas las dependencias'}
-              >
-                {o.label}
-              </button>
-            ))}
+        <div className="border-b border-line p-4 sm:p-5">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="mr-auto">
+              <h2 className="flex items-center gap-2 text-base font-black text-content-1"><i className="fa-solid fa-clock-rotate-left text-brand-text" aria-hidden="true" />Historial de actividad</h2>
+              <p className="mt-1 text-xs text-content-3">Cada registro muestra quién hizo el cambio y qué dato pasó de antes a después.</p>
+            </div>
+            <span className="w-fit rounded-full bg-surface-2 px-3 py-1.5 text-xs font-bold tabular-nums text-content-2">{totalAud.toLocaleString('es-PY')} eventos</span>
+            <div className="flex rounded-xl border border-line bg-surface-2 p-1" role="group" aria-label="Alcance de los registros">
+              {[
+                { id: 'dep', label: 'Esta dependencia' },
+                { id: 'todas', label: 'Todas' }
+              ].map(opcion => (
+                <button key={opcion.id} type="button" onClick={() => setAlcanceAud(opcion.id)} aria-pressed={alcanceAud === opcion.id} className={`min-h-9 rounded-lg px-3 text-[11px] font-bold transition ${alcanceAud === opcion.id ? 'bg-surface-1 text-content-1 shadow-sm' : 'text-content-3 hover:text-content-1'}`}>
+                  {opcion.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="relative">
-            <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
-            <input
-              type="text" value={searchAud} onChange={(e) => setSearchAud(e.target.value)} placeholder="Buscar en el libro..."
-              className="rounded-control border border-line dark:border-white/10 bg-surface-2 dark:bg-surface-1/5 h-10 pl-10 pr-3 text-[13px] font-medium text-content-1 dark:text-white placeholder:text-content-3 outline-none focus:border-zinc-900 dark:focus:border-zinc-400 focus:ring-2 focus:ring-zinc-900/5 dark:focus:ring-white/10 w-full sm:w-56"
-            />
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <label className="relative sm:col-span-2 xl:col-span-1">
+              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true" />
+              <input type="search" value={searchAud} onChange={event => setSearchAud(event.target.value)} placeholder="Buscar usuario, bien o detalle" aria-label="Buscar en auditoría" className="h-11 w-full rounded-xl border border-line bg-surface-1 pl-10 pr-3 text-sm text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15" />
+            </label>
+            <FiltroCombo valor={filtroAccionAud} opciones={accionesUnicasAud} onElegir={setFiltroAccionAud} etiquetaTodos="Todas las acciones" titulo="Filtrar por acción" ancho="w-full" />
+            <FiltroCombo valor={filtroUsuarioAud} opciones={usuariosAud} onElegir={setFiltroUsuarioAud} etiquetaTodos="Todos los usuarios" titulo="Filtrar por usuario" ancho="w-full" />
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">Desde<input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Desde la fecha" className="min-w-0 w-full bg-transparent text-xs text-content-1" /></label>
+              <label className="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">Hasta<input type="date" value={hastaAud} min={desdeAud || undefined} onChange={event => setHastaAud(event.target.value)} aria-label="Hasta la fecha" className="min-w-0 w-full bg-transparent text-xs text-content-1" /></label>
+            </div>
           </div>
-          <FiltroCombo
-            valor={filtroAccionAud}
-            opciones={accionesUnicasAud}
-            onElegir={setFiltroAccionAud}
-            etiquetaTodos="Acción: Todas"
-            titulo="Filtrar por acción"
-            ancho="max-w-[200px]"
-          />
-          <FiltroCombo
-            valor={filtroUsuarioAud}
-            opciones={usuariosAud}
-            onElegir={setFiltroUsuarioAud}
-            etiquetaTodos="Usuario: Todos"
-            titulo="Filtrar por usuario"
-            ancho="max-w-[220px]"
-          />
-          <label className="flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">
-            Desde
-            <input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Auditoría desde la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />
-          </label>
-          <div className="flex gap-1" role="group" aria-label="Rangos rápidos de auditoría">
-            {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-10 rounded-control border border-line px-2.5 text-[10px] font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">{dias} días</button>)}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-content-3">Período rápido</span>
+            {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-8 rounded-lg border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 hover:border-brand/40 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Últimos {dias} días</button>)}
+            {(desdeAud || hastaAud || filtroAccionAud || filtroUsuarioAud || searchAud) && <button type="button" onClick={() => { setDesdeAud(''); setHastaAud(''); setFiltroAccionAud(''); setFiltroUsuarioAud(''); setSearchAud(''); }} className="ml-auto min-h-8 rounded-lg px-3 text-[11px] font-bold text-content-3 hover:bg-surface-2 hover:text-content-1">Limpiar filtros</button>}
           </div>
-          <label className="flex min-h-10 items-center gap-2 rounded-control border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">
-            Hasta
-            <input type="date" value={hastaAud} min={desdeAud || undefined} onChange={event => setHastaAud(event.target.value)} aria-label="Auditoría hasta la fecha" className="min-w-0 bg-transparent text-label text-content-1 outline-none" />
-          </label>
-          {(desdeAud || hastaAud) && <button type="button" onClick={() => { setDesdeAud(''); setHastaAud(''); }} className="min-h-10 rounded-control px-3 text-label font-bold text-content-3 hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Limpiar fechas</button>}
         </div>
-        <div className="overflow-x-auto custom-scrollbar">
-          <Table sinContenedor minWidth={false} className="w-full text-left border-collapse min-w-[720px]">
-            <THead>
-              <TRow className="text-[10px] sm:text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-[0.14em]">
-                <TH className="py-3.5 pl-6 pr-4">Fecha</TH>
-                <TH className="px-4 py-3.5">Usuario</TH>
-                <TH className="px-4 py-3.5">Acción</TH>
-                <TH className="px-4 py-3.5">Evento</TH>
-                <TH className="py-3.5 pl-4 pr-6">Detalle</TH>
-              </TRow>
-            </THead>
-            <TBody>
-              {isLoadingAud ? (
-                <TRow><TD colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Cargando libro...</TD></TRow>
-              ) : auditoriaList.length === 0 ? (
-                <TRow><TD colSpan="5" className="p-10 text-center text-xs font-semibold text-content-3">Sin eventos para los filtros aplicados.</TD></TRow>
-              ) : (
-                auditoriaList.map(r => {
-                  let cambios = null;
-                  try {
-                    const mensaje = typeof r.mensaje === 'string' ? JSON.parse(r.mensaje) : r.mensaje;
-                    if (mensaje?.cambios?.anterior && mensaje?.cambios?.nuevo) cambios = mensaje.cambios;
-                  } catch { /* evento histórico sin estructura de cambios */ }
-                  const campos = cambios ? Object.keys(cambios.nuevo).filter(k => JSON.stringify(cambios.nuevo[k]) !== JSON.stringify(cambios.anterior[k])) : [];
-                  const expandido = eventoExpandido === r.id && campos.length > 0;
-                  return (
-                  <React.Fragment key={r.id}>
-                  <TRow className="hover:bg-surface-2/70 dark:hover:bg-surface-1/[0.03] transition-colors">
-                    <TD className="py-3 pl-6 pr-4 align-top text-xs tabular-nums text-content-3 dark:text-content-3 whitespace-nowrap">
-                      {r.fecha ? new Date(r.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
-                    </TD>
-                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-content-3 whitespace-nowrap">{actorAud(r)}</TD>
-                    <TD className="px-4 py-3 align-top">
-                      <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${tonoAccionAud(r.accion)}`}>
-                        {r.accion || 'OTROS'}
-                      </span>
-                    </TD>
-                    <TD className="px-4 py-3 align-top text-xs font-bold text-content-1 dark:text-zinc-200">
-                      <div>{r.titulo || '-'}</div>
-                      {r.bienid && /BIEN/i.test(r.titulo || '') && <button type="button" onClick={() => {
-                        const existe = bienes.some(b => String(b.id) === String(r.bienid));
-                        if (!existe) return;
-                        clearAllFilters();
-                        setSearchTerm(String(r.bienid));
-                        setSearchInput(String(r.bienid));
-                        setCurrentPage(1);
-                        setActiveTab('inventario');
-                      }} disabled={!bienes.some(b => String(b.id) === String(r.bienid))} className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-brand-text hover:underline disabled:cursor-not-allowed disabled:text-content-3" title={bienes.some(b => String(b.id) === String(r.bienid)) ? 'Abrir el bien relacionado' : 'El bien relacionado ya no está en el inventario'}>
-                        <i className={`fa-solid ${bienes.some(b => String(b.id) === String(r.bienid)) ? 'fa-arrow-up-right-from-square' : 'fa-circle-exclamation'}`} aria-hidden="true" />
-                        {bienes.some(b => String(b.id) === String(r.bienid)) ? 'Abrir bien relacionado' : 'Bien relacionado no disponible'}
-                      </button>}
-                    </TD>
-                    <TD className="py-3 pl-4 pr-6 align-top text-xs text-content-3 dark:text-content-3 max-w-[280px]">
-                      <button type="button" onClick={() => setEventoExpandido(expandido ? null : r.id)} disabled={!campos.length} aria-expanded={expandido} className="max-w-full inline-flex items-center gap-2 text-left truncate disabled:cursor-default enabled:hover:text-brand-text">
-                        <span className="truncate" title={detalleAudCorto(r)}>{detalleAudCorto(r)}</span>
-                        {campos.length > 0 && <i className={`fa-solid ${expandido ? 'fa-chevron-up' : 'fa-chevron-down'} text-[9px] shrink-0`} aria-hidden="true"></i>}
-                      </button>
-                    </TD>
-                  </TRow>
-                  {expandido && (
-                    <TRow className="bg-surface-2/60 dark:bg-surface-1/[0.04]">
-                      <TD colSpan="5" className="px-6 py-4">
-                        <div className="grid gap-2 sm:grid-cols-2">
-                          {campos.map(campo => (
-                            <div key={campo} className="rounded-control border border-line dark:border-white/10 bg-surface-1 dark:bg-surface-1/5 p-3">
-                              <p className="mb-2 text-[10px] font-black uppercase tracking-wider text-content-3">{campo}</p>
-                              <div className="grid grid-cols-2 gap-2 text-[11px]">
-                                <p className="min-w-0"><span className="block font-bold text-content-3">Antes</span><span className="block break-words text-content-2 dark:text-content-3">{String(cambios.anterior[campo] ?? '—')}</span></p>
-                                <p className="min-w-0"><span className="block font-bold text-content-3">Después</span><span className="block break-words text-content-1 dark:text-white">{String(cambios.nuevo[campo] ?? '—')}</span></p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </TD>
-                    </TRow>
+        <div className="space-y-3 p-3 sm:p-5">
+          {isLoadingAud ? (
+            <div role="status" className="rounded-2xl border border-line bg-surface-2/50 px-4 py-12 text-center text-sm font-semibold text-content-3"><i className="fa-solid fa-circle-notch fa-spin mr-2" aria-hidden="true" />Cargando actividad…</div>
+          ) : auditoriaList.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-line px-4 py-12 text-center"><i className="fa-solid fa-magnifying-glass-minus mb-3 text-2xl text-content-3" aria-hidden="true" /><p className="text-sm font-bold text-content-1">No encontramos eventos</p><p className="mt-1 text-xs text-content-3">Prueba con otro período o limpia los filtros.</p></div>
+          ) : auditoriaList.map(r => {
+            const campos = obtenerCambiosAuditoria(r);
+            const mostrarTodos = eventoExpandido === r.id;
+            const camposVisibles = mostrarTodos ? campos : campos.slice(0, 3);
+            const existeBien = bienes.some(b => String(b.id) === String(r.bienid));
+            const fechaEvento = r.fecha ? new Date(r.fecha) : null;
+            return (
+              <article key={r.id} className="rounded-2xl border border-line bg-surface-1 p-4 shadow-sm transition-colors hover:border-line-strong sm:p-5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line/70 pb-3">
+                  <span className="inline-flex items-center gap-2 text-xs font-bold tabular-nums text-content-2"><i className="fa-regular fa-clock text-content-3" aria-hidden="true" />{fechaEvento ? fechaEvento.toLocaleString('es-PY', { dateStyle: 'medium', timeStyle: 'short' }) : 'Fecha no registrada'}</span>
+                  <span className="hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
+                  <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold text-content-2"><i className="fa-regular fa-user text-content-3" aria-hidden="true" /><span className="truncate">{actorAud(r)}</span></span>
+                  <span className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${tonoAccionAud(r.accion)}`}><i className={`fa-solid ${String(r.accion).includes('ALTA') ? 'fa-plus' : String(r.accion).includes('BAJA') ? 'fa-trash-can' : 'fa-pen'}`} aria-hidden="true" />{etiquetaAccionAuditoria(r.accion)}</span>
+                </div>
+
+                <div className="flex flex-wrap items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-black text-content-1">{tituloEventoAuditoria(r)}</h3>
+                    <p className="mt-1 text-xs text-content-3">{detalleAudCorto(r)}</p>
+                  </div>
+                  {r.bienid && /BIEN/i.test(r.titulo || '') && (
+                    <button type="button" onClick={() => {
+                      if (!existeBien) return;
+                      clearAllFilters();
+                      setSearchTerm(String(r.bienid));
+                      setSearchInput(String(r.bienid));
+                      setCurrentPage(1);
+                      setActiveTab('inventario');
+                    }} disabled={!existeBien} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-xl border border-line px-3 text-[11px] font-bold text-brand-text transition hover:border-brand/30 hover:bg-brand-soft disabled:cursor-not-allowed disabled:text-content-3" title={existeBien ? 'Ir al bien en Inventario' : 'El bien ya no está en Inventario'}>
+                      <i className={`fa-solid ${existeBien ? 'fa-box-open' : 'fa-circle-exclamation'}`} aria-hidden="true" />{existeBien ? 'Ver bien' : 'Bien no disponible'}
+                    </button>
                   )}
-                  </React.Fragment>
-                  );
-                })
-              )}
-            </TBody>
-          </Table>
+                </div>
+
+                {campos.length > 0 && (
+                  <section aria-label={`Cambios realizados: ${campos.length}`} className="rounded-xl bg-surface-2/60 p-3 sm:p-4">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="flex items-center gap-2 text-xs font-black text-content-1"><i className="fa-solid fa-code-compare text-brand-text" aria-hidden="true" />Qué cambió</h4>
+                      <span className="text-[10px] font-semibold text-content-3">{campos.length} {campos.length === 1 ? 'dato modificado' : 'datos modificados'}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {camposVisibles.map(({ campo, etiqueta, antes, despues }) => (
+                        <div key={campo} className="grid gap-2 rounded-xl border border-line/70 bg-surface-1 p-3 sm:grid-cols-[minmax(130px,0.7fr)_minmax(0,1fr)_28px_minmax(0,1fr)] sm:items-center">
+                          <p className="text-xs font-bold text-content-1">{etiqueta}</p>
+                          <div className="min-w-0 rounded-lg bg-danger-soft/70 px-3 py-2"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-danger">Antes</span><span className="block break-words text-xs text-content-2">{valorAuditoriaLegible(antes, campo)}</span></div>
+                          <i className="fa-solid fa-arrow-right hidden text-center text-xs text-content-3 sm:block" aria-hidden="true" />
+                          <div className="min-w-0 rounded-lg bg-ok-soft/70 px-3 py-2"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-ok">Después</span><span className="block break-words text-xs font-semibold text-content-1">{valorAuditoriaLegible(despues, campo)}</span></div>
+                        </div>
+                      ))}
+                    </div>
+                    {campos.length > 3 && <button type="button" onClick={() => setEventoExpandido(mostrarTodos ? null : r.id)} aria-expanded={mostrarTodos} className="mt-3 rounded-lg px-2 py-1 text-[11px] font-bold text-brand-text hover:bg-brand-soft">{mostrarTodos ? 'Mostrar menos' : `Ver los ${campos.length - 3} cambios restantes`}</button>}
+                  </section>
+                )}
+              </article>
+            );
+          })}
         </div>
         <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-3.5 border-t border-line dark:border-white/10">
           <span className="text-xs text-content-3 font-medium">
@@ -479,6 +446,7 @@ export default function AuditoriaView({
           </div>
         </div>
       </div>
+      }
     </div>
   );
 }

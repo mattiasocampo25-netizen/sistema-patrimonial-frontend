@@ -7,6 +7,7 @@ import { registrarAuditoria } from '../services/auditService';
 import { guardarPDF } from '../utils/pdfSanear';
 import { estimarUsoDB, alertaUso } from '../services/supabaseFreeTier';
 import { tomarMuestra } from '../utils/muestreo';
+import { detalleAuditoriaLegible } from '../utils/auditoriaPresentacion';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //
@@ -159,24 +160,7 @@ export function useAuditoria({
     } catch {}
     return 'No registrado';
   };
-  const detalleAudCorto = (row) => {
-    try {
-      const m = typeof row.mensaje === 'string' ? JSON.parse(row.mensaje) : row.mensaje;
-      if (m && typeof m === 'object') {
-        if (m.cambios && m.cambios.anterior && m.cambios.nuevo) {
-          const keys = Object.keys(m.cambios.nuevo).filter(k => JSON.stringify(m.cambios.nuevo[k]) !== JSON.stringify(m.cambios.anterior[k]));
-          return keys.length ? `Campos: ${keys.slice(0, 5).join(', ')}${keys.length > 5 ? '…' : ''}` : 'Registro actualizado';
-        }
-        const bits = [];
-        if (m.solicitante) bits.push(m.solicitante);
-        if (m.motivo) bits.push(m.motivo);
-        if (m.descripcion) bits.push(String(m.descripcion).slice(0, 60));
-        else if (m.rotulo) bits.push(`Rótulo ${m.rotulo}`);
-        return bits.join(' · ');
-      }
-      return String(row.mensaje || '').slice(0, 120);
-    } catch { return String(row.mensaje || '').slice(0, 120); }
-  };
+  const detalleAudCorto = detalleAuditoriaLegible;
   const tonoAccionAud = (accion) => {
     const a = String(accion || '').toUpperCase();
     if (a.includes('BAJA') || a.includes('ELIMINA')) return 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20';

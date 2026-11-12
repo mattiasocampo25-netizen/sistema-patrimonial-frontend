@@ -199,8 +199,9 @@ export default function AppSidebar({
     };
   }, [isSidebarOpen]);
   const { t } = useIdioma();
-  const LOGO_SISTEMA = darkMode ? '/UNP-Site-Logo.webp' : '/UNP-Site-Logo-negro.webp';
-  const LOGO_SISTEMA_PNG = darkMode ? '/UNP-Site-Logo.png' : '/UNP-Site-Logo-negro.png';
+  // El sidebar usa fondo oscuro en ambos temas; mantener siempre el logo claro.
+  const LOGO_SISTEMA = '/UNP-Site-Logo.webp';
+  const LOGO_SISTEMA_PNG = '/UNP-Site-Logo.png';
 
   const cerrar = () => setIsSidebarOpen && setIsSidebarOpen(false);
 

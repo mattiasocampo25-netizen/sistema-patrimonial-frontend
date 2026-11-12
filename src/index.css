@@ -283,7 +283,16 @@ html.density-compact table th { letter-spacing: 0.035em; }
 }
 
 .dashboard-welcome-card {
-  background-image: radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--brand) 9%, transparent), transparent 42%);
+  background-image: radial-gradient(ellipse at 100% 0%, rgb(255 255 255 / 12%), transparent 42%), linear-gradient(135deg, #123149, #14566a 58%, #147a7e);
+  color: #fff;
+}
+
+.dashboard-welcome-card :is(h1, h2, h3, p, span, i) {
+  color: inherit;
+}
+
+.dashboard-welcome-card :is(button, [role="button"]) {
+  color: #fff;
 }
 
 .dashboard-metric-card {

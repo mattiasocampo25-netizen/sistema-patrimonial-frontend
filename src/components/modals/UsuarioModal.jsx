@@ -8,7 +8,11 @@ const LABEL = FORM.label;
 
 export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsuario, todasDependencias, esDesarrollador, STYLES }) {
     const [rolSeleccionado, setRolSeleccionado] = useState(usuarioEditing?.cargo || 'user');
-    useEffect(() => { setRolSeleccionado(usuarioEditing?.cargo || 'user'); }, [usuarioEditing, isOpen]);
+    const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(usuarioEditing?.dependencia || 'Rectorado');
+    useEffect(() => {
+      setRolSeleccionado(usuarioEditing?.cargo || 'user');
+      setDependenciaSeleccionada(usuarioEditing?.dependencia || 'Rectorado');
+    }, [usuarioEditing, isOpen]);
     if (!isOpen) return null;
     const permisosPorRol = {
       user: ['Gestionar bienes y funcionarios de su dependencia', 'Crear y consultar formularios FC-04, FC-10 y FC-11', 'Enviar solicitudes para revisión administrativa'],
@@ -81,7 +85,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                     <FiltroCombo
                       name="cargo"
                       required
-                      valor={usuarioEditing?.cargo || 'user'}
+                      valor={rolSeleccionado}
                       opciones={[
                         { label: 'Funcionario Local (lectura y creación)', value: 'user' },
                         { label: 'Administrador General (control total)', value: 'admin' },
@@ -104,8 +108,9 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
                     <FiltroCombo
                       name="dependencia"
                       required
-                      valor={usuarioEditing?.dependencia || 'Rectorado'}
+                      valor={dependenciaSeleccionada}
                       opciones={todasDependencias}
+                      onElegir={setDependenciaSeleccionada}
                       etiquetaTodos="Elegí dependencia"
                       titulo="Dependencia asignada"
                     />

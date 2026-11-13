@@ -729,6 +729,60 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       }, 100);
   };
 
+  const handleExportInventarioPDF = (registros = filteredBienes) => {
+      if (!registros?.length) return notify('No hay bienes para incluir en el informe.', 'warning');
+      if (!window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return notify('Cargando librerías PDF, intenta de nuevo.', 'warning');
+      setIsProcessing({ active: true, text: 'Generando informe de bienes sin asignar...' });
+      setTimeout(async () => {
+          try {
+              const { jsPDF } = window.jspdf;
+              const doc = new jsPDF('l', 'mm', 'a4');
+              const pageWidth = doc.internal.pageSize.getWidth();
+              const fecha = new Date().toLocaleString('es-PY', { dateStyle: 'medium', timeStyle: 'short' });
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(15);
+              doc.text('UNIVERSIDAD NACIONAL DE PILAR', pageWidth / 2, 16, { align: 'center' });
+              doc.setFontSize(13);
+              doc.text('INFORME DE BIENES LIBRES PARA ASIGNAR', pageWidth / 2, 24, { align: 'center' });
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(9);
+              doc.text(`Dependencia: ${dependenciaActual || 'Todas'}`, 14, 34);
+              doc.text(`Generado: ${fecha}`, pageWidth - 14, 34, { align: 'right' });
+              doc.setFont('helvetica', 'bold');
+              doc.setTextColor(120, 75, 0);
+              doc.text('Este informe identifica bienes pendientes de asignación. No constituye una baja patrimonial ni autoriza su eliminación del inventario.', 14, 41, { maxWidth: pageWidth - 28 });
+              doc.setTextColor(0, 0, 0);
+              const filas = registros.map(b => [
+                  b.rotulo || 'Sin rótulo', b.descripcion || '-', b.ubicacion || 'Sin ubicación',
+                  b.funcionario || 'Sin funcionario', etiquetaEstadoAsignacion(b),
+                  b.estadoConservacion || '-', b.observaciones || '-'
+              ]);
+              doc.autoTable({
+                  startY: 48, head: [['Rótulo', 'Descripción', 'Ubicación', 'Funcionario', 'Asignación', 'Estado', 'Observaciones']],
+                  body: filas, theme: 'grid', rowPageBreak: 'avoid', margin: { left: 14, right: 14, bottom: 16 },
+                  styles: { font: 'helvetica', fontSize: 7.5, cellPadding: 2.2, overflow: 'linebreak', valign: 'middle' },
+                  headStyles: { fillColor: [30, 64, 75], textColor: [255, 255, 255], fontStyle: 'bold' },
+                  alternateRowStyles: { fillColor: [244, 248, 248] },
+                  columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 61 }, 2: { cellWidth: 36 }, 3: { cellWidth: 38 }, 4: { cellWidth: 32 }, 5: { cellWidth: 27 }, 6: { cellWidth: 'auto' } },
+                  didDrawPage: () => {
+                      const page = doc.internal.getNumberOfPages();
+                      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(90);
+                      doc.text(`Total: ${registros.length.toLocaleString('es-PY')} bienes · Página ${page}`, pageWidth - 14, doc.internal.pageSize.getHeight() - 7, { align: 'right' });
+                  }
+              });
+              const nombre = await solicitarNombreArchivo(`Bienes_libres_para_asignar_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.pdf`);
+              if (nombre) await guardarPDF(doc, nombre);
+              else return;
+              notify(`Informe PDF descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, 'success');
+          } catch (error) {
+              console.error('Error al generar informe PDF de bienes libres:', error);
+              notify('No se pudo generar el informe PDF.', 'error');
+          } finally {
+              setIsProcessing({ active: false, text: '' });
+          }
+      }, 100);
+  };
+
   const handleDownloadTemplateFuncionarios = () => {
       const csvContent = "\uFEFFCédula;Nombre Completo;Cargo\n1234567;Juan Pérez;Asistente Administrativo\n7654321;María Gómez;Directora de Área";
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -742,7 +796,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
     handleGenerateFC04PDF, handleGenerateFC11PDF, handleGenerateFC10PDF, handleBulkFC10Zip,
     handleGenerateConsolidatedFC10PDF, handleExportFC10CSV, handleExportFC11CSV,
     handleDownloadTemplateCSV, handleExportBackupGeneral,
-    handleExportInventarioCSV, handleExportInventarioExcel,
+    handleExportInventarioCSV, handleExportInventarioExcel, handleExportInventarioPDF,
     handleDownloadTemplateFuncionarios
   };
 }

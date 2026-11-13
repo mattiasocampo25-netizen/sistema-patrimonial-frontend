@@ -712,26 +712,40 @@ export function useRealtimeSync({
 
   // xÓ Escuchador de estado de red (Offline / Online)
   const [colaOffline, setColaOffline] = useState(0);
+  const [estaSincronizandoOffline, setEstaSincronizandoOffline] = useState(false);
+  const sincronizacionColaRef = useRef(false);
   const reintentarSincronizacion = useCallback(async () => {
-    const resumen = await processOfflineQueue((resultado) => {
-      setColaOffline(resultado.pendientes);
-      if (resultado.exitosas > 0) {
-        notify(`Se sincronizaron ${resultado.exitosas} cambios guardados en este dispositivo.`, 'success');
-        fetchData(true);
-      } else if (resultado.pendientes > 0) {
-        notify(`${resultado.pendientes} cambio(s) siguen pendientes. La app continuará reintentando.`, 'warning');
-      }
-    }, { force: true });
-    setColaOffline(resumen?.pendientes ?? await getOfflineQueueLength());
-    return resumen;
+    if (sincronizacionColaRef.current) return { ocupado: true, pendientes: await getOfflineQueueLength() };
+    sincronizacionColaRef.current = true;
+    setEstaSincronizandoOffline(true);
+    try {
+      const resumen = await processOfflineQueue((resultado) => {
+        setColaOffline(resultado.pendientes);
+        if (resultado.exitosas > 0) {
+          notify(`Se sincronizaron ${resultado.exitosas} cambios guardados en este dispositivo.`, 'success');
+          fetchData(true);
+        } else if (resultado.pendientes > 0) {
+          notify(`${resultado.pendientes} cambio(s) siguen pendientes. Se conservaron en este dispositivo y habrá nuevos intentos.`, 'warning');
+        }
+      }, { force: true });
+      setColaOffline(resumen?.pendientes ?? await getOfflineQueueLength());
+      return resumen;
+    } finally {
+      sincronizacionColaRef.current = false;
+      setEstaSincronizandoOffline(false);
+    }
   }, [fetchData, notify]);
   const refrescarColaOffline = async () => {
     try { setColaOffline(await getOfflineQueueLength()); } catch {}
   };
   useEffect(() => {
     let vigente = true;
-    const sincronizarColaPendiente = (avisarFallos = false, force = false) => {
-      processOfflineQueue((resumen) => {
+    const sincronizarColaPendiente = async (avisarFallos = false, force = false) => {
+      if (sincronizacionColaRef.current) return;
+      sincronizacionColaRef.current = true;
+      setEstaSincronizandoOffline(true);
+      try {
+      await processOfflineQueue((resumen) => {
         if (!vigente) return;
         setColaOffline(resumen.pendientes);
         if (resumen.exitosas > 0) {
@@ -741,6 +755,10 @@ export function useRealtimeSync({
           notify(`Internet volvió, pero ${resumen.pendientes} cambio(s) siguen pendientes. La app volverá a intentar automáticamente.`, 'warning');
         }
       }, { force });
+      } finally {
+        sincronizacionColaRef.current = false;
+        if (vigente) setEstaSincronizandoOffline(false);
+      }
     };
     const handleOnline = () => {
       setIsOnline(true);
@@ -786,7 +804,7 @@ export function useRealtimeSync({
   // competing sobre la misma caché de IndexedDB.
 
   return {
-    isOnline, colaOffline, reintentarSincronizacion, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
+    isOnline, colaOffline, estaSincronizandoOffline, reintentarSincronizacion, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
     fetchData, cargarNotificaciones, sondearNotificaciones, fusionarNotificacion,
     markAsRead, markAllAsRead, misNotificaciones, unreadCount
   };

@@ -31,6 +31,7 @@ export default function InventarioView({
   fileInputRef,
   handleExportInventarioCSV,
   handleExportInventarioExcel,
+  handleExportInventarioPDF,
   ultimaExportacion,
   onRepetirExport,
   setIsBulkQR,
@@ -367,8 +368,15 @@ export default function InventarioView({
       <div className="flex shrink-0 items-center gap-2 pl-1 sm:pl-0">
         <Button variante="subtle" tamano="sm" icono="fa-file-csv" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en CSV">Descargar CSV</Button>
         <Button variante="subtle" tamano="sm" icono="fa-file-excel" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en Excel">Excel</Button>
+        <Button variante="secondary" tamano="sm" icono="fa-file-pdf" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} title="Descargar informe PDF de bienes libres para asignar">PDF</Button>
       </div>
     </div>
+
+    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-500/[0.035] hover:bg-amber-500/[0.08]'}`}>
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
+      <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
+      <span className="rounded-full border border-amber-600/20 bg-surface-1 px-2.5 py-1 text-xs font-black tabular-nums text-amber-800 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
+    </button>
 
     <div>
       <button

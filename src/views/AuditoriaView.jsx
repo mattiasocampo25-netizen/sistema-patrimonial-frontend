@@ -19,11 +19,28 @@ export default function AuditoriaView({
   muestra, verificadosMuestra, setVerificadosMuestra, generarMuestra,
   guardarActaMuestreo, descargarActaMuestreoPDF,
   totalAud, paginaAud, alcanceAud, setAlcanceAud, searchAud, setSearchAud,
-  filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, accionesUnicasAud, auditoriaList,
+  filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, tipoEntidadAud, setTipoEntidadAud, campoAud, setCampoAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, accionesUnicasAud, auditoriaList,
   actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
   const [seccionAuditoria, setSeccionAuditoria] = useState('actividad');
+  const [filtrosGuardados, setFiltrosGuardados] = useState(() => { try { return JSON.parse(localStorage.getItem('auditoria_filtros_guardados') || 'null'); } catch { return null; } });
+  const guardarFiltrosAuditoria = () => { const filtros = { searchAud, filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud }; try { localStorage.setItem('auditoria_filtros_guardados', JSON.stringify(filtros)); setFiltrosGuardados(filtros); } catch {} };
+  const aplicarFiltrosAuditoria = () => { if (!filtrosGuardados) return; setSearchAud(filtrosGuardados.searchAud || ''); setFiltroAccionAud(filtrosGuardados.filtroAccionAud || ''); setFiltroUsuarioAud(filtrosGuardados.filtroUsuarioAud || ''); setTipoEntidadAud(filtrosGuardados.tipoEntidadAud || ''); setCampoAud(filtrosGuardados.campoAud || ''); setDesdeAud(filtrosGuardados.desdeAud || ''); setHastaAud(filtrosGuardados.hastaAud || ''); };
+  const exportarEventosCSV = () => {
+    if (!auditoriaList.length) return;
+    const filas = [['Fecha', 'Usuario', 'Acción', 'Registro', 'Detalle', 'Identificador'], ...auditoriaList.map(row => [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : '', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), detalleAudCorto(row), row.id])];
+    const csv = '\uFEFF' + filas.map(fila => fila.map(valor => `"${String(valor ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const enlace = document.createElement('a'); enlace.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); enlace.download = `auditoria_pagina_${paginaAud}.csv`; enlace.click(); setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
+  };
+  const exportarEventosPDF = () => {
+    if (!auditoriaList.length || !window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return;
+    const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('Historial de auditoría', 14, 15);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(`Dependencia: ${alcanceAud === 'todas' ? 'Todas' : 'Esta dependencia'} · Página ${paginaAud} · ${auditoriaList.length} eventos`, 14, 22);
+    doc.autoTable({ startY: 28, head: [['Fecha', 'Usuario', 'Acción', 'Registro', 'Detalle']], body: auditoriaList.map(row => [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : 'Sin fecha', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), detalleAudCorto(row)]), styles: { font: 'helvetica', fontSize: 7, cellPadding: 2.2, overflow: 'linebreak' }, headStyles: { fillColor: [30, 64, 75] }, columnStyles: { 0: { cellWidth: 34 }, 1: { cellWidth: 28 }, 2: { cellWidth: 24 }, 3: { cellWidth: 38 } } });
+    doc.save(`auditoria_pagina_${paginaAud}.pdf`);
+  };
   const aplicarRangoRapido = (dias) => {
     const fin = new Date();
     const inicio = new Date(fin);
@@ -32,6 +49,14 @@ export default function AuditoriaView({
     setDesdeAud(aFecha(inicio));
     setHastaAud(aFecha(fin));
   };
+  const gruposEventos = auditoriaList.reduce((grupos, evento) => {
+    const fecha = evento.fecha ? new Date(evento.fecha) : null;
+    const clave = fecha && Number.isFinite(fecha.getTime()) ? fecha.toLocaleDateString('es-PY', { dateStyle: 'full' }) : 'Fecha no registrada';
+    const ultimo = grupos[grupos.length - 1];
+    if (ultimo?.clave === clave) ultimo.eventos.push(evento);
+    else grupos.push({ clave, eventos: [evento] });
+    return grupos;
+  }, []);
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
       <Card className="p-5 sm:p-6">
@@ -349,9 +374,11 @@ export default function AuditoriaView({
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             <label className="relative sm:col-span-2 xl:col-span-1">
               <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true" />
-              <input type="search" value={searchAud} onChange={event => setSearchAud(event.target.value)} placeholder="Buscar usuario, bien o detalle" aria-label="Buscar en auditoría" className="h-11 w-full rounded-xl border border-line bg-surface-1 pl-10 pr-3 text-sm text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15" />
+              <input type="search" value={searchAud} onChange={event => setSearchAud(event.target.value)} placeholder="Buscar usuario, bien o cambio realizado" aria-label="Buscar en auditoría; incluye los valores anteriores y nuevos" className="h-11 w-full rounded-xl border border-line bg-surface-1 pl-10 pr-3 text-sm text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15" />
             </label>
             <FiltroCombo valor={filtroAccionAud} opciones={accionesUnicasAud} onElegir={setFiltroAccionAud} etiquetaTodos="Todas las acciones" titulo="Filtrar por acción" ancho="w-full" />
+            <FiltroCombo valor={tipoEntidadAud} opciones={[{ label: 'Bienes', value: 'BIEN' }, { label: 'Actas FC-10', value: 'FC10' }, { label: 'Traslados FC-11', value: 'FC11' }, { label: 'Funcionarios', value: 'FUNCIONARIO' }, { label: 'Dependencias', value: 'DEPENDENCIA' }, { label: 'Usuarios', value: 'USUARIO' }, { label: 'Solicitudes', value: 'SOLICITUD' }]} onElegir={setTipoEntidadAud} etiquetaTodos="Todos los registros" titulo="Filtrar por tipo de registro" ancho="w-full" />
+            <FiltroCombo valor={campoAud} opciones={[{ label: 'Responsable', value: 'funcionario' }, { label: 'Ubicación', value: 'ubicacion' }, { label: 'Observaciones', value: 'observaciones' }, { label: 'Estado de conservación', value: 'estadoConservacion' }, { label: 'Valor unitario', value: 'valorUnitario' }, { label: 'Fotografías', value: 'fotos' }, { label: 'Dependencia', value: 'dependencia' }]} onElegir={setCampoAud} etiquetaTodos="Todos los campos" titulo="Filtrar por dato modificado" ancho="w-full" />
             <FiltroCombo valor={filtroUsuarioAud} opciones={usuariosAud} onElegir={setFiltroUsuarioAud} etiquetaTodos="Todos los usuarios" titulo="Filtrar por usuario" ancho="w-full" />
             <div className="grid grid-cols-2 gap-2">
               <label className="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">Desde<input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Desde la fecha" className="min-w-0 w-full bg-transparent text-xs text-content-1" /></label>
@@ -361,7 +388,13 @@ export default function AuditoriaView({
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-content-3">Período rápido</span>
             {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-8 rounded-lg border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 hover:border-brand/40 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Últimos {dias} días</button>)}
-            {(desdeAud || hastaAud || filtroAccionAud || filtroUsuarioAud || searchAud) && <button type="button" onClick={() => { setDesdeAud(''); setHastaAud(''); setFiltroAccionAud(''); setFiltroUsuarioAud(''); setSearchAud(''); }} className="ml-auto min-h-8 rounded-lg px-3 text-[11px] font-bold text-content-3 hover:bg-surface-2 hover:text-content-1">Limpiar filtros</button>}
+            <div className="ml-auto flex flex-wrap gap-2">
+              <button type="button" onClick={guardarFiltrosAuditoria} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-brand-text hover:bg-brand-soft">Guardar búsqueda</button>
+              {filtrosGuardados && <button type="button" onClick={aplicarFiltrosAuditoria} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-brand-text hover:bg-brand-soft">Aplicar guardada</button>}
+              <button type="button" onClick={exportarEventosCSV} disabled={!auditoriaList.length} className="min-h-8 rounded-lg border border-line px-3 text-[11px] font-bold text-content-2 hover:bg-surface-2 disabled:opacity-40" title="Descarga los eventos de la página visible">CSV de esta página</button>
+              <button type="button" onClick={exportarEventosPDF} disabled={!auditoriaList.length} className="min-h-8 rounded-lg border border-line px-3 text-[11px] font-bold text-content-2 hover:bg-surface-2 disabled:opacity-40" title="Descarga los eventos de la página visible">PDF de esta página</button>
+              {(desdeAud || hastaAud || filtroAccionAud || filtroUsuarioAud || searchAud || tipoEntidadAud || campoAud) && <button type="button" onClick={() => { setDesdeAud(''); setHastaAud(''); setFiltroAccionAud(''); setFiltroUsuarioAud(''); setSearchAud(''); setTipoEntidadAud(''); setCampoAud(''); }} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-content-3 hover:bg-surface-2 hover:text-content-1">Limpiar filtros</button>}
+            </div>
           </div>
         </div>
         <div className="space-y-3 p-3 sm:p-5">
@@ -369,7 +402,9 @@ export default function AuditoriaView({
             <div role="status" className="rounded-2xl border border-line bg-surface-2/50 px-4 py-12 text-center text-sm font-semibold text-content-3"><i className="fa-solid fa-circle-notch fa-spin mr-2" aria-hidden="true" />Cargando actividad…</div>
           ) : auditoriaList.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-line px-4 py-12 text-center"><i className="fa-solid fa-magnifying-glass-minus mb-3 text-2xl text-content-3" aria-hidden="true" /><p className="text-sm font-bold text-content-1">No encontramos eventos</p><p className="mt-1 text-xs text-content-3">Prueba con otro período o limpia los filtros.</p></div>
-          ) : auditoriaList.map(r => {
+          ) : gruposEventos.map(grupo => <section key={grupo.clave} aria-label={`Eventos del ${grupo.clave}`}>
+          <h3 className="sticky top-0 z-[1] mb-2 mt-2 flex items-center gap-2 rounded-lg bg-surface-2/90 px-3 py-2 text-[11px] font-extrabold capitalize text-content-2 backdrop-blur"><i className="fa-regular fa-calendar text-brand-text" aria-hidden="true" />{grupo.clave}<span className="ml-auto font-semibold text-content-3">{grupo.eventos.length} {grupo.eventos.length === 1 ? 'evento' : 'eventos'}</span></h3>
+          <div className="space-y-3">{grupo.eventos.map(r => {
             const campos = obtenerCambiosAuditoria(r);
             const mostrarTodos = eventoExpandido === r.id;
             const camposVisibles = mostrarTodos ? campos : campos.slice(0, 3);
@@ -381,6 +416,7 @@ export default function AuditoriaView({
                   <span className="inline-flex items-center gap-2 text-xs font-bold tabular-nums text-content-2"><i className="fa-regular fa-clock text-content-3" aria-hidden="true" />{fechaEvento ? fechaEvento.toLocaleString('es-PY', { dateStyle: 'medium', timeStyle: 'short' }) : 'Fecha no registrada'}</span>
                   <span className="hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
                   <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold text-content-2"><i className="fa-regular fa-user text-content-3" aria-hidden="true" /><span className="truncate">{actorAud(r)}</span></span>
+                  <button type="button" onClick={() => navigator.clipboard?.writeText(String(r.id || '')).catch(() => {})} className="rounded-md px-2 py-1 text-[10px] font-semibold text-content-3 hover:bg-surface-2 hover:text-content-1" title={`Copiar identificador ${r.id}`}>ID · {String(r.id || '').slice(0, 8)} <i className="fa-regular fa-copy ml-1" aria-hidden="true" /></button>
                   <span className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${tonoAccionAud(r.accion)}`}><i className={`fa-solid ${String(r.accion).includes('ALTA') ? 'fa-plus' : String(r.accion).includes('BAJA') ? 'fa-trash-can' : 'fa-pen'}`} aria-hidden="true" />{etiquetaAccionAuditoria(r.accion)}</span>
                 </div>
 
@@ -424,7 +460,7 @@ export default function AuditoriaView({
                 )}
               </article>
             );
-          })}
+          })}</div></section>)}
         </div>
         <div className="flex flex-wrap gap-2 justify-between items-center px-4 sm:px-6 py-3.5 border-t border-line dark:border-white/10">
           <span className="text-xs text-content-3 font-medium">

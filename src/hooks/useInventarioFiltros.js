@@ -47,7 +47,7 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
   const [filtroQR, setFiltroQR] = useState('ALL');
   const [filtroFC10, setFiltroFC10] = useState('ALL');
   const [filtroEstado, setFiltroEstado] = useState('ALL');
-  // Bandeja de pendientes: '' | sinQR | sinFC10 | sinUbicacion | sinFuncionario | vidaVencida
+  // Bandeja de pendientes: '' | sinQR | sinFC10 | sinUbicacion | sinFuncionario | libresParaAsignar | observados | vidaVencida
   const [filtroPendiente, setFiltroPendiente] = useState('');
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -379,7 +379,8 @@ useEffect(() => {
       depBienes.forEach(b => { if (b.cuenta) cuentasCounts[b.cuenta] = (cuentasCounts[b.cuenta] || 0) + 1; });
       const topCuentas = Object.entries(cuentasCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
       const libresParaAsignar = depBienes.filter(esBienLibreParaAsignar).length;
-      return { totalItems, totalValue, withFc10, withoutFc10: totalItems - withFc10, fc10Pendientes, withQR, withoutQR: totalItems - withQR, libresParaAsignar, percFC10, percQR, estados, topCuentas };
+      const observados = depBienes.filter(b => String(b.observaciones || '').trim()).length;
+      return { totalItems, totalValue, withFc10, withoutFc10: totalItems - withFc10, fc10Pendientes, withQR, withoutQR: totalItems - withQR, libresParaAsignar, observados, percFC10, percQR, estados, topCuentas };
   }, [bienesDependencia, bienesPorId, dependenciaActual, fc10List]);
 
   // Bandeja de pendientes: conteos operativos para atención directa (mismo universo que stats: activos)
@@ -405,6 +406,7 @@ useEffect(() => {
         { id: 'sinUbicacion', label: 'Sin ubicación', count: base.filter(b => esCampoSinAsignar(b.ubicacion)).length, icon: 'fa-location-dot', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
         { id: 'sinFuncionario', label: 'Sin responsable', count: base.filter(b => esCampoSinAsignar(b.funcionario)).length, icon: 'fa-user-tie', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20' },
         { id: 'libresParaAsignar', label: 'Libres para asignar', count: base.filter(esBienLibreParaAsignar).length, icon: 'fa-box-open', box: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20' },
+        { id: 'observados', label: 'Bienes con observaciones', count: base.filter(b => String(b.observaciones || '').trim()).length, icon: 'fa-eye', box: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20' },
         { id: 'vidaVencida', label: 'Vida útil vencida', count: base.filter(esVidaVencida).length, icon: 'fa-hourglass-end', box: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
         { id: 'porVencer', label: 'Por vencer (12 m.)', count: base.filter(b => { const r = mesesRestantes(b); return r !== null && r > 0 && r <= 12; }).length, icon: 'fa-hourglass-half', box: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20' },
       ];
@@ -436,6 +438,7 @@ useEffect(() => {
     else if (filtroPendiente === 'sinUbicacion') filtered = filtered.filter(b => esCampoSinAsignar(b.ubicacion));
     else if (filtroPendiente === 'sinFuncionario') filtered = filtered.filter(b => esCampoSinAsignar(b.funcionario));
     else if (filtroPendiente === 'libresParaAsignar') filtered = filtered.filter(b => b.estadoConservacion !== 'De Baja' && esBienLibreParaAsignar(b));
+    else if (filtroPendiente === 'observados') filtered = filtered.filter(b => String(b.observaciones || '').trim());
     else if (filtroPendiente === 'vidaVencida') filtered = filtered.filter(b => {
       const { year } = parseDateInfo(b.fechaAdquisicion);
       const vu = parseInt(b.vidaUtil, 10);

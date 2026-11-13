@@ -70,19 +70,31 @@ export const processOfflineQueue = async (onComplete, { force = false } = {}) =>
     }
 
     const enviar = async (item) => {
+      let consulta;
       if (item.type === 'SAVE_BIEN') {
         // conSello es obligatorio: sin updated_at el cambio no entra en el
         // delta de los demás equipos hasta la resincronización total (24 h).
-        return supabase.from('bens').upsert([conSello({ id: item.payload.id, data: item.payload })]);
+        consulta = supabase.from('bens').upsert([conSello({ id: item.payload.id, data: item.payload })]);
       }
-      if (item.type === 'DELETE_BIEN') {
-        return supabase.from('bens').delete().eq('id', item.payload.id);
+      else if (item.type === 'DELETE_BIEN') {
+        consulta = supabase.from('bens').delete().eq('id', item.payload.id);
       }
-      if (item.type === 'SAVE_FC10') {
+      else if (item.type === 'SAVE_FC10') {
         // fc10 no usa delta: se recarga entera, por eso no lleva conSello.
-        return supabase.from('fc10').upsert([{ id: item.payload.id, data: item.payload }]);
+        consulta = supabase.from('fc10').upsert([{ id: item.payload.id, data: item.payload }]);
       }
-      return { error: new Error(`tipo no soportado: ${item.type}`) };
+      else return { error: new Error(`tipo no soportado: ${item.type}`) };
+
+      // navigator.onLine solo indica que hay una interfaz de red. Si el acceso
+      // a Supabase sigue colgado, abortar esta operación permite liberar el
+      // mutex, conservar la acción pendiente y reintentar después.
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      try {
+        return await consulta.abortSignal(controller.signal);
+      } finally {
+        clearTimeout(timeoutId);
+      }
     };
 
     const { exitosas, fallidas } = await procesarCola(cola, enviar);

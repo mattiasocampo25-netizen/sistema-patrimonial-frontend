@@ -8,6 +8,7 @@ import { guardarPDF } from '../utils/pdfSanear';
 import { estimarUsoDB, alertaUso } from '../services/supabaseFreeTier';
 import { tomarMuestra } from '../utils/muestreo';
 import { detalleAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import { analizarSaludDatos } from '../utils/saludDatos';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //
@@ -205,34 +206,7 @@ export function useAuditoria({
     return String(v);
   };
   // Salud de datos: solo lectura (cero riesgo), detecta inconsistencias sin modificar nada
-  const saludDatos = useMemo(() => {
-    const idsBienes = new Set(bienes.map(b => b.id));
-    const vistos = new Map();
-    const duplicados = [];
-    bienes.forEach(b => {
-      const k = `${normalizeStr(b.dependencia)}||${normalizeStr(b.rotulo)}`;
-      if (!b.rotulo || String(b.rotulo).trim() === '' || String(b.rotulo).trim() === 'S/R') return;
-      if (vistos.has(k)) duplicados.push(b);
-      else vistos.set(k, b.id);
-    });
-    // Posibles duplicados del padrón: mismo nombre normalizado, distinto registro
-    const vistosFunc = new Map();
-    const duplicadosFunc = [];
-    funcionariosPadron.forEach(f => {
-      const k = normalizeStr(f.nombre || '');
-      if (!k) return;
-      if (vistosFunc.has(k)) duplicadosFunc.push(f);
-      else vistosFunc.set(k, f.id);
-    });
-    return [
-      { id: 'dup', label: 'Rótulos duplicados', count: duplicados.length, detalle: duplicados.slice(0, 20), icon: 'fa-clone', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20' },
-      { id: 'dupfunc', label: 'Posibles duplicados en padrón', count: duplicadosFunc.length, detalle: duplicadosFunc.slice(0, 20), icon: 'fa-user-group', box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20', esPadron: true },
-      { id: 'fc10', label: 'FC-10 sin bien asociado', count: fc10List.filter(fc => fc.bienId && !idsBienes.has(fc.bienId)).length, detalle: [], icon: 'fa-file-signature', box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20' },
-      { id: 'fc11', label: 'FC-11 sin bien asociado', count: fc11List.filter(fc => fc.bienId && !idsBienes.has(fc.bienId)).length, detalle: [], icon: 'fa-truck-fast', box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20' },
-      { id: 'sindep', label: 'Bienes sin dependencia', count: bienes.filter(b => !String(b.dependencia || '').trim()).length, detalle: [], icon: 'fa-building-columns', box: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20' },
-      { id: 'sinfecha', label: 'Bienes sin fecha de adquisición', count: bienes.filter(b => !String(b.fechaAdquisicion || '').trim()).length, detalle: [], icon: 'fa-calendar-xmark', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
-    ];
-  }, [bienes, fc10List, fc11List, funcionariosPadron]);
+  const saludDatos = useMemo(() => analizarSaludDatos({ bienes, fc10List, fc11List, funcionariosPadron }), [bienes, fc10List, fc11List, funcionariosPadron]);
   const resultadoConteo = useMemo(() => {
     const base = bienes.filter(b =>
       normalizeStr(b.dependencia) === normalizeStr(dependenciaActual) &&

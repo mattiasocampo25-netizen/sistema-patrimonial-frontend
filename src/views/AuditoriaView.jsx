@@ -24,6 +24,7 @@ export default function AuditoriaView({
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
   const [seccionAuditoria, setSeccionAuditoria] = useState('actividad');
+  const [hallazgoActivo, setHallazgoActivo] = useState('');
   const [filtrosGuardados, setFiltrosGuardados] = useState(() => { try { return JSON.parse(localStorage.getItem('auditoria_filtros_guardados') || 'null'); } catch { return null; } });
   const guardarFiltrosAuditoria = () => { const filtros = { searchAud, filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud }; try { localStorage.setItem('auditoria_filtros_guardados', JSON.stringify(filtros)); setFiltrosGuardados(filtros); } catch {} };
   const aplicarFiltrosAuditoria = () => { if (!filtrosGuardados) return; setSearchAud(filtrosGuardados.searchAud || ''); setFiltroAccionAud(filtrosGuardados.filtroAccionAud || ''); setFiltroUsuarioAud(filtrosGuardados.filtroUsuarioAud || ''); setTipoEntidadAud(filtrosGuardados.tipoEntidadAud || ''); setCampoAud(filtrosGuardados.campoAud || ''); setDesdeAud(filtrosGuardados.desdeAud || ''); setHastaAud(filtrosGuardados.hastaAud || ''); };
@@ -48,6 +49,20 @@ export default function AuditoriaView({
     const aFecha = fecha => `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
     setDesdeAud(aFecha(inicio));
     setHastaAud(aFecha(fin));
+  };
+  const descargarInformeSalud = () => {
+    const filas = [['Tipo de revisión', 'Cantidad detectada', 'Identificador', 'Rótulo o nombre', 'Dependencia', 'Detalle']];
+    saludDatos.forEach((grupo) => {
+      if (!grupo.detalle.length) filas.push([grupo.label, grupo.count, '', '', '', 'Sin ejemplos disponibles']);
+      grupo.detalle.forEach((item) => filas.push([
+        grupo.label, grupo.count, item.id || '', item.rotulo || item.nombre || item.descripcion || '',
+        item.dependencia || '', item.cedula ? `Documento ${item.cedula}` : item.funcionario || item.motivo || '',
+      ]));
+    });
+    const csv = '\uFEFF' + filas.map((fila) => fila.map((valor) => `"${String(valor ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = 'revision_calidad_datos.csv'; link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
   const gruposEventos = auditoriaList.reduce((grupos, evento) => {
     const fecha = evento.fecha ? new Date(evento.fecha) : null;
@@ -121,6 +136,10 @@ export default function AuditoriaView({
       </>}
 
       {seccionAuditoria === 'calidad' && <>
+        <div className="flex flex-col gap-3 rounded-panel border border-line bg-surface-1 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div><h2 className="text-sm font-extrabold text-content-1">Revisión de integridad del inventario</h2><p className="mt-1 max-w-3xl text-xs leading-relaxed text-content-3">Revisión de solo lectura. Las alertas no modifican datos y algunas pueden ser válidas; abre cada grupo y verifica los registros antes de corregirlos.</p></div>
+          <Button variante="secondary" tamano="sm" icono="fa-file-csv" onClick={descargarInformeSalud}>Descargar informe</Button>
+        </div>
       <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
@@ -173,44 +192,34 @@ export default function AuditoriaView({
             <i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />Los proyectos Free pueden pausarse tras 7 días de poca actividad. Revisa el panel de uso de Supabase si el sistema deja de responder.
             {' '}<a href="https://supabase.com/docs/guides/deployment/going-into-prod" target="_blank" rel="noreferrer" className="font-bold text-brand-text underline underline-offset-2">Ver disponibilidad y límites</a>
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 mb-4">
               {saludDatos.map(s => (
-                  <div key={s.id} className="rounded-card border border-line/70 dark:border-white/10 px-3 py-3 text-center shadow-sm">
-                      <p className="text-xl sm:text-2xl font-black tabular-nums text-content-1 dark:text-white">{s.count}</p>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-content-3 mt-0.5 leading-tight">{s.label}</p>
-                  </div>
+                  <button key={s.id} type="button" aria-pressed={hallazgoActivo === s.id} onClick={() => setHallazgoActivo(actual => actual === s.id ? '' : s.id)} className={`rounded-card border px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${hallazgoActivo === s.id ? 'border-brand bg-brand-soft/60' : 'border-line/70 dark:border-white/10'}`}>
+                      <span className="flex items-center justify-between gap-2"><i className={`fa-solid ${s.icon} text-sm text-content-3`} aria-hidden="true"/><span className={`text-xl sm:text-2xl font-black tabular-nums ${s.count ? 'text-content-1 dark:text-white' : 'text-content-3'}`}>{s.count.toLocaleString('es-PY')}</span></span>
+                      <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-content-3 leading-tight">{s.label}</span>
+                      <span className="mt-1 block text-[10px] text-brand-text">{s.count ? 'Ver registros' : 'Sin hallazgos'} <i className="fa-solid fa-chevron-right ml-1" aria-hidden="true"/></span>
+                  </button>
               ))}
           </div>
-          {saludDatos[0].detalle.length > 0 && (
-              <div className="max-h-40 overflow-y-auto custom-scrollbar rounded-card border border-line/60 dark:border-white/10 divide-y divide-zinc-100 dark:divide-white/5">
-                  {saludDatos[0].detalle.map(b => (
-                      <button
-                          key={b.id}
-                          onClick={() => { clearAllFilters(); setSearchTerm(b.rotulo || ''); setSearchInput(b.rotulo || ''); setCurrentPage(1); setActiveTab('inventario'); }}
-                          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 text-xs hover:bg-surface-2 dark:hover:bg-surface-1/[0.04] transition-colors cursor-pointer"
-                          title="Revisar en inventario"
-                      >
-                          <span className="font-mono font-bold text-content-1 dark:text-content-3 truncate">{b.rotulo}</span>
-                          <span className="text-content-3 truncate">{b.descripcion}</span>
-                      </button>
-                  ))}
-              </div>
-          )}
-          {saludDatos[1].detalle.length > 0 && (
-              <div className="mt-2 max-h-40 overflow-y-auto custom-scrollbar rounded-card border border-violet-500/20 divide-y divide-zinc-100 dark:divide-white/5">
-                  {saludDatos[1].detalle.map(f => (
-                      <button
-                          key={f.id}
-                          onClick={() => { setSearchFuncionarioInput(f.nombre || ''); setCurrentPaginaFuncionarios(1); setActiveTab('funcionarios'); }}
-                          className="w-full flex items-center justify-between gap-2 px-3.5 py-2 text-xs hover:bg-surface-2 dark:hover:bg-surface-1/[0.04] transition-colors cursor-pointer"
-                          title="Revisar en el padrón"
-                      >
-                          <span className="font-bold text-content-1 dark:text-content-3 truncate">{f.nombre}</span>
-                          <span className="text-content-3 tabular-nums truncate">CI {f.cedula} · {f.cargo}</span>
-                      </button>
-                  ))}
-              </div>
-          )}
+          {hallazgoActivo && (() => {
+            const grupo = saludDatos.find((s) => s.id === hallazgoActivo);
+            if (!grupo) return null;
+            return <section className="mt-4 overflow-hidden rounded-card border border-line/70" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-surface-2/50 px-3.5 py-3"><div><h3 className="text-xs font-bold text-content-1">{grupo.label}</h3><p className="mt-0.5 text-[10px] text-content-3">{grupo.count.toLocaleString('es-PY')} registros detectados · se muestran hasta {grupo.detalle.length}</p></div><button type="button" onClick={() => setHallazgoActivo('')} className="rounded-control px-2.5 py-1.5 text-xs font-semibold text-content-3 hover:bg-surface-2">Cerrar</button></div>
+              {grupo.detalle.length ? <div className="max-h-72 divide-y divide-line/60 overflow-y-auto custom-scrollbar">{grupo.detalle.map((item, idx) => {
+                const nombre = item.rotulo || item.nombre || item.descripcion || `Registro ${item.id || idx + 1}`;
+                const descripcion = [item.dependencia, item.funcionario, item.cedula ? `CI ${item.cedula}` : '', item.motivo].filter(Boolean).join(' · ');
+                const inspeccionar = () => {
+                  if (grupo.entidad === 'funcionario') { setSearchFuncionarioInput(item.nombre || item.cedula || ''); setCurrentPaginaFuncionarios(1); setActiveTab('funcionarios'); }
+                  else if (grupo.entidad === 'bien') { clearAllFilters(); setSearchTerm(item.rotulo || item.descripcion || ''); setSearchInput(item.rotulo || item.descripcion || ''); setCurrentPage(1); setActiveTab('inventario'); }
+                };
+                return <div key={`${item.id || nombre}-${idx}`} className="flex items-center justify-between gap-3 px-3.5 py-2.5">
+                  <div className="min-w-0"><p className="truncate text-xs font-semibold text-content-1">{nombre}</p><p className="mt-0.5 truncate text-[10px] text-content-3">{descripcion || `Identificador: ${item.id || 'no disponible'}`}</p></div>
+                  {grupo.entidad !== 'fc10' && grupo.entidad !== 'fc11' && <button type="button" onClick={inspeccionar} className="shrink-0 rounded-control border border-line px-2.5 py-1.5 text-[10px] font-bold text-brand-text hover:bg-brand-soft">Revisar</button>}
+                </div>;
+              })}</div> : <p className="px-3.5 py-5 text-center text-xs text-content-3">No se encontraron registros para esta revisión.</p>}
+            </section>;
+          })()}
       </div>
       </>}
 

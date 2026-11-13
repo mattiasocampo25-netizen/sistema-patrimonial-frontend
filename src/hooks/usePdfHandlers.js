@@ -12,6 +12,7 @@ import {
 import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
 import { fechaParaArchivo, nombreDescargaFC10, nombreFC10Archivo, normalizarSegmentoArchivo, solicitarNombreArchivo } from '../utils/fileNames.js';
+import { etiquetaEstadoAsignacion } from '../utils/asignacionBien';
 
 // Handlers de PDFs, QR, CSV, Excel y backup (extraídos de App.jsx, Fase 6).
 // Funciones de presentación: reciben todo por parámetros, sin estado propio.
@@ -645,13 +646,13 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
       setIsProcessing({ active: true, text: 'Generando Reporte Excel...' });
       setTimeout(async () => {
-          let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
+          let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Dependencia;Ubicacion;Funcionario;Estado de asignacion;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
           const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
           registros.forEach(b => {
               const row = [
                   b.cuenta || '-', b.subcuenta || '-', b.analitico1 || '-', b.analitico2 || '-',
                   b.rotulo || '-', b.descripcion || '',
-                  b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-', b.funcionarioAlternativo || '-',
+                  b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-', etiquetaEstadoAsignacion(b), b.funcionarioAlternativo || '-',
                   formatDateText(b.fechaAdquisicion) || '-', b.valorUnitario || '0',
                   b.estadoConservacion || '-', b.vidaUtil || '-',
                   b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
@@ -690,6 +691,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
                   'Rótulo': b.rotulo || '-', 'Descripción': b.descripcion || '-',
                   'Dependencia': b.dependencia || '-', 'Ubicación': b.ubicacion || '-',
                   'Funcionario': b.funcionario || '-',
+                  'Estado de asignación': etiquetaEstadoAsignacion(b),
                   'Funcionario alternativo (sin FC-10 propio)': b.funcionarioAlternativo || '-',
                   'Fecha Adquisición': formatDateText(b.fechaAdquisicion) || '-',
                   'Valor Unitario (Gs.)': parseInt(String(b.valorUnitario || '0').replace(/\D/g, ''), 10) || 0,
@@ -698,7 +700,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               }));
               const wb = window.XLSX.utils.book_new();
               const ws = window.XLSX.utils.json_to_sheet(filas);
-              ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 55 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 34 }, { wch: 16 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 8 }, { wch: 8 }];
+              ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 55 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 25 }, { wch: 34 }, { wch: 16 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 8 }, { wch: 8 }];
               ws['!autofilter'] = { ref: ws['!ref'] };
               const totalValor = filas.reduce((a, r) => a + (r['Valor Unitario (Gs.)'] || 0), 0);
               const porEstado = {};

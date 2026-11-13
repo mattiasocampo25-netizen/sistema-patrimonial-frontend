@@ -6,6 +6,7 @@ import KanbanBienes from '../components/KanbanBienes';
 import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText, repairMojibake } from '../utils/helpers';
+import { esBienLibreParaAsignar } from '../utils/asignacionBien';
 import { imprimirInformeBajaBien } from '../utils/informeBaja';
 import { useIdioma } from '../utils/i18n';
 import Dialogo from '../components/ui/Dialogo';
@@ -24,6 +25,8 @@ const normalizarRecientes = value => Array.isArray(value) ? value.filter(x => ty
 export default function InventarioView({
   hasFilters,
   filteredBienes,
+  bienesLibresParaAsignar = [],
+  stats = {},
   handleDownloadTemplateCSV,
   fileInputRef,
   handleExportInventarioCSV,
@@ -347,6 +350,26 @@ export default function InventarioView({
 
     </div>
 
+    <div className="flex flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+      <button
+        type="button"
+        aria-pressed={filtroPendiente === 'libresParaAsignar'}
+        onClick={() => { setFiltroPendiente(filtroPendiente === 'libresParaAsignar' ? '' : 'libresParaAsignar'); setCurrentPage(1); }}
+        className={`flex min-w-0 items-center gap-3 rounded-xl px-2 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-box-open" aria-hidden="true" /></span>
+        <span className="min-w-0">
+          <span className="block text-sm font-extrabold text-content-1">Libres para asignar</span>
+          <span className="block text-xs text-content-3">Sin funcionario ni ubicación, o marcados expresamente para asignación</span>
+        </span>
+        <span className="ml-1 rounded-full border border-emerald-600/20 bg-surface-1 px-2.5 py-1 text-xs font-black tabular-nums text-emerald-800 dark:text-emerald-300">{Number(stats.libresParaAsignar || 0).toLocaleString('es-PY')}</span>
+      </button>
+      <div className="flex shrink-0 items-center gap-2 pl-1 sm:pl-0">
+        <Button variante="subtle" tamano="sm" icono="fa-file-csv" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en CSV">Descargar CSV</Button>
+        <Button variante="subtle" tamano="sm" icono="fa-file-excel" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en Excel">Excel</Button>
+      </div>
+    </div>
+
     <div>
       <button
         type="button"
@@ -648,7 +671,7 @@ export default function InventarioView({
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
-                                <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{item.funcionario || 'Sin asignación'}</p>
+                                <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{esBienLibreParaAsignar(item) ? 'Libre para asignar' : item.funcionario || 'Sin asignación'}</p>
                                 {item.funcionarioAlternativo && <p className="text-[10px] text-content-3 truncate"><i className="fa-solid fa-user-clock mr-1"></i>Otro turno: {item.funcionarioAlternativo}</p>}
                                 <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
                               </div>
@@ -800,6 +823,7 @@ export default function InventarioView({
                                       <i className="fa-solid fa-location-dot text-danger text-xs shrink-0"></i>
                                       <InlineInventoryField bien={item} campo="ubicacion" etiqueta="Ubicación" valor={item.ubicacion} onSave={onEditarCampoBien} />
                                     </div>
+                                    {esBienLibreParaAsignar(item) && <span className="ml-5 inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:text-emerald-300"><i className="fa-solid fa-box-open" aria-hidden="true" /> Libre para asignar</span>}
                                     {(() => {
                                       const fc10 = fc10VigentePorBien.get(item.id);
                                       const fechaAsig = fc10 ? (fc10.entregadoFecha || fc10.fechaGeneracion) : null;

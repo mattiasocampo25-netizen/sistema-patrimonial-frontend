@@ -28,7 +28,7 @@ export const INACTIVITY_LIMIT_MS = 15 * 60 * 1000;
 export const FORMATO_PDF = [216, 330];
 
 // Etiquetas de la bandeja de pendientes del inventario.
-export const PENDIENTE_LABELS = { sinQR: 'Sin etiqueta QR', sinFC10: 'Sin acta FC-10', sinUbicacion: 'Sin ubicación', sinFuncionario: 'Sin responsable', vidaVencida: 'Vida útil vencida', porVencer: 'Vida útil por vencer' };
+export const PENDIENTE_LABELS = { sinQR: 'Sin etiqueta QR', sinFC10: 'Sin acta FC-10', sinUbicacion: 'Sin ubicación', sinFuncionario: 'Sin responsable', libresParaAsignar: 'Libres para asignar', vidaVencida: 'Vida útil vencida', porVencer: 'Vida útil por vencer' };
 
 // Atajos de teclado globales (se muestran en el modal de atajos y en Ayuda).
 export const SHORTCUTS = [

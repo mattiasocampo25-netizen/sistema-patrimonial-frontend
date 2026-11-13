@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch, toInputDateFormat } from '../utils/helpers';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
 import { aplicarSeleccionRango, construirLinkInventario, idsEntre } from '../utils/inventarioInteracciones';
+import { esBienLibreParaAsignar, esCampoSinAsignar } from '../utils/asignacionBien';
 import useScopedPreference from './useScopedPreference';
 
 // Claves del query string para los filtros compartibles por URL.
@@ -290,6 +291,10 @@ useEffect(() => {
     () => bienes.filter(b => !dependenciaActual || normalizeStr(b.dependencia) === normalizeStr(dependenciaActual)),
     [bienes, dependenciaActual]
   );
+  const bienesLibresParaAsignar = useMemo(
+    () => bienesDependencia.filter(b => b.estadoConservacion !== 'De Baja' && esBienLibreParaAsignar(b)),
+    [bienesDependencia]
+  );
   const bienesPorId = useMemo(() => new Map(bienes.map(b => [String(b.id), b])), [bienes]);
   const fc10PorBien = useMemo(() => {
     const mapa = new Map();
@@ -373,7 +378,8 @@ useEffect(() => {
       const cuentasCounts = {};
       depBienes.forEach(b => { if (b.cuenta) cuentasCounts[b.cuenta] = (cuentasCounts[b.cuenta] || 0) + 1; });
       const topCuentas = Object.entries(cuentasCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
-      return { totalItems, totalValue, withFc10, withoutFc10: totalItems - withFc10, fc10Pendientes, withQR, withoutQR: totalItems - withQR, percFC10, percQR, estados, topCuentas };
+      const libresParaAsignar = depBienes.filter(esBienLibreParaAsignar).length;
+      return { totalItems, totalValue, withFc10, withoutFc10: totalItems - withFc10, fc10Pendientes, withQR, withoutQR: totalItems - withQR, libresParaAsignar, percFC10, percQR, estados, topCuentas };
   }, [bienesDependencia, bienesPorId, dependenciaActual, fc10List]);
 
   // Bandeja de pendientes: conteos operativos para atención directa (mismo universo que stats: activos)
@@ -396,8 +402,9 @@ useEffect(() => {
       return [
         { id: 'sinQR', label: 'Sin etiqueta QR', count: base.filter(b => b.hasQR !== true).length, icon: 'fa-qrcode', box: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20' },
         { id: 'sinFC10', label: 'Sin acta FC-10', count: base.filter(b => b.hasFC10 !== true).length, icon: 'fa-file-signature', box: 'bg-amber-500/10 text-warn dark:text-amber-400 border-amber-500/20' },
-        { id: 'sinUbicacion', label: 'Sin ubicación', count: base.filter(b => !String(b.ubicacion || '').trim()).length, icon: 'fa-location-dot', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
-        { id: 'sinFuncionario', label: 'Sin responsable', count: base.filter(b => !String(b.funcionario || '').trim()).length, icon: 'fa-user-tie', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20' },
+        { id: 'sinUbicacion', label: 'Sin ubicación', count: base.filter(b => esCampoSinAsignar(b.ubicacion)).length, icon: 'fa-location-dot', box: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
+        { id: 'sinFuncionario', label: 'Sin responsable', count: base.filter(b => esCampoSinAsignar(b.funcionario)).length, icon: 'fa-user-tie', box: 'bg-rose-500/10 text-danger dark:text-rose-400 border-rose-500/20' },
+        { id: 'libresParaAsignar', label: 'Libres para asignar', count: base.filter(esBienLibreParaAsignar).length, icon: 'fa-box-open', box: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20' },
         { id: 'vidaVencida', label: 'Vida útil vencida', count: base.filter(esVidaVencida).length, icon: 'fa-hourglass-end', box: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20' },
         { id: 'porVencer', label: 'Por vencer (12 m.)', count: base.filter(b => { const r = mesesRestantes(b); return r !== null && r > 0 && r <= 12; }).length, icon: 'fa-hourglass-half', box: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20' },
       ];
@@ -426,8 +433,9 @@ useEffect(() => {
     // Bandeja de pendientes: atajos operativos que combinan condiciones
     if (filtroPendiente === 'sinQR') filtered = filtered.filter(b => b.hasQR !== true);
     else if (filtroPendiente === 'sinFC10') filtered = filtered.filter(b => b.hasFC10 !== true);
-    else if (filtroPendiente === 'sinUbicacion') filtered = filtered.filter(b => !String(b.ubicacion || '').trim());
-    else if (filtroPendiente === 'sinFuncionario') filtered = filtered.filter(b => !String(b.funcionario || '').trim());
+    else if (filtroPendiente === 'sinUbicacion') filtered = filtered.filter(b => esCampoSinAsignar(b.ubicacion));
+    else if (filtroPendiente === 'sinFuncionario') filtered = filtered.filter(b => esCampoSinAsignar(b.funcionario));
+    else if (filtroPendiente === 'libresParaAsignar') filtered = filtered.filter(b => b.estadoConservacion !== 'De Baja' && esBienLibreParaAsignar(b));
     else if (filtroPendiente === 'vidaVencida') filtered = filtered.filter(b => {
       const { year } = parseDateInfo(b.fechaAdquisicion);
       const vu = parseInt(b.vidaUtil, 10);
@@ -514,7 +522,7 @@ useEffect(() => {
     guardarVistaActual, aplicarVista, eliminarVista,
     funcionariosUnicos, ubicacionesUnicas, ubicacionesConBienes, aniosUnicos,
     subcuentasUnicas, analiticos1Unicos, analiticos2Unicos,
-    stats, pendientes, filteredBienes, paginatedBienes, itemsPaginados, totalPages,
+    stats, pendientes, bienesLibresParaAsignar, filteredBienes, paginatedBienes, itemsPaginados, totalPages,
     itemsPorPagina, cambiarPaginaTam, seleccionados, toggleSeleccion, limpiarSeleccion,
     vistaInv, cambiarVistaInv, urlFiltrosActual
   };

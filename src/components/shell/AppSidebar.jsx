@@ -154,9 +154,19 @@ export default function AppSidebar({
   const [desbordes, setDesbordes] = useState({ arriba: false, abajo: false });
   const [favoritos, setFavoritos] = useState([]);
   const [favoritosUsuario, setFavoritosUsuario] = useState(null);
+  const [busquedaModulos, setBusquedaModulos] = useState('');
+  const [gruposUsuario, setGruposUsuario] = useState(null);
+  const busquedaRef = useRef(null);
   const usuarioKey = currentUser?.username || currentUser?.id || 'sesion';
+  const gruposKey = `sidebar_grupos_${usuarioKey}`;
   const itemsPermitidos = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).flatMap(g => g.items);
-  const favoritosVisibles = itemsPermitidos.filter(item => favoritos.includes(item.id));
+  const terminoBusqueda = busquedaModulos.trim().toLocaleLowerCase('es');
+  const contieneBusqueda = (texto) => String(texto || '').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(terminoBusqueda.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+  const favoritosVisibles = itemsPermitidos.filter(item => favoritos.includes(item.id) && (!terminoBusqueda || contieneBusqueda(t(item.label))));
+  const gruposVisibles = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).map(grupo => ({
+    ...grupo,
+    items: grupo.items.filter(item => !terminoBusqueda || contieneBusqueda(t(item.label)) || contieneBusqueda(grupo.titulo)),
+  })).filter(grupo => grupo.items.length > 0);
 
   useEffect(() => {
     const key = `sidebar_favoritos_${usuarioKey}`;
@@ -168,6 +178,24 @@ export default function AppSidebar({
   // Solo cargar al cambiar la identidad; los permisos se vuelven a aplicar al mostrar.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [usuarioKey]);
+
+  useEffect(() => {
+    try {
+      const guardados = JSON.parse(localStorage.getItem(gruposKey) || 'null');
+      if (guardados && typeof guardados === 'object') {
+        const siguiente = Object.fromEntries(GRUPOS.map(grupo => [grupo.titulo, guardados[grupo.titulo] !== false]));
+        const grupoActivo = GRUPOS.find(grupo => grupo.items.some(item => item.id === activeTab));
+        if (grupoActivo) siguiente[grupoActivo.titulo] = true;
+        setGruposAbiertos(siguiente);
+      }
+    } catch { /* Preferencia opcional; se mantienen los grupos abiertos. */ }
+    setGruposUsuario(gruposKey);
+  }, [gruposKey, activeTab]);
+
+  useEffect(() => {
+    if (gruposUsuario !== gruposKey) return;
+    try { localStorage.setItem(gruposKey, JSON.stringify(gruposAbiertos)); } catch { /* Preferencia local opcional. */ }
+  }, [gruposAbiertos, gruposKey, gruposUsuario]);
 
   useEffect(() => {
     if (favoritosUsuario !== `sidebar_favoritos_${usuarioKey}`) return;
@@ -279,13 +307,17 @@ export default function AppSidebar({
           ref={navRef}
           className={`flex-1 overflow-y-auto ${compacta ? 'px-3 py-4 space-y-4 lg:px-2 lg:space-y-3' : 'px-3 py-4 space-y-4'} custom-scrollbar ${desbordes.arriba ? 'nav-desborde-arriba' : ''} ${desbordes.abajo ? 'nav-desborde-abajo' : ''}`}
         >
+          <div className={`relative ${compacta ? 'lg:hidden' : ''}`}>
+            <i className="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[11px] text-sidebar-content-3" aria-hidden="true" />
+            <input ref={busquedaRef} type="search" value={busquedaModulos} onChange={event => setBusquedaModulos(event.target.value)} onKeyDown={event => { if (event.key === 'Escape') setBusquedaModulos(''); }} placeholder="Buscar módulo…" aria-label="Buscar módulo" className="h-10 w-full rounded-xl border border-sidebar-line bg-surface-1/5 pl-9 pr-9 text-xs text-sidebar-content placeholder:text-sidebar-content-3 outline-none transition focus:border-brand/60 focus:ring-2 focus:ring-brand/20" />
+            {busquedaModulos && <button type="button" onClick={() => { setBusquedaModulos(''); busquedaRef.current?.focus(); }} aria-label="Limpiar búsqueda de módulos" title="Limpiar búsqueda" className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-control text-sidebar-content-3 hover:bg-white/10 hover:text-sidebar-content"><i className="fa-solid fa-xmark text-xs" aria-hidden="true" /></button>}
+          </div>
+          {compacta && <button type="button" onClick={() => { onToggleCompacta?.(); setTimeout(() => busquedaRef.current?.focus(), 120); }} title="Buscar módulo (expandir navegación)" aria-label="Buscar módulo" className="hidden h-10 w-full items-center justify-center rounded-xl text-sidebar-content-2 hover:bg-brand/10 hover:text-sidebar-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand lg:flex"><i className="fa-solid fa-magnifying-glass text-sm" aria-hidden="true" /></button>}
           {favoritosVisibles.length > 0 && <section className="space-y-1" aria-label="Favoritos">
             <p className={`px-3 text-[9px] font-bold uppercase tracking-[0.13em] text-sidebar-content-3 ${compacta ? 'lg:hidden' : ''}`}>Favoritos</p>
             {favoritosVisibles.map(item => <ItemNav key={`fav-${item.id}`} item={item} activo={activeTab === item.id} onIr={irA} solicitudes={solicitudesBaja} t={t} compacta={compacta} favorito onToggleFavorito={alternarFavorito} />)}
           </section>}
-          {GRUPOS.map((grupo) => {
-            if (grupo.soloAdmin && !isAdmin) return null;
-            if (grupo.soloDesarrollador && !esDesarrollador) return null;
+          {gruposVisibles.map((grupo) => {
             const visibles = grupo.items;
             if (!visibles.length) return null;
             return (
@@ -293,16 +325,16 @@ export default function AppSidebar({
                 <button
                   type="button"
                   onClick={() => setGruposAbiertos(actuales => ({ ...actuales, [grupo.titulo]: !actuales[grupo.titulo] }))}
-                  aria-expanded={!!gruposAbiertos[grupo.titulo]}
+                  aria-expanded={!!gruposAbiertos[grupo.titulo] || Boolean(terminoBusqueda)}
                   aria-controls={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
                   title={compacta ? grupo.titulo : undefined}
                   className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                 >
                   <i className={`fa-solid ${grupo.icon} w-5 text-center text-[11px]`} aria-hidden="true" />
                   <span className={`flex-1 text-left uppercase tracking-[0.13em] ${compacta ? 'lg:hidden' : ''}`}>{grupo.titulo}</span>
-                  <i className={`fa-solid fa-chevron-down text-[9px] transition-transform ${gruposAbiertos[grupo.titulo] ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
+                  <i className={`fa-solid fa-chevron-down text-[9px] transition-transform ${gruposAbiertos[grupo.titulo] || terminoBusqueda ? 'rotate-180' : ''} ${compacta ? 'lg:hidden' : ''}`} aria-hidden="true" />
                 </button>
-                {gruposAbiertos[grupo.titulo] ? <div id={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className={`${compacta ? 'space-y-1' : 'ml-3 border-l border-sidebar-line pl-1.5 space-y-1'} animate-fade-in`}>
+                {gruposAbiertos[grupo.titulo] || terminoBusqueda ? <div id={`nav-group-${grupo.titulo.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} className={`${compacta ? 'space-y-1' : 'ml-3 border-l border-sidebar-line pl-1.5 space-y-1'} animate-fade-in`}>
                   {visibles.map((item) => (
                     <ItemNav
                       key={item.id}
@@ -320,6 +352,7 @@ export default function AppSidebar({
               </section>
             );
           })}
+          {terminoBusqueda && favoritosVisibles.length === 0 && gruposVisibles.length === 0 && <p role="status" className="rounded-xl border border-sidebar-line px-3 py-4 text-center text-xs text-sidebar-content-3">No se encontró ningún módulo con “{busquedaModulos}”.</p>}
           {isAdmin ? (
             <section className="space-y-1 border-t border-sidebar-line pt-3">
               <button type="button" onClick={() => setUtilidadesAbiertas(abierta => !abierta)} aria-expanded={utilidadesAbiertas} aria-controls="sidebar-utilities" title={compacta ? 'Utilidades' : undefined} className={`group flex w-full items-center ${compacta ? 'justify-center' : 'gap-2 px-3'} h-8 rounded-control text-label font-semibold text-sidebar-content-3 hover:bg-brand/5 hover:text-sidebar-content motion focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>

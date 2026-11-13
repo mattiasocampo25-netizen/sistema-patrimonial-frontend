@@ -62,6 +62,22 @@ export function useInventarioFiltros({ bienes, dependenciaActual, fc10List, user
   const [seleccionados, setSeleccionados] = useState([]);
   const anclaSeleccionRef = useRef(null);
   const [vistaInv, setVistaInv] = useScopedPreference('inv_vista', username || 'anon', 'galeria', normalizarVistaInventario);
+  const claveVista = `inv_vista:${encodeURIComponent(String(username || 'anon').trim().toLocaleLowerCase('es'))}`;
+  // Primera visita: tabla en pantallas amplias, tarjetas en móvil. Si la
+  // persona ya eligió una vista, su preferencia explícita siempre prevalece.
+  useEffect(() => {
+    const media = window.matchMedia?.('(max-width: 767px)');
+    if (!media) return undefined;
+    const aplicarPredeterminada = () => {
+      try {
+        if (localStorage.getItem(claveVista) !== null) return;
+        setVistaInv(media.matches ? 'tarjetas' : 'tabla');
+      } catch { /* Preferencia visual local opcional. */ }
+    };
+    aplicarPredeterminada();
+    media.addEventListener?.('change', aplicarPredeterminada);
+    return () => media.removeEventListener?.('change', aplicarPredeterminada);
+  }, [claveVista, setVistaInv]);
   const cambiarPaginaTam = useCallback((n) => {
     setItemsPorPagina(n);
     setCurrentPage(1);

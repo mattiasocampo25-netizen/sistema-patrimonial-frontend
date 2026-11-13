@@ -94,6 +94,17 @@ export function useRealtimeSync({
     const consultas = [];
     if (currentUser?.username) consultas.push(consultaDestino(currentUser.username));
     consultas.push(consultaDestino('TODOS'));
+    // El historial de Anuncios es administrativo: además de los recibidos por
+    // el propio administrador y los globales, debe recuperar los avisos
+    // dirigidos a otros usuarios. Sin esta consulta el anuncio recién enviado
+    // solo vive en el estado local y desaparece al refrescar/sincronizar.
+    if (isAdmin) {
+      consultas.push(supabase.from('notificaciones').select('id, data')
+        .eq('data->>tipoRegistro', 'NOTIFICACION')
+        .eq('data->>accion', 'anuncio')
+        .order('id', { ascending: false })
+        .limit(limite));
+    }
     // El centro de aprobaciones conserva el historial completo de solicitudes,
     // incluidas las que están en revisión y las resueltas. Se consulta por
     // separado para evitar OR JSON compuestas incompatibles con PostgREST.

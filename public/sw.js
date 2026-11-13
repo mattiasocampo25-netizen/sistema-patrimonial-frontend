@@ -1,7 +1,7 @@
 // Service Worker: shell offline + actualización inmediata.
 // Navegaciones (HTML) siempre van a RED primero: evita HTML viejo con chunks nuevos (404).
 // Solo /assets con hash (inmutables) usan caché primero. API y CDN siempre a red.
-const VERSION = 'sigep-v2';
+const VERSION = 'sigep-v3';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -39,18 +39,20 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
-  event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }).then((cached) => {
-      const go = fetch(event.request)
+  // Solo los recursos hasheados del build se guardan para uso sin conexión.
+  // La red va primero para evitar servir un chunk antiguo tras una publicación.
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      fetch(event.request)
         .then((res) => {
-          if (res && res.ok) {
-            const copy = res.clone();
-            caches.open(VERSION).then((cache) => cache.put(event.request, copy));
+          const tipo = res.headers.get('content-type') || '';
+          if (res.ok && !tipo.includes('text/html')) {
+            const copia = res.clone();
+            caches.open(VERSION).then((cache) => cache.put(event.request, copia));
           }
           return res;
         })
-        .catch(() => cached);
-      return cached || go;
-    })
-  );
+        .catch(() => caches.match(event.request, { ignoreSearch: true }))
+    );
+  }
 });

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } fr
 import { lazyConReintento } from './utils/lazyConReintento';
 import { STYLES, DEPENDENCIAS_UNP, ESTADOS_CONSERVACION, ORIGENES_FC04 } from './constants/appConstants';
 import FiltroCombo from './components/FiltroCombo';
-import { Pagination, Card, Button, Badge } from './components/ui';
+import { Pagination } from './components/ui';
 import AtajosModal from './components/modals/AtajosModal';
 import AppShell from './components/shell/AppShell';
 // Modales de apertura bajo demanda: carga diferida para acelerar el arranque
@@ -49,7 +49,7 @@ import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
 import ErrorView from './views/ErrorView';
 import InventarioCompartidoView from './views/InventarioCompartidoView';
-import KioskBar, { BotonPantallaCompleta } from './components/KioskBar';
+import BienQrPublicoView from './views/BienQrPublicoView';
 import { parseIdleSegundos } from './utils/kiosk';
 import { obtenerProgramacion, guardarProgramacion, tocaEjecutar, construirCSVInventario, nombreArchivoInventario, descargarYArchivar } from './services/exportSchedule';
 
@@ -116,7 +116,7 @@ export default function App() {
   const kioscoIdle = kioscoActivo ? parseIdleSegundos(window.location.search) : 0;
   
   const [publicBienData, setPublicBienData] = useState(null);
-  const [publicDescExpandida, setPublicDescExpandida] = useState(false);
+  const [publicBienAutorizado, setPublicBienAutorizado] = useState(false);
   const { toasts, addToast, quitarToast } = useToasts();
   const [solicitudesNombreArchivo, setSolicitudesNombreArchivo] = useState([]);
   const solicitudNombreArchivo = solicitudesNombreArchivo[0] || null;
@@ -790,11 +790,29 @@ export default function App() {
 // (clearAllFilters vive en useInventarioFiltros, Fase 3)
 useEffect(() => {
   if (!publicBienId) return;
-
+  let cancelado = false;
   const cargarBienPublico = async () => {
     try {
       const idSanitizado = decodeURIComponent(publicBienId).trim();
       let bienEncontrado = null;
+
+      // Si la sesión ya tiene este bien en su inventario autorizado, mostrar
+      // su ficha completa. El visitante anónimo solo recibe la proyección
+      // pública que entrega la RPC.
+      if (isAuthenticated) {
+        const bienAutorizado = bienes.find(b => String(b.id || '').trim() === idSanitizado || normalizeStr(b.rotulo) === normalizeStr(idSanitizado));
+        if (bienAutorizado) {
+          if (!cancelado) {
+            setPublicBienData(normalizarBien(bienAutorizado));
+            setPublicBienAutorizado(true);
+          }
+          return;
+        }
+      }
+      if (!cancelado) {
+        setPublicBienData(null);
+        setPublicBienAutorizado(false);
+      }
 
       // 1. RPC público: proyección de los campos públicos de UN bien (por id o
       //    por rótulo). Es el único camino de lectura para un visitante sin
@@ -813,16 +831,16 @@ useEffect(() => {
 
       // Nunca completar una vista pública con cachés del inventario autenticado.
       if (bienEncontrado) {
-        setPublicBienData(bienEncontrado);
+        if (!cancelado) setPublicBienData(bienEncontrado);
       } else {
-        setPublicBienData({
+        if (!cancelado) setPublicBienData({
           rotulo: idSanitizado,
           descripcion: 'No se encontraron datos registrados para este activo en la base de datos oficial.'
         });
       }
     } catch (err) {
       console.error("Error al cargar bien público:", err);
-      setPublicBienData({
+      if (!cancelado) setPublicBienData({
         rotulo: 'Error',
         descripcion: 'Ocurrió un problema al procesar la solicitud del código QR.'
       });
@@ -830,7 +848,8 @@ useEffect(() => {
   };
 
   cargarBienPublico();
-}, [publicBienId]);
+  return () => { cancelado = true; };
+}, [publicBienId, isAuthenticated, bienes]);
   // -----------------------------------
 
 
@@ -1640,104 +1659,7 @@ if (publicShareToken) {
   return <InventarioCompartidoView token={publicShareToken} />;
 }
 if (publicBienId) {
-  return (
-    <div className="h-dvh overflow-y-auto bg-surface-3 flex flex-col items-center p-3 sm:p-6 text-content-1 font-sans selection:bg-brand selection:text-white custom-scrollbar">
-      <Card tamaño="lg" className="max-w-md w-full shadow-pop border border-line m-auto overflow-hidden relative">
-
-        {/* Acento superior institucional */}
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-brand via-brand-hover to-brand/60"></div>
-
-        {/* Header institucional */}
-        <div className="flex flex-col items-center text-center pb-4 border-b border-line">
-          <div className="flex h-12 w-12 items-center justify-center rounded-card bg-brand-soft text-brand-text mb-3 border border-brand/20 shadow-sm">
-            <i className="fa-solid fa-shield-halved text-xl"></i>
-          </div>
-
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-brand-soft text-brand-text mb-2 border border-brand/25">
-            <i className="fa-solid fa-circle-check text-[10px] text-brand"></i> Verificación Oficial de Activo
-          </span>
-
-          <h1 className="text-base sm:text-lg font-bold text-content-1 tracking-tight leading-tight font-display">
-            Universidad Nacional de Pilar
-          </h1>
-          <p className="text-[11px] sm:text-xs text-content-3 font-semibold mt-0.5">
-            Sistema Integrado de Gestión Patrimonial
-          </p>
-        </div>
-
-        {/* Contenido principal o Spinner */}
-        {publicBienData ? (
-          <div className="py-4 space-y-3">
-            {/* Tarjeta de Rótulo y Estado */}
-            <Card tamaño="md" className="p-4 shadow-xs border border-line/80">
-              <div className="flex justify-between items-center gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold text-content-2 uppercase tracking-widest">Código / Rótulo</p>
-                  <p className="text-xl sm:text-2xl font-black text-content-1 font-mono tracking-tight mt-0.5 truncate">
-                    {publicBienData.rotulo || "S/Rótulo"}
-                  </p>
-                </div>
-                {publicBienData.estadoConservacion && (
-                  <Badge tono={publicBienData.estadoConservacion === 'De Baja' ? 'danger' : 'ok'} icono={publicBienData.estadoConservacion === 'De Baja' ? 'fa-triangle-exclamation' : 'fa-check'}>
-                    {publicBienData.estadoConservacion}
-                  </Badge>
-                )}
-              </div>
-
-              <div className="mt-3 pt-3 border-t border-line/60">
-                <p className="text-[10px] font-bold text-content-2 uppercase tracking-widest">Descripción General</p>
-                <p className={!publicDescExpandida && (publicBienData.descripcion || '').length > 140 ? 'text-sm font-medium text-content-1 mt-1 leading-relaxed line-clamp-3' : 'text-sm font-medium text-content-1 mt-1 leading-relaxed'}>
-                  {publicBienData.descripcion || "Sin descripción asignada"}
-                </p>
-                {(publicBienData.descripcion || '').length > 140 && (
-                  <Button variante="ghost" tamano="sm" onClick={() => setPublicDescExpandida(v => !v)} className="mt-1.5">
-                    {publicDescExpandida ? 'Ver menos' : 'Ver más'}
-                  </Button>
-                )}
-              </div>
-            </Card>
-
-          </div>
-        ) : (
-          <div className="py-12 flex flex-col items-center justify-center text-center">
-            <i className="fa-solid fa-circle-notch fa-spin text-3xl text-brand mb-3"></i>
-            <p className="text-xs text-content-3 font-semibold">Consultando datos de registro...</p>
-          </div>
-        )}
-
-        {/* Pie y botón de retorno */}
-        <div className="pt-4 border-t border-line">
-          <Button variante="primary" tamano="md" onClick={() => window.location.href = window.location.origin} className="w-full">
-            <i className="fa-solid fa-arrow-left text-xs"></i> Ir a la Plataforma Principal
-          </Button>
-        </div>
-
-      </Card>
-
-        {/* Controles de exhibition: pantalla completa siempre; barra de kiosco solo en ?kiosk=1 */}
-        <div className="flex items-center gap-2 mb-2 mt-4">
-          <span className="flex-1" />
-          <BotonPantallaCompleta />
-          {!kioscoActivo && (
-            <a href={`?id=${encodeURIComponent(publicBienId)}&kiosk=1`} title="Abrir en modo kiosco (pantalla completa con temporizador)" className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-control bg-transparent text-content-2 hover:bg-surface-2 hover:text-content-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-              <i className="fa-solid fa-display text-[10px]"></i>
-              <span className="hidden sm:inline">Kiosco</span>
-            </a>
-          )}
-        </div>
-
-        {kioscoActivo && (
-          <KioskBar
-            idleSegundos={kioscoIdle}
-            onSalir={() => { window.location.href = window.location.origin; }}
-            onEscanearOtro={() => {
-              window.location.href = window.location.origin;
-            }}
-          />
-        )}
-
-    </div>
-  );
+  return <BienQrPublicoView bien={publicBienData} autorizado={publicBienAutorizado} appLogo={appLogo} publicBienId={publicBienId} kioscoActivo={kioscoActivo} kioscoIdle={kioscoIdle} />;
 }
 
   // 2. LUEGO EL RESTO DE VALIDACIONES (Mantenimiento global, Login, etc.)

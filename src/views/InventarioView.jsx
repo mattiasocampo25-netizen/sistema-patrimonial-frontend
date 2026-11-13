@@ -679,6 +679,7 @@ export default function InventarioView({
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
+                                {Array.isArray(item.componentes) && item.componentes.length > 0 && <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2 py-1 text-[10px] font-bold text-brand-text" title={item.componentes.map(c => `${c.nombre} ×${c.cantidad || 1} · ${c.ubicacion || item.ubicacion || 'Ubicación del bien'} · ${c.funcionario || item.funcionario || 'Encargado del bien'}`).join(' | ')}><i className="fa-solid fa-cubes-stacked" aria-hidden="true" />Conjunto · {item.componentes.length} tipos / {item.componentes.reduce((total, c) => total + (Number.parseInt(c.cantidad, 10) || 1), 0)} piezas</span>}
                                 <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{esBienLibreParaAsignar(item) ? 'Libre para asignar' : item.funcionario || 'Sin asignación'}</p>
                                 {item.funcionarioAlternativo && <p className="text-[10px] text-content-3 truncate"><i className="fa-solid fa-user-clock mr-1"></i>Otro turno: {item.funcionarioAlternativo}</p>}
                                 <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
@@ -810,6 +811,7 @@ export default function InventarioView({
                                       <p className={`font-semibold text-content-1 dark:text-white text-sm leading-snug ${compacto ? 'line-clamp-1' : 'line-clamp-2'}`} >
                                         {repairMojibake(item.descripcion)}
                                       </p>
+                                      {Array.isArray(item.componentes) && item.componentes.length > 0 && <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2 py-1 text-[10px] font-bold text-brand-text" title={item.componentes.map(c => `${c.nombre} ×${c.cantidad || 1} · ${c.ubicacion || item.ubicacion || 'Ubicación del bien'} · ${c.funcionario || item.funcionario || 'Encargado del bien'}`).join(' | ')}><i className="fa-solid fa-cubes-stacked" aria-hidden="true" />{item.componentes.length} tipos · {item.componentes.reduce((total, c) => total + (Number.parseInt(c.cantidad, 10) || 1), 0)} piezas</span>}
                                       {cols.cuenta && item.cuenta && (
                                         <span className="inline-block text-[10px] font-medium text-content-3 bg-surface-3 dark:bg-surface-3/50 px-2 py-0.5 rounded-lg">
                                           #{item.cuenta}

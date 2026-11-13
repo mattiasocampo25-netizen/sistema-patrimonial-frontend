@@ -136,6 +136,7 @@ export default function FiltroCombo({
           type="text"
           name={name}
           value={valorActual ?? ''}
+          onChange={() => {}}
           required={required && validarNativo}
           tabIndex={-1}
           aria-label={titulo || 'Campo obligatorio'}

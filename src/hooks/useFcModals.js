@@ -182,9 +182,16 @@ export function useFcModals({
         const tableRows = bienesToPrint.map(b => {
             const valor = parseInt(String(b.valorUnitario).replace(/\D/g, ''), 10) || 0;
             totalValor += valor;
+            const detalleComponentes = Array.isArray(b.componentes) ? b.componentes.map(componente => {
+                const cantidad = Math.max(1, Number.parseInt(componente.cantidad, 10) || 1);
+                const ubicacion = componente.ubicacion || b.ubicacion || 'Ubicación del bien';
+                const funcionario = componente.funcionario || b.funcionario || 'Encargado del bien';
+                return `${componente.nombre || 'Componente'} ×${cantidad} · ${ubicacion} · ${funcionario}${componente.observaciones ? ` · ${componente.observaciones}` : ''}`;
+            }).join('\n') : '';
+            const descripcionFC03 = [b.descripcion || '', detalleComponentes && `Componentes:\n${detalleComponentes}`].filter(Boolean).join('\n');
             return [
                 b.cuenta || '', b.subcuenta || '', b.analitico1 || '', b.analitico2 || '', 
-                b.descripcion || '', b.ubicacion || '-', b.funcionario || 'Sin Asignar', 
+                descripcionFC03, b.ubicacion || '-', b.funcionario || 'Sin Asignar',
                 formatDateText(b.fechaAdquisicion) || '', b.rotulo || 'S/Rótulo', '1', 
                 formatCurrency(valor), formatCurrency(valor), 'C', getEstadoAbbr(b.estadoConservacion), '', String(b.observaciones || '').trim()
             ];
@@ -549,6 +556,39 @@ export function useFcModals({
     setIsProcessing({ active: true, text: 'Guardando y sincronizando activo...' });
 
     const formData = new FormData(form);
+    let componentesCapturados = [];
+    try {
+        const rawComponentes = JSON.parse(String(formData.get('componentes') || '[]'));
+        if (Array.isArray(rawComponentes)) componentesCapturados = rawComponentes;
+    } catch {
+        notify('No se pudo leer el detalle de componentes. Revisa el formulario e inténtalo otra vez.', 'warning');
+        setIsSaving(false);
+        setIsProcessing({ active: false, text: '' });
+        return false;
+    }
+    const tieneComponentes = formData.get('tieneComponentes') === 'on';
+    if (tieneComponentes && componentesCapturados.length === 0) {
+        notify('Agrega al menos un componente o desactiva la opción.', 'warning');
+        setIsSaving(false);
+        setIsProcessing({ active: false, text: '' });
+        return false;
+    }
+    const componentes = tieneComponentes ? componentesCapturados.map((componente, indice) => {
+        const nombreFuncionario = String(componente.funcionario || '').trim();
+        const funcionarioComponente = funcionariosPadron.find(f => normalizeStr(f.nombre) === normalizeStr(nombreFuncionario));
+        return {
+            id: componente.id || generateId(),
+            nombre: String(componente.nombre || '').trim(),
+            cantidad: Math.max(1, Math.min(999, Number.parseInt(componente.cantidad, 10) || 1)),
+            ubicacion: String(componente.ubicacion || '').trim(),
+            funcionario: nombreFuncionario,
+            funcionarioDoc: funcionarioComponente?.cedula || '',
+            funcionarioCargo: funcionarioComponente?.cargo || '',
+            estadoConservacion: String(componente.estadoConservacion || '').trim(),
+            observaciones: String(componente.observaciones || '').trim(),
+            orden: indice + 1
+        };
+    }) : [];
     const rotuloInput = String(formData.get('rotulo') ?? '').trim();
     // Sin el_String()_ los bienes importados de CSV que vinieron sin rótulo
     // rompían con "Cannot read properties of undefined (reading 'toLowerCase')".
@@ -635,6 +675,7 @@ export function useFcModals({
         ubicacion: String(formData.get('ubicacion') ?? '').trim(), 
         estadoConservacion: formData.get('estadoConservacion') || 'Muy bueno', 
         observaciones: String(formData.get('observaciones') || '').trim(),
+        componentes,
         vidaUtil: formData.get('vidaUtil') || '', 
         hasFC10: esEdicion ? bienEditing.hasFC10 : false, 
         hasQR: formData.get('hasQR') === 'on',

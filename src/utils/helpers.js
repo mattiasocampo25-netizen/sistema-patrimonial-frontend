@@ -206,6 +206,7 @@ export const matchBienSearch = (bien, query, registrosRelacionados = [], { codig
     b.cuenta, b.subcuenta, b.analitico1, b.analitico2, b.ubicacion,
     b.funcionario, b.funcionarioAlternativo, b.funcionarioNombre, b.responsable, b.responsableNombre,
     b.custodio, b.funcionarioDoc, b.cedulaResponsable, b.funcionarioCargo, b.id,
+    ...(Array.isArray(b.componentes) ? b.componentes.flatMap(componente => [componente.nombre, componente.ubicacion, componente.funcionario, componente.observaciones]) : []),
     ...registrosRelacionados.flatMap(registro => [
       registro?.funcionarioNombre, registro?.funcionarioDoc, registro?.funcionarioCargo,
       registro?.jefeInmediatoNombre, registro?.jefeInmediatoDoc

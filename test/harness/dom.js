@@ -153,6 +153,19 @@ export function instalarDom({ url = 'http://localhost:5173/', fetchConfig = {} }
   }
   if (w.scrollTo === undefined) w.scrollTo = () => {};
 
+  // Stub del lector QR para que las pruebas validen la apertura del diálogo
+  // sin depender de la cámara ni de la librería descargada por CDN.
+  class Html5QrcodeFalso {
+    constructor() { this.isScanning = false; this.started = false; }
+    start() { this.isScanning = true; this.started = true; return Promise.resolve(); }
+    stop() { this.isScanning = false; return Promise.resolve(); }
+    clear() { this.isScanning = false; }
+  }
+  w.Html5Qrcode = Html5QrcodeFalso;
+  globalThis.Html5Qrcode = Html5QrcodeFalso;
+  w.html5QrCode = null;
+  globalThis.html5QrCode = null;
+
   instalado = true;
   return w;
 }

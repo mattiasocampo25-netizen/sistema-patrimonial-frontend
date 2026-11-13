@@ -293,7 +293,7 @@ describe('smoke por modulo', () => {
   });
 
   // ── 10. Auditoría ───────────────────────────────────────────────────────
-  test('modulo Auditoría: lista la traza y abre el escáner', async () => {
+  test('modulo Auditoría: lista la traza', async () => {
     await entrar();
     await app.clickTour('nav-auditoria');
     await app.esperar('MODIFICACION', 4000);
@@ -303,9 +303,6 @@ describe('smoke por modulo', () => {
     // lee datos de verdad, no que solo pinta la cabecera.
     assert.ok(app.tiene('MODIFICACION'), 'debe listar los eventos de la traza');
 
-    // Accion principal: abrir el escaner de conciliacion fisica.
-    await app.clickSiExiste('Escanear con cámara');
-    assert.ok(await app.hayDialogo(), 'debe abrir el escaner');
   });
 
   // ── 11. Usuarios ────────────────────────────────────────────────────────

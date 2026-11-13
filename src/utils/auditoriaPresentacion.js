@@ -14,6 +14,7 @@ const ETIQUETAS_CAMPO = {
   descripcion: 'Descripción',
   estadoConservacion: 'Estado de conservación',
   observaciones: 'Observaciones',
+  componentes: 'Componentes del bien',
   fechaAdquisicion: 'Fecha de adquisición',
   valorUnitario: 'Valor unitario',
   cuenta: 'Cuenta contable',

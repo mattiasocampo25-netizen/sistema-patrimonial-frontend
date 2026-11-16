@@ -251,25 +251,26 @@ export default function DashboardView({
     <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-5 pb-16 sm:space-y-6">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card relative overflow-visible border-0 bg-[#145a75] p-0 text-white shadow-card">
-        <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
+      <Card className="dashboard-welcome-card relative overflow-hidden !border-[#d4e6ec] !bg-[#eaf4f7] !text-[#17384a] shadow-card dark:!border-[#2c4958] dark:!bg-[#172d3b] dark:!text-slate-100 p-0">
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[#20a4a5] via-[#1688a3] to-[#566cc5]" aria-hidden="true" />
+        <div className="grid gap-5 p-5 pl-6 sm:p-7 sm:pl-8 lg:grid-cols-[minmax(0,1fr)_minmax(320px,.76fr)] lg:items-center lg:p-8 lg:pl-10">
           <div className="flex min-w-0 items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand/20 bg-brand-soft text-lg font-black text-brand-text sm:h-14 sm:w-14 sm:text-xl">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#167f91] text-lg font-black text-white shadow-sm shadow-[#167f91]/20 sm:h-14 sm:w-14 sm:text-xl">
               {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-cyan-100/85 sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-white/50">/</span> {dependenciaActual}</p>
-              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
-              <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-100 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención.</p>
+              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#167b8f] dark:text-[#78d0d9] sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-[#8daab5] dark:text-slate-500">/</span> {dependenciaActual}</p>
+              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-[#17384a] dark:text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
+              <p className="mt-2 max-w-xl text-xs leading-relaxed text-[#486574] dark:text-slate-300 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención.</p>
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-300' : 'bg-amber-300'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className="fa-solid fa-boxes-stacked text-cyan-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#c8dfe5] bg-white/75 px-3 py-1.5 text-[10px] font-bold text-[#294d5d] dark:border-white/10 dark:bg-white/5 dark:text-slate-200"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#c8dfe5] bg-white/75 px-3 py-1.5 text-[10px] font-bold text-[#294d5d] dark:border-white/10 dark:bg-white/5 dark:text-slate-200"><i className="fa-solid fa-boxes-stacked text-[#1688a3] dark:text-[#71cbd1]" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
                 <div className="relative">
                   <button
                     ref={widgetButtonRef}
                     onClick={() => setMenuWidgets(v => !v)}
                     title="Personalizar panel" aria-label="Personalizar panel"
-                    className="flex h-9 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-3 text-[11px] font-bold text-white shadow-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                    className="flex h-9 items-center gap-2 rounded-xl border border-[#c8dfe5] bg-white/75 px-3 text-[11px] font-bold text-[#294d5d] shadow-sm transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1688a3] dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                   >
                     <i className="fa-solid fa-sliders text-xs" aria-hidden="true"></i><span>Personalizar</span>
                   </button>
@@ -297,15 +298,15 @@ export default function DashboardView({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-900 shadow-sm sm:gap-3 sm:p-4">
-            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
-              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-500">Bienes con responsable</p><p className="mt-1 text-[10px] text-slate-600">Según el inventario, independientemente del FC-10</p></div>
-              <span className="text-2xl font-black tabular-nums text-slate-900 sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
+          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-[#d6e7ec] bg-white p-3 text-[#17384a] shadow-card dark:border-[#345362] dark:bg-[#203a49] dark:text-slate-100 sm:gap-3 sm:p-4">
+            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-[#dfeaf0] pb-3 dark:border-white/10">
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#526f7c] dark:text-slate-300">Bienes con responsable</p><p className="mt-1 text-[10px] text-[#617985] dark:text-slate-400">Según el inventario, independientemente del FC-10</p></div>
+              <span className="text-2xl font-black tabular-nums text-[#167b8f] dark:text-[#82d2dc] sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-slate-900">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
-            <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Sin responsable</p><p className="mt-1 text-lg font-black tabular-nums text-slate-900">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
-            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-slate-200" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-[#145a75] transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
-            <p className="col-span-2 text-[9px] leading-relaxed text-slate-500">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
+            <div className="rounded-xl border border-[#dfeaf0] bg-[#f7fafb] p-3 dark:border-white/10 dark:bg-[#172d3b]"><p className="text-[9px] font-bold uppercase tracking-wide text-[#627b86] dark:text-slate-400">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-[#17384a] dark:text-white">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
+            <div className="rounded-xl border border-[#dfeaf0] bg-[#f7fafb] p-3 dark:border-white/10 dark:bg-[#172d3b]"><p className="text-[9px] font-bold uppercase tracking-wide text-[#627b86] dark:text-slate-400">Sin responsable</p><p className="mt-1 text-lg font-black tabular-nums text-[#17384a] dark:text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
+            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-[#dce8ed] dark:bg-slate-700" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-gradient-to-r from-[#1688a3] to-[#25aa9c] transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
+            <p className="col-span-2 text-[9px] leading-relaxed text-[#617985] dark:text-slate-400">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
           </div>
         </div>
 
@@ -326,6 +327,7 @@ export default function DashboardView({
               onClick={card.onClick}
               progress={card.progress}
               progressColor="brand"
+              className={`!bg-white dark:!bg-[#1e3544] border-t-4 ${card.tono === 'warn' ? 'border-t-amber-500' : card.tono === 'ok' ? 'border-t-emerald-500' : card.tono === 'info' ? 'border-t-sky-500' : 'border-t-[#1688a3]'}`}
             />
           ))}
         </KpiGrid>
@@ -333,7 +335,7 @@ export default function DashboardView({
 
       {/* 2A. ACTAS POR FIRMAR */}
       {actasPorFirmar.length > 0 && (
-        <div className="bg-surface-1 rounded-card border border-brand/20 shadow-sm overflow-hidden" data-tour="dash-firmas">
+        <div className="bg-surface-1 dark:!bg-[#172d3b] rounded-card border border-brand/20 dark:border-[#2c4958] shadow-sm overflow-hidden" data-tour="dash-firmas">
           <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-brand/5 border-b border-brand/15">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand text-content-inverse shadow-xs shadow-brand/20">
@@ -398,7 +400,7 @@ export default function DashboardView({
 
       {/* 2B. BANDEJA DE PENDIENTES */}
       {widgets.pendientes && (
-      <div className="bg-surface-1 rounded-panel border border-line shadow-card p-4 sm:p-5" data-tour="dash-pendientes" aria-label="Mi bandeja de trabajo">
+      <div className="bg-surface-1 dark:!bg-[#172d3b] rounded-panel border border-line dark:border-[#2c4958] shadow-card p-4 sm:p-5" data-tour="dash-pendientes" aria-label="Mi bandeja de trabajo">
           <div className="flex items-center justify-between gap-3 mb-4">
               <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-list-check text-content-3" aria-hidden="true"></i> Mi bandeja de trabajo
@@ -418,7 +420,7 @@ export default function DashboardView({
                       key={p.id}
                       onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
                       title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-card border border-line hover:border-line-strong hover:bg-surface-2 px-3.5 py-3 text-left motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
+                      className="group flex items-center gap-3 rounded-card border border-line bg-surface-1 dark:!border-[#345362] dark:!bg-[#203a49] hover:border-line-strong hover:bg-surface-2 dark:hover:!bg-[#274657] px-3.5 py-3 text-left motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
                   >
                       <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-control border` + p.box}>
                           <i className={`fa-solid ${p.icon} text-xs`}></i>
@@ -437,14 +439,14 @@ export default function DashboardView({
 
       {/* 2b. TILES POR DEPENDENCIA */}
       {widgets.metricas && tilesPorDependencia.length > 0 && (
-        <details open className="group overflow-hidden rounded-[26px] border border-line bg-surface-1 shadow-card">
+        <details open className="group overflow-hidden rounded-[26px] border border-line bg-surface-1 shadow-card dark:!border-[#2c4958] dark:!bg-[#172d3b]">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
             <span className="flex items-center gap-2.5"><i className="fa-solid fa-building-columns text-brand-text"></i> Desglose por dependencia</span>
             <span className="flex items-center gap-2 text-[11px] font-semibold text-content-3"><span>{tilesPorDependencia.length} áreas</span><i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i></span>
           </summary>
-          <div className="grid grid-cols-1 gap-3 border-t border-line bg-surface-2/40 p-4 sm:grid-cols-2 xl:grid-cols-3 sm:p-5">
+          <div className="grid grid-cols-1 gap-3 border-t border-line bg-surface-2/40 p-4 dark:bg-[#1b3342] sm:grid-cols-2 xl:grid-cols-3 sm:p-5">
             {tilesPorDependencia.map((t) => (
-              <button key={t.dep} type="button" disabled={!requestDependenciaChange || t.dep === dependenciaActual} onClick={() => requestDependenciaChange?.(t.dep)} className="group/dep min-w-0 rounded-2xl border border-line bg-surface-1 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-default disabled:hover:translate-y-0 disabled:hover:border-line disabled:hover:shadow-sm">
+              <button key={t.dep} type="button" disabled={!requestDependenciaChange || t.dep === dependenciaActual} onClick={() => requestDependenciaChange?.(t.dep)} className="group/dep min-w-0 rounded-2xl border border-line bg-surface-1 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-default disabled:hover:translate-y-0 disabled:hover:border-line disabled:hover:shadow-sm dark:border-[#345362] dark:bg-[#203a49]">
                 <div className="flex items-center gap-3">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface-2 p-1.5">{t.logo ? <img src={t.logo} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" />}</span>
                   <span className="min-w-0 flex-1"><span className="block truncate text-xs font-extrabold text-content-1">{t.dep}</span><span className="mt-0.5 block text-[10px] text-content-3">{t.total.toLocaleString('es-PY')} bienes en inventario</span></span>
@@ -463,7 +465,7 @@ export default function DashboardView({
 
       {/* 3. ACCESOS DIRECTOS */}
       {widgets.accesos && (
-      <div className="rounded-panel border border-line/70 bg-surface-1 p-5 shadow-sm dark:border-white/10 dark:bg-surface-1/[0.04] sm:p-6">
+      <div className="rounded-panel border border-line/70 bg-surface-1 p-5 shadow-sm dark:border-[#2c4958] dark:!bg-[#172d3b] sm:p-6">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-bolt" aria-hidden="true" /></span>
@@ -506,16 +508,16 @@ export default function DashboardView({
 
       {/* 4. GRÁFICOS Y TENDENCIAS */}
       {widgets.tendencias && (
-      <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+      <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card dark:border-[#2c4958] dark:!bg-[#172d3b]">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
           <span className="flex items-center gap-2.5"><i className="fa-solid fa-chart-line text-brand-text"></i> Tendencias y cobertura</span>
           <i className="fa-solid fa-chevron-down text-content-3 transition-transform group-open:rotate-180"></i>
         </summary>
-        <div className="border-t border-line bg-surface-2/40 p-4 sm:p-5">
+        <div className="border-t border-line bg-surface-2/40 p-4 dark:bg-[#1b3342] sm:p-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Estado de Regularización */}
-        <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
+        <div className="bg-surface-1 dark:bg-[#203a49] rounded-panel border border-line/70 dark:border-[#345362] shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                <i className="fa-solid fa-chart-pie text-ok"></i> Metas de Cobertura
@@ -553,7 +555,7 @@ export default function DashboardView({
         </div>
 
         {/* Tendencias Operativas */}
-        <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
+        <div className="bg-surface-1 dark:bg-[#203a49] rounded-panel border border-line/70 dark:border-[#345362] shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                <i className="fa-solid fa-chart-line text-brand-text"></i> Gestión Anual

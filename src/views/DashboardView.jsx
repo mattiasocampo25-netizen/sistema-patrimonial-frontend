@@ -251,7 +251,7 @@ export default function DashboardView({
     <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-5 pb-16 sm:space-y-6">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card relative overflow-visible border-0 bg-gradient-to-br from-[#0c1e38] via-[#123e67] to-[#136d7d] p-0 text-white shadow-card">
+      <Card className="dashboard-welcome-card relative overflow-visible border-0 bg-[#145a75] p-0 text-white shadow-card">
         <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
           <div className="flex min-w-0 items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand/20 bg-brand-soft text-lg font-black text-brand-text sm:h-14 sm:w-14 sm:text-xl">
@@ -262,14 +262,14 @@ export default function DashboardView({
               <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
               <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-100 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención.</p>
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[10px] font-bold text-content-2"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[10px] font-bold text-content-2"><i className="fa-solid fa-boxes-stacked text-brand-text" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-300' : 'bg-amber-300'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className="fa-solid fa-boxes-stacked text-cyan-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
                 <div className="relative">
                   <button
                     ref={widgetButtonRef}
                     onClick={() => setMenuWidgets(v => !v)}
                     title="Personalizar panel" aria-label="Personalizar panel"
-                    className="flex h-9 items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 shadow-sm transition hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                    className="flex h-9 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-3 text-[11px] font-bold text-white shadow-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                   >
                     <i className="fa-solid fa-sliders text-xs" aria-hidden="true"></i><span>Personalizar</span>
                   </button>
@@ -297,15 +297,15 @@ export default function DashboardView({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/30 bg-white p-3 text-content-1 shadow-lg sm:gap-3 sm:p-4">
-            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-line pb-3">
-              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-content-3">Asignación a funcionarios</p><p className="mt-1 text-[10px] text-content-2">Basada en el responsable del bien; independiente del FC-10</p></div>
-              <span className="text-2xl font-black tabular-nums text-content-1 sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
+          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-slate-900 shadow-sm sm:gap-3 sm:p-4">
+            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-slate-500">Bienes con responsable</p><p className="mt-1 text-[10px] text-slate-600">Según el inventario, independientemente del FC-10</p></div>
+              <span className="text-2xl font-black tabular-nums text-slate-900 sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
             </div>
-            <div className="rounded-xl border border-line bg-surface-1 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-content-3">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-content-1">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
-            <div className="rounded-xl border border-line bg-surface-1 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-content-3">Sin responsable</p><p className="mt-1 text-lg font-black tabular-nums text-content-1">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
-            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-surface-3" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-brand transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
-            <p className="col-span-2 text-[9px] leading-relaxed text-content-3">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
+            <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-slate-900">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Sin responsable</p><p className="mt-1 text-lg font-black tabular-nums text-slate-900">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
+            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-slate-200" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-[#145a75] transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
+            <p className="col-span-2 text-[9px] leading-relaxed text-slate-500">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
           </div>
         </div>
 

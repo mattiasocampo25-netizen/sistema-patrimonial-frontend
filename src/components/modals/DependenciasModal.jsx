@@ -25,6 +25,7 @@ export default function DependenciasModal({
   const [editandoDep, setEditandoDep] = useState(false);
   const [nuevo, setNuevo] = useState('');
   const [nuevoCod, setNuevoCod] = useState('');
+  const [mostrarNuevaDep, setMostrarNuevaDep] = useState(false);
   const [nuevaUbic, setNuevaUbicacion] = useState('');
   const [editUbicId, setEditUbicId] = useState(null);
   const [editUbicNombre, setEditUbicNombre] = useState('');
@@ -45,6 +46,7 @@ export default function DependenciasModal({
       setEditandoDep(false);
       setNuevo('');
       setNuevaUbicacion('');
+      setMostrarNuevaDep(false);
       setEditUbicId(null);
       setBuscaFunc('');
       setVistaDetalle('departamentos');
@@ -158,26 +160,18 @@ export default function DependenciasModal({
   return (
     <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " max-w-7xl !max-h-[94dvh] overflow-hidden !rounded-[28px] shadow-2xl"} onClick={(e) => e.stopPropagation()}>
-        <div className="relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-line bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 px-5 py-5 text-white sm:px-7">
+        <div className="relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-white/10 bg-[#145a75] px-5 py-5 text-white sm:px-7">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-inner">
               <i className="fa-solid fa-sitemap text-lg" aria-hidden="true"></i>
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-200">Estructura institucional</p>
-              <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Dependencias</h2>
-              <p className="mt-0.5 text-xs text-slate-300">1. Elige una dependencia · 2. administra sus departamentos o funcionarios</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-100">Organización institucional</p>
+              <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Dependencias y departamentos</h2>
+              <p className="mt-0.5 text-xs text-white/80">Selecciona una dependencia y luego elige qué quieres administrar.</p>
             </div>
           </div>
-          <div className="flex w-full items-center gap-2 sm:w-auto">
-            <div className="relative min-w-0 flex-1 sm:w-[min(36vw,420px)] sm:flex-none">
-              <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none" aria-hidden="true"></i>
-              <input
-                type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar dependencia o departamento..."
-                className="h-11 w-full rounded-2xl border border-white/15 bg-white/10 pl-10 pr-3 text-[13px] font-medium text-white outline-none placeholder:text-slate-400 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-300/30"
-              />
-            </div>
+          <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
             <button onClick={onClose} title="Cerrar" aria-label="Cerrar" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/10 text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
               <i className="fa-solid fa-xmark text-base"></i>
             </button>
@@ -186,14 +180,19 @@ export default function DependenciasModal({
 
         <div className="grid min-h-0 flex-1 overflow-hidden bg-surface-2/50 dark:bg-surface-2/30 md:grid-cols-[300px_minmax(0,1fr)]">
           {/* Panel izquierdo: lista de dependencias */}
-          <div className="flex max-h-52 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r">
+          <div className="flex max-h-64 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r">
             <div className="mb-3 flex items-center justify-between gap-2 px-1">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">Paso 1</p>
-                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Elige dependencia</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">1 · Dependencia</p>
+                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Selecciona una unidad</h3>
               </div>
               <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-bold tabular-nums text-brand-text">{depsFiltradas.length}</span>
             </div>
+            <label className="relative mb-3 block">
+              <span className="sr-only">Buscar dependencia o departamento</span>
+              <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-content-3 text-xs" aria-hidden="true" />
+              <input type="search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar unidad o departamento" className="h-10 w-full rounded-control border border-line bg-surface-2 pl-9 pr-3 text-xs font-medium text-content-1 outline-none placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/15" />
+            </label>
             <div className="min-h-0 flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
               {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
             {detFiltradas.length > 0 && (
@@ -211,12 +210,13 @@ export default function DependenciasModal({
               </div>
             )}
             </div>
-            <div className="mt-3 rounded-2xl border border-line bg-surface-2/70 p-3 dark:bg-surface-2">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-content-3">Agregar dependencia</p>
+            <div className="mt-3">
+              {!mostrarNuevaDep ? <button type="button" onClick={() => setMostrarNuevaDep(true)} className="flex h-10 w-full items-center justify-center gap-2 rounded-control border border-dashed border-line-strong text-xs font-bold text-brand-text transition hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-plus" aria-hidden="true"/>Agregar dependencia</button> : <div className="rounded-xl border border-line bg-surface-2 p-3">
+              <div className="mb-2 flex items-center justify-between"><p className="text-xs font-bold text-content-1">Nueva dependencia</p><button type="button" onClick={() => { setMostrarNuevaDep(false); setNuevo(''); setNuevoCod(''); }} className="flex h-7 w-7 items-center justify-center rounded-lg text-content-3 hover:bg-surface-3" aria-label="Cancelar nueva dependencia"><i className="fa-solid fa-xmark"/></button></div>
               <div className="grid grid-cols-[minmax(0,1fr)_72px_40px] gap-2">
                 <input
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); setMostrarNuevaDep(false); } }}
                   placeholder="Nombre de la dependencia"
                   className="h-10 min-w-0 rounded-xl border border-line bg-surface-1 px-3 text-xs font-medium text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 dark:bg-surface-1/5 dark:text-white"
                 />
@@ -226,7 +226,7 @@ export default function DependenciasModal({
                   className="h-10 min-w-0 rounded-xl border border-line bg-surface-1 px-2 text-center font-mono text-[10px] font-bold text-content-1 outline-none focus:border-brand dark:bg-surface-1/5 dark:text-white"
                 />
                 <button
-                  onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
+                  onClick={() => { if (nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); setMostrarNuevaDep(false); } }}
                   disabled={isSaving || !nuevo.trim()}
                   title="Agregar dependencia" aria-label="Agregar dependencia"
                   className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-content-inverse shadow-sm transition hover:bg-brand-hover active:scale-95 disabled:opacity-40"
@@ -234,6 +234,7 @@ export default function DependenciasModal({
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
+              </div>}
             </div>
           </div>
 

@@ -27,12 +27,12 @@ export default function PageHeader({
 }) {
   return (
     <header
-      className={`flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6 animate-fade-up ${className}`}
+      className={`module-page-header flex flex-col gap-4 rounded-panel border border-line bg-surface-1 px-4 py-4 shadow-card sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:px-6 animate-fade-up ${className}`}
     >
       <div className="flex items-start gap-3 min-w-0 flex-1">
         {icono ? (
           <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-text ring-1 ring-inset ring-brand/10 sm:h-14 sm:w-14"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text ring-1 ring-inset ring-brand/10 sm:h-12 sm:w-12"
             aria-hidden="true"
           >
             <i className={`fa-solid ${icono}`} />

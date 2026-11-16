@@ -40,7 +40,7 @@ export function Table({
 export function THead({ className = '', children, sticky = true, ...resto }) {
   return (
     <thead
-      className={`${sticky ? 'sticky top-0 z-10 bg-slate-50/95 backdrop-blur-md dark:bg-slate-900/95' : 'bg-slate-50 dark:bg-slate-900'} border-b border-line text-[10px] font-extrabold text-content-3 uppercase tracking-[0.12em] ${className}`}
+      className={`${sticky ? 'sticky top-0 z-10 bg-surface-2/95 backdrop-blur-md' : 'bg-surface-2'} border-b border-line text-[10px] font-extrabold text-content-2 uppercase tracking-[0.1em] ${className}`}
       {...resto}
     >
       {children}
@@ -51,7 +51,7 @@ export function THead({ className = '', children, sticky = true, ...resto }) {
 export function TRow({ className = '', children, ...resto }) {
   return (
     <tr
-      className={`border-b border-line/50 transition-colors duration-[var(--dur-fast)] even:bg-surface-2/20 hover:bg-brand/5 ${className}`}
+      className={`border-b border-line/70 transition-colors duration-[var(--dur-fast)] even:bg-surface-2/35 hover:bg-brand-soft/55 ${className}`}
       {...resto}
     >
       {children}

@@ -156,6 +156,48 @@ html.density-compact table th { letter-spacing: 0.035em; }
   background: rgb(255 255 255 / 0.3);
 }
 
+/* Lenguaje visual transversal: navegación por tareas, superficies legibles y
+   controles coherentes en formularios y ventanas de todos los módulos. */
+.workspace-main {
+  background-image: radial-gradient(ellipse at 5% 0%, rgb(20 111 130 / 0.055), transparent 34%),
+    radial-gradient(ellipse at 100% 10%, rgb(15 118 110 / 0.035), transparent 30%);
+}
+
+.dark .workspace-main {
+  background-image: radial-gradient(ellipse at 5% 0%, rgb(91 184 192 / 0.07), transparent 34%),
+    radial-gradient(ellipse at 100% 10%, rgb(20 116 130 / 0.06), transparent 30%);
+}
+
+.module-page-header {
+  border-left: 3px solid var(--brand);
+}
+
+.workspace-main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea),
+[role="dialog"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea) {
+  border-radius: var(--radius-control);
+}
+
+.workspace-main :is(input, select, textarea):focus-visible,
+[role="dialog"] :is(input, select, textarea):focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 72%, transparent);
+  outline-offset: 1px;
+}
+
+.workspace-main :is(details > summary, button) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+[role="dialog"] > div {
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-pop);
+}
+
+@media (max-width: 640px) {
+  .module-page-header {
+    border-left-width: 2px;
+  }
+}
+
 /* Sistema visual institucional: navegación oscura y superficies cálidas claras. */
 .sidebar-premium {
   background-color: var(--sidebar);

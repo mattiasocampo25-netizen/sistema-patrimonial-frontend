@@ -166,7 +166,7 @@ export default function DependenciasModal({
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-200">Estructura institucional</p>
               <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Dependencias</h2>
-              <p className="mt-0.5 text-xs text-slate-300">Organiza departamentos y funcionarios en un solo lugar</p>
+              <p className="mt-0.5 text-xs text-slate-300">1. Elige una dependencia · 2. administra sus departamentos o funcionarios</p>
             </div>
           </div>
           <div className="flex w-full items-center gap-2 sm:w-auto">
@@ -174,7 +174,7 @@ export default function DependenciasModal({
               <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none" aria-hidden="true"></i>
               <input
                 type="text" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar dependencia, departamento o funcionario..."
+                placeholder="Buscar dependencia o departamento..."
                 className="h-11 w-full rounded-2xl border border-white/15 bg-white/10 pl-10 pr-3 text-[13px] font-medium text-white outline-none placeholder:text-slate-400 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-300/30"
               />
             </div>
@@ -189,8 +189,8 @@ export default function DependenciasModal({
           <div className="flex max-h-52 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r">
             <div className="mb-3 flex items-center justify-between gap-2 px-1">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">Catálogo</p>
-                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Unidades</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">Paso 1</p>
+                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Elige dependencia</h3>
               </div>
               <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-bold tabular-nums text-brand-text">{depsFiltradas.length}</span>
             </div>
@@ -212,12 +212,12 @@ export default function DependenciasModal({
             )}
             </div>
             <div className="mt-3 rounded-2xl border border-line bg-surface-2/70 p-3 dark:bg-surface-2">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-content-3">Nueva dependencia</p>
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-content-3">Agregar dependencia</p>
               <div className="grid grid-cols-[minmax(0,1fr)_72px_40px] gap-2">
                 <input
                   type="text" value={nuevo} onChange={(e) => setNuevo(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter' && nuevo.trim()) { onSave(null, nuevo.trim(), nuevoCod.trim()); setNuevo(''); setNuevoCod(''); } }}
-                  placeholder="Nombre"
+                  placeholder="Nombre de la dependencia"
                   className="h-10 min-w-0 rounded-xl border border-line bg-surface-1 px-3 text-xs font-medium text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 dark:bg-surface-1/5 dark:text-white"
                 />
                 <input
@@ -341,6 +341,7 @@ export default function DependenciasModal({
                 </div>
                 </div>
 
+                <div className="mb-2 rounded-xl border border-brand/15 bg-brand-soft/50 px-3 py-2 text-[11px] font-medium text-content-2"><i className="fa-solid fa-circle-info mr-2 text-brand-text" aria-hidden="true"/>Paso 2: gestiona sus espacios físicos o cambia dónde está asignado cada funcionario.</div>
                 <div className="flex gap-2 rounded-2xl border border-line bg-surface-1 p-1.5 dark:bg-surface-1/80" role="tablist" aria-label="Contenido de la dependencia">
                   <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
                     <i className="fa-solid fa-diagram-project" aria-hidden="true" /> Departamentos <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{ubicsDeSel.length}</span>

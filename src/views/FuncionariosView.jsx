@@ -27,7 +27,7 @@ export default function FuncionariosView({
           <div className="p-5 sm:p-6">
             <PageHeader
               titulo={'Plantel de Funcionarios'}
-              descripcion={<>Directorio oficial de personal asignado a <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong></>}
+              descripcion={<>Padrón de personal de <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong>. Busca por nombre, cédula o cargo; edita desde la fila.</>}
               icono="fa-address-book"
               contador={(
                 <div className="flex flex-wrap items-center gap-2">
@@ -46,11 +46,11 @@ export default function FuncionariosView({
   
             {/* Botones de Acción Principal */}
             <div className="flex flex-wrap items-center gap-2">
-              <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={sincronizarBienesConPadron} title="Sincronizar custodios con inventario">
-                Sincronizar
+                <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={sincronizarBienesConPadron} title="Actualizar los responsables de bienes usando el padrón">
+                Actualizar responsables
               </Button>
-              <Button variante="subtle" tamano="md" icono="fa-file-excel" onClick={handleDownloadTemplateFuncionarios} title="Descargar plantilla de funcionarios">
-                Plantilla
+                <Button variante="subtle" tamano="md" icono="fa-file-excel" onClick={handleDownloadTemplateFuncionarios} title="Descargar el archivo modelo para importar funcionarios">
+                Plantilla CSV
               </Button>
               <Button variante="subtle" tamano="md" icono="fa-file-import" onClick={() => fileInputFuncionariosRef.current?.click()} title="Importar lista de funcionarios desde CSV">
                 Importar CSV
@@ -62,7 +62,7 @@ export default function FuncionariosView({
               )}
               <span className="hidden sm:block h-6 w-px bg-surface-3 dark:bg-surface-1/10 mx-1" />
               <Button variante="primary" tamano="md" icono="fa-user-plus" onClick={() => setIsNewFuncionarioModalOpen(true)} title="Registrar nuevo funcionario">
-                Nuevo Funcionario
+                  Nuevo funcionario
               </Button>
             </div>
   
@@ -71,13 +71,17 @@ export default function FuncionariosView({
         </Card>
 
         {/* Barra de búsqueda del padrón */}
-        <Card className="p-4">
+        <Card className="p-4 sm:p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div><h2 className="text-sm font-bold text-content-1">Buscar en el padrón</h2><p className="mt-0.5 text-xs text-content-3">{funcionariosVisibles.toLocaleString('es-PY')} resultados en {dependenciaActual}</p></div>
+            {(searchFuncionarioInput || filtroCargo) && <button type="button" onClick={() => { setSearchFuncionarioInput(''); setFiltroCargo(''); setCurrentPaginaFuncionarios(1); }} className="inline-flex h-9 items-center gap-2 rounded-control px-3 text-xs font-semibold text-brand-text hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-filter-circle-xmark" aria-hidden="true"/>Limpiar filtros</button>}
+          </div>
           <div className="relative w-full">
             <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
             <input
               type="text"
               aria-label="Buscar funcionario por nombre, cargo o número de cédula"
-              placeholder="Buscar funcionario por nombre, apellido o número de cédula..."
+              placeholder="Escribe nombre, cédula o cargo..."
               value={searchFuncionarioInput}
               onChange={(e) => {
                 setSearchFuncionarioInput(e.target.value);
@@ -99,7 +103,7 @@ export default function FuncionariosView({
               {mostrarCedulas ? 'Ocultar cédulas' : 'Mostrar cédulas'}
             </button>
           </div>
-          <p className="mt-2 text-[11px] text-content-3">Las cédulas se ocultan inicialmente para reducir su exposición en pantalla.</p>
+          <p className="mt-2 text-[11px] text-content-3">Las cédulas permanecen ocultas hasta que elijas «Mostrar cédulas».</p>
         </Card>
 
       </div>

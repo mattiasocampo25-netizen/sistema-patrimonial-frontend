@@ -1461,19 +1461,12 @@ export function useFcModals({
                   return notify('Debe ingresar el motivo de la solicitud.', 'warning');
               }
               const solicitudId = generateId();
-              const nuevaSolicitud = {
-                  id: solicitudId,
-                  funcionarioId: item.id || id,
-                  nombre: item.nombre,
-                  cedula: item.cedula,
-                  solicitante: currentUser?.username || 'Usuario',
-                  dependencia: item.dependencia || dependenciaActual,
-                  tipo: 'BAJA_FUNCIONARIO',
-                  estado: 'PENDIENTE',
-                  motivo: motivoSolicitudBaja.trim(),
-                  created_at: new Date().toISOString()
-              };
-              res = await supabase.from('notificaciones').insert([{ id: solicitudId, data: nuevaSolicitud }]);
+              res = await supabase.rpc('crear_solicitud_baja', {
+                p_solicitud_id: solicitudId,
+                p_tipo: 'BAJA_FUNCIONARIO',
+                p_entidad_id: String(item.id || id),
+                p_motivo: motivoSolicitudBaja.trim()
+              });
 
               if (!res.error) {
                 notify('Solicitud enviada con éxito al administrador.', 'success');
@@ -1500,21 +1493,12 @@ export function useFcModals({
                   return notify("Debe ingresar el motivo de la baja.", "warning");
               }
               const solicitudId = generateId();
-              const nuevaSolicitud = { 
-                  id: solicitudId, 
-                  bienId: item.id || id, 
-                  rotulo: item.rotulo, 
-                  descripcion: item.descripcion, 
-                  ubicacion: item.ubicacion, 
-                  funcionario: item.funcionario, 
-                  solicitante: currentUser?.username || 'Usuario', 
-                  dependencia: item.dependencia || dependenciaActual, 
-                  tipo: 'BAJA_BIEN', 
-                  estado: 'PENDIENTE', 
-                  motivo: motivoSolicitudBaja.trim(),
-                  created_at: new Date().toISOString() 
-              };
-              res = await supabase.from('notificaciones').insert([{ id: solicitudId, data: nuevaSolicitud }]);
+              res = await supabase.rpc('crear_solicitud_baja', {
+                p_solicitud_id: solicitudId,
+                p_tipo: 'BAJA_BIEN',
+                p_entidad_id: String(item.id || id),
+                p_motivo: motivoSolicitudBaja.trim()
+              });
               
               if (!res.error) { 
                 notify("Solicitud de baja enviada con éxito al administrador.", "success"); 

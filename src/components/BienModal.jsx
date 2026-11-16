@@ -360,19 +360,19 @@ export default function BienModal({
 
     return (
         <Dialogo className={STYLES.modalOverlay} onCerrar={solicitarCierre}>
-          <div className={STYLES.modalContent + " max-w-4xl overflow-hidden"}>
+          <div className={STYLES.modalContent + " max-w-5xl overflow-hidden !rounded-[24px] shadow-2xl"}>
 
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0 z-10">
+            <div className="flex justify-between items-center px-6 py-5 border-b border-white/10 bg-[#145a75] text-white shrink-0 z-10">
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white">
                    <i className={`fa-solid ${esNuevo ? 'fa-plus' : 'fa-pen-to-square'} text-base`}></i>
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-content-1 dark:text-white tracking-tight">
+                  <h2 className="text-lg font-extrabold text-white tracking-tight">
                     {esNuevo ? 'Registrar Nuevo Bien' : 'Editar Bien Patrimonial'}
                   </h2>
-                  <p className="text-xs text-content-3 dark:text-content-3 mt-0.5">Complete la información requerida para el inventario</p>
+                  <p className="text-xs text-white/80 mt-0.5">{esNuevo ? 'Sigue las secciones para registrar el bien.' : 'Edita los datos del bien por sección.'} · Dependencia: {dependenciaActual || 'No indicada'}</p>
                 </div>
               </div>
 
@@ -392,7 +392,16 @@ export default function BienModal({
               </div>
             )}
             <form key={formKey} ref={bienFormRef} onSubmit={(e) => guardarConRevision(e, false)} onInputCapture={() => setHayCambiosSinGuardar(true)} onChange={() => { setHayCambiosSinGuardar(true); guardarBorrador(serializarForm(bienFormRef.current)); }} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
-              <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
+              <div className="sticky top-0 z-40 border-b border-line bg-surface-1/95 px-4 py-2.5 backdrop-blur sm:px-7">
+                <nav aria-label="Secciones del formulario de bien" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {[['bien-seccion-1','1','Código'],['bien-seccion-2','2','Descripción'],['bien-seccion-3','3','Valor'],['bien-seccion-4','4','Asignación']].map(([id,nombre,titulo]) => (
+                    <button key={id} type="button" onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="flex min-h-10 items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 text-left text-xs font-bold text-content-2 transition hover:border-brand/40 hover:bg-brand-soft/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[10px] font-black text-brand-text">{nombre}</span>{titulo}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+              <div className="p-4 overflow-y-auto space-y-5 custom-scrollbar sm:p-7">
                 {!isOnline && (
                   <section role="alert" className="rounded-2xl border border-amber-500/40 bg-amber-50 p-4 text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
                     <div className="flex items-start gap-3">
@@ -411,7 +420,7 @@ export default function BienModal({
                 {estadoGuardado && <p role="status" className="text-label font-semibold text-ok"><i className="fa-solid fa-cloud-arrow-up mr-1.5" aria-hidden="true" />{estadoGuardado}</p>}
 
                 {/* 1. IMPUTACIÓN CONTABLE Y RÓTULO */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div id="bien-seccion-1" className="scroll-mt-24 p-5 rounded-2xl bg-surface-1 border border-line shadow-sm sm:p-6">
                   <div className={`${SECTION.header}`}>
                      <span className={`${SECTION.number}`}>1</span>
                      <h3 className={`${SECTION.title}`}>Imputación y Código Patrimonial</h3>
@@ -448,7 +457,7 @@ export default function BienModal({
                 </div>
 
                 {/* 2. IDENTIFICACIÓN FÍSICA Y ESTADO */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div id="bien-seccion-2" className="scroll-mt-24 p-5 rounded-2xl bg-surface-1 border border-line shadow-sm sm:p-6">
                   <div className={`${SECTION.header}`}>
                      <span className={`${SECTION.number}`}>2</span>
                      <h3 className={`${SECTION.title}`}>Especificaciones del Activo</h3>
@@ -554,7 +563,7 @@ export default function BienModal({
                 </section>
 
                 {/* 3. VALORIZACIÓN Y CONTABILIDAD */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div id="bien-seccion-3" className="scroll-mt-24 p-5 rounded-2xl bg-surface-1 border border-line shadow-sm sm:p-6">
                   <div className={`${SECTION.header}`}>
                      <span className={`${SECTION.number}`}>3</span>
                      <h3 className={`${SECTION.title}`}>Valor y Fecha de Incorporación</h3>
@@ -578,7 +587,7 @@ export default function BienModal({
                 </div>
 
                 {/* 4. ASIGNACIÓN, CUSTODIA Y UBICACIÓN */}
-                <div className="p-6 rounded-card bg-surface-1 dark:bg-surface-1/40 border border-line/80 dark:border-zinc-800/60 shadow-xs">
+                <div id="bien-seccion-4" className="scroll-mt-24 p-5 rounded-2xl bg-surface-1 border border-line shadow-sm sm:p-6">
                   <div className={`${SECTION.header} justify-between`}>
                       <div className="flex items-center gap-2">
                          <span className={`${SECTION.number}`}>4</span>
@@ -597,42 +606,42 @@ export default function BienModal({
                         <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
                     </div>
                     <div className="md:col-span-2 relative" ref={custodioDropdownRef}>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Custodio Designado (Nombre)</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Funcionario responsable</label>
+                        <p className="mb-2 text-[11px] leading-relaxed text-content-3">Busca por nombre o cédula. Al elegirlo, se completan automáticamente su cargo, documento y ubicación.</p>
                         <input
                             name="funcionario"
                             value={custodioTexto}
                             onChange={handleCustodioChange}
                             onFocus={() => setShowCustodioDropdown(true)}
                             className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
-                            placeholder="Escribe o selecciona custodio..."
+                            placeholder="Escribe un nombre o número de cédula..."
                             autoComplete="off"
                         />
 
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && filteredCustodios.length > 0 && (
-                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-56 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-72 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
+                                <p className="sticky top-0 z-10 border-b border-line bg-surface-1 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-content-3">{custodioTexto.trim() ? `${filteredCustodios.length} coincidencia${filteredCustodios.length === 1 ? '' : 's'}` : 'Funcionarios de la dependencia'}</p>
                                 {filteredCustodios.map((f) => (
                                     <button
                                         type="button"
                                         key={f.id || f.cedula}
                                         onClick={() => handleSelectCustodio(f)}
-                                        className="w-full text-left px-4 py-2.5 hover:bg-surface-3 dark:hover:bg-surface-3/80 transition-colors flex items-center justify-between cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                                        className="w-full text-left px-4 py-3 hover:bg-brand-soft/50 transition-colors flex items-center gap-3 cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                                     >
-                                        <div className="min-w-0 pr-2">
-                                            <p className="text-xs font-bold text-content-1 dark:text-zinc-100 group-hover:text-brand-text dark:group-hover:text-blue-400 truncate">
+                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-sm font-black text-brand-text">{(f.nombre || '?').trim().charAt(0).toUpperCase()}</span>
+                                        <div className="min-w-0 flex-1 pr-2">
+                                            <p className="text-xs font-bold text-content-1 group-hover:text-brand-text truncate">
                                                 {f.nombre}
                                             </p>
-                                            <p className="text-[10px] text-content-3 dark:text-content-3 truncate mt-0.5">
-                                                {f.cargo || 'Funcionario'}{f.ubicacion ? ` · ${f.ubicacion}` : ''}
+                                            <p className="text-[10px] text-content-3 truncate mt-0.5">
+                                                {f.cargo || 'Funcionario'} · {f.ubicacion || 'Sin departamento'}
                                             </p>
                                         </div>
-                                        {f.cedula && (
-                                            <span className="shrink-0 text-[10px] font-mono tabular-nums bg-surface-3 dark:bg-surface-3 text-content-2 dark:text-content-3 px-2 py-0.5 rounded-lg border border-line dark:border-zinc-700">
-                                                {f.cedula}
-                                            </span>
-                                        )}
+                                        <span className="shrink-0 rounded-lg border border-line bg-surface-2 px-2 py-1 text-[10px] font-mono tabular-nums text-content-2">CI {f.cedula || 'S/C'}</span>
                                     </button>
                                 ))}
+                                {filteredCustodios.length === 0 && <p className="px-4 py-5 text-center text-xs font-medium text-content-3">No hay coincidencias. Puedes continuar con el nombre escrito.</p>}
                             </div>
                         )}
                     </div>

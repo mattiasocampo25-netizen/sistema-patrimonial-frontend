@@ -3,12 +3,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Dialogo from '../ui/Dialogo';
 import { normalizeStr } from '../../utils/helpers';
 
-// Gestor de dependencias v4: maestro-detalle con búsqueda unificada.
-// Mejoras v4:
-// - Jerarquía visual más clara entre dependencias oficiales y detectadas.
-// - Tarjetas de departamento más limpias y fáciles de leer.
-// - Estados de fusión y acciones más visibles.
-// - Mejor contraste y accesibilidad en modo oscuro.
+// Gestor de dependencias: selector de unidad a la izquierda y acciones
+// concretas para departamentos y funcionarios en el panel de trabajo.
 export default function DependenciasModal({
   isOpen, onClose, dependencias, detectadas, conteos,
   onSave, onDelete, onFusionar, isSaving,
@@ -66,8 +62,8 @@ export default function DependenciasModal({
   const qfBusca = useMemo(() => normalizeStr(buscaFunc), [buscaFunc]);
 
   const depsFiltradas = useMemo(
-    () => dependencias.filter(d => !q || normalizeStr(d.nombre).includes(q)),
-    [dependencias, q]
+    () => dependencias.filter(d => !q || normalizeStr(d.nombre).includes(q) || ubicacionesList.some(u => normalizeStr(u.dependencia || '') === normalizeStr(d.nombre) && normalizeStr(u.nombre).includes(q))),
+    [dependencias, ubicacionesList, q]
   );
   const detFiltradas = useMemo(
     () => detectadas.filter(d => !q || normalizeStr(d.nombre).includes(q)),
@@ -135,9 +131,9 @@ export default function DependenciasModal({
           else { setSelId(d.id); setSelDetectada(null); }
         }}
         title={d.nombre}
-        className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-control text-left motion cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo || activoDet ? 'bg-brand-soft dark:bg-brand/10 border border-brand/30 border-l-4 border-brand text-content-1 dark:text-white shadow-sm' : 'hover:bg-surface-3 dark:hover:bg-surface-1/5 text-content-1 dark:text-zinc-100 border border-transparent' }`}
+        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${ activo || activoDet ? 'bg-brand-soft border border-brand/30 text-content-1 shadow-sm' : 'border border-transparent bg-surface-1 hover:border-line hover:bg-surface-2 text-content-1 dark:text-zinc-100' }`}
       >
-        <span className={`flex h-2.5 w-2.5 shrink-0 rounded-full ${detectada ? 'bg-amber-500 ring-1 ring-amber-900/20' : (activo || activoDet ? 'bg-brand ring-1 ring-brand/50' : 'bg-zinc-400 dark:bg-zinc-600 ring-1 ring-zinc-900/10')}`}></span>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${detectada ? 'bg-warn-soft text-warn' : (activo || activoDet ? 'bg-brand text-white' : 'bg-surface-3 text-content-3')}`}><i className={`fa-solid ${detectada ? 'fa-triangle-exclamation' : 'fa-building'}`} aria-hidden="true" /></span>
         <span className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <span className={`flex-1 min-w-0 block text-[13px] font-bold leading-snug truncate ${detectada ? 'text-warn dark:text-amber-400' : 'text-content-1 dark:text-white'}`} title={d.nombre}>
@@ -167,8 +163,8 @@ export default function DependenciasModal({
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-100">Organización institucional</p>
-              <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Dependencias y departamentos</h2>
-              <p className="mt-0.5 text-xs text-white/80">Selecciona una dependencia y luego elige qué quieres administrar.</p>
+              <h2 className="mt-0.5 truncate text-xl font-black tracking-tight sm:text-2xl">Organización</h2>
+              <p className="mt-0.5 text-xs text-white/80">Dependencias, departamentos y asignación de funcionarios.</p>
             </div>
           </div>
           <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
@@ -178,20 +174,20 @@ export default function DependenciasModal({
           </div>
         </div>
 
-        <div className="grid min-h-0 flex-1 overflow-hidden bg-surface-2/50 dark:bg-surface-2/30 md:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="grid min-h-0 flex-1 overflow-hidden bg-surface-2/40 dark:bg-surface-2/30 md:grid-cols-[320px_minmax(0,1fr)]">
           {/* Panel izquierdo: lista de dependencias */}
-          <div className="flex max-h-64 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r">
+          <div className="flex max-h-64 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r md:p-5">
             <div className="mb-3 flex items-center justify-between gap-2 px-1">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">1 · Dependencia</p>
-                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Selecciona una unidad</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">UNIDADES</p>
+                <h3 className="mt-0.5 text-sm font-black text-content-1 dark:text-white">Dependencias</h3>
               </div>
               <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-bold tabular-nums text-brand-text">{depsFiltradas.length}</span>
             </div>
             <label className="relative mb-3 block">
               <span className="sr-only">Buscar dependencia o departamento</span>
               <i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-content-3 text-xs" aria-hidden="true" />
-              <input type="search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar unidad o departamento" className="h-10 w-full rounded-control border border-line bg-surface-2 pl-9 pr-3 text-xs font-medium text-content-1 outline-none placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/15" />
+              <input type="search" value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar dependencia o espacio" className="h-11 w-full rounded-xl border border-line bg-surface-2 pl-9 pr-3 text-xs font-medium text-content-1 outline-none placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/15" />
             </label>
             <div className="min-h-0 flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
               {depsFiltradas.map(d => <ItemDep key={d.id} d={d} />)}
@@ -239,7 +235,7 @@ export default function DependenciasModal({
           </div>
 
           {/* Panel derecho: detalle y gestión */}
-          <div className="min-w-0 overflow-y-auto custom-scrollbar p-4 sm:p-6">
+          <div className="min-w-0 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-7">
             {detSel ? (
               <div className="space-y-6">
                 {/* Banner de posible duplicado */}
@@ -312,11 +308,11 @@ export default function DependenciasModal({
                         )}
                       </h3>
                     )}
-                    <p className="mt-1 text-xs text-content-3">Dependencia activa en el catálogo institucional</p>
+                    <p className="mt-1 text-xs text-content-3">Resumen de esta unidad y herramientas para administrarla.</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => onVerPadron(depSel.nombre)} title="Ver padrón y bienes" className="flex h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 dark:text-content-3">
-                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i><span>Padrón</span>
+                    <button onClick={() => onVerPadron(depSel.nombre)} title="Abrir inventario y padrón" className="flex h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 dark:text-content-3">
+                      <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i><span>Ver inventario</span>
                     </button>
                     <button onClick={() => { setEditandoDep(true); setEditDepNombre(depSel.nombre); setEditDepCod(depSel.codigo || ''); }} title="Renombrar (actualiza todo)" aria-label="Renombrar (actualiza todo)" className="flex h-10 w-10 items-center justify-center rounded-xl border border-line text-content-3 transition hover:bg-surface-2 hover:text-content-1 dark:hover:text-white">
                       <i className="fa-solid fa-pen text-xs"></i>
@@ -327,27 +323,27 @@ export default function DependenciasModal({
                   </div>
                 </div>
 
-                <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                   {[
                     { label: 'Bienes', value: conteos[depSel.nombre]?.bienes || 0, icon: 'fa-boxes-stacked', tone: 'text-brand-text bg-brand-soft' },
                     { label: 'Funcionarios', value: conteos[depSel.nombre]?.funcionarios || 0, icon: 'fa-users', tone: 'text-info bg-info-soft' },
                     { label: 'Departamentos', value: ubicsDeSel.length, icon: 'fa-diagram-project', tone: 'text-ok bg-ok-soft' }
                   ].map(m => (
-                    <div key={m.label} className="min-w-0 rounded-2xl border border-line bg-surface-2/60 p-3 dark:bg-surface-2 sm:p-4">
-                      <span className={`flex h-8 w-8 items-center justify-center rounded-xl ${m.tone}`}><i className={`fa-solid ${m.icon} text-xs`} aria-hidden="true" /></span>
-                      <p className="mt-2 truncate text-[10px] font-semibold uppercase tracking-wide text-content-3 sm:text-[11px]">{m.label}</p>
-                      <p className="mt-0.5 text-lg font-black tabular-nums text-content-1 dark:text-white">{Number(m.value).toLocaleString('es-PY')}</p>
+                    <div key={m.label} className="flex min-w-0 items-center gap-3 rounded-2xl border border-line bg-surface-2/60 p-3 dark:bg-surface-2 sm:p-4">
+                      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${m.tone}`}><i className={`fa-solid ${m.icon} text-sm`} aria-hidden="true" /></span>
+                      <div className="min-w-0"><p className="truncate text-[10px] font-semibold uppercase tracking-wide text-content-3 sm:text-[11px]">{m.label}</p>
+                      <p className="mt-0.5 text-lg font-black tabular-nums text-content-1 dark:text-white">{Number(m.value).toLocaleString('es-PY')}</p></div>
                     </div>
                   ))}
                 </div>
                 </div>
 
-                <div className="mb-2 rounded-xl border border-brand/15 bg-brand-soft/50 px-3 py-2 text-[11px] font-medium text-content-2"><i className="fa-solid fa-circle-info mr-2 text-brand-text" aria-hidden="true"/>Paso 2: gestiona sus espacios físicos o cambia dónde está asignado cada funcionario.</div>
-                <div className="flex gap-2 rounded-2xl border border-line bg-surface-1 p-1.5 dark:bg-surface-1/80" role="tablist" aria-label="Contenido de la dependencia">
-                  <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-content-2"><i className="fa-solid fa-arrow-turn-down text-brand-text" aria-hidden="true"/>¿Qué quieres gestionar en esta dependencia?</div>
+                <div className="grid grid-cols-2 gap-2 rounded-2xl border border-line bg-surface-1 p-1.5 dark:bg-surface-1/80" role="tablist" aria-label="Contenido de la dependencia">
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-[#145a75] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
                     <i className="fa-solid fa-diagram-project" aria-hidden="true" /> Departamentos <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{ubicsDeSel.length}</span>
                   </button>
-                  <button type="button" role="tab" aria-selected={vistaDetalle === 'funcionarios'} onClick={() => setVistaDetalle('funcionarios')} className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'funcionarios' ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'funcionarios'} onClick={() => setVistaDetalle('funcionarios')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'funcionarios' ? 'bg-[#145a75] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
                     <i className="fa-solid fa-users" aria-hidden="true" /> Funcionarios <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{funcsDeSel.length}</span>
                   </button>
                 </div>
@@ -355,13 +351,14 @@ export default function DependenciasModal({
                 {vistaDetalle === 'departamentos' && <div className="rounded-3xl border border-line bg-surface-1 p-4 shadow-sm dark:bg-surface-1/80 sm:p-5">
                   <div className="flex items-center gap-2 mb-2.5">
                     <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-diagram-project" aria-hidden="true" /></span>
-                    <div><h4 className="text-sm font-black text-content-1 dark:text-white">Departamentos</h4><p className="text-[11px] text-content-3">Espacios dentro de esta dependencia</p></div>
+                    <div><h4 className="text-sm font-black text-content-1 dark:text-white">Departamentos y espacios</h4><p className="text-[11px] text-content-3">Agrega o renombra espacios y revisa cuántos funcionarios tienen.</p></div>
                   </div>
+                  <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-content-3">Agregar departamento</label>
                   <div className="flex items-center gap-2 mb-2.5">
                     <input
                       type="text" value={nuevaUbic} onChange={(e) => setNuevaUbicacion(e.target.value)}
                       onKeyDown={(e) => { if (e.key === 'Enter' && nuevaUbic.trim()) { onGuardarUbicacion(null, nuevaUbic.trim(), depSel.nombre); setNuevaUbicacion(''); } }}
-                      placeholder={`Nuevo departamento en ${depSel.nombre}...`}
+                      placeholder="Escribe el nombre del departamento o espacio"
                       className="h-11 flex-1 rounded-xl border border-line bg-surface-2 px-4 text-[13px] font-medium outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15 placeholder:text-content-3 dark:bg-surface-2"
                     />
                     <button
@@ -401,7 +398,7 @@ export default function DependenciasModal({
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-info-soft text-info"><i className="fa-solid fa-users" aria-hidden="true" /></span>
-                      <div><h4 className="text-sm font-black text-content-1 dark:text-white">Funcionarios</h4><p className="text-[11px] text-content-3">Asigna a cada persona a un departamento</p></div>
+                      <div><h4 className="text-sm font-black text-content-1 dark:text-white">Funcionarios</h4><p className="text-[11px] text-content-3">Busca una persona y selecciona su departamento.</p></div>
                     </div>
                     <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-bold tabular-nums text-content-2">{funcsFiltrados.length} visibles</span>
                   </div>
@@ -409,13 +406,13 @@ export default function DependenciasModal({
                     <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-content-3 text-xs pointer-events-none"></i>
                     <input
                       type="text" value={buscaFunc} onChange={(e) => setBuscaFunc(e.target.value)}
-                      placeholder="Buscar funcionario por nombre o cédula..."
+                      placeholder="Buscar por nombre, cédula o ubicación..."
                       className="h-11 w-full rounded-xl border border-line bg-surface-2 pl-10 pr-3 text-[13px] font-medium outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15 placeholder:text-content-3 dark:bg-surface-2"
                     />
                   </div>
                   <div className="max-h-[52vh] overflow-y-auto custom-scrollbar rounded-2xl border border-line divide-y divide-line/60 dark:divide-white/5">
                     {funcsFiltrados.slice(0, 60).map(f => (
-                      <div key={f.id} className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-surface-2/60">
+                      <div key={f.id} className="flex flex-wrap items-center gap-3 px-3.5 py-3 transition hover:bg-surface-2/60 sm:flex-nowrap">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-info-soft text-info font-black text-sm">
                           {(f.nombre || '?').charAt(0).toUpperCase()}
                         </span>
@@ -423,13 +420,15 @@ export default function DependenciasModal({
                           <span className="block text-[13px] font-bold text-content-1 dark:text-zinc-200 truncate" title={f.nombre}>{f.nombre}</span>
                           <span className="block text-[11px] text-content-3 truncate tabular-nums">CI {f.cedula || 'S/C'}{f.ubicacion ? ` · ${f.ubicacion}` : ' · Sin ubicación'}</span>
                         </span>
-                        <ComboUbicacion
-                          valor={f.ubicacion || ''}
-                          ubicaciones={ubicsDeSel}
-                          onElegir={(nombreUbic) => onAsignarFuncionario(f.id, nombreUbic)}
-                          titulo="Cambiar departamento"
-                          compacto
-                        />
+                        <div className="flex w-full flex-col gap-1 sm:w-[220px] sm:shrink-0">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-content-3">Departamento actual</span>
+                          <ComboUbicacion
+                            valor={f.ubicacion || ''}
+                            ubicaciones={ubicsDeSel}
+                            onElegir={(nombreUbic) => onAsignarFuncionario(f.id, nombreUbic)}
+                            titulo="Cambiar departamento"
+                          />
+                        </div>
                       </div>
                     ))}
                     {funcsFiltrados.length > 60 && (

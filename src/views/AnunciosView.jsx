@@ -18,6 +18,8 @@ export default function AnunciosView({
   const [destino, setDestino] = useState('TODOS');
   const [enviando, setEnviando] = useState(false);
   const [eliminando, setEliminando] = useState(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroAlcance, setFiltroAlcance] = useState('TODOS');
 
   const usuariosOrdenados = useMemo(
     () => [...usuariosList].sort((a, b) => String(a.nombre || a.username || '').localeCompare(String(b.nombre || b.username || ''), 'es')),
@@ -53,6 +55,11 @@ export default function AnunciosView({
   const totalEnviados = anunciosGrupos.length;
   const totalLeidos = anunciosGrupos.reduce((s, a) => s + (a.leidos || 0), 0);
   const totalDestinatarios = anunciosGrupos.reduce((s, a) => s + (a.total || 0), 0);
+  const anunciosFiltrados = useMemo(() => anunciosGrupos.filter(a => {
+    const coincideTexto = !busqueda.trim() || `${a.titulo || ''} ${a.mensaje || ''} ${a.alcance || ''}`.toLocaleLowerCase('es').includes(busqueda.trim().toLocaleLowerCase('es'));
+    const coincideAlcance = filtroAlcance === 'TODOS' || (filtroAlcance === 'masivo' ? a.alcance === 'TODOS' : a.alcance !== 'TODOS');
+    return coincideTexto && coincideAlcance;
+  }), [anunciosGrupos, busqueda, filtroAlcance]);
 
   return (
     <div className="space-y-6 pb-12 font-sans">
@@ -145,20 +152,26 @@ export default function AnunciosView({
       {/* Historial con tarjetas elegantes */}
       <div className="bg-surface-1 dark:bg-surface-1 border border-line/70 dark:border-line rounded-panel shadow-sm overflow-hidden">
         <div className="px-5 sm:px-6 py-4 border-b border-line/50 dark:border-line/50">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Historial de anuncios</h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div><h3 className="text-sm font-semibold text-content-1 dark:text-white">Historial de anuncios</h3><p className="mt-1 text-xs text-content-3">{anunciosFiltrados.length} de {totalEnviados} comunicados</p></div>
+            <div className="flex flex-wrap gap-2">
+              <label className="relative"><span className="sr-only">Buscar anuncios</span><i className="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true"/><input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar título o contenido" className="h-9 w-56 rounded-control border border-line bg-surface-1 pl-9 pr-3 text-xs text-content-1 outline-none focus:ring-2 focus:ring-brand"/></label>
+              <select value={filtroAlcance} onChange={e => setFiltroAlcance(e.target.value)} aria-label="Filtrar anuncios por destinatarios" className="h-9 rounded-control border border-line bg-surface-1 px-3 text-xs text-content-1 focus:ring-2 focus:ring-brand"><option value="TODOS">Todos los alcances</option><option value="masivo">Enviados a todos</option><option value="especifico">Destinatario específico</option></select>
+            </div>
+          </div>
         </div>
         {isLoadingHistorial ? (
           <div className="p-10 text-center" role="status"><i className="fa-solid fa-circle-notch fa-spin text-brand" aria-hidden="true" /><p className="mt-3 text-sm font-semibold text-content-3">Cargando historial completo…</p></div>
-        ) : anunciosGrupos.length === 0 ? (
+        ) : anunciosFiltrados.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-inner shadow-zinc-200/50 dark:shadow-darkbg-main/50">
               <i className="fa-solid fa-bullhorn text-2xl"></i>
             </div>
-            <p className="text-sm font-semibold text-content-3">Aún no has enviado anuncios.</p>
+            <p className="text-sm font-semibold text-content-3">{anunciosGrupos.length ? 'No hay anuncios que coincidan con la búsqueda.' : 'Aún no has enviado anuncios.'}</p>
           </div>
         ) : (
           <ul className="divide-y divide-zinc-100/50 dark:divide-darkbg-border/30">
-            {anunciosGrupos.map(a => (
+            {anunciosFiltrados.map(a => (
               <li key={a.grupo} className="px-5 sm:px-6 py-5 flex items-start gap-4 group hover:bg-surface-2/50 dark:hover:bg-surface-1/[0.02] transition-colors border-b border-zinc-50 dark:border-line/30 last:border-0">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/5 text-content-2 dark:text-content-3 flex-shrink-0 shadow-inner">
                   <i className="fa-solid fa-bullhorn text-sm"></i>
@@ -173,7 +186,7 @@ export default function AnunciosView({
                       {a.leidos}/{a.total} leídos
                     </span>
                   </div>
-                  <p className="text-[13px] text-content-2 dark:text-content-3 mt-1 whitespace-pre-wrap break-words line-clamp-2">{a.mensaje}</p>
+                  <p className="text-[13px] text-content-2 dark:text-content-3 mt-1 whitespace-pre-wrap break-words">{a.mensaje}</p>
                   <p className="text-[11px] text-content-3 mt-2.5 tabular-nums flex items-center gap-1.5">
                     <i className="fa-regular fa-clock text-[10px]"></i>
                     {formatearFecha(a.fecha)}

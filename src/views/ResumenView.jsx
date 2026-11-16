@@ -4,7 +4,7 @@ import { Card, PageHeader, StatTile, KpiGrid, Button } from '../components/ui';
 
 // Resumen de solo lectura, con accesos contextuales a las tareas pendientes.
 export default function ResumenView({
-  dependenciaActual, stats = {}, pendientes = [], fc10List = [], timeStats = {},
+  dependenciaActual, stats = {}, pendientes = [], fc10List = [], timeStats = {}, solicitudesBaja = [], currentUser,
   setActiveTab, setFiltroQR, setFiltroFC10, setFiltroPendiente, setCurrentPage,
   clearAllFilters, setFc10Year, setFc10Month
 }) {
@@ -13,6 +13,14 @@ export default function ResumenView({
     .slice()
     .sort((a, b) => String(b.entregadoFecha || b.fechaGeneracion || '').localeCompare(String(a.entregadoFecha || a.fechaGeneracion || '')))
     .slice(0, 5), [fc10List, dependenciaActual]);
+
+  const misSolicitudesBaja = useMemo(() => {
+    const usuario = String(currentUser?.username || currentUser?.id || '').trim().toLocaleLowerCase('es');
+    if (!usuario) return [];
+    return (solicitudesBaja || [])
+      .filter(s => String(s.solicitante || '').trim().toLocaleLowerCase('es') === usuario)
+      .sort((a, b) => String(b.created_at || b.fecha || '').localeCompare(String(a.created_at || a.fecha || '')));
+  }, [solicitudesBaja, currentUser]);
 
   const irInventario = (preparar) => {
     clearAllFilters?.();
@@ -48,6 +56,52 @@ export default function ResumenView({
         <StatTile etiqueta="Pendientes de QR" valor={stats.withoutQR || 0} icono="fa-qrcode" tono="warn" animado onClick={() => irInventario(() => setFiltroQR?.('NO'))} />
         <StatTile etiqueta="Sin acta FC-10" valor={stats.withoutFc10 || 0} icono="fa-file-signature" tono="warn" animado onClick={() => irInventario(() => setFiltroFC10?.('NO'))} />
       </KpiGrid>
+
+      <Card tamaño="sm" className="overflow-hidden p-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
+          <div>
+            <h2 className="text-sm font-bold text-content-1"><i className="fa-solid fa-file-circle-check mr-2 text-brand-text" aria-hidden="true" />Seguimiento de mis solicitudes de baja</h2>
+            <p className="mt-1 text-xs text-content-3">Consulta aquí los cambios de estado y observaciones de la gestión administrativa.</p>
+          </div>
+          <span className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-semibold text-content-2">{misSolicitudesBaja.length} solicitudes</span>
+        </div>
+        {misSolicitudesBaja.length === 0 ? (
+          <p className="px-5 py-6 text-center text-xs text-content-3 sm:px-6">Todavía no tienes solicitudes de baja registradas.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {misSolicitudesBaja.map(solicitud => {
+              const historial = Array.isArray(solicitud.historial) && solicitud.historial.length
+                ? solicitud.historial
+                : [{ estado: solicitud.estado || 'PENDIENTE', usuario: solicitud.solicitante, fecha: solicitud.created_at || solicitud.fecha, motivo: solicitud.motivo }];
+              const ultimo = historial[historial.length - 1] || {};
+              const estado = String(solicitud.estado || ultimo.estado || 'PENDIENTE').toUpperCase();
+              const estadoTexto = ({ PENDIENTE: 'Recibida', EN_REVISION: 'En revisión', APROBADO: 'Aprobada', RECHAZADO: 'Rechazada', RESUELTO: 'Resuelta' })[estado] || estado.replaceAll('_', ' ');
+              const esFinal = ['APROBADO', 'RECHAZADO', 'RESUELTO'].includes(estado);
+              return (
+                <li key={solicitud.id} className="px-5 py-4 sm:px-6">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-content-1">{solicitud.tipo === 'BAJA_FUNCIONARIO' ? 'Solicitud de baja de funcionario' : 'Solicitud de baja de bien'}{solicitud.rotulo ? ` · Rótulo ${solicitud.rotulo}` : ''}</p>
+                      <p className="mt-1 text-xs text-content-2">{solicitud.descripcion || solicitud.funcionario || solicitud.motivo || 'Sin detalle adicional'}</p>
+                    </div>
+                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${estado === 'RECHAZADO' ? 'border-danger/20 bg-danger-soft text-danger' : esFinal ? 'border-ok/20 bg-ok-soft text-ok' : 'border-warn/20 bg-warn-soft text-warn'}`}>{estadoTexto}</span>
+                  </div>
+                  <ol className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {historial.map((evento, indice) => (
+                      <li key={`${solicitud.id}-${indice}`} className="relative rounded-control border border-line bg-surface-2 p-3">
+                        <p className="text-xs font-bold text-content-1">{({ PENDIENTE: 'Solicitud enviada', EN_REVISION: 'En revisión', APROBADO: 'Aprobada', RECHAZADO: 'Rechazada', RESUELTO: 'Resuelta' })[String(evento.estado || '').toUpperCase()] || String(evento.estado || 'Actualización').replaceAll('_', ' ')}</p>
+                        <p className="mt-1 text-[10px] text-content-3">{evento.fecha ? formatDateText(evento.fecha) : 'Fecha no registrada'}{evento.usuario ? ` · ${evento.usuario}` : ''}</p>
+                        {evento.motivo && <p className="mt-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-content-2">{evento.motivo}</p>}
+                      </li>
+                    ))}
+                  </ol>
+                  {!esFinal && <p className="mt-3 text-[10px] text-content-3">El trámite sigue en gestión. La aprobación de la solicitud no da de baja el bien del inventario; ese proceso requiere un expediente administrativo separado.</p>}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card tamaño="sm" className="p-5 sm:p-6 shadow-sm">

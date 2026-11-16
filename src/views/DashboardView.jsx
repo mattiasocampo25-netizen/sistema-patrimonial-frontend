@@ -130,12 +130,6 @@ export default function DashboardView({
     .sort((a, b) => (a.pendiente.orden - b.pendiente.orden)
       || String(a.fc.entregadoFecha || '').localeCompare(String(b.fc.entregadoFecha || ''))), [fc10List, bienes]);
 
-  const bienesSinFuncionario = Number((pendientes || []).find(p => p.id === 'sinFuncionario')?.count) || 0;
-  const bienesVinculadosFuncionario = Math.max(0, (Number(stats?.totalItems) || 0) - bienesSinFuncionario);
-  const porcentajeVinculadoFuncionario = stats?.totalItems
-    ? (bienesVinculadosFuncionario / stats.totalItems) * 100
-    : 0;
-
   const irInventario = (aplicar) => {
     clearAllFilters();
     if (aplicar) aplicar();
@@ -244,32 +238,38 @@ export default function DashboardView({
     [resumenDependencias]
   );
   const resumenActual = tilesPorDependencia.find(t => t.dep === dependenciaActual);
+  // El RPC y la tarjeta de desglose comparten el mismo conteo; no estimar el
+  // avance restando pendientes, porque eso incluye solo responsables vacíos y
+  // no los valores de inventario que significan “libre/sin asignar”.
+  const bienesVinculadosFuncionario = Number(resumenActual?.asignados) || 0;
+  const totalBienesDashboard = Number(resumenActual?.total) || Number(stats?.totalItems) || 0;
+  const porcentajeVinculadoFuncionario = totalBienesDashboard
+    ? (bienesVinculadosFuncionario / totalBienesDashboard) * 100
+    : 0;
 
   return (
     <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-5 pb-16 sm:space-y-6">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card relative isolate overflow-hidden border-0 bg-gradient-to-br from-[#0c1e38] via-[#123e67] to-[#136d7d] p-0 text-white shadow-[0_28px_70px_-42px_rgba(9,35,66,.85)]">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-32 h-80 w-80 rounded-full border border-white/10 bg-white/[0.035]" />
-        <div aria-hidden="true" className="pointer-events-none absolute bottom-[-170px] right-[24%] h-80 w-80 rounded-full border border-white/[0.08]" />
-        <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
+      <Card className="dashboard-welcome-card relative overflow-visible border border-line bg-surface-1 p-0 text-content-1 shadow-card">
+        <div className="grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
           <div className="flex min-w-0 items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-lg font-black text-white shadow-sm ring-4 ring-white/5 sm:h-14 sm:w-14 sm:text-xl">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand/20 bg-brand-soft text-lg font-black text-brand-text sm:h-14 sm:w-14 sm:text-xl">
               {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-cyan-100/75 sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-white/35">/</span> {dependenciaActual}</p>
-              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
-              <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-200 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención. La asignación se calcula desde el responsable del bien, por separado del FC-10.</p>
+              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-content-3 sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-content-3">/</span> {dependenciaActual}</p>
+              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-content-1 sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
+              <p className="mt-2 max-w-xl text-xs leading-relaxed text-content-2 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención.</p>
               <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,.16)]' : 'bg-amber-300 shadow-[0_0_0_3px_rgba(252,211,77,.16)]'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className="fa-solid fa-boxes-stacked text-cyan-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[10px] font-bold text-content-2"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[10px] font-bold text-content-2"><i className="fa-solid fa-boxes-stacked text-brand-text" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
                 <div className="relative">
                   <button
                     ref={widgetButtonRef}
                     onClick={() => setMenuWidgets(v => !v)}
                     title="Personalizar panel" aria-label="Personalizar panel"
-                    className="flex h-9 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 text-[11px] font-bold text-white shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                    className="flex h-9 items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 shadow-sm transition hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     <i className="fa-solid fa-sliders text-xs" aria-hidden="true"></i><span>Personalizar</span>
                   </button>
@@ -297,15 +297,15 @@ export default function DashboardView({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/15 bg-slate-950/20 p-3 shadow-inner backdrop-blur-sm sm:gap-3 sm:p-4">
+          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-line bg-surface-2 p-3 sm:gap-3 sm:p-4">
             <div className="col-span-2 flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-cyan-100/70">Avance de asignación</p><p className="mt-1 text-[10px] text-slate-200">Responsable registrado en Inventario</p></div>
-              <span className="text-2xl font-black tabular-nums text-white sm:text-3xl">{resumenActual?.pctAsignados == null ? '—' : `${Math.round(resumenActual.pctAsignados)}%`}</span>
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-content-3">Asignación a funcionarios</p><p className="mt-1 text-[10px] text-content-2">Basada en el responsable del bien; independiente del FC-10</p></div>
+              <span className="text-2xl font-black tabular-nums text-content-1 sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
             </div>
-            <div className="rounded-xl bg-white/[0.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/65">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : resumenActual.asignados.toLocaleString('es-PY')}</p></div>
-            <div className="rounded-xl bg-white/[0.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/65">Pendientes</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, resumenActual.total - resumenActual.asignados).toLocaleString('es-PY')}</p></div>
-            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-black/20" role={resumenActual?.pctAsignados == null ? undefined : 'progressbar'} aria-label="Avance de bienes con responsable" aria-valuemin={resumenActual?.pctAsignados == null ? undefined : 0} aria-valuemax={resumenActual?.pctAsignados == null ? undefined : 100} aria-valuenow={resumenActual?.pctAsignados == null ? undefined : Math.round(resumenActual.pctAsignados)}><span className="block h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300 transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, resumenActual?.pctAsignados || 0))}%` }} /></div>
-            <p className="col-span-2 text-[9px] leading-relaxed text-slate-300">Este avance no depende de las firmas ni de la existencia de un FC-10.</p>
+            <div className="rounded-xl border border-line bg-surface-1 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-content-3">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-content-1">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
+            <div className="rounded-xl border border-line bg-surface-1 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-content-3">Sin responsable</p><p className="mt-1 text-lg font-black tabular-nums text-content-1">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
+            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-surface-3" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-brand transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
+            <p className="col-span-2 text-[9px] leading-relaxed text-content-3">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
           </div>
         </div>
 
@@ -534,20 +534,6 @@ export default function DashboardView({
               </div>
               <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
                 <div className="h-full bg-emerald-500 rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <p className="text-xs font-bold text-content-1 dark:text-white uppercase tracking-wider">Asignación a funcionarios</p>
-                  <p className="text-[11px] text-content-3 font-medium mt-1">{bienesVinculadosFuncionario.toLocaleString('es-PY')} de {Number(stats.totalItems || 0).toLocaleString('es-PY')} bienes activos vinculados a funcionario</p>
-                  <p className="text-[10px] text-content-3 mt-0.5">Basado en el responsable del inventario; independiente del FC-10.</p>
-                </div>
-                <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{porcentajeVinculadoFuncionario.toFixed(1)}%</span>
-              </div>
-              <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-info rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-info/40" style={{ width: `${Math.max(1.5, porcentajeVinculadoFuncionario)}%` }}></div>
               </div>
             </div>
 

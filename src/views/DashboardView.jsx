@@ -252,7 +252,7 @@ export default function DashboardView({
       <Card className="dashboard-welcome-card relative isolate overflow-hidden border-0 bg-gradient-to-br from-[#0c1e38] via-[#123e67] to-[#136d7d] p-0 text-white shadow-[0_28px_70px_-42px_rgba(9,35,66,.85)]">
         <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-32 h-80 w-80 rounded-full border border-white/10 bg-white/[0.035]" />
         <div aria-hidden="true" className="pointer-events-none absolute bottom-[-170px] right-[24%] h-80 w-80 rounded-full border border-white/[0.08]" />
-        <div className="relative grid gap-6 p-5 pt-16 sm:p-7 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
+        <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
           <div className="flex min-w-0 items-start gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-lg font-black text-white shadow-sm ring-4 ring-white/5 sm:h-14 sm:w-14 sm:text-xl">
               {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
@@ -264,6 +264,35 @@ export default function DashboardView({
               <div className="mt-5 flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,.16)]' : 'bg-amber-300 shadow-[0_0_0_3px_rgba(252,211,77,.16)]'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className="fa-solid fa-boxes-stacked text-cyan-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
+                <div className="relative">
+                  <button
+                    ref={widgetButtonRef}
+                    onClick={() => setMenuWidgets(v => !v)}
+                    title="Personalizar panel" aria-label="Personalizar panel"
+                    className="flex h-9 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 text-[11px] font-bold text-white shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                  >
+                    <i className="fa-solid fa-sliders text-xs" aria-hidden="true"></i><span>Personalizar</span>
+                  </button>
+                  {menuWidgets && widgetMenuStyle && createPortal(
+                    <>
+                      <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)}></button>
+                      <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
+                        <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
+                        {WIDGETS_DASHBOARD.map(([k, label]) => (
+                          <button
+                            key={k} onClick={() => alternarWidget(k)}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                          >
+                            <span className={'flex h-4 w-4 items-center justify-center rounded border' + (widgets[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
+                              <i className="fa-solid fa-check text-[9px]"></i>
+                            </span>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </>, document.body
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -280,37 +309,6 @@ export default function DashboardView({
           </div>
         </div>
 
-        <div className="absolute right-5 top-5 flex items-center gap-2 sm:right-7 sm:top-7">
-          <div className="relative">
-            <button
-              ref={widgetButtonRef}
-              onClick={() => setMenuWidgets(v => !v)}
-              title="Personalizar panel" aria-label="Personalizar panel"
-              className="flex h-10 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 text-[12px] font-bold text-white shadow-sm transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-            >
-              <i className="fa-solid fa-sliders text-xs"></i> <span className="hidden sm:inline">Personalizar</span>
-            </button>
-            {menuWidgets && widgetMenuStyle && createPortal(
-              <>
-                <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)}></button>
-                <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
-                  <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
-                  {WIDGETS_DASHBOARD.map(([k, label]) => (
-                    <button
-                      key={k} onClick={() => alternarWidget(k)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                    >
-                      <span className={'flex h-4 w-4 items-center justify-center rounded border' + (widgets[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
-                        <i className="fa-solid fa-check text-[9px]"></i>
-                      </span>
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </>, document.body
-            )}
-          </div>
-        </div>
       </Card>
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES (simétricas, un solo sistema de tonos) */}

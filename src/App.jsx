@@ -622,15 +622,17 @@ export default function App() {
     const onKey = (e) => {
       if (!e || typeof e.key !== 'string') return;
       const k = e.key.toLowerCase();
+      const t = e.target;
+      const escribiendo = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
       if ((e.ctrlKey || e.metaKey) && k === 'k') {
+        if (escribiendo) return;
         e.preventDefault();
         setCmdOpen(v => !v);
         return;
       }
       if (e.key === 'Escape') { ultimaTeclaG.current = 0; return; }
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const t = e.target;
-      const escribiendo = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);
+      if (escribiendo || t?.closest?.('[role="dialog"], .modalOverlay')) { ultimaTeclaG.current = 0; return; }
       if (e.key === '/' && !escribiendo) {
         if (activeTab !== 'inventario' || cmdOpen) return;
         e.preventDefault();
@@ -654,7 +656,7 @@ export default function App() {
         return;
       }
       // Secuencias g+letra para navegar (con ventana de 800ms)
-      if (escribiendo || cmdOpen) return;
+      if (cmdOpen) return;
       const ahora = Date.now();
       if (k === 'g') { ultimaTeclaG.current = ahora; return; }
       if (ahora - ultimaTeclaG.current < 800 && TABS_ATAJO[k]) {

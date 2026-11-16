@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, Chip, ChipGroup, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
+import { Card, Chip, ChipGroup, EmptyState, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 import { descargarInformeSolicitudBaja } from '../utils/informeBaja';
 import useScopedPreference from '../hooks/useScopedPreference';
 
@@ -58,6 +58,8 @@ export default function AprobacionesView({
     },
     { PENDIENTE: 0, APROBADO: 0, RECHAZADO: 0, EN_REVISION: 0 }
   );
+  const solicitudesAbiertas = conteo.PENDIENTE + conteo.EN_REVISION;
+  const sinResponsable = solicitudesBaja.filter(n => !['APROBADO', 'RECHAZADO'].includes(n.estado) && !String(n.responsable || '').trim()).length;
 
   const listaFiltrada = solicitudesBaja.filter(n => {
     const estadoOK = filtroEstado === 'todos' || (n.estado || 'PENDIENTE') === filtroEstado;
@@ -112,16 +114,25 @@ export default function AprobacionesView({
     <div className="flex flex-col flex-1 space-y-6">
       <Card className="p-0">
         <div className="p-5 sm:p-6">
-          <PageHeader
-            titulo={'Centro de Aprobaciones'}
-            descripcion={<>Gestión y seguimiento de solicitudes de baja en <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong>. Su aprobación no da de baja automáticamente el bien.</>}
-            icono="fa-check-to-slot"
-            contador={(
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
-                {conteo.PENDIENTE} pendientes
-              </span>
-            )}
-          />
+          <section className="relative isolate overflow-hidden rounded-[26px] bg-gradient-to-br from-slate-950 via-[#123a60] to-[#176475] p-5 text-white shadow-[0_22px_60px_-38px_rgba(15,45,75,.75)] sm:p-7">
+            <div aria-hidden="true" className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full border border-white/10 bg-white/[0.035]" />
+            <div className="relative flex flex-wrap items-start justify-between gap-4">
+              <div className="max-w-3xl">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-cyan-100"><i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Trámite y seguimiento · {dependenciaActual}</span>
+                <h1 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">Centro de Aprobaciones</h1>
+                <p className="mt-2 max-w-2xl text-xs leading-relaxed text-slate-200 sm:text-sm">Revisa quién solicitó cada trámite, asigna su seguimiento y registra una decisión con motivo e historial.</p>
+              </div>
+              <div className="grid min-w-[230px] grid-cols-2 gap-2 rounded-2xl border border-white/15 bg-slate-950/20 p-3 sm:p-4">
+                <div className="rounded-xl bg-white/[.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/70">Abiertas</p><p className="mt-1 text-2xl font-black tabular-nums">{solicitudesAbiertas.toLocaleString('es-PY')}</p></div>
+                <div className="rounded-xl bg-white/[.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/70">Sin responsable</p><p className="mt-1 text-2xl font-black tabular-nums">{sinResponsable.toLocaleString('es-PY')}</p></div>
+              </div>
+            </div>
+            <div className="relative mt-5 grid gap-2 border-t border-white/10 pt-4 text-[10px] font-bold sm:grid-cols-3 sm:text-xs">
+              <span className="inline-flex items-center gap-2 text-white"><i className="fa-solid fa-inbox text-cyan-200" aria-hidden="true" />1. Recibir solicitud</span>
+              <span className="inline-flex items-center gap-2 text-white"><i className="fa-solid fa-magnifying-glass text-cyan-200" aria-hidden="true" />2. Revisar y asignar responsable</span>
+              <span className="inline-flex items-center gap-2 text-white"><i className="fa-solid fa-circle-check text-emerald-200" aria-hidden="true" />3. Resolver y dejar constancia</span>
+            </div>
+          </section>
           <Toolbar className="mt-4">
           <div className="flex flex-wrap items-center gap-1.5 -mb-1">
             <ChipGroup>
@@ -138,6 +149,7 @@ export default function AprobacionesView({
             </ChipGroup>
           </div>
           </Toolbar>
+          <p className="mt-3 flex items-start gap-2 rounded-xl border border-amber-500/20 bg-amber-500/[.07] px-3.5 py-3 text-[11px] leading-relaxed text-content-2"><i className="fa-solid fa-circle-info mt-0.5 shrink-0 text-amber-600" aria-hidden="true" /><span><strong>Alcance de la aprobación:</strong> aprobar una solicitud de baja de un bien habilita la continuación del trámite administrativo; no cambia su estado patrimonial ni lo elimina del inventario. La baja requiere su procedimiento independiente.</span></p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <label className="sr-only" htmlFor="aprobaciones-bandeja">Bandeja de solicitudes</label>
             <select id="aprobaciones-bandeja" value={bandeja} onChange={e => setBandeja(e.target.value)} className="h-9 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-1"><option value="todos">Todas las solicitudes</option><option value="mis_pendientes">Mis pendientes / sin asignar</option><option value="sin_asignar">Pendientes sin responsable</option></select>
@@ -295,9 +307,9 @@ export default function AprobacionesView({
                           <button
                             type="button"
                             onClick={() => openResolucionModal(bienAsociado, 'aprobar', notif)}
-                            className="px-4 h-10 rounded-control text-[13px] font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                            className="px-4 h-10 rounded-control text-[13px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none"
                           >
-                            {esSolicitudFuncionario ? 'Aprobar Eliminación' : 'Aprobar solicitud'}
+                            {esSolicitudFuncionario ? 'Aprobar Eliminación' : 'Aprobar trámite'}
                           </button>
                         </div>
                       )}

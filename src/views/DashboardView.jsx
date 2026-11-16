@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
-import { Card, Tile, StatTile, KpiGrid } from '../components/ui';
+import { Card, StatTile, KpiGrid } from '../components/ui';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 import useScopedPreference from '../hooks/useScopedPreference';
@@ -116,7 +116,7 @@ function AgendaPatrimonial({ bienes, fc10List, dependenciaActual, onAbrirBien, o
 
 // Vista del panel principal (extraída de App.jsx, Fase 5).
 export default function DashboardView({
-  currentUser, dependenciaActual, saludoBienvenida, stats, pendientes, isLoading,
+  currentUser, isOnline = true, dependenciaActual, saludoBienvenida, stats, pendientes, isLoading,
   timeStats, clearAllFilters, setActiveTab,
   setFiltroQR, setFiltroFC10, setFiltroPendiente, setFiltroAnio, setCurrentPage,
   setBienEditing, setIsBienModalOpen, fileInputRef, handleExportInventarioCSV,
@@ -236,33 +236,51 @@ export default function DashboardView({
         indice: i,
         total: Number(r.total) || 0,
         buenos: Number(r.buenos) || 0,
+        asignados: r.asignados == null ? null : Number(r.asignados) || 0,
+        pctAsignados: r.asignados == null || !Number(r.total) ? null : (Number(r.asignados) / Number(r.total)) * 100,
         pctBueno: Number(r.total) ? (Number(r.buenos) / Number(r.total)) * 100 : 0,
         logo: getLogoPorDependencia(r.dependencia, 'webp')
       })),
     [resumenDependencias]
   );
+  const resumenActual = tilesPorDependencia.find(t => t.dep === dependenciaActual);
 
   return (
-    <div className="dashboard-stagger space-y-6 sm:space-y-7 pb-16">
+    <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-5 pb-16 sm:space-y-6">
 
       {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card overflow-hidden border-0 bg-gradient-to-br from-[#123149] via-[#14566a] to-[#147a7e] p-0 text-white shadow-panel">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 sm:p-6">
-        <div className="flex items-center gap-4 min-w-0">
-          <div className="flex h-13 w-13 sm:h-15 sm:w-15 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-xl font-extrabold text-white shadow-sm ring-4 ring-white/5 sm:text-2xl">
-            {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
+      <Card className="dashboard-welcome-card relative isolate overflow-hidden border-0 bg-gradient-to-br from-[#0c1e38] via-[#123e67] to-[#136d7d] p-0 text-white shadow-[0_28px_70px_-42px_rgba(9,35,66,.85)]">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-32 h-80 w-80 rounded-full border border-white/10 bg-white/[0.035]" />
+        <div aria-hidden="true" className="pointer-events-none absolute bottom-[-170px] right-[24%] h-80 w-80 rounded-full border border-white/[0.08]" />
+        <div className="relative grid gap-6 p-5 pt-16 sm:p-7 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(280px,.72fr)] lg:items-center lg:p-8">
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-lg font-black text-white shadow-sm ring-4 ring-white/5 sm:h-14 sm:w-14 sm:text-xl">
+              {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-cyan-100/75 sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-white/35">/</span> {dependenciaActual}</p>
+              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
+              <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-200 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención. La asignación se calcula desde el responsable del bien, por separado del FC-10.</p>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-400 shadow-[0_0_0_3px_rgba(52,211,153,.16)]' : 'bg-amber-300 shadow-[0_0_0_3px_rgba(252,211,77,.16)]'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white"><i className="fa-solid fa-boxes-stacked text-cyan-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
+              </div>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-teal-100/80 sm:text-[11px]">
-              Gestión patrimonial · {dependenciaActual}
-            </p>
-            <h3 className="mt-1 truncate font-display text-xl font-extrabold tracking-tight text-white sm:text-3xl">
-              {saludoBienvenida}, {currentUser?.nombre || 'Usuario'}!
-            </h3>
+
+          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/15 bg-slate-950/20 p-3 shadow-inner backdrop-blur-sm sm:gap-3 sm:p-4">
+            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-cyan-100/70">Avance de asignación</p><p className="mt-1 text-[10px] text-slate-200">Responsable registrado en Inventario</p></div>
+              <span className="text-2xl font-black tabular-nums text-white sm:text-3xl">{resumenActual?.pctAsignados == null ? '—' : `${Math.round(resumenActual.pctAsignados)}%`}</span>
+            </div>
+            <div className="rounded-xl bg-white/[0.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/65">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : resumenActual.asignados.toLocaleString('es-PY')}</p></div>
+            <div className="rounded-xl bg-white/[0.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/65">Pendientes</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, resumenActual.total - resumenActual.asignados).toLocaleString('es-PY')}</p></div>
+            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-black/20" role={resumenActual?.pctAsignados == null ? undefined : 'progressbar'} aria-label="Avance de bienes con responsable" aria-valuemin={resumenActual?.pctAsignados == null ? undefined : 0} aria-valuemax={resumenActual?.pctAsignados == null ? undefined : 100} aria-valuenow={resumenActual?.pctAsignados == null ? undefined : Math.round(resumenActual.pctAsignados)}><span className="block h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300 transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, resumenActual?.pctAsignados || 0))}%` }} /></div>
+            <p className="col-span-2 text-[9px] leading-relaxed text-slate-300">Este avance no depende de las firmas ni de la existencia de un FC-10.</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+        <div className="absolute right-5 top-5 flex items-center gap-2 sm:right-7 sm:top-7">
           <div className="relative">
             <button
               ref={widgetButtonRef}
@@ -292,18 +310,7 @@ export default function DashboardView({
               </>, document.body
             )}
           </div>
-          <div className="flex items-center gap-2.5 rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold leading-tight text-white">Sistema sincronizado</span>
-              <span className="text-[10px] font-medium leading-tight text-teal-100/75">Conexión activa</span>
-            </div>
-          </div>
         </div>
-      </div>
       </Card>
 
       {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES (simétricas, un solo sistema de tonos) */}
@@ -432,27 +439,25 @@ export default function DashboardView({
 
       {/* 2b. TILES POR DEPENDENCIA */}
       {widgets.metricas && tilesPorDependencia.length > 0 && (
-        <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+        <details open className="group overflow-hidden rounded-[26px] border border-line bg-surface-1 shadow-card">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
             <span className="flex items-center gap-2.5"><i className="fa-solid fa-building-columns text-brand-text"></i> Desglose por dependencia</span>
             <span className="flex items-center gap-2 text-[11px] font-semibold text-content-3"><span>{tilesPorDependencia.length} áreas</span><i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i></span>
           </summary>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 border-t border-line bg-surface-2/50 p-4">
+          <div className="grid grid-cols-1 gap-3 border-t border-line bg-surface-2/40 p-4 sm:grid-cols-2 xl:grid-cols-3 sm:p-5">
             {tilesPorDependencia.map((t) => (
-              <Tile
-                key={t.dep}
-                titulo={t.dep}
-                subtitulo={t.total.toLocaleString('es-PY') + ' bienes'}
-                estado={t.buenos + ' en buen estado'}
-                porcentaje={t.pctBueno}
-                indice={t.indice}
-                logo={t.logo}
-                onClick={
-                  requestDependenciaChange && t.dep !== dependenciaActual
-                    ? () => requestDependenciaChange(t.dep)
-                    : undefined
-                }
-              />
+              <button key={t.dep} type="button" disabled={!requestDependenciaChange || t.dep === dependenciaActual} onClick={() => requestDependenciaChange?.(t.dep)} className="group/dep min-w-0 rounded-2xl border border-line bg-surface-1 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-default disabled:hover:translate-y-0 disabled:hover:border-line disabled:hover:shadow-sm">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface-2 p-1.5">{t.logo ? <img src={t.logo} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" />}</span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-xs font-extrabold text-content-1">{t.dep}</span><span className="mt-0.5 block text-[10px] text-content-3">{t.total.toLocaleString('es-PY')} bienes en inventario</span></span>
+                  {t.dep !== dependenciaActual && requestDependenciaChange && <i className="fa-solid fa-arrow-up-right-from-square text-[10px] text-content-3 opacity-0 transition group-hover/dep:opacity-100" aria-hidden="true" />}
+                </div>
+                <div className="mt-4 flex items-end justify-between gap-2"><span className="text-[10px] font-bold uppercase tracking-wide text-content-3">Responsable en Inventario</span><span className="text-sm font-black tabular-nums text-content-1">{t.asignados == null ? '—' : `${t.asignados.toLocaleString('es-PY')} / ${t.total.toLocaleString('es-PY')}`}</span></div>
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-3" role={t.asignados == null ? undefined : 'progressbar'} aria-label={t.asignados == null ? undefined : `Bienes con responsable en ${t.dep}`} aria-valuemin={t.asignados == null ? undefined : 0} aria-valuemax={t.asignados == null ? undefined : 100} aria-valuenow={t.pctAsignados == null ? undefined : Math.round(t.pctAsignados)}>
+                  {t.pctAsignados != null && <span className="block h-full rounded-full bg-gradient-to-r from-brand to-emerald-500 transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, t.pctAsignados))}%` }} />}
+                </div>
+                <div className="mt-2 flex items-center justify-between text-[10px]"><span className="font-bold text-brand-text">{t.pctAsignados == null ? 'Avance no disponible' : `${Math.round(t.pctAsignados)}% con responsable`}</span><span className="text-content-3">{t.buenos.toLocaleString('es-PY')} en buen estado</span></div>
+              </button>
             ))}
           </div>
         </details>

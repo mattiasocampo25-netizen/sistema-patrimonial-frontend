@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
-import { Card, PageHeader, Button, StatTile } from '../components/ui';
+import { Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
-import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, resumenAccionAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -74,23 +74,31 @@ export default function AuditoriaView({
   }, []);
   return (
     <div className="flex flex-col flex-1 space-y-6 pb-12">
-      <Card className="p-5 sm:p-6">
-      <PageHeader
-        titulo="Auditoría"
-        descripcion="Consulta quién hizo cada cambio y compara los valores anteriores con los nuevos."
-        icono="fa-magnifying-glass-chart"
-        contador={<span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-2.5 py-1 text-[10px] font-bold text-violet-700 dark:text-violet-300">Solo administradores</span>}
-        acciones={<Button variante="secondary" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Actualizar historial">{isLoadingAud ? 'Actualizando…' : 'Actualizar'}</Button>}
-      />
-      </Card>
+      <section className="relative isolate overflow-hidden rounded-[28px] border border-slate-700/30 bg-gradient-to-br from-slate-950 via-[#123a60] to-[#165b73] px-5 py-6 text-white shadow-[0_22px_60px_-35px_rgba(15,45,75,.65)] sm:px-8 sm:py-8">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-white/10 bg-white/[0.04]" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-32 h-64 w-64 rounded-full border border-white/[0.08]" />
+        <div className="relative flex flex-wrap items-end justify-between gap-5">
+          <div className="max-w-3xl">
+            <div className="mb-3 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-100/75"><span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-cyan-100"><i className="fa-solid fa-shield-halved" aria-hidden="true" /></span>Control institucional · Solo administradores</div>
+            <h1 className="text-2xl font-black tracking-tight sm:text-3xl">Trazabilidad patrimonial</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200">Revisa cada acción, quién la realizó y cómo cambió cada dato. Las alertas de calidad ayudan a localizar inconsistencias antes de corregirlas.</p>
+          </div>
+          <Button variante="secondary" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Actualizar historial" className="relative border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/15 hover:text-white">{isLoadingAud ? 'Actualizando…' : 'Actualizar datos'}</Button>
+        </div>
+        <div className="relative mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 pt-4 text-[11px] font-medium text-slate-200">
+          <span><i className="fa-solid fa-clock-rotate-left mr-2 text-cyan-200" aria-hidden="true" />Historial con filtros por fecha, usuario y cambio</span>
+          <span><i className="fa-solid fa-code-compare mr-2 text-emerald-200" aria-hidden="true" />Comparación anterior y actual</span>
+          <span><i className="fa-solid fa-lock mr-2 text-cyan-200" aria-hidden="true" />Consulta administrativa protegida</span>
+        </div>
+      </section>
 
-      <nav className="grid grid-cols-3 gap-2 rounded-2xl border border-line bg-surface-1 p-2 shadow-sm" role="tablist" aria-label="Secciones de auditoría">
+      <nav className="grid grid-cols-1 gap-2 rounded-[22px] border border-line bg-surface-1 p-2 shadow-sm sm:grid-cols-3" role="tablist" aria-label="Secciones de auditoría">
         {[
           { id: 'actividad', titulo: 'Actividad', descripcion: 'Historial de cambios', icono: 'fa-clock-rotate-left' },
           { id: 'calidad', titulo: 'Calidad de datos', descripcion: 'Alertas y recursos', icono: 'fa-shield-halved' },
           { id: 'conteo', titulo: 'Verificación física', descripcion: 'Conteo y muestreo', icono: 'fa-clipboard-check' },
         ].map(tab => (
-          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`flex min-h-[66px] items-center gap-2 rounded-xl px-2.5 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-sm dark:bg-white dark:text-slate-950' : 'text-content-2 hover:bg-surface-2'}`}>
+          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`flex min-h-[66px] items-center gap-2 rounded-2xl px-3 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-md dark:bg-white dark:text-slate-950' : 'border border-transparent text-content-2 hover:border-line hover:bg-surface-2'}`}>
             <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:flex ${seccionAuditoria === tab.id ? 'bg-white/15 dark:bg-slate-900/10' : 'bg-brand-soft text-brand-text'}`}><i className={`fa-solid ${tab.icono}`} aria-hidden="true" /></span>
             <span className="min-w-0"><span className="block truncate text-xs font-bold sm:text-sm">{tab.titulo}</span><span className={`mt-0.5 hidden truncate text-[10px] sm:block ${seccionAuditoria === tab.id ? 'text-white/70 dark:text-slate-600' : 'text-content-3'}`}>{tab.descripcion}</span></span>
           </button>
@@ -105,7 +113,7 @@ export default function AuditoriaView({
         <StatTile etiqueta="Bajas y eliminaciones" valor={kpisAud.bajas} icono="fa-flag" tono="danger" animado />
       </div>
 
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
+      <div className="overflow-hidden rounded-[26px] border border-line/70 bg-surface-1 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-chart-line text-ok"></i> Evolución del valor patrimonial
@@ -140,7 +148,7 @@ export default function AuditoriaView({
           <div><h2 className="text-sm font-extrabold text-content-1">Revisión de integridad del inventario</h2><p className="mt-1 max-w-3xl text-xs leading-relaxed text-content-3">Revisión de solo lectura. Las alertas no modifican datos y algunas pueden ser válidas; abre cada grupo y verifica los registros antes de corregirlos.</p></div>
           <Button variante="secondary" tamano="sm" icono="fa-file-csv" onClick={descargarInformeSalud}>Descargar informe</Button>
         </div>
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 p-5 sm:p-6 shadow-sm">
+      <div className="overflow-hidden rounded-[26px] border border-line/70 bg-surface-1 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-1">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-heart-pulse text-danger"></i> Salud de datos
@@ -361,14 +369,14 @@ export default function AuditoriaView({
       </>}
 
       {seccionAuditoria === 'actividad' &&
-      <div className="bg-surface-1 dark:bg-surface-1/[0.04] rounded-panel border border-line/70 dark:border-white/10 shadow-sm overflow-hidden">
-        <div className="border-b border-line p-4 sm:p-5">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="overflow-hidden rounded-[28px] border border-line/70 bg-surface-1 shadow-[0_18px_55px_-40px_rgba(20,35,55,.5)]">
+        <div className="border-b border-line bg-gradient-to-b from-surface-2/70 to-surface-1 p-4 sm:p-6">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="mr-auto">
-              <h2 className="flex items-center gap-2 text-base font-black text-content-1"><i className="fa-solid fa-clock-rotate-left text-brand-text" aria-hidden="true" />Historial de actividad</h2>
-              <p className="mt-1 text-xs text-content-3">Cada registro muestra quién hizo el cambio y qué dato pasó de antes a después.</p>
+              <h2 className="flex items-center gap-2 text-base font-black text-content-1"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-clock-rotate-left" aria-hidden="true" /></span>Historial de actividad</h2>
+              <p className="mt-1 text-xs text-content-3">Busca un movimiento y revisa el dato anterior junto al valor nuevo.</p>
             </div>
-            <span className="w-fit rounded-full bg-surface-2 px-3 py-1.5 text-xs font-bold tabular-nums text-content-2">{totalAud.toLocaleString('es-PY')} eventos</span>
+            <span className="w-fit rounded-full border border-line bg-surface-1 px-3 py-1.5 text-xs font-bold tabular-nums text-content-2"><i className="fa-solid fa-list-check mr-1.5 text-brand-text" aria-hidden="true" />{totalAud.toLocaleString('es-PY')} eventos</span>
             <div className="flex rounded-xl border border-line bg-surface-2 p-1" role="group" aria-label="Alcance de los registros">
               {[
                 { id: 'dep', label: 'Esta dependencia' },
@@ -406,32 +414,33 @@ export default function AuditoriaView({
             </div>
           </div>
         </div>
-        <div className="space-y-3 p-3 sm:p-5">
+        <div className="space-y-5 bg-surface-2/35 p-3 sm:p-6">
           {isLoadingAud ? (
             <div role="status" className="rounded-2xl border border-line bg-surface-2/50 px-4 py-12 text-center text-sm font-semibold text-content-3"><i className="fa-solid fa-circle-notch fa-spin mr-2" aria-hidden="true" />Cargando actividad…</div>
           ) : auditoriaList.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-line px-4 py-12 text-center"><i className="fa-solid fa-magnifying-glass-minus mb-3 text-2xl text-content-3" aria-hidden="true" /><p className="text-sm font-bold text-content-1">No encontramos eventos</p><p className="mt-1 text-xs text-content-3">Prueba con otro período o limpia los filtros.</p></div>
           ) : gruposEventos.map(grupo => <section key={grupo.clave} aria-label={`Eventos del ${grupo.clave}`}>
-          <h3 className="sticky top-0 z-[1] mb-2 mt-2 flex items-center gap-2 rounded-lg bg-surface-2/90 px-3 py-2 text-[11px] font-extrabold capitalize text-content-2 backdrop-blur"><i className="fa-regular fa-calendar text-brand-text" aria-hidden="true" />{grupo.clave}<span className="ml-auto font-semibold text-content-3">{grupo.eventos.length} {grupo.eventos.length === 1 ? 'evento' : 'eventos'}</span></h3>
-          <div className="space-y-3">{grupo.eventos.map(r => {
+          <h3 className="sticky top-0 z-[1] mb-3 mt-2 flex items-center gap-2 rounded-xl border border-line/70 bg-surface-1/95 px-4 py-3 text-xs font-extrabold capitalize text-content-2 shadow-sm backdrop-blur"><span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-soft text-brand-text"><i className="fa-regular fa-calendar" aria-hidden="true" /></span>{grupo.clave}<span className="ml-auto rounded-full bg-surface-2 px-2.5 py-1 text-[10px] font-bold text-content-3">{grupo.eventos.length} {grupo.eventos.length === 1 ? 'evento' : 'eventos'}</span></h3>
+          <div className="relative space-y-3 pl-3 before:absolute before:bottom-5 before:left-[21px] before:top-3 before:w-px before:bg-line/80 sm:pl-5">{grupo.eventos.map(r => {
             const campos = obtenerCambiosAuditoria(r);
             const mostrarTodos = eventoExpandido === r.id;
             const camposVisibles = mostrarTodos ? campos : campos.slice(0, 3);
             const existeBien = bienes.some(b => String(b.id) === String(r.bienid));
             const fechaEvento = r.fecha ? new Date(r.fecha) : null;
             return (
-              <article key={r.id} className="rounded-2xl border border-line bg-surface-1 p-4 shadow-sm transition-colors hover:border-line-strong sm:p-5">
+              <article key={r.id} className="relative ml-3 rounded-2xl border border-line bg-surface-1 p-4 shadow-[0_8px_28px_-22px_rgba(15,35,55,.55)] transition-all hover:-translate-y-px hover:border-brand/30 hover:shadow-md sm:ml-5 sm:p-5">
+                <span className="absolute -left-[22px] top-6 z-[1] h-3 w-3 rounded-full border-[3px] border-surface-2 bg-brand sm:-left-[30px]" aria-hidden="true" />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line/70 pb-3">
                   <span className="inline-flex items-center gap-2 text-xs font-bold tabular-nums text-content-2"><i className="fa-regular fa-clock text-content-3" aria-hidden="true" />{fechaEvento ? fechaEvento.toLocaleString('es-PY', { dateStyle: 'medium', timeStyle: 'short' }) : 'Fecha no registrada'}</span>
                   <span className="hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
-                  <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold text-content-2"><i className="fa-regular fa-user text-content-3" aria-hidden="true" /><span className="truncate">{actorAud(r)}</span></span>
+                  <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold text-content-2" aria-label={`Usuario: ${actorAud(r)}`}><i className="fa-regular fa-user text-content-3" aria-hidden="true" /><span className="truncate">{actorAud(r)}</span></span>
                   <button type="button" onClick={() => navigator.clipboard?.writeText(String(r.id || '')).catch(() => {})} className="rounded-md px-2 py-1 text-[10px] font-semibold text-content-3 hover:bg-surface-2 hover:text-content-1" title={`Copiar identificador ${r.id}`}>ID · {String(r.id || '').slice(0, 8)} <i className="fa-regular fa-copy ml-1" aria-hidden="true" /></button>
                   <span className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${tonoAccionAud(r.accion)}`}><i className={`fa-solid ${String(r.accion).includes('ALTA') ? 'fa-plus' : String(r.accion).includes('BAJA') ? 'fa-trash-can' : 'fa-pen'}`} aria-hidden="true" />{etiquetaAccionAuditoria(r.accion)}</span>
                 </div>
 
                 <div className="flex flex-wrap items-start justify-between gap-3 py-3">
                   <div className="min-w-0">
-                    <h3 className="text-sm font-black text-content-1">{tituloEventoAuditoria(r)}</h3>
+                    <h3 className="text-sm font-black leading-relaxed text-content-1">{resumenAccionAuditoria(r, actorAud(r))}</h3>
                     <p className="mt-1 text-xs text-content-3">{detalleAudCorto(r)}</p>
                   </div>
                   {r.bienid && /BIEN/i.test(r.titulo || '') && (
@@ -458,9 +467,9 @@ export default function AuditoriaView({
                       {camposVisibles.map(({ campo, etiqueta, antes, despues }) => (
                         <div key={campo} className="grid gap-2 rounded-xl border border-line/70 bg-surface-1 p-3 sm:grid-cols-[minmax(130px,0.7fr)_minmax(0,1fr)_28px_minmax(0,1fr)] sm:items-center">
                           <p className="text-xs font-bold text-content-1">{etiqueta}</p>
-                          <div className="min-w-0 rounded-lg bg-danger-soft/70 px-3 py-2"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-danger">Antes</span><span className="block break-words text-xs text-content-2">{valorAuditoriaLegible(antes, campo)}</span></div>
+                          <div className="min-w-0 rounded-lg border border-danger/10 bg-danger-soft/50 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-danger"><i className="fa-solid fa-minus mr-1" aria-hidden="true" />Antes</span><span className="block break-words text-xs text-content-2">{valorAuditoriaLegible(antes, campo)}</span></div>
                           <i className="fa-solid fa-arrow-right hidden text-center text-xs text-content-3 sm:block" aria-hidden="true" />
-                          <div className="min-w-0 rounded-lg bg-ok-soft/70 px-3 py-2"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-ok">Después</span><span className="block break-words text-xs font-semibold text-content-1">{valorAuditoriaLegible(despues, campo)}</span></div>
+                          <div className="min-w-0 rounded-lg border border-ok/20 bg-ok-soft/70 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-ok"><i className="fa-solid fa-plus mr-1" aria-hidden="true" />Después</span><span className="block break-words text-xs font-bold text-content-1">{valorAuditoriaLegible(despues, campo)}</span></div>
                         </div>
                       ))}
                     </div>

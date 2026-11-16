@@ -648,48 +648,61 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
   const handleExportInventarioCSV = (registros = filteredBienes) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
-      setIsProcessing({ active: true, text: 'Generando Reporte Excel...' });
+      setIsProcessing({ active: true, text: 'Preparando el CSV…', pct: 0 });
       setTimeout(async () => {
-          let csvContent = "\uFEFFCuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Componentes (ubicación y encargado);Dependencia;Ubicacion;Funcionario;Estado de asignacion;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR\n";
-          const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
-          registros.forEach(b => {
-              const row = [
+          try {
+            const filas = ["Cuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Componentes (ubicación y encargado);Dependencia;Ubicacion;Funcionario;Estado de asignacion;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR"];
+            const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
+            const lote = 400;
+            for (let inicio = 0; inicio < registros.length; inicio += lote) {
+              const bloque = registros.slice(inicio, inicio + lote);
+              for (const b of bloque) {
+                filas.push([
                   b.cuenta || '-', b.subcuenta || '-', b.analitico1 || '-', b.analitico2 || '-',
                   b.rotulo || '-', b.descripcion || '', resumenComponentes(b),
                   b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-', etiquetaEstadoAsignacion(b), b.funcionarioAlternativo || '-',
                   formatDateText(b.fechaAdquisicion) || '-', b.valorUnitario || '0',
-                  b.estadoConservacion || '-', b.vidaUtil || '-',
-                  b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
-              ].map(celda);
-              csvContent += row.join(';') + "\r\n";
-          });
-          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          if (window.saveAs) {
-            const sufijo = registros.length !== filteredBienes.length ? '_Seleccion' : '';
-            const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
-            if (nombre) window.saveAs(blob, nombre);
-            else { setIsProcessing({ active: false, text: '' }); return; }
-          } else {
-            const nombre = `Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.csv`;
-            const url = URL.createObjectURL(blob);
-            const anchor = document.createElement('a');
-            anchor.href = url;
-            anchor.download = nombre;
-            anchor.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
+                  b.estadoConservacion || '-', b.vidaUtil || '-', b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
+                ].map(celda).join(';'));
+              }
+              const progreso = Math.round(Math.min(90, ((inicio + bloque.length) / registros.length) * 90));
+              setIsProcessing({ active: true, text: `Preparando ${Math.min(inicio + bloque.length, registros.length).toLocaleString('es-PY')} de ${registros.length.toLocaleString('es-PY')} bienes…`, pct: progreso });
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const blob = new Blob(['\uFEFF', filas.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+            setIsProcessing({ active: true, text: 'Preparando descarga…', pct: 96 });
+            if (window.saveAs) {
+              const sufijo = registros.length !== filteredBienes.length ? '_Seleccion' : '';
+              const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}${sufijo}_${fechaParaArchivo()}.csv`);
+              if (!nombre) return;
+              window.saveAs(blob, nombre);
+            } else {
+              const nombre = `Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.csv`;
+              const url = URL.createObjectURL(blob);
+              const anchor = document.createElement('a'); anchor.href = url; anchor.download = nombre; anchor.click();
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+            notify(`CSV descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, "success");
+          } catch (error) {
+            console.error('No se pudo generar el CSV del inventario:', error);
+            notify('No se pudo generar el CSV del inventario.', 'error');
+          } finally {
+            setIsProcessing({ active: false, text: '' });
           }
-          setIsProcessing({ active: false, text: '' });
-          notify(`CSV descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, "success");
       }, 100);
   };
 
   const handleExportInventarioExcel = (registros = filteredBienes) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
       if (!window.XLSX) return notify("Cargando librería Excel, intenta de nuevo...", "warning");
-      setIsProcessing({ active: true, text: 'Generando Excel...' });
+      setIsProcessing({ active: true, text: 'Preparando Excel…', pct: 0 });
       setTimeout(async () => {
           try {
-          const filas = registros.map(b => ({
+              const filas = [];
+              const lote = 400;
+              for (let inicio = 0; inicio < registros.length; inicio += lote) {
+                const bloque = registros.slice(inicio, inicio + lote);
+                filas.push(...bloque.map(b => ({
                   'Cuenta': b.cuenta || '-', 'Subcuenta': b.subcuenta || '-',
                   'Analítico 1': b.analitico1 || '-', 'Analítico 2': b.analitico2 || '-',
                   'Rótulo': b.rotulo || '-', 'Descripción': b.descripcion || '-',
@@ -702,7 +715,10 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
                   'Valor Unitario (Gs.)': parseInt(String(b.valorUnitario || '0').replace(/\D/g, ''), 10) || 0,
                   'Estado': b.estadoConservacion || '-', 'Vida Útil': b.vidaUtil || '-',
                   'FC-10': b.hasFC10 ? 'SÍ' : 'NO', 'QR': b.hasQR ? 'SÍ' : 'NO'
-              }));
+                })));
+                setIsProcessing({ active: true, text: `Preparando ${Math.min(inicio + bloque.length, registros.length).toLocaleString('es-PY')} de ${registros.length.toLocaleString('es-PY')} bienes…`, pct: Math.round(Math.min(90, ((inicio + bloque.length) / registros.length) * 90)) });
+                await new Promise(resolve => setTimeout(resolve, 0));
+              }
               const wb = window.XLSX.utils.book_new();
               const ws = window.XLSX.utils.json_to_sheet(filas);
               ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 20 }, { wch: 55 }, { wch: 55 }, { wch: 22 }, { wch: 28 }, { wch: 30 }, { wch: 25 }, { wch: 34 }, { wch: 16 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 8 }, { wch: 8 }];
@@ -723,6 +739,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               ws2['!cols'] = [{ wch: 28 }, { wch: 34 }];
               window.XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
               window.XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
+              setIsProcessing({ active: true, text: 'Preparando descarga…', pct: 96 });
               const nombre = await solicitarNombreArchivo(`Inventario_${normalizarSegmentoArchivo(dependenciaActual, 'dependencia')}_${fechaParaArchivo()}.xlsx`);
               if (nombre) window.XLSX.writeFile(wb, nombre);
               notify(`Excel descargado: ${registros.length.toLocaleString('es-PY')} bienes incluidos.`, "success");

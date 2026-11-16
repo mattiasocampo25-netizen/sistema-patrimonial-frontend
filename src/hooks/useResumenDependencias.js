@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
+import { normalizeStr } from '../utils/helpers';
 
 /**
  * useResumenDependencias — resumen por dependencia para los tiles del panel.
@@ -20,10 +21,18 @@ export function useResumenDependencias() {
   const cargar = useCallback(async () => {
     setCargando(true);
     try {
-      const { data, error: err } = await supabase.rpc('resumen_por_dependencia');
+      const [resumenBase, resumenAsignaciones] = await Promise.all([
+        supabase.rpc('resumen_por_dependencia'),
+        supabase.rpc('resumen_asignaciones_por_dependencia')
+      ]);
+      const { data, error: err } = resumenBase;
       if (err) throw err;
-      setResumen(Array.isArray(data) ? data : []);
-      setError(null);
+      const asignados = new Map((resumenAsignaciones.data || []).map(fila => [normalizeStr(fila.dependencia), Number(fila.asignados) || 0]));
+      setResumen((Array.isArray(data) ? data : []).map(fila => ({
+        ...fila,
+        asignados: resumenAsignaciones.error ? null : (asignados.get(normalizeStr(fila.dependencia)) || 0)
+      })));
+      setError(resumenAsignaciones.error || null);
     } catch (e) {
       setError(e);
       setResumen([]);

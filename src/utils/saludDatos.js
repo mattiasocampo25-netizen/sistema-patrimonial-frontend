@@ -25,14 +25,48 @@ export function analizarSaludDatos({ bienes = [], fc10List = [], fc11List = [], 
   const cedulasPadron = new Set();
   const nombresPadron = new Set();
   const duplicadosBien = [];
+  const idsDuplicadosBien = new Set();
   const duplicadosCedula = [];
   const duplicadosNombre = [];
   for (const bien of assets) {
     const rotulo = normalizeStr(bien.rotulo || '');
     if (!rotulo || rotulo === 's/r') continue;
     const key = `${normalizeStr(bien.dependencia)}||${rotulo}`;
-    if (porRotulo.has(key)) duplicadosBien.push(bien);
+    if (porRotulo.has(key) && !idsDuplicadosBien.has(String(bien.id))) {
+      duplicadosBien.push({ ...bien, motivo: 'Rótulo repetido dentro de la misma dependencia.' });
+      idsDuplicadosBien.add(String(bien.id));
+    }
     else porRotulo.set(key, bien.id);
+  }
+  // Señal de revisión, nunca deduplicación automática: descripciones iguales
+  // pueden corresponder a bienes distintos. Se excluyen textos genéricos muy
+  // cortos para reducir falsos positivos y se limita cada grupo al máximo que
+  // la interfaz de calidad de datos ya muestra.
+  const porDescripcionBien = new Map();
+  for (const bien of assets) {
+    const descripcion = normalizeStr(bien.descripcion || '');
+    if (descripcion.length < 12) continue;
+    const key = `${normalizeStr(bien.dependencia)}||${descripcion}`;
+    const grupo = porDescripcionBien.get(key) || [];
+    grupo.push(bien);
+    porDescripcionBien.set(key, grupo);
+  }
+  for (const grupo of porDescripcionBien.values()) {
+    if (grupo.length < 2) continue;
+    const referencia = grupo[0];
+    const referenciaCuenta = [referencia.cuenta, referencia.subcuenta, referencia.analitico1, referencia.analitico2].filter(Boolean).join('.');
+    const referenciaAnio = String(referencia.fechaAdquisicion || '').slice(0, 4);
+    for (const bien of grupo.slice(1, 101)) {
+      const id = String(bien.id);
+      if (idsDuplicadosBien.has(id)) continue;
+      const cuenta = [bien.cuenta, bien.subcuenta, bien.analitico1, bien.analitico2].filter(Boolean).join('.');
+      const anio = String(bien.fechaAdquisicion || '').slice(0, 4);
+      const razones = ['Descripción coincidente'];
+      if (referenciaCuenta && cuenta === referenciaCuenta) razones.push('misma clasificación contable');
+      if (referenciaAnio && anio === referenciaAnio) razones.push(`mismo año (${anio})`);
+      duplicadosBien.push({ ...bien, motivo: `Posible coincidencia: ${razones.join(' y ')}. Verifica el rótulo y la ubicación.` });
+      idsDuplicadosBien.add(id);
+    }
   }
   for (const persona of personas) {
     const cedula = String(persona.cedula || persona.documento || '').replace(/\D/g, '');
@@ -95,7 +129,7 @@ export function analizarSaludDatos({ bienes = [], fc10List = [], fc11List = [], 
     neutro: 'bg-zinc-500/10 text-content-2 dark:text-content-3 border-zinc-500/20',
   };
   return [
-    categoria('dup', 'Rótulos duplicados', duplicadosBien, 'fa-clone', estilo.duplicado),
+    categoria('dup', 'Posibles bienes duplicados', duplicadosBien, 'fa-clone', estilo.duplicado),
     categoria('dupfunc', 'Documentos duplicados en padrón', duplicadosCedula, 'fa-user-group', estilo.duplicado, 'funcionario'),
     categoria('dupnombre', 'Nombres repetidos para revisar', duplicadosNombre, 'fa-user-tag', estilo.advertencia, 'funcionario'),
     categoria('fc10', 'FC-10 sin bien asociado', fcSinBien(fc10), 'fa-file-signature', estilo.advertencia, 'fc10'),

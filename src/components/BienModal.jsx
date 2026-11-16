@@ -66,10 +66,28 @@ export default function BienModal({
     const [fechaAviso, setFechaAviso] = useState('');
     const [cambiosParaConfirmar, setCambiosParaConfirmar] = useState(null);
     const [offlineConfirmado, setOfflineConfirmado] = useState(false);
+    const [hayCambiosSinGuardar, setHayCambiosSinGuardar] = useState(false);
+    const [confirmarDescartar, setConfirmarDescartar] = useState(false);
     useEffect(() => { if (isOnline) setOfflineConfirmado(false); }, [isOnline]);
+    useEffect(() => {
+        if (!hayCambiosSinGuardar) return undefined;
+        const avisar = (evento) => { evento.preventDefault(); evento.returnValue = ''; };
+        window.addEventListener('beforeunload', avisar);
+        return () => window.removeEventListener('beforeunload', avisar);
+    }, [hayCambiosSinGuardar]);
+    const solicitarCierre = () => {
+        if (hayCambiosSinGuardar) setConfirmarDescartar(true);
+        else setIsBienModalOpen(false);
+    };
+    const descartarYCerrar = () => {
+        setConfirmarDescartar(false);
+        setHayCambiosSinGuardar(false);
+        if (esNuevo) limpiarBorrador();
+        setIsBienModalOpen(false);
+    };
     const defecto = (campo, fb) => (restaurado && restaurado[campo] !== undefined && restaurado[campo] !== null ? restaurado[campo] : fb);
     const guardarBorradorDespuesDeCambio = () => setTimeout(() => guardarBorrador(serializarForm(bienFormRef.current)), 0);
-    const actualizarComponente = (indice, cambios) => setComponentes(prev => prev.map((item, index) => index === indice ? { ...item, ...cambios } : item));
+    const actualizarComponente = (indice, cambios) => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.map((item, index) => index === indice ? { ...item, ...cambios } : item)); };
     const validarRotulo = (valor) => {
         const v = String(valor || "").trim();
         if (!v) { setRotuloError(''); return true; }
@@ -115,7 +133,7 @@ export default function BienModal({
             }
         }
         const ok = await saveBien({ preventDefault() {} }, mantenerAbierto);
-        if (ok) limpiarBorrador();
+        if (ok) { limpiarBorrador(); setHayCambiosSinGuardar(false); }
         return ok;
     };
     const confirmarCambios = async () => {
@@ -125,11 +143,13 @@ export default function BienModal({
         const ok = await saveBien({ preventDefault() {} }, mantenerAbierto);
         if (ok) {
             limpiarBorrador();
+            setHayCambiosSinGuardar(false);
             setCambiosParaConfirmar(null);
         }
     };
     const continuarBorrador = () => {
         if (!borrador) return;
+        setHayCambiosSinGuardar(true);
         setRestaurado(borrador);
         const cantidadComponentesGuardados = Number.parseInt(borrador.cantidadComponentes, 10) || 0;
         const componentesDesdeCampos = Array.from({ length: cantidadComponentesGuardados }, (_, indice) => ({
@@ -174,6 +194,7 @@ export default function BienModal({
         return out;
     }, [descTexto, sugerenciasBienes]);
     const handleSelectDescripcion = (b) => {
+        setHayCambiosSinGuardar(true);
         setDescTexto(b.descripcion || '');
         setShowDescDropdown(false);
         if (bienFormRef.current) {
@@ -276,12 +297,14 @@ export default function BienModal({
     };
 
     const handleSelectCustodio = (f) => {
+        setHayCambiosSinGuardar(true);
         setCustodioTexto(f.nombre);
         setShowCustodioDropdown(false);
         autocompletarDesdeFuncionario(f);
     };
 
     const handleSelectCustodioAlternativo = (f) => {
+        setHayCambiosSinGuardar(true);
         setCustodioAlternativoTexto(f.nombre);
         setShowAlternativoDropdown(false);
         if (!bienFormRef.current) return;
@@ -303,6 +326,7 @@ export default function BienModal({
     };
 
     const handleSelectUbicacion = (ub) => {
+        setHayCambiosSinGuardar(true);
         setUbicacionTexto(ub);
         setShowUbicacionDropdown(false);
         if (bienFormRef.current) {
@@ -335,7 +359,7 @@ export default function BienModal({
     };
 
     return (
-        <Dialogo className={STYLES.modalOverlay}>
+        <Dialogo className={STYLES.modalOverlay} onCerrar={solicitarCierre}>
           <div className={STYLES.modalContent + " max-w-4xl overflow-hidden"}>
 
             {/* Header */}
@@ -352,7 +376,7 @@ export default function BienModal({
                 </div>
               </div>
 
-              <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setIsBienModalOpen(false)} />
+              <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={solicitarCierre} />
             </div>
 
             {esNuevo && hayBorrador && !restaurado && (
@@ -367,7 +391,7 @@ export default function BienModal({
                 </Button>
               </div>
             )}
-            <form key={formKey} ref={bienFormRef} onSubmit={(e) => guardarConRevision(e, false)} onChange={() => guardarBorrador(serializarForm(bienFormRef.current))} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
+            <form key={formKey} ref={bienFormRef} onSubmit={(e) => guardarConRevision(e, false)} onInputCapture={() => setHayCambiosSinGuardar(true)} onChange={() => { setHayCambiosSinGuardar(true); guardarBorrador(serializarForm(bienFormRef.current)); }} className="flex flex-col h-full overflow-hidden bg-surface-2/50 dark:bg-surface-2">
               <div className="p-8 overflow-y-auto space-y-6 custom-scrollbar">
                 {!isOnline && (
                   <section role="alert" className="rounded-2xl border border-amber-500/40 bg-amber-50 p-4 text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
@@ -505,14 +529,14 @@ export default function BienModal({
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-cubes-stacked" aria-hidden="true" /></span>
                       <div><h3 id="bien-componentes-titulo" className="text-sm font-extrabold text-content-1">Componentes del bien</h3><p className="mt-1 max-w-2xl text-xs leading-relaxed text-content-3">Actívalo para juegos o conjuntos con piezas que pueden moverse por separado. Cada componente conserva el rótulo patrimonial principal, con ubicación y encargado operativos propios; el FC-10 permanece asociado al bien principal.</p></div>
                     </div>
-                    <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2 text-xs font-bold text-content-2"><input type="checkbox" name="tieneComponentes" checked={tieneComponentes} onChange={event => { const activo = event.target.checked; setTieneComponentes(activo); if (activo && componentes.length === 0) setComponentes([{ id: `componente-${Date.now()}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20" />Tiene componentes</label>
+                      <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2 text-xs font-bold text-content-2"><input type="checkbox" name="tieneComponentes" checked={tieneComponentes} onChange={event => { const activo = event.target.checked; setHayCambiosSinGuardar(true); setTieneComponentes(activo); if (activo && componentes.length === 0) setComponentes([{ id: `componente-${Date.now()}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20" />Tiene componentes</label>
                   </div>
                   <input type="hidden" name="componentes" value={tieneComponentes ? JSON.stringify(componentes) : '[]'} readOnly />
                   {tieneComponentes && <div className="mt-4 space-y-3">
                     <input type="hidden" name="cantidadComponentes" value={componentes.length} readOnly />
                     {errorComponentes && <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-xs font-semibold text-danger">{errorComponentes}</p>}
                     {componentes.map((componente, indice) => <article key={componente.id} className="rounded-xl border border-line bg-surface-1 p-4">
-                      <div className="mb-3 flex items-center justify-between gap-3"><p className="text-xs font-extrabold text-content-1">Componente {indice + 1}</p><button type="button" onClick={() => { setComponentes(prev => prev.filter((_, i) => i !== indice)); guardarBorradorDespuesDeCambio(); }} className="rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-danger hover:bg-danger-soft" aria-label={`Quitar componente ${indice + 1}`}><i className="fa-solid fa-trash-can mr-1.5" aria-hidden="true" />Quitar</button></div>
+                      <div className="mb-3 flex items-center justify-between gap-3"><p className="text-xs font-extrabold text-content-1">Componente {indice + 1}</p><button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.filter((_, i) => i !== indice)); guardarBorradorDespuesDeCambio(); }} className="rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-danger hover:bg-danger-soft" aria-label={`Quitar componente ${indice + 1}`}><i className="fa-solid fa-trash-can mr-1.5" aria-hidden="true" />Quitar</button></div>
                       <input type="hidden" name={`componente_${indice}_id`} value={componente.id} readOnly />
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Nombre o tipo<input required maxLength={100} name={`componente_${indice}_nombre`} value={componente.nombre} onChange={event => actualizarComponente(indice, { nombre: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Ej.: Silla, mesa, sofá" /></label>
@@ -523,7 +547,7 @@ export default function BienModal({
                         <label className="text-[10px] font-bold uppercase tracking-wider text-content-3 sm:col-span-2 lg:col-span-1">Observación<input maxLength={300} name={`componente_${indice}_observaciones`} value={componente.observaciones} onChange={event => actualizarComponente(indice, { observaciones: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Opcional" /></label>
                       </div>
                     </article>)}
-                    <button type="button" onClick={() => { setComponentes(prev => [...prev, { id: `componente-${Date.now()}-${prev.length}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/25 bg-surface-1 px-4 text-xs font-bold text-brand-text hover:bg-brand-soft"><i className="fa-solid fa-plus" aria-hidden="true" />Añadir componente</button>
+                    <button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => [...prev, { id: `componente-${Date.now()}-${prev.length}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/25 bg-surface-1 px-4 text-xs font-bold text-brand-text hover:bg-brand-soft"><i className="fa-solid fa-plus" aria-hidden="true" />Añadir componente</button>
                     <p className="text-[10px] text-content-3">Si ubicación o encargado quedan vacíos, se entenderá que comparten los datos del bien principal. Si piezas del mismo tipo están en lugares distintos, crea una fila para cada grupo. Los componentes no reciben un rótulo patrimonial independiente.</p>
                   </div>}
                   {!tieneComponentes && <p className="mt-3 text-[11px] text-content-3">Desactivado para bienes individuales. No cambia la forma actual de registrar bienes simples.</p>}
@@ -687,7 +711,7 @@ export default function BienModal({
 
               {/* Footer Buttons */}
               <div className="flex justify-end items-center gap-2 px-6 py-4 border-t border-line dark:border-zinc-800/80 shrink-0 z-10">
-                <Button variante="ghost" tamano="md" onClick={() => setIsBienModalOpen(false)}>
+                <Button variante="ghost" tamano="md" onClick={solicitarCierre}>
                   Cancelar
                 </Button>
 
@@ -710,6 +734,17 @@ export default function BienModal({
 
             </form>
           </div>
+          {confirmarDescartar && <Dialogo className={STYLES.modalOverlay}>
+            <section role="alertdialog" aria-modal="true" aria-labelledby="bien-descartar-titulo" className="w-full max-w-md rounded-panel border border-line bg-surface-1 p-6 text-center shadow-pop">
+              <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-card bg-warn-soft text-warn"><i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /></span>
+              <h3 id="bien-descartar-titulo" className="text-lg font-bold text-content-1">¿Descartar los cambios?</h3>
+              <p className="mt-2 text-sm leading-relaxed text-content-3">Hay cambios sin guardar. Si cierras el formulario se perderán; el bien todavía no se ha actualizado.</p>
+              <div className="mt-6 flex justify-end gap-2">
+                <Button variante="secondary" onClick={() => setConfirmarDescartar(false)}>Seguir editando</Button>
+                <Button variante="danger" onClick={descartarYCerrar}>Descartar y cerrar</Button>
+              </div>
+            </section>
+          </Dialogo>}
           {cambiosParaConfirmar && <Dialogo className={STYLES.modalOverlay} onCerrar={() => setCambiosParaConfirmar(null)}>
             <section role="alertdialog" aria-modal="true" aria-labelledby="bien-cambios-titulo" className="w-full max-w-xl rounded-panel border border-line bg-surface-1 p-5 shadow-pop sm:p-6">
               <div className="flex items-start gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-info-soft text-info"><i className="fa-solid fa-arrows-rotate" aria-hidden="true" /></span><div><h3 id="bien-cambios-titulo" className="text-base font-bold text-content-1">Revisa los cambios antes de guardar</h3><p className="mt-1 text-xs text-content-3">Se actualizará este bien. Confirma que los datos sean correctos.</p></div></div>

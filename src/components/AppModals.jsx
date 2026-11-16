@@ -30,6 +30,7 @@ import { descargarReporteImportacionCSV } from '../utils/csvBienes';
 // Componente presentacional: todo llega por props, sin estado propio.
 export default function AppModals({
   STYLES,
+  currentUser,
   isCSVPreviewOpen,
   setIsCSVPreviewOpen,
   confirmCSVImportFuncionarios,
@@ -467,6 +468,7 @@ export default function AppModals({
         saveUsuario={saveUsuario}
         todasDependencias={todasDependencias}
         esDesarrollador={esDesarrollador}
+        currentUser={currentUser}
         STYLES={STYLES}
     />
           {isBienModalOpen && (
@@ -639,9 +641,24 @@ export default function AppModals({
           if (nFc10 > 0) impacto.push(nFc10 + (nFc10 === 1 ? ' acta FC-10' : ' actas FC-10'));
           if (nFc11 > 0) impacto.push(nFc11 + (nFc11 === 1 ? ' traslado FC-11' : ' traslados FC-11'));
         }
-        if (!esSolicitud && esFunc && itemToDelete.item?.nombre) {
-          const nBienes = (bienes || []).filter(b => normalizeStr(b.funcionario || '') === normalizeStr(itemToDelete.item.nombre)).length;
-          if (nBienes > 0) impacto.push(nBienes + (nBienes === 1 ? ' bien a su cargo' : ' bienes a su cargo'));
+        const nombreFuncionario = normalizeStr(itemToDelete.item?.nombre || '');
+        const bienesRelacionados = esFunc && nombreFuncionario ? (bienes || []).filter(b => {
+          const responsable = normalizeStr(b.funcionario || '');
+          const alternativo = normalizeStr(b.funcionarioAlternativo || '');
+          let componentes = b.componentes || [];
+          if (typeof componentes === 'string') { try { componentes = JSON.parse(componentes); } catch { componentes = []; } }
+          return responsable === nombreFuncionario || alternativo === nombreFuncionario
+            || (Array.isArray(componentes) && componentes.some(c => normalizeStr(c?.funcionario || '') === nombreFuncionario));
+        }) : [];
+        const bienesDelFuncionario = bienesRelacionados.filter(b => normalizeStr(b.funcionario || '') === nombreFuncionario).length;
+        const bienesAlternativos = bienesRelacionados.filter(b => normalizeStr(b.funcionarioAlternativo || '') === nombreFuncionario).length;
+        const bienesComponentes = bienesRelacionados.filter(b => {
+          let componentes = b.componentes || [];
+          if (typeof componentes === 'string') { try { componentes = JSON.parse(componentes); } catch { componentes = []; } }
+          return Array.isArray(componentes) && componentes.some(c => normalizeStr(c?.funcionario || '') === nombreFuncionario);
+        }).length;
+        if (bienesRelacionados.length) {
+          impacto.push(`${bienesRelacionados.length} ${bienesRelacionados.length === 1 ? 'bien relacionado' : 'bienes relacionados'} (${bienesDelFuncionario} principal, ${bienesAlternativos} alternativo, ${bienesComponentes} por componente)`);
         }
             return (
             <Dialogo className={STYLES.modalOverlay}>
@@ -663,6 +680,13 @@ export default function AppModals({
                         <i className="fa-solid fa-link text-[10px]"></i>
                         Vinculado a {impacto.join(' y ')}
                       </p>
+                    )}
+                    {esFunc && bienesRelacionados.length > 0 && (
+                      <div role="alert" className="mb-5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-left">
+                        <p className="flex items-start gap-2 text-[11px] font-semibold leading-relaxed text-warn dark:text-amber-300"><i className="fa-solid fa-triangle-exclamation mt-0.5 shrink-0" aria-hidden="true" />{esSolicitud
+                          ? `El funcionario está vinculado a ${bienesRelacionados.length} bienes. Esta solicitud no reasigna ni devuelve esos bienes; Patrimonio deberá resolverlos antes de cerrar su desvinculación.`
+                          : `El funcionario está vinculado a ${bienesRelacionados.length} bienes. La eliminación del padrón no los reasigna, no cierra sus FC-10 ni registra su devolución. Actualiza primero la responsabilidad patrimonial.`}</p>
+                      </div>
                     )}
 
                     {esSolicitud && (

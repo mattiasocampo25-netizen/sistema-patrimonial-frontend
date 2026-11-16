@@ -108,10 +108,53 @@ export function tituloEventoAuditoria(row) {
   };
   const nombreAccion = etiquetas[accion] || etiquetaCampoAuditoria(accion.toLowerCase());
   const titulo = String(row?.titulo || '');
-  const entidad = titulo.match(/\s[-–]\s([A-ZÁÉÍÓÚÑ0-9_-]+)\s*$/i)?.[1];
+  const entidadTexto = titulo.split(/\s[-–]\s/, 2)[1] || '';
+  const entidad = Object.keys({ BIEN: 1, FC10: 1, FC11: 1, USUARIO: 1, FUNCIONARIO: 1, SOLICITUD: 1 })
+    .find(clave => new RegExp(`^${clave}(?=$|[^A-Z0-9])`, 'i').test(entidadTexto))
+    // Hay títulos antiguos con texto de navegación pegado a la entidad (por
+    // ejemplo, "BIENAbrir bien relacionado"). Reconocemos primero el prefijo.
+    || Object.keys({ BIEN: 1, FC10: 1, FC11: 1, USUARIO: 1, FUNCIONARIO: 1, SOLICITUD: 1 })
+      .find(clave => entidadTexto.toUpperCase().startsWith(clave));
   const nombresEntidad = { BIEN: 'bien', FC10: 'FC-10', FC11: 'FC-11', USUARIO: 'usuario', FUNCIONARIO: 'funcionario', SOLICITUD: 'solicitud' };
   const entidadLegible = nombresEntidad[String(entidad || '').toUpperCase()];
   return entidadLegible ? `${nombreAccion} de ${entidadLegible}` : nombreAccion;
+}
+
+export function resumenAccionAuditoria(row, actor = row?.usuario) {
+  const accion = String(row?.accion || '').trim().toUpperCase();
+  const titulo = String(row?.titulo || '');
+  const tituloEntidad = titulo.split(/\s[-–]\s/, 2)[1] || '';
+  const nombresEntidad = [
+    ['FUNCIONARIO', 'el funcionario'], ['SOLICITUD', 'la solicitud'],
+    ['FC11', 'el FC-11'], ['FC10', 'el FC-10'], ['BIEN', 'el bien'], ['USUARIO', 'el usuario']
+  ];
+  const entidad = nombresEntidad.find(([clave]) => tituloEntidad.toUpperCase().startsWith(clave))?.[1]
+    || (accion.includes('FUNCIONARIO') ? 'el funcionario' : accion.includes('FC11') ? 'el FC-11' : accion.includes('FC10') ? 'el FC-10' : accion.includes('BIEN') ? 'el bien' : 'registro del sistema');
+  const verbos = [
+    [/SOLICITUD_BAJA_EN_REVISION/, `marcó en revisión la solicitud de baja de ${entidad}`],
+    [/SOLICITUD_BAJA_ASIGNADA/, `asignó responsable a la solicitud de baja de ${entidad}`],
+    [/APROBAR_BAJA_FUNCIONARIO/, 'aprobó la baja del funcionario'],
+    [/RECHAZAR_BAJA_FUNCIONARIO/, 'rechazó la solicitud de baja del funcionario'],
+    [/APROBAR_SOLICITUD_BAJA/, `aprobó la solicitud de baja de ${entidad}`],
+    [/RECHAZAR_SOLICITUD_BAJA/, `rechazó la solicitud de baja de ${entidad}`],
+    [/SOLICITUD_BAJA_FUNCIONARIO/, 'solicitó la baja del funcionario'],
+    [/SOLICITUD_BAJA/, `solicitó la baja de ${entidad}`],
+    [/MODIFICACION_FOTOS/, `actualizó las fotografías de ${entidad}`],
+    [/MODIFICACION/, `modificó ${entidad}`],
+    [/ELIMINACION|BAJA/, `registró la baja o eliminación de ${entidad}`],
+    [/RECHAZO/, `rechazó ${entidad}`], [/APROBACION|APROBAR/, `aprobó ${entidad}`],
+    [/ALTA|CREACION|CREACIÓN/, `registró ${entidad}`], [/TRASLADO/, `registró un traslado de ${entidad}`],
+    [/FC10_/, 'actualizó el trámite del FC-10'], [/FC11_/, 'actualizó el trámite del FC-11'],
+    [/CONCILIACION|MUESTREO/, 'realizó una verificación física del inventario'],
+  ];
+  const accionHumana = verbos.find(([patron]) => patron.test(accion))?.[1]
+    || `registró una acción sobre ${entidad}`;
+  const mensaje = leerMensajeAuditoria(row);
+  const sujeto = mensaje?.rotulo ? ` · Rótulo ${mensaje.rotulo}`
+    : mensaje?.nombre ? ` · ${mensaje.nombre}`
+      : mensaje?.cambios?.nuevo?.rotulo || mensaje?.cambios?.anterior?.rotulo
+        ? ` · Rótulo ${mensaje.cambios.nuevo?.rotulo || mensaje.cambios.anterior?.rotulo}` : '';
+  return `${actor || 'Usuario no identificado'} ${accionHumana}${sujeto}`;
 }
 
 export function etiquetaAccionAuditoria(accion) {

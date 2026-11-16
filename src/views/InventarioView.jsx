@@ -20,6 +20,38 @@ const normalizarDensidad = value => value === 'compacta' ? 'compacta' : 'comoda'
 const normalizarColumnas = value => ({ ...COLUMNAS_INICIALES, ...(value && typeof value === 'object' ? value : {}) });
 const normalizarRecientes = value => Array.isArray(value) ? value.filter(x => typeof x === 'string').slice(0, 6) : VISTAS_RECIENTES_INICIALES;
 
+function ComponentesInventario({ bien, compacto = false }) {
+  let componentes = bien?.componentes;
+  if (typeof componentes === 'string') {
+    try { componentes = JSON.parse(componentes); } catch { componentes = []; }
+  }
+  if (!Array.isArray(componentes) || componentes.length === 0) return null;
+  const piezas = componentes.reduce((total, componente) => total + (Number.parseInt(componente?.cantidad, 10) || 1), 0);
+  return (
+    <details className="mt-2 min-w-0 rounded-lg border border-brand/20 bg-brand-soft/50 text-brand-text">
+      <summary className={`flex cursor-pointer list-none items-center gap-1.5 rounded-lg px-2.5 ${compacto ? 'py-1' : 'py-1.5'} text-[10px] font-bold hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}>
+        <i className="fa-solid fa-cubes-stacked" aria-hidden="true" />
+        <span>{componentes.length} {componentes.length === 1 ? 'tipo' : 'tipos'} · {piezas} {piezas === 1 ? 'pieza' : 'piezas'}</span>
+        <i className="fa-solid fa-chevron-down ml-auto text-[9px]" aria-hidden="true" />
+      </summary>
+      <div className="grid gap-1.5 border-t border-brand/15 p-2">
+        {componentes.map((componente, index) => (
+          <div key={componente?.id || `${componente?.nombre || 'componente'}-${index}`} className="rounded-md bg-surface-1 px-2.5 py-2 text-content-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+              <span className="text-xs font-bold">{componente?.nombre || `Componente ${index + 1}`}</span>
+              <span className="text-[10px] font-semibold text-content-3">× {Number.parseInt(componente?.cantidad, 10) || 1}</span>
+            </div>
+            <div className="mt-1 grid gap-1 text-[10px] text-content-2 sm:grid-cols-2">
+              <span className="flex min-w-0 items-start gap-1.5"><i className="fa-solid fa-location-dot mt-0.5 w-3 shrink-0 text-danger" aria-hidden="true" /><span className="min-w-0"><b>Ubicación:</b> {componente?.ubicacion?.trim() || bien.ubicacion || 'Sin ubicación'}</span></span>
+              <span className="flex min-w-0 items-start gap-1.5"><i className="fa-solid fa-user-check mt-0.5 w-3 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><b>Funcionario:</b> {componente?.funcionario?.trim() || bien.funcionario || 'Sin funcionario'}</span></span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+}
+
 // Vista del inventario general (extraída de App.jsx, Fase 5).
 // Es la vista más grande del sistema; recibe todo por props.
 export default function InventarioView({
@@ -639,6 +671,7 @@ export default function InventarioView({
                                     <div className="min-w-0">
                                       <span className="inline-flex max-w-full truncate rounded-md bg-surface-2 px-2 py-1 font-mono text-label font-bold text-content-2">{item.rotulo || 'Sin rótulo'}</span>
                                       <h3 className="mt-2 line-clamp-2 text-body font-bold leading-snug text-content-1" title={repairMojibake(item.descripcion)}>{repairMojibake(item.descripcion) || 'Sin descripción'}</h3>
+                                      <ComponentesInventario bien={item} compacto />
                                     </div>
                                   </div>
                                   <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar bien (Mayús + clic para seleccionar un rango)" aria-label={`Seleccionar ${item.rotulo || item.descripcion}`} className="mt-1 h-4 w-4 shrink-0 rounded border-line-strong text-brand-text cursor-pointer" />
@@ -679,7 +712,7 @@ export default function InventarioView({
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
-                                {Array.isArray(item.componentes) && item.componentes.length > 0 && <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2 py-1 text-[10px] font-bold text-brand-text" title={item.componentes.map(c => `${c.nombre} ×${c.cantidad || 1} · ${c.ubicacion || item.ubicacion || 'Ubicación del bien'} · ${c.funcionario || item.funcionario || 'Encargado del bien'}`).join(' | ')}><i className="fa-solid fa-cubes-stacked" aria-hidden="true" />Conjunto · {item.componentes.length} tipos / {item.componentes.reduce((total, c) => total + (Number.parseInt(c.cantidad, 10) || 1), 0)} piezas</span>}
+                                <ComponentesInventario bien={item} compacto />
                                 <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{esBienLibreParaAsignar(item) ? 'Libre para asignar' : item.funcionario || 'Sin asignación'}</p>
                                 {item.funcionarioAlternativo && <p className="text-[10px] text-content-3 truncate"><i className="fa-solid fa-user-clock mr-1"></i>Otro turno: {item.funcionarioAlternativo}</p>}
                                 <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
@@ -811,7 +844,7 @@ export default function InventarioView({
                                       <p className={`font-semibold text-content-1 dark:text-white text-sm leading-snug ${compacto ? 'line-clamp-1' : 'line-clamp-2'}`} >
                                         {repairMojibake(item.descripcion)}
                                       </p>
-                                      {Array.isArray(item.componentes) && item.componentes.length > 0 && <span className="mt-1 inline-flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand-soft px-2 py-1 text-[10px] font-bold text-brand-text" title={item.componentes.map(c => `${c.nombre} ×${c.cantidad || 1} · ${c.ubicacion || item.ubicacion || 'Ubicación del bien'} · ${c.funcionario || item.funcionario || 'Encargado del bien'}`).join(' | ')}><i className="fa-solid fa-cubes-stacked" aria-hidden="true" />{item.componentes.length} tipos · {item.componentes.reduce((total, c) => total + (Number.parseInt(c.cantidad, 10) || 1), 0)} piezas</span>}
+                                      <ComponentesInventario bien={item} compacto={compacto} />
                                       {cols.cuenta && item.cuenta && (
                                         <span className="inline-block text-[10px] font-medium text-content-3 bg-surface-3 dark:bg-surface-3/50 px-2 py-0.5 rounded-lg">
                                           #{item.cuenta}

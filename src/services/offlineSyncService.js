@@ -2,7 +2,8 @@ import localforage from 'localforage';
 import { supabase } from '../supabaseClient';
 import { conSello } from './syncBienes';
 import {
-  encolarAccion, procesarCola, quitarExitosas, contarPendientes
+  encolarAccion, procesarCola, quitarExitosas, contarPendientes, crearMutacionSerializada,
+  TIPOS_CONOCIDOS
 } from './offlineQueue';
 
 const QUEUE_KEY = 'pending_offline_actions';
@@ -18,16 +19,15 @@ export const esFalloDeConexion = (error) => {
 let sincronizando = false;
 let reintentarDespuesDe = 0;
 let esperaReintentoMs = 5000;
+const mutarCola = crearMutacionSerializada({
+  leer: async () => (await localforage.getItem(QUEUE_KEY)) || [],
+  escribir: (cola) => localforage.setItem(QUEUE_KEY, cola)
+});
 
 // Encolar acción localmente.
 export const enqueueOfflineAction = async (action) => {
   try {
-    const actual = (await localforage.getItem(QUEUE_KEY)) || [];
-    // Se vuelve a leer y a escribir la cola completa: si hay un sincronizado en
-    // curso, su escritura final solo quita lo que él procesó, así que la acción
-    // nueva sobrevive.
-    const nueva = encolarAccion(actual, action);
-    await localforage.setItem(QUEUE_KEY, nueva);
+    const nueva = await mutarCola(actual => encolarAccion(actual, action));
     return nueva.length;
   } catch (error) {
     console.error('❌ Error al guardar en cola offline:', error);
@@ -97,25 +97,30 @@ export const processOfflineQueue = async (onComplete, { force = false } = {}) =>
       }
     };
 
-    const { exitosas, fallidas } = await procesarCola(cola, enviar);
+    const procesables = cola.filter(item => TIPOS_CONOCIDOS.includes(item.type));
+    const desconocidas = cola.filter(item => !TIPOS_CONOCIDOS.includes(item.type));
+    const { exitosas, fallidas } = await procesarCola(procesables, enviar);
 
     if (exitosas.length > 0) {
-      // Releer antes de escribir: entre la lectura inicial y ahora pueden
-      // haber entrado acciones nuevas, y esas no se deben tocar.
-      const vigente = (await localforage.getItem(QUEUE_KEY)) || [];
-      await localforage.setItem(QUEUE_KEY, quitarExitosas(vigente, exitosas));
+      // La lectura y escritura se serializan con las nuevas acciones encoladas:
+      // ninguna puede entrar en la ventana entre el getItem y el setItem.
+      await mutarCola(vigente => quitarExitosas(vigente, exitosas));
     }
 
     const pendientes = await getOfflineQueueLength();
-    const resumen = { exitosas: exitosas.length, fallidas: pendientes, pendientes, ocupado: false };
-    if (resumen.pendientes > 0) {
+    const resumen = { exitosas: exitosas.length, fallidas: fallidas.length, desconocidas: desconocidas.length, pendientes, requiereAtencion: desconocidas.length > 0, ocupado: false };
+    if (fallidas.length > 0) {
       reintentarDespuesDe = Date.now() + esperaReintentoMs;
       esperaReintentoMs = Math.min(esperaReintentoMs * 2, 120000);
-      console.warn(`⚠️ ${resumen.fallidas} acción(es) offline siguen pendientes.`);
+      console.warn(`⚠️ ${fallidas.length} acción(es) offline siguen pendientes.`);
+    } else if (desconocidas.length > 0) {
+      reintentarDespuesDe = Date.now() + 60 * 60 * 1000;
+      esperaReintentoMs = 5000;
     } else {
       reintentarDespuesDe = 0;
       esperaReintentoMs = 5000;
     }
+    if (desconocidas.length) console.error(`⚠️ ${desconocidas.length} acción(es) offline requieren atención por formato desconocido; se conservaron sin borrar.`);
     if (onComplete) onComplete(resumen);
     return resumen;
   } catch (error) {

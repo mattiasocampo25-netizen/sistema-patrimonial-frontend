@@ -8,6 +8,7 @@ import { Button, Card, Field, Input, PageHeader, Textarea, Toolbar } from '../co
 export default function AnunciosView({
   usuariosList = [],
   anunciosGrupos = [],
+  isLoadingHistorial = false,
   onEnviar,
   onEliminarGrupo,
   currentUser
@@ -146,7 +147,9 @@ export default function AnunciosView({
         <div className="px-5 sm:px-6 py-4 border-b border-line/50 dark:border-line/50">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white">Historial de anuncios</h3>
         </div>
-        {anunciosGrupos.length === 0 ? (
+        {isLoadingHistorial ? (
+          <div className="p-10 text-center" role="status"><i className="fa-solid fa-circle-notch fa-spin text-brand" aria-hidden="true" /><p className="mt-3 text-sm font-semibold text-content-3">Cargando historial completo…</p></div>
+        ) : anunciosGrupos.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-3 dark:bg-surface-2 text-content-3 mb-4 shadow-inner shadow-zinc-200/50 dark:shadow-darkbg-main/50">
               <i className="fa-solid fa-bullhorn text-2xl"></i>

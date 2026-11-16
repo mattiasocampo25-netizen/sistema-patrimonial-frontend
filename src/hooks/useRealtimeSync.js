@@ -7,6 +7,7 @@ import { BIENES_SYNC_VERSION, debeResyncTotal, fusionarBienes, ahoraISO } from '
 import { normalizeStr } from '../utils/helpers';
 import { processOfflineQueue, getOfflineQueueLength } from '../services/offlineSyncService';
 import { escaparFiltroPostgrest, rolDesdeCargo, rolEsPrivilegiado } from '../utils/postgrest';
+import { seleccionarNotificacionesPurgables } from '../utils/anuncios';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //
@@ -34,6 +35,8 @@ export function useRealtimeSync({
   setDbError, setIsLoading, setFichaBien
 }) {
   const [notificaciones, setNotificaciones] = useState([]);
+  const [historialAnuncios, setHistorialAnuncios] = useState([]);
+  const [isLoadingHistorialAnuncios, setIsLoadingHistorialAnuncios] = useState(false);
   const [ultimoSyncBienes, setUltimoSyncBienes] = useState(null);
   const [isLoadingDocumentos, setIsLoadingDocumentos] = useState(false);
 
@@ -128,33 +131,38 @@ export function useRealtimeSync({
     return { data: [...unicas.values()].sort((a, b) => fecha(b) - fecha(a)).slice(0, limite), error: null };
   }, [currentUser?.username, isAdmin]);
 
-  // Purga local (throttle 2 días por usuario): borra leídas viejas,
-  // anuncios globales totalmente leídos y solicitudes resueltas viejas.
+  // Purga de notificaciones temporales (throttle 2 días por usuario).
+  // Los anuncios son comunicaciones institucionales y nunca se purgan aquí.
   const purgarNotificacionesViejas = async (filas) => {
     try {
       const user = currentUser?.username || 'anon';
       const key = `notif_purge_ts_${user}`;
       const last = parseInt(localStorage.getItem(key) || '0', 10) || 0;
       if (Date.now() - last < RETENCION_NOTIF_MS) return;
-      localStorage.setItem(key, String(Date.now()));
       const corte = Date.now() - RETENCION_NOTIF_MS;
-      const fechaDe = (n) => new Date(n.resueltoFecha || n.fecha || n.created_at || 0).getTime() || 0;
-      const paraBorrar = (filas || []).filter(n => {
-        if (fechaDe(n) >= corte) return false;
-        if (n.tipo === 'BAJA_BIEN' || n.tipo === 'BAJA_FUNCIONARIO') return false;
-        if (esAnuncioGlobal(n)) {
-          return (n.totalDest || 0) > 0 && (n.leidos || []).length >= (n.totalDest || 0);
-        }
-        return n.leido === true;
-      });
-      if (paraBorrar.length === 0) return;
-      const ids = paraBorrar.map(n => n.id);
-      for (let i = 0; i < ids.length; i += 20) {
-        await Promise.all(ids.slice(i, i + 20).map(id => supabase.from('notificaciones').delete().eq('id', id)));
+      const paraBorrar = seleccionarNotificacionesPurgables(filas, corte);
+        if (paraBorrar.length === 0) {
+          localStorage.setItem(key, String(Date.now()));
+          return;
       }
-      const set = new Set(ids);
-      setNotificaciones(prev => prev.filter(n => !set.has(n.id)));
-    } catch {}
+        const ids = paraBorrar.map(n => n.id);
+        const eliminados = new Set();
+        let huboError = false;
+        for (let i = 0; i < ids.length; i += 20) {
+          const { data, error } = await supabase.from('notificaciones')
+            .delete().in('id', ids.slice(i, i + 20)).select('id');
+          if (error) {
+            huboError = true;
+            console.warn('No se pudo purgar una notificación temporal:', error.message);
+            continue;
+          }
+          (data || []).forEach(fila => eliminados.add(fila.id));
+        }
+        if (eliminados.size) setNotificaciones(prev => prev.filter(n => !eliminados.has(n.id)));
+        if (!huboError) localStorage.setItem(key, String(Date.now()));
+      } catch (error) {
+        console.warn('No se pudo completar la limpieza de notificaciones temporales:', error);
+      }
   };
 
   const fetchData = useCallback(async (isSilent = false) => {
@@ -664,6 +672,42 @@ export function useRealtimeSync({
       return { id: item.id, ...d };
   };
 
+  // El historial íntegro se carga solo al abrir Anuncios, no en cada sondeo de
+  // notificaciones. La paginación por id es estable aunque cambie el estado leído.
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin || activeTab !== 'anuncios') return undefined;
+    let vigente = true;
+    setIsLoadingHistorialAnuncios(true);
+    const cargarHistorial = async () => {
+      try {
+        const filas = [];
+        const tamano = 500;
+        let cursor = null;
+        while (true) {
+          let consulta = supabase.from('notificaciones').select('id, data')
+            .eq('data->>tipoRegistro', 'NOTIFICACION')
+            .eq('data->>accion', 'anuncio')
+            .order('id', { ascending: false })
+            .limit(tamano);
+          if (cursor) consulta = consulta.lt('id', cursor);
+          const { data, error } = await consulta;
+          if (error) throw error;
+          filas.push(...(data || []));
+          if (!data || data.length < tamano) break;
+          cursor = data[data.length - 1].id;
+        }
+        if (vigente) setHistorialAnuncios(filas.map(parseNotifRow));
+      } catch (error) {
+        if (vigente) notify('No se pudo cargar el historial completo de anuncios.', 'error');
+        console.error('No se pudo cargar el historial de anuncios:', error);
+      } finally {
+        if (vigente) setIsLoadingHistorialAnuncios(false);
+      }
+    };
+    cargarHistorial();
+    return () => { vigente = false; };
+  }, [activeTab, isAuthenticated, isAdmin, notify]);
+
   const cargarNotificaciones = async () => {
       const { data, error } = await queryNotificacionesAcotadas();
       if (!error && data) {
@@ -735,6 +779,8 @@ export function useRealtimeSync({
         if (resultado.exitosas > 0) {
           notify(`Se sincronizaron ${resultado.exitosas} cambios guardados en este dispositivo.`, 'success');
           fetchData(true);
+        } else if (resultado.requiereAtencion) {
+          notify(`${resultado.desconocidas} cambio(s) guardados localmente tienen un formato que esta versión no puede sincronizar. Se conservaron en el dispositivo; contacta al administrador.`, 'error');
         } else if (resultado.pendientes > 0) {
           notify(`${resultado.pendientes} cambio(s) siguen pendientes. Se conservaron en este dispositivo y habrá nuevos intentos.`, 'warning');
         }
@@ -762,6 +808,8 @@ export function useRealtimeSync({
         if (resumen.exitosas > 0) {
           notify(`Se sincronizaron ${resumen.exitosas} cambios guardados en este dispositivo.`, 'success');
           fetchData(true);
+        } else if (avisarFallos && resumen.requiereAtencion) {
+          notify(`${resumen.desconocidas} cambio(s) guardados localmente tienen un formato que esta versión no puede sincronizar. Se conservaron en el dispositivo; contacta al administrador.`, 'error');
         } else if (avisarFallos && resumen.pendientes > 0) {
           notify(`Internet volvió, pero ${resumen.pendientes} cambio(s) siguen pendientes. La app volverá a intentar automáticamente.`, 'warning');
         }
@@ -815,7 +863,8 @@ export function useRealtimeSync({
   // competing sobre la misma caché de IndexedDB.
 
   return {
-    isOnline, colaOffline, estaSincronizandoOffline, reintentarSincronizacion, notificaciones, setNotificaciones, ultimoSyncBienes, isLoadingDocumentos,
+    isOnline, colaOffline, estaSincronizandoOffline, reintentarSincronizacion, notificaciones, setNotificaciones,
+    historialAnuncios, setHistorialAnuncios, isLoadingHistorialAnuncios, ultimoSyncBienes, isLoadingDocumentos,
     fetchData, cargarNotificaciones, sondearNotificaciones, fusionarNotificacion,
     markAsRead, markAllAsRead, misNotificaciones, unreadCount
   };

@@ -11,6 +11,7 @@ import LoginScreen from './components/LoginScreen';
 import { supabase } from './supabaseClient';
 // Modales pesados: carga diferida para acelerar el arranque
 import { generateId, parseDateInfo, formatDateText, normalizeStr, getPlaceholderLogo, convertirImagenABase64, getLogoPorDependencia, comprimirImagen, coloresPorDependencia } from './utils/helpers';
+import { agruparAnuncios } from './utils/anuncios';
 import { useIdioma } from './utils/i18n';
 import { conSello, ahoraISO } from './services/syncBienes';
 import { mapearFilasBienes, parsearArchivoCSVBienes, MAX_CSV_BIENES_BYTES } from './utils/csvBienes';
@@ -130,6 +131,16 @@ export default function App() {
   };
   // Sesión y autenticación: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { isAuthenticated, currentUser, setCurrentUser, isAdmin, esDesarrollador, loginUser, setLoginUser, loginPass, setLoginPass, showPassword, setShowPassword, loginError, isProcessing, setIsProcessing, dependenciaActual, setDependenciaActual, showLogoutConfirm, setShowLogoutConfirm, mantenimiento, versionApp, isMantenimientoModalOpen, setIsMantenimientoModalOpen, isSavingMant, mostrarLoginDev, setMostrarLoginDev, mantBypass, handleLogin, handleLogout, saveMantenimiento } = useAuthSession({ notify: addToast });
+  const ultimoAvisoAuditoriaRef = useRef(0);
+  useEffect(() => {
+    const avisarFalloAuditoria = () => {
+      if (Date.now() - ultimoAvisoAuditoriaRef.current < 5000) return;
+      ultimoAvisoAuditoriaRef.current = Date.now();
+      addToast('No se pudo confirmar el registro de un evento en Auditoría. Verifica el historial antes de repetir la operación.', 'warning');
+    };
+    window.addEventListener('sigep-auditoria-no-registrada', avisarFalloAuditoria);
+    return () => window.removeEventListener('sigep-auditoria-no-registrada', avisarFalloAuditoria);
+  }, [addToast]);
   const [appLogo, _setAppLogo] = useState(() => localStorage.getItem('logoOficial'));
   
   
@@ -859,7 +870,7 @@ useEffect(() => {
 
   // Ficha 360: la lee el realtime (H5) anterior a H8, vive en App.
   // Sincronización de datos: hook extraído (Fase 6). La UI usa los mismos nombres.
-  const { isOnline, colaOffline, estaSincronizandoOffline, reintentarSincronizacion, notificaciones, setNotificaciones, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount, ultimoSyncBienes, isLoadingDocumentos } = useRealtimeSync({
+  const { isOnline, colaOffline, estaSincronizandoOffline, reintentarSincronizacion, notificaciones, setNotificaciones, historialAnuncios, setHistorialAnuncios, isLoadingHistorialAnuncios, cargarNotificaciones, markAsRead, markAllAsRead, misNotificaciones, unreadCount, ultimoSyncBienes, isLoadingDocumentos } = useRealtimeSync({
     notify: addToast, currentUser, setCurrentUser, dependenciaActual, setDependenciaActual, clearAllFilters, activeTab, isAuthenticated, isAdmin,
     handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
     setEstructurasDB, setUsuariosList, setFuncionariosPadron,
@@ -1008,35 +1019,23 @@ useEffect(() => {
       }
   };
   const eliminarGrupoAnuncio = async (grupo) => {
-      const ids = notificaciones.filter(n => (n.grupo || n.id) === grupo).map(n => n.id);
+      const ids = [...new Map([...notificaciones, ...historialAnuncios]
+        .filter(n => (n.grupo || n.id) === grupo)
+        .map(n => [n.id, n.id])).values()];
       if (ids.length === 0) return;
       try {
-          await Promise.all(ids.map(id => supabase.from('notificaciones').delete().eq('id', id)));
-          setNotificaciones(prev => prev.filter(n => (n.grupo || n.id) !== grupo));
+          const resultados = await Promise.all(ids.map(id => supabase.from('notificaciones').delete().eq('id', id)));
+          const fallidos = resultados.filter(resultado => resultado.error);
+          const idsEliminados = new Set(ids.filter((_, i) => !resultados[i].error));
+          setNotificaciones(prev => prev.filter(n => !idsEliminados.has(n.id)));
+          setHistorialAnuncios(prev => prev.filter(n => !idsEliminados.has(n.id)));
+          if (fallidos.length) throw fallidos[0].error;
           addToast('Anuncio eliminado.', 'success');
       } catch {
           addToast('No se pudo eliminar el anuncio.', 'error');
       }
   };
-  const anunciosGrupos = useMemo(() => {
-      const mapa = new Map();
-      notificaciones.filter(n => n.accion === 'anuncio').forEach(n => {
-          const g = n.grupo || n.id;
-          if (!mapa.has(g)) mapa.set(g, { grupo: g, titulo: n.titulo || '(Sin título)', mensaje: n.mensaje || '', fecha: n.fecha, remitente: n.remitente, alcance: n.alcance || n.usuarioDestino, total: 0, leidos: 0 });
-          const e = mapa.get(g);
-          if (Array.isArray(n.leidos) || n.totalDest) {
-              // Formato nuevo: una sola fila (toma el máximo por seguridad)
-              e.total = Math.max(e.total, n.totalDest || 0);
-              e.leidos = Math.max(e.leidos, (n.leidos || []).length);
-          } else {
-              // Formato legacy (fan-out): una fila por destinatario
-              e.total++;
-              if (n.leido) e.leidos++;
-          }
-          if (new Date(n.fecha).getTime() > new Date(e.fecha).getTime()) e.fecha = n.fecha;
-      });
-      return [...mapa.values()].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
-  }, [notificaciones]);
+  const anunciosGrupos = useMemo(() => agruparAnuncios([...notificaciones, ...historialAnuncios]), [notificaciones, historialAnuncios]);
 
   // --- EN App_2.jsx ---
 
@@ -1779,7 +1778,7 @@ if (publicBienId) {
 
                 {activeTab === 'auditoria' && isAdmin && (<AuditoriaView fetchAuditoria={fetchAuditoria} isLoadingAud={isLoadingAud} kpisAud={kpisAud} evolucionValor={evolucionValor} maxEvolucion={maxEvolucion} formatoCortoGs={formatoCortoGs} clearAllFilters={clearAllFilters} setFiltroAnio={setFiltroAnio} setFiltroMes={setFiltroMes} setActiveTab={setActiveTab} saludDatos={saludDatos} usoDb={usoDb} alertaDb={alertaDb} errorUsoDb={errorUsoDb} ultimoBackup={ultimoBackup} handleExportBackupGeneral={handleExportBackupGeneral} setSearchTerm={setSearchTerm} setSearchInput={setSearchInput} setCurrentPage={setCurrentPage} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} conteoUbicacion={conteoUbicacion} setConteoUbicacion={setConteoUbicacion} bienes={bienes} dependenciaActual={dependenciaActual} ubicacionesUnicas={ubicacionesUnicas} conteoCodigos={conteoCodigos} conteoInput={conteoInput} setConteoInput={setConteoInput} agregarCodigoConteo={agregarCodigoConteo} resultadoConteo={resultadoConteo} setScanParaConteo={setScanParaConteo} setIsScannerOpen={setIsScannerOpen} setConteoCodigos={setConteoCodigos} exportarConteoCSV={exportarConteoCSV} descargarActaConteoPDF={descargarActaConteoPDF} guardarActaConteo={guardarActaConteo} muestraN={muestraN} setMuestraN={setMuestraN} muestraUbicacion={muestraUbicacion} setMuestraUbicacion={setMuestraUbicacion} muestra={muestra} verificadosMuestra={verificadosMuestra} setVerificadosMuestra={setVerificadosMuestra} generarMuestra={generarMuestra} guardarActaMuestreo={guardarActaMuestreo} descargarActaMuestreoPDF={descargarActaMuestreoPDF} totalAud={totalAud} paginaAud={paginaAud} alcanceAud={alcanceAud} setAlcanceAud={setAlcanceAud} searchAud={searchAud} setSearchAud={setSearchAud} tipoEntidadAud={tipoEntidadAud} setTipoEntidadAud={setTipoEntidadAud} campoAud={campoAud} setCampoAud={setCampoAud} filtroAccionAud={filtroAccionAud} setFiltroAccionAud={setFiltroAccionAud} filtroUsuarioAud={filtroUsuarioAud} setFiltroUsuarioAud={setFiltroUsuarioAud} usuariosAud={usuariosAud} desdeAud={desdeAud} setDesdeAud={setDesdeAud} hastaAud={hastaAud} setHastaAud={setHastaAud} accionesUnicasAud={accionesUnicasAud} auditoriaList={auditoriaList} actorAud={actorAud} tonoAccionAud={tonoAccionAud} detalleAudCorto={detalleAudCorto} />)}
                 {activeTab === 'usuarios' && isAdmin && (<UsuariosView isLoading={isLoading} usuariosList={usuariosList} setUsuarioEditing={setUsuarioEditing} setIsUsuarioModalOpen={setIsUsuarioModalOpen} esDesarrollador={esDesarrollador} currentUser={currentUser} setItemToDelete={setItemToDelete} STYLES={STYLES} />)}
-                {activeTab === 'anuncios' && esDesarrollador && (<AnunciosView usuariosList={usuariosList} anunciosGrupos={anunciosGrupos} onEnviar={enviarAnuncio} onEliminarGrupo={eliminarGrupoAnuncio} currentUser={currentUser} />)}
+                {activeTab === 'anuncios' && esDesarrollador && (<AnunciosView usuariosList={usuariosList} anunciosGrupos={anunciosGrupos} isLoadingHistorial={isLoadingHistorialAnuncios} onEnviar={enviarAnuncio} onEliminarGrupo={eliminarGrupoAnuncio} currentUser={currentUser} />)}
                 {activeTab === 'funcionarios' && (<FuncionariosView isLoading={isLoading} dependenciaActual={dependenciaActual} funcionariosPurosDependencia={funcionariosPurosDependencia} bienesDependenciaCount={sugerenciasBienesDep.length} filtroCargo={filtroCargo} setFiltroCargo={setFiltroCargo} cargosFuncionarios={cargosFuncionarios} sincronizarBienesConPadron={sincronizarBienesConPadron} handleDownloadTemplateFuncionarios={handleDownloadTemplateFuncionarios} fileInputFuncionariosRef={fileInputFuncionariosRef} isAdmin={isAdmin} setIsUbicacionesModalOpen={setIsUbicacionesModalOpen} setIsNewFuncionarioModalOpen={setIsNewFuncionarioModalOpen} searchFuncionarioInput={searchFuncionarioInput} setSearchFuncionarioInput={setSearchFuncionarioInput} setCurrentPaginaFuncionarios={setCurrentPaginaFuncionarios} funcionariosPaginados={funcionariosPaginados} handleEditFuncionario={handleEditFuncionario} handleDeleteFuncionario={handleDeleteFuncionario} renderPaginationFuncionarios={renderPaginationFuncionarios} />)}
 
                 {activeTab === 'fc04' && (<Fc04View filteredFC04={filteredFC04} fc10Year={fc10Year} setFc10Year={setFc10Year} fc10Month={fc10Month} setFc10Month={setFc10Month} openFC04Modal={openFC04Modal} STYLES={STYLES} isLoading={isLoading || isLoadingDocumentos} ORIGENES_FC04={ORIGENES_FC04} handleGenerateFC04PDF={handleGenerateFC04PDF} isAdmin={isAdmin} setItemToDelete={setItemToDelete} />)}

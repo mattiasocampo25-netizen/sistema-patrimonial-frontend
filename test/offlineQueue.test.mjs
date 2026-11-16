@@ -7,7 +7,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  encolarAccion, procesarCola, quitarExitosas, contarPendientes, TIPOS_CONOCIDOS
+  encolarAccion, procesarCola, quitarExitosas, contarPendientes, TIPOS_CONOCIDOS,
+  crearMutacionSerializada
 } from '../src/services/offlineQueue.js';
 
 const accion = (tipo, id, extra = {}) => ({ type: tipo, payload: { id }, ...extra });
@@ -54,12 +55,6 @@ test('quitarExitosas NO borra lo que se.agregó durante el procesamiento', () =>
   // Estado inicial: una acción en cola.
   const alEmpezar = encolarAccion([], accion('SAVE_BIEN', 'vieja'));
 
-  // Se procesa y esa una acción se sincroniza bien.
-  const procesar = async () => {
-    const { exitosas } = await procesarCola(alEmpezar, async () => ({ error: null }));
-    return exitosas;
-  };
-
   // Mientras corría la red, el usuario (sin conexión) editó OTRO bien y la
   // acción entró en la cola vigente.
   const claveVieja = alEmpezar[0].clave;
@@ -72,6 +67,22 @@ test('quitarExitosas NO borra lo que se.agregó durante el procesamiento', () =>
   assert.equal(finales.length, 1, 'debe quedar solo la acción nueva');
   assert.equal(finales[0].payload.id, 'nueva-durante-el-proceso', 'la acción nueva NO puede perderse');
   assert.ok(claveNueva !== claveVieja);
+});
+
+test('las mutaciones simultáneas de la cola se serializan y no pierden acciones', async () => {
+  let guardada = [];
+  const mutar = crearMutacionSerializada({
+    leer: async () => guardada,
+    escribir: async valor => {
+      await new Promise(resolve => setTimeout(resolve, 5));
+      guardada = valor;
+    }
+  });
+  await Promise.all([
+    mutar(actual => encolarAccion(actual, accion('SAVE_BIEN', 'primera'))),
+    mutar(actual => encolarAccion(actual, accion('SAVE_BIEN', 'segunda')))
+  ]);
+  assert.deepEqual(guardada.map(item => item.payload.id).sort(), ['primera', 'segunda']);
 });
 
 test('quitarExitosas sin claves no modifica nada', () => {

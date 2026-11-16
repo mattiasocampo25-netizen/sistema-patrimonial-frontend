@@ -51,6 +51,7 @@
     "atob": "readonly",
     "CompressionStream": "readonly",
     "DecompressionStream": "readonly",
-    "ResizeObserver": "readonly"
+    "ResizeObserver": "readonly",
+    "AbortController": "readonly"
   }
 }

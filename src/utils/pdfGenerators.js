@@ -395,7 +395,11 @@ export const buildActaAuditoriaPDF = async ({ tipo, fecha, dependencia, alcance,
 };
 
 // --- GENERADOR DE ETIQUETA PROFESIONAL PNG CON QR DINMICO ---
+const idUuidValidoParaQR = (id) => typeof id === 'string'
+  && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id.trim());
+
 export const generateProfessionalLabelPNG = async (bien, logoUrl, returnOnly = false) => {
+    if (!idUuidValidoParaQR(bien?.id)) throw new Error('El bien no tiene un identificador UUID válido para generar un QR.');
     // qrcode (npm) se carga bajo demanda: no entra al bundle inicial.
     const { default: QRCode } = await import('qrcode');
     // La etiqueta también usa Open Sans (ya cargada en el documento).
@@ -450,7 +454,7 @@ export const generateProfessionalLabelPNG = async (bien, logoUrl, returnOnly = f
     ctx.fillText(`RESPONSABLE: ${(bien.funcionario || 'Sin custodio').substring(0, 30)}`, 32, 268);
 
     // Generar e incrustar QR dinmico
-    const qrTargetValue = bien.id || bien.rotulo || 'UNP';
+    const qrTargetValue = String(bien.id).trim();
     const baseUrl = (typeof window !== "undefined" && window.location.origin && !window.location.origin.includes("localhost")) ? window.location.origin : "https://sigep-inventario.vercel.app";
     const qrUrl = `${baseUrl}/?id=${encodeURIComponent(qrTargetValue)}`;
 
@@ -495,8 +499,9 @@ export const generateProfessionalLabelPNG = async (bien, logoUrl, returnOnly = f
 
 // --- GENERADOR DE CÓDIGO QR PURO (SIN MARCOS NI TEXTO ADICIONAL) ---
 export const generateSimpleQR = async (bien, returnOnly = false) => {
+    if (!idUuidValidoParaQR(bien?.id)) throw new Error('El bien no tiene un identificador UUID válido para generar un QR.');
     const { default: QRCode } = await import('qrcode');
-    const qrTargetValue = bien.id || bien.rotulo || 'UNP';
+    const qrTargetValue = String(bien.id).trim();
     const baseUrl = (typeof window !== "undefined" && window.location.origin && !window.location.origin.includes("localhost")) 
         ? window.location.origin 
         : "https://sigep-inventario.vercel.app";

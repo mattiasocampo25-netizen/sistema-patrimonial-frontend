@@ -17,6 +17,21 @@
 
 export const TIPOS_CONOCIDOS = ['SAVE_BIEN', 'DELETE_BIEN', 'SAVE_FC10'];
 
+/** Serializa cada lectura-modificación-escritura para evitar que dos operaciones se pisen. */
+export const crearMutacionSerializada = ({ leer, escribir }) => {
+  let turno = Promise.resolve();
+  return (mutar) => {
+    const operacion = turno.then(async () => {
+      const actual = (await leer()) || [];
+      const siguiente = await mutar(Array.isArray(actual) ? actual : []);
+      await escribir(siguiente);
+      return siguiente;
+    });
+    turno = operacion.then(() => undefined, () => undefined);
+    return operacion;
+  };
+};
+
 /** Identificador único de una acción encolada. */
 const nuevaClave = () => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();

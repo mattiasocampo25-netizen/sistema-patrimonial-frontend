@@ -23,8 +23,13 @@ export const registrarAuditoria = async ({ usuario, dependencia, accion, entidad
     const { error } = await supabase.from('auditoria').insert([payload]);
     if (error) {
       console.warn('Advertencia al registrar auditoría en Supabase:', error.message);
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('sigep-auditoria-no-registrada'));
+      return false;
     }
+    return true;
   } catch (error) {
     console.error('Error al registrar auditoría:', error);
+    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('sigep-auditoria-no-registrada'));
+    return false;
   }
 };

@@ -27,6 +27,12 @@ const FOCALIZABLES =
 export default function Dialogo({ className = '', children, onCerrar, onClick, ...resto }) {
   const ref = useRef(null);
   const openerRef = useRef(null);
+  const onCerrarRef = useRef(onCerrar);
+  // Los callbacks de cierre suelen declararse inline en el modal padre y
+  // cambian en cada pulsación. Mantener el valor actual en un ref evita que
+  // el efecto de foco se reinicie y devuelva el foco al botón de apertura
+  // mientras se escribe en un campo del diálogo.
+  onCerrarRef.current = onCerrar;
 
   // Si el modal ya trae su propio role="dialog" en el contenido, el overlay
   // no lo repite (dos dialogos anidados en el arbol de accesibilidad).
@@ -57,8 +63,8 @@ export default function Dialogo({ className = '', children, onCerrar, onClick, .
         boton.click();
         return;
       }
-      if (onCerrar) {
-        onCerrar();
+      if (onCerrarRef.current) {
+        onCerrarRef.current();
         return;
       }
       // Ultimo recurso: pulsar el fondo, que en estos modales cierra.
@@ -103,7 +109,7 @@ export default function Dialogo({ className = '', children, onCerrar, onClick, .
       const devolver = openerRef.current;
       if (devolver && typeof devolver.focus === 'function') devolver.focus();
     };
-  }, [onCerrar]);
+  }, []);
 
   return (
     <div

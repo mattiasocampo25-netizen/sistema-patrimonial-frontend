@@ -710,11 +710,15 @@ export function useRealtimeSync({
 
   const cargarNotificaciones = async () => {
       const { data, error } = await queryNotificacionesAcotadas();
-      if (!error && data) {
-          const filas = data.map(parseNotifRow);
-          setNotificaciones(filas);
-          purgarNotificacionesViejas(filas);
+      if (error) {
+          console.error('No se pudieron cargar las notificaciones y solicitudes:', error);
+          notify('No se pudieron cargar las solicitudes. Comprueba la conexión y vuelve a intentarlo.', 'error');
+          return false;
       }
+      const filas = (data || []).map(parseNotifRow);
+      setNotificaciones(filas);
+      purgarNotificacionesViejas(filas);
+      return true;
   };
 
   // Sondeo liviano: solo lo que todavía no se vio, fusionado sin recargar todo.

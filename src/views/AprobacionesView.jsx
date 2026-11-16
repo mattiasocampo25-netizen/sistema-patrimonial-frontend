@@ -19,7 +19,7 @@ const normalizarVistaAprobaciones = value => value && typeof value === 'object' 
 export default function AprobacionesView({
   dependenciaActual,
   solicitudesBaja, bienes,
-  openResolucionModal, marcarSolicitudEnRevision, actualizarSolicitud, currentUser,
+  openResolucionModal, marcarSolicitudEnRevision, actualizarSolicitud, cargarNotificaciones, currentUser,
  
 }) {
   const [filtroEstado, setFiltroEstado] = useState('todos');
@@ -36,6 +36,14 @@ export default function AprobacionesView({
   const [asignandoId, setAsignandoId] = useState(null);
   const usuarioActual = currentUser?.username || '';
   const [revisandoIds, setRevisandoIds] = useState(() => new Set());
+  const [actualizandoBandeja, setActualizandoBandeja] = useState(false);
+
+  const actualizarBandeja = async () => {
+    if (!cargarNotificaciones || actualizandoBandeja) return;
+    setActualizandoBandeja(true);
+    try { await cargarNotificaciones(); }
+    finally { setActualizandoBandeja(false); }
+  };
 
   const iniciarRevision = async (solicitud) => {
     if (revisandoIds.has(solicitud.id)) return;
@@ -113,7 +121,7 @@ export default function AprobacionesView({
   return (
     <div className="flex flex-col flex-1 space-y-6">
       <Card className="p-0">
-        <div className="p-5 sm:p-6">
+          <div className="p-5 sm:p-6">
           <section className="relative isolate overflow-hidden rounded-[26px] bg-gradient-to-br from-slate-950 via-[#123a60] to-[#176475] p-5 text-white shadow-[0_22px_60px_-38px_rgba(15,45,75,.75)] sm:p-7">
             <div aria-hidden="true" className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full border border-white/10 bg-white/[0.035]" />
             <div className="relative flex flex-wrap items-start justify-between gap-4">
@@ -121,6 +129,10 @@ export default function AprobacionesView({
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-cyan-100"><i className="fa-solid fa-scale-balanced" aria-hidden="true" /> Trámite y seguimiento · {dependenciaActual}</span>
                 <h1 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">Centro de Aprobaciones</h1>
                 <p className="mt-2 max-w-2xl text-xs leading-relaxed text-slate-200 sm:text-sm">Revisa quién solicitó cada trámite, asigna su seguimiento y registra una decisión con motivo e historial.</p>
+                <button type="button" onClick={actualizarBandeja} disabled={actualizandoBandeja} className="mt-4 inline-flex h-9 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 text-xs font-bold text-white transition hover:bg-white/20 disabled:cursor-wait disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80">
+                  <i className={`fa-solid ${actualizandoBandeja ? 'fa-spinner fa-spin' : 'fa-rotate'}`} aria-hidden="true" />
+                  {actualizandoBandeja ? 'Actualizando solicitudes…' : 'Actualizar solicitudes'}
+                </button>
               </div>
               <div className="grid min-w-[230px] grid-cols-2 gap-2 rounded-2xl border border-white/15 bg-slate-950/20 p-3 sm:p-4">
                 <div className="rounded-xl bg-white/[.08] p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-cyan-100/70">Abiertas</p><p className="mt-1 text-2xl font-black tabular-nums">{solicitudesAbiertas.toLocaleString('es-PY')}</p></div>
@@ -193,7 +205,7 @@ export default function AprobacionesView({
                 const esSolicitudFuncionario = notif.tipo === 'BAJA_FUNCIONARIO';
                 const bienAsociado = esSolicitudFuncionario
                   ? {
-                      id: notif.funcionarioId,
+                      id: notif.funcionarioId || notif.funcionario_id,
                       rotulo: notif.cedula || 'S/C',
                       descripcion: notif.nombre || 'Funcionario del padrón'
                     }

@@ -376,8 +376,9 @@ export function useFcModals({
       };
       setIsProcessing({ active: true, text: 'Marcando solicitud en revisión...' });
       try {
-          const { error } = await supabase.from('notificaciones').update({ data: actualizada }).eq('id', solicitud.id);
+          const { data: filaActualizada, error } = await supabase.from('notificaciones').update({ data: actualizada }).eq('id', solicitud.id).select('id').maybeSingle();
           if (error) throw error;
+          if (!filaActualizada) throw new Error('No se encontró la solicitud o no tienes permiso para actualizarla. Actualiza la bandeja.');
           setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? actualizada : item));
           await registrarAuditoria({
               usuario: actor,
@@ -413,8 +414,9 @@ export function useFcModals({
               return false;
           }
           const versionActualizada = { ...actual, responsable: String(solicitud.responsable).trim(), asignadoPor: currentUser?.username || 'Admin', asignadoEn: new Date().toISOString(), historial: Array.isArray(solicitud.historial) ? solicitud.historial : actual.historial || [] };
-          const { error } = await supabase.from('notificaciones').update({ data: versionActualizada }).eq('id', solicitud.id);
+          const { data: filaActualizada, error } = await supabase.from('notificaciones').update({ data: versionActualizada }).eq('id', solicitud.id).select('id').maybeSingle();
           if (error) throw error;
+          if (!filaActualizada) throw new Error('No se encontró la solicitud o no tienes permiso para asignarle un responsable.');
           setNotificaciones(prev => prev.map(item => item.id === solicitud.id ? versionActualizada : item));
           await registrarAuditoria({
               usuario: currentUser?.username || 'Admin',
@@ -1359,7 +1361,7 @@ export function useFcModals({
           //    huerfanas que nadie podia volver a resolver.
           if (accion === "aprobar") {
               if (esSolicitudFuncionario) {
-                  const funcId = notifPendiente.funcionarioId;
+                   const funcId = notifPendiente.funcionarioId || notifPendiente.funcionario_id || bien?.id;
                   if (!funcId) throw new Error("la solicitud no tiene funcionario asociado");
                   const { error: errFunc } = await supabase.from("funcionarios").delete().eq("id", funcId);
                   if (errFunc) throw new Error(`no se pudo eliminar al funcionario: ${errFunc.message}`);
@@ -1383,8 +1385,9 @@ export function useFcModals({
                   resueltoFecha: fechaResolucion,
                   historial: [...historialPrevio, { estado: estadoNuevo, usuario: actor, fecha: fechaResolucion, motivo: motivoFinal }]
               };
-              const { error: errNotif } = await supabase.from("notificaciones").update({ data: notifActualizada }).eq("id", notifPendiente.id);
+               const { data: filaResuelta, error: errNotif } = await supabase.from("notificaciones").update({ data: notifActualizada }).eq("id", notifPendiente.id).select('id').maybeSingle();
               if (errNotif) throw new Error(`no se pudo cerrar la solicitud: ${errNotif.message}`);
+               if (!filaResuelta) throw new Error('No se actualizó la solicitud. Puede que otro administrador ya la haya resuelto; actualiza la bandeja.');
               setNotificaciones(prev => prev.map(n => n.id === notifPendiente.id ? notifActualizada : n));
           }
 
@@ -1486,6 +1489,9 @@ export function useFcModals({
                   entidadId: item.id || id,
                   detalles: { nombre: item?.nombre, cedula: item?.cedula, motivo: motivoSolicitudBaja.trim() }
                 });
+              } else {
+                console.error('No se pudo enviar la solicitud de baja del funcionario:', res.error);
+                notify(`No se pudo enviar la solicitud. ${res.error.message || 'Comprueba la conexión y vuelve a intentarlo.'}`, 'error');
               }
               return;
           }
@@ -1524,6 +1530,9 @@ export function useFcModals({
                   entidadId: item.id || id,
                   detalles: { rotulo: item?.rotulo, descripcion: item?.descripcion, motivo: motivoSolicitudBaja.trim() }
                 });
+              } else {
+                console.error('No se pudo enviar la solicitud de baja del bien:', res.error);
+                notify(`No se pudo enviar la solicitud. ${res.error.message || 'Comprueba la conexión y vuelve a intentarlo.'}`, 'error');
               }
           } else {
               // Borrado diferido con Deshacer (6s): aplica local ya, confirma remoto después.

@@ -4,6 +4,7 @@ import { Button, IconButton, Badge } from './ui';
 import { camposIncompletos } from '../utils/dataCompleteness';
 import { supabase } from '../supabaseClient';
 import { crearExpedienteAuditoria } from '../utils/expedienteAuditoria';
+import { obtenerCambiosAuditoria, etiquetaCampoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 
 const TIPO_TONO = {
   alta: 'ok',
@@ -23,6 +24,13 @@ const TIPO_ICONO = {
   otro: 'fa-circle-info',
 };
 
+function normalizarComponentesFicha(valor) {
+  if (typeof valor === 'string') {
+    try { valor = JSON.parse(valor); } catch { valor = []; }
+  }
+  return Array.isArray(valor) ? valor : [];
+}
+
 export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10List = [], fc11List = [], formatCurrency, formatDateText, onAgregarFoto, onEliminarFoto, subiendoFoto, esAdmin, STYLES, onVerEnInventario }) {
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
   const [urlsFotosPrivadas, setUrlsFotosPrivadas] = useState({});
@@ -31,6 +39,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
   const [errorExpediente, setErrorExpediente] = useState('');
   const bienId = bien?.id;
   const bienRotulo = bien?.rotulo;
+  const componentesBien = normalizarComponentesFicha(bien?.componentes);
   const fotos = bien?.fotos || [];
   const claveFotos = fotos.map(f => f.ruta || f.url || '').join('|');
   useEffect(() => {
@@ -83,6 +92,17 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
   }, [isOpen, bienId, bienRotulo]);
   if (!isOpen || !bien) return null;
   const incompletos = camposIncompletos(bien);
+  const eventoAlta = (eventos || []).find(evento => evento.tipo === 'alta' && evento.usuario);
+  const eventoModificacion = (eventos || []).find(evento => evento.usuario && evento.tipo === 'modificacion');
+  const fechaCargaBien = bien.fechaCarga || bien.created_at || eventoAlta?.fecha || null;
+  const usuarioCargaBien = bien.creadoPor || eventoAlta?.usuario || null;
+  const fechaModificacionBien = bien.modificadoEn || bien.updated_at || eventoModificacion?.fecha || fechaCargaBien;
+  const usuarioModificacionBien = bien.modificadoPor || eventoModificacion?.usuario || usuarioCargaBien;
+  const mostrarFechaHora = (valor) => {
+    if (!valor) return 'Sin registro';
+    const fecha = new Date(valor);
+    return Number.isNaN(fecha.getTime()) ? String(valor) : new Intl.DateTimeFormat('es-PY', { dateStyle: 'medium', timeStyle: 'short' }).format(fecha);
+  };
   const descargarExpediente = async () => {
     if (exportandoExpediente) return;
     setExportandoExpediente(true);
@@ -132,7 +152,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
 
   return (
     <Dialogo className={`${STYLES.modalOverlay} ficha-bien-overlay`} onCerrar={onClose}>
-      <div className={STYLES.modalContent + " ficha-bien-dialog max-w-2xl"} onClick={(e) => e.stopPropagation()}>
+      <div className={STYLES.modalContent + " ficha-bien-dialog max-w-3xl"} onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card bg-surface-2 dark:bg-surface-1/5 text-content-1 dark:text-content-1">
@@ -159,7 +179,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
           <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={onClose} />
         </div>
 
-        <div className="ficha-bien-contenido p-6 space-y-6 overflow-y-auto custom-scrollbar">
+        <div className="ficha-bien-contenido space-y-5 overflow-y-auto p-4 custom-scrollbar sm:p-6">
           {incompletos.length > 0 && (
             <section aria-label="Datos incompletos del bien" className="rounded-card border border-warn/25 bg-warn-soft px-4 py-3.5">
               <div className="flex items-start gap-3">
@@ -171,12 +191,22 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
               </div>
             </section>
           )}
+          <section className="rounded-card border border-line bg-surface-1 p-4" aria-label="Registro y últimas modificaciones">
+            <div className="mb-3 flex items-center gap-2"><i className="fa-solid fa-clock-rotate-left text-brand-text" aria-hidden="true" /><h3 className="text-xs font-extrabold text-content-1">Registro del bien</h3></div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Dato label="Cargado en el sistema" value={mostrarFechaHora(fechaCargaBien)} />
+              <Dato label="Cargado por" value={usuarioCargaBien || 'Usuario no identificado'} />
+              <Dato label="Última modificación" value={mostrarFechaHora(fechaModificacionBien)} />
+              <Dato label="Modificado por" value={usuarioModificacionBien || 'Sin dato de auditoría'} />
+            </div>
+          </section>
           {String(bien.observaciones || '').trim() && (
-            <section aria-label="Observaciones del bien" className="rounded-card border border-amber-300 bg-amber-50 px-4 py-3.5 dark:border-amber-400/30 dark:bg-amber-400/10">
+            <section aria-label="Observaciones del bien" className="rounded-card border border-amber-300 bg-amber-50 p-4 dark:border-amber-400/30 dark:bg-amber-400/10">
               <h3 className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
-                <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Observación registrada
+                <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /> Observación del bien
               </h3>
-              <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-relaxed text-amber-950 dark:text-amber-100">{bien.observaciones}</p>
+              <p className="mt-2 max-h-56 overflow-y-auto overscroll-contain whitespace-pre-wrap break-words text-sm leading-relaxed text-amber-950 custom-scrollbar dark:text-amber-100">{bien.observaciones}</p>
+              <p className="mt-3 border-t border-amber-300/60 pt-2 text-[10px] text-amber-900/75 dark:border-amber-300/20 dark:text-amber-100/70">{usuarioModificacionBien ? `Último cambio del registro por ${usuarioModificacionBien}` : 'Nota registrada en el inventario'}{fechaModificacionBien ? ` · ${mostrarFechaHora(fechaModificacionBien)}` : ''}</p>
             </section>
           )}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -188,6 +218,17 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
             {bien.funcionarioAlternativo && <Dato label="Responsable alternativo · sin FC-10 propio" value={bien.funcionarioAlternativo} />}
             <Dato label="Dependencia" value={bien.dependencia} />
           </div>
+
+          {componentesBien.length > 0 && (
+            <section className="rounded-card border border-brand/20 bg-brand-soft/20 p-4" aria-label="Piezas y conjuntos del bien">
+              <div className="mb-3 flex items-center gap-2"><i className="fa-solid fa-cubes-stacked text-brand-text" aria-hidden="true" /><h3 className="text-xs font-extrabold text-content-1">Piezas y conjuntos · {componentesBien.length}</h3></div>
+              <div className="grid gap-2 sm:grid-cols-2">{componentesBien.map((componente, indice) => <article key={componente.id || `${componente.nombre}-${indice}`} className="rounded-control border border-line bg-surface-1 p-3">
+                <p className="text-xs font-bold text-content-1">{componente.nombre || `Pieza ${indice + 1}`} <span className="font-semibold text-content-3">× {componente.cantidad || 1}</span></p>
+                <p className="mt-1.5 text-[10px] leading-relaxed text-content-2"><i className="fa-solid fa-location-dot mr-1 text-danger" aria-hidden="true" />{componente.ubicacion || bien.ubicacion || 'Sin ubicación'}<br /><i className="fa-solid fa-user-check mr-1 text-ok" aria-hidden="true" />{componente.funcionario || bien.funcionario || 'Sin funcionario'}</p>
+                {(componente.estadoConservacion || componente.observaciones) && <p className="mt-2 whitespace-pre-wrap break-words border-t border-line pt-2 text-[10px] leading-relaxed text-content-2">{componente.estadoConservacion && <><b>Estado:</b> {componente.estadoConservacion}. </>}{componente.observaciones && <><b>Observación:</b> {componente.observaciones}</>}</p>}
+              </article>)}</div>
+            </section>
+          )}
 
           <section className="ficha-bien-qr flex items-center gap-4 rounded-card border border-line bg-surface-2 p-4" aria-label="Código QR del bien">
             {qrFicha ? <img src={qrFicha} alt={`Código QR del bien ${bien.rotulo || ''}`} className="h-24 w-24 shrink-0 rounded-lg bg-white p-1 print:h-28 print:w-28" /> : <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-lg bg-surface-3 text-content-3"><i className="fa-solid fa-qrcode text-2xl" aria-hidden="true" /></span>}
@@ -270,13 +311,13 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
                         </div>
                         {ev.detalle && <p className="text-xs text-content-3 dark:text-content-3 mt-2 leading-relaxed pl-[38px]">{ev.detalle}</p>}
                         {ev.usuario && <p className="text-[10px] font-semibold text-content-3 mt-2 pl-[38px]">Registrado por {ev.usuario}</p>}
-                        {ev.cambios?.anterior && ev.cambios?.nuevo && <details className="mt-2 pl-[38px]">
+                        {(ev.auditRow ? obtenerCambiosAuditoria(ev.auditRow) : []).length > 0 && <details className="mt-2 pl-[38px]">
                           <summary className="cursor-pointer text-[10px] font-bold text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Comparar antes y después</summary>
                           <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
-                            {Object.keys(ev.cambios.nuevo).filter((campo) => JSON.stringify(ev.cambios.nuevo[campo]) !== JSON.stringify(ev.cambios.anterior[campo])).map((campo) => <div key={campo} className="rounded-control border border-line bg-surface-1 p-2.5">
-                              <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-content-3">{campo}</p>
-                              <p className="break-words text-[10px] text-content-2"><span className="font-bold">Antes:</span> {String(ev.cambios.anterior[campo] ?? '—')}</p>
-                              <p className="break-words text-[10px] text-content-1"><span className="font-bold">Después:</span> {String(ev.cambios.nuevo[campo] ?? '—')}</p>
+                            {obtenerCambiosAuditoria(ev.auditRow).map((cambio) => <div key={cambio.campo} className="rounded-control border border-line bg-surface-1 p-2.5">
+                              <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-content-3">{etiquetaCampoAuditoria(cambio.campo)}</p>
+                              <p className="break-words text-[10px] text-content-2"><span className="font-bold">Antes:</span> {valorAuditoriaLegible(cambio.antes, cambio.campo)}</p>
+                              <p className="break-words text-[10px] text-content-1"><span className="font-bold">Después:</span> {valorAuditoriaLegible(cambio.despues, cambio.campo)}</p>
                             </div>)}
                           </div>
                         </details>}

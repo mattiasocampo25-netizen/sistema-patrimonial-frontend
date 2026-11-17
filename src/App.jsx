@@ -309,7 +309,7 @@ export default function App() {
           }
         } else if (m) detalle = String(m);
       } catch { detalle = String(row.mensaje || ''); }
-      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle, usuario: row.usuario || '', cambios });
+      ev.push({ fecha: row.fecha || '', fechaFmt: row.fecha ? fmt(String(row.fecha).split('T')[0]) : 'Sin fecha', tipo, titulo: row.titulo || row.accion || 'Evento', detalle, usuario: row.usuario || '', cambios, auditRow: row });
     });
     return ev.sort((x, y) => String(y.fecha || '').localeCompare(String(x.fecha || '')));
   }, [fichaBien, eventosAuditFicha, fc10List, fc11List]);
@@ -331,7 +331,7 @@ export default function App() {
       // (las fichas se revisan con 2 o 3 fotos).
       const fotos = [...(fichaBien.fotos || []), { ruta: nombre, fecha: new Date().toISOString(), usuario: currentUser?.username || 'Usuario' }].slice(-MAX_FOTOS_POR_BIEN);
       const sobrantes = (fichaBien.fotos || []).filter(f => !fotos.includes(f));
-      const actualizado = { ...fichaBien, fotos };
+      const actualizado = { ...fichaBien, fotos, modificadoEn: new Date().toISOString(), modificadoPor: currentUser?.username || 'Usuario' };
       const { error: dbErr } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
       if (dbErr) throw dbErr;
       rutaSubida = null;
@@ -350,7 +350,7 @@ export default function App() {
         const { data: releido, error: readErr } = await supabase.from('bens').select('*').eq('id', fichaBien.id).maybeSingle();
         if (!readErr && releido) {
           const d = typeof releido.data === 'string' ? JSON.parse(releido.data) : (releido.data || {});
-          final = { id: releido.id, ...d };
+          final = { id: releido.id, ...d, updated_at: releido.updated_at };
         }
       } catch {}
       setBienes(prev => prev.map(b => (b.id === fichaBien.id ? final : b)));
@@ -374,7 +374,7 @@ export default function App() {
   const eliminarFotoBien = async (foto) => {
     if (!fichaBien || !foto) return;
     try {
-      const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => foto.ruta ? f.ruta !== foto.ruta : f.url !== foto.url) };
+      const actualizado = { ...fichaBien, fotos: (fichaBien.fotos || []).filter(f => foto.ruta ? f.ruta !== foto.ruta : f.url !== foto.url), modificadoEn: new Date().toISOString(), modificadoPor: currentUser?.username || 'Usuario' };
       const { error } = await supabase.from('bens').update(conSello({ data: actualizado })).eq('id', fichaBien.id);
       if (error) throw error;
       if (foto.ruta) {

@@ -62,6 +62,8 @@ export default function BienModal({
     const [rotuloError, setRotuloError] = useState('');
     const [componentes, setComponentes] = useState(() => normalizarComponentes(bienEditing?.componentes));
     const [tieneComponentes, setTieneComponentes] = useState(() => normalizarComponentes(bienEditing?.componentes).length > 0);
+    const [observacionesTexto, setObservacionesTexto] = useState(() => String(bienEditing?.observaciones || ''));
+    useEffect(() => { setObservacionesTexto(String(bienEditing?.observaciones || '')); }, [bienEditing?.id, bienEditing?.observaciones]);
     const [errorComponentes, setErrorComponentes] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
     const [cambiosParaConfirmar, setCambiosParaConfirmar] = useState(null);
@@ -152,6 +154,7 @@ export default function BienModal({
         setHayCambiosSinGuardar(true);
         setRestaurado(borrador);
         const cantidadComponentesGuardados = Number.parseInt(borrador.cantidadComponentes, 10) || 0;
+        if (borrador.observaciones !== undefined) setObservacionesTexto(String(borrador.observaciones || ''));
         const componentesDesdeCampos = Array.from({ length: cantidadComponentesGuardados }, (_, indice) => ({
             id: borrador[`componente_${indice}_id`] || `componente-${indice + 1}`,
             nombre: borrador[`componente_${indice}_nombre`] || '',
@@ -526,38 +529,50 @@ export default function BienModal({
                     rows={3}
                     maxLength={2000}
                     defaultValue={defecto('observaciones', bienEditing?.observaciones || '')}
+                    onChange={event => setObservacionesTexto(event.target.value)}
                     className={`${STYLES.input} min-h-24 resize-y leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                     placeholder="Describe el estado o cualquier detalle útil. Ej.: pantalla rota, requiere reparación, falta un accesorio..."
                   />
-                  <p className="mt-1.5 text-[10px] text-content-3">Esta nota se guardará con el bien y aparecerá en la columna Observaciones del FC-03.</p>
+                  <div className="mt-1.5 flex flex-wrap items-center justify-between gap-2"><p className="text-[10px] text-content-3">Se verá en Inventario y se incluirá en el FC-03. Escribe solo lo observado, por ejemplo: “pantalla rota” o “falta cable”.</p><span className="shrink-0 text-[10px] tabular-nums text-content-3">{observacionesTexto.length}/2000</span></div>
                 </div>
 
-                <section className="rounded-card border border-brand/20 bg-brand-soft/30 p-5 dark:bg-brand/5" aria-labelledby="bien-componentes-titulo">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <section className="rounded-card border border-brand/25 bg-gradient-to-br from-brand-soft/55 to-surface-1 p-4 sm:p-5 dark:from-brand/10 dark:to-surface-1/40" aria-labelledby="bien-componentes-titulo">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-start gap-3">
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-cubes-stacked" aria-hidden="true" /></span>
-                      <div><h3 id="bien-componentes-titulo" className="text-sm font-extrabold text-content-1">Componentes del bien</h3><p className="mt-1 max-w-2xl text-xs leading-relaxed text-content-3">Actívalo para juegos o conjuntos con piezas que pueden moverse por separado. Cada componente conserva el rótulo patrimonial principal, con ubicación y encargado operativos propios; el FC-10 permanece asociado al bien principal.</p></div>
+                      <div><h3 id="bien-componentes-titulo" className="text-sm font-extrabold text-content-1">Piezas y conjuntos</h3><p className="mt-1 max-w-2xl text-xs leading-relaxed text-content-3">Para muebles en juego o equipos con partes que pueden tener distinta ubicación y encargado. El rótulo y FC-10 siguen siendo del bien principal.</p></div>
                     </div>
-                      <label className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 py-2 text-xs font-bold text-content-2"><input type="checkbox" name="tieneComponentes" checked={tieneComponentes} onChange={event => { const activo = event.target.checked; setHayCambiosSinGuardar(true); setTieneComponentes(activo); if (activo && componentes.length === 0) setComponentes([{ id: `componente-${Date.now()}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20" />Tiene componentes</label>
+                      <label className={`inline-flex min-h-10 shrink-0 cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition ${tieneComponentes ? 'border-brand/30 bg-brand-soft text-brand-text' : 'border-line bg-surface-1 text-content-2'}`}><input type="checkbox" name="tieneComponentes" checked={tieneComponentes} onChange={event => { const activo = event.target.checked; setHayCambiosSinGuardar(true); setTieneComponentes(activo); if (activo && componentes.length === 0) setComponentes([{ id: `componente-${Date.now()}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="h-4 w-4 rounded border-line-strong text-brand-text focus:ring-brand/20" />Este bien tiene piezas</label>
                   </div>
                   <input type="hidden" name="componentes" value={tieneComponentes ? JSON.stringify(componentes) : '[]'} readOnly />
                   {tieneComponentes && <div className="mt-4 space-y-3">
                     <input type="hidden" name="cantidadComponentes" value={componentes.length} readOnly />
                     {errorComponentes && <p role="alert" className="rounded-lg bg-danger-soft px-3 py-2 text-xs font-semibold text-danger">{errorComponentes}</p>}
-                    {componentes.map((componente, indice) => <article key={componente.id} className="rounded-xl border border-line bg-surface-1 p-4">
-                      <div className="mb-3 flex items-center justify-between gap-3"><p className="text-xs font-extrabold text-content-1">Componente {indice + 1}</p><button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.filter((_, i) => i !== indice)); guardarBorradorDespuesDeCambio(); }} className="rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-danger hover:bg-danger-soft" aria-label={`Quitar componente ${indice + 1}`}><i className="fa-solid fa-trash-can mr-1.5" aria-hidden="true" />Quitar</button></div>
-                      <input type="hidden" name={`componente_${indice}_id`} value={componente.id} readOnly />
-                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Nombre o tipo<input required maxLength={100} name={`componente_${indice}_nombre`} value={componente.nombre} onChange={event => actualizarComponente(indice, { nombre: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Ej.: Silla, mesa, sofá" /></label>
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Cantidad<input required type="number" min="1" max="999" name={`componente_${indice}_cantidad`} value={componente.cantidad} onChange={event => actualizarComponente(indice, { cantidad: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} /></label>
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Ubicación propia<input maxLength={160} name={`componente_${indice}_ubicacion`} value={componente.ubicacion} onChange={event => actualizarComponente(indice, { ubicacion: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder={ubicacionTexto || 'Hereda la ubicación del bien'} /></label>
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Encargado propio<FiltroCombo name={`componente_${indice}_funcionario`} valor={componente.funcionario} opciones={funcionariosPadron.map(f => f.nombre).filter(Boolean)} onElegir={valor => actualizarComponente(indice, { funcionario: valor })} etiquetaTodos="Heredar encargado del bien" titulo={`Encargado del componente ${indice + 1}`} ancho="w-full" /></label>
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Estado<input maxLength={80} name={`componente_${indice}_estadoConservacion`} value={componente.estadoConservacion} onChange={event => actualizarComponente(indice, { estadoConservacion: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Hereda el estado del bien" /></label>
-                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3 sm:col-span-2 lg:col-span-1">Observación<input maxLength={300} name={`componente_${indice}_observaciones`} value={componente.observaciones} onChange={event => actualizarComponente(indice, { observaciones: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Opcional" /></label>
+                    {componentes.map((componente, indice) => <article key={componente.id} className="rounded-xl border border-line bg-surface-1 p-3.5 shadow-sm sm:p-4">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2.5">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-soft text-[11px] font-black text-brand-text">{indice + 1}</span>
+                          <div className="min-w-0"><p className="text-xs font-extrabold text-content-1">Pieza {indice + 1}{componente.nombre ? ` · ${componente.nombre}` : ''}</p><p className="mt-0.5 truncate text-[10px] text-content-3">{componente.ubicacion || ubicacionTexto || 'Usa la ubicación del bien'} · {componente.funcionario || custodioTexto || 'Usa el responsable del bien'}</p></div>
+                        </div>
+                        <button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.filter((_, i) => i !== indice)); guardarBorradorDespuesDeCambio(); }} className="rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-danger hover:bg-danger-soft" aria-label={`Quitar pieza ${indice + 1}`}><i className="fa-solid fa-trash-can mr-1.5" aria-hidden="true" />Quitar</button>
                       </div>
+                      <input type="hidden" name={`componente_${indice}_id`} value={componente.id} readOnly />
+                      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_130px]">
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">¿Qué pieza es?<input required maxLength={100} name={`componente_${indice}_nombre`} value={componente.nombre} onChange={event => actualizarComponente(indice, { nombre: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Ej.: Silla, mesa, sofá" /></label>
+                        <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">¿Cuántas?<input required type="number" min="1" max="999" name={`componente_${indice}_cantidad`} value={componente.cantidad} onChange={event => actualizarComponente(indice, { cantidad: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} /></label>
+                      </div>
+                      <details className="mt-3 rounded-lg border border-line/80 bg-surface-2/60 px-3 py-2.5" open={Boolean(componente.ubicacion || componente.funcionario || componente.estadoConservacion || componente.observaciones)}>
+                        <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px] font-bold text-content-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-location-dot text-brand-text" aria-hidden="true" />Ubicación, responsable y estado <span className="ml-auto text-[10px] font-medium text-content-3">Opcional</span></summary>
+                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Ubicación de esta pieza<input maxLength={160} name={`componente_${indice}_ubicacion`} value={componente.ubicacion} onChange={event => actualizarComponente(indice, { ubicacion: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder={ubicacionTexto || 'Vacío = usa la ubicación del bien'} /></label>
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Funcionario encargado<FiltroCombo name={`componente_${indice}_funcionario`} valor={componente.funcionario} opciones={funcionariosPadron.map(f => f.nombre).filter(Boolean)} onElegir={valor => actualizarComponente(indice, { funcionario: valor })} etiquetaTodos="Usar responsable del bien" titulo={`Funcionario encargado de la pieza ${indice + 1}`} ancho="w-full" /></label>
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-content-3">Estado de la pieza<input maxLength={80} name={`componente_${indice}_estadoConservacion`} value={componente.estadoConservacion} onChange={event => actualizarComponente(indice, { estadoConservacion: event.target.value })} className={`${STYLES.input} mt-1.5 normal-case tracking-normal`} placeholder="Ej.: Bueno, roto, incompleto" /></label>
+                          <label className="text-[10px] font-bold uppercase tracking-wider text-content-3 sm:col-span-2">Observación de esta pieza<textarea maxLength={300} name={`componente_${indice}_observaciones`} value={componente.observaciones} onChange={event => actualizarComponente(indice, { observaciones: event.target.value })} className={`${STYLES.input} mt-1.5 min-h-16 resize-y normal-case tracking-normal`} placeholder="Ej.: respaldo flojo, falta un accesorio…" /></label>
+                        </div>
+                      </details>
                     </article>)}
-                    <button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => [...prev, { id: `componente-${Date.now()}-${prev.length}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/25 bg-surface-1 px-4 text-xs font-bold text-brand-text hover:bg-brand-soft"><i className="fa-solid fa-plus" aria-hidden="true" />Añadir componente</button>
-                    <p className="text-[10px] text-content-3">Si ubicación o encargado quedan vacíos, se entenderá que comparten los datos del bien principal. Si piezas del mismo tipo están en lugares distintos, crea una fila para cada grupo. Los componentes no reciben un rótulo patrimonial independiente.</p>
+                    <button type="button" onClick={() => { setHayCambiosSinGuardar(true); setComponentes(prev => [...prev, { id: `componente-${Date.now()}-${prev.length}`, nombre: '', cantidad: 1, ubicacion: '', funcionario: '', estadoConservacion: '', observaciones: '' }]); guardarBorradorDespuesDeCambio(); }} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-brand/30 bg-surface-1 px-4 text-xs font-bold text-brand-text shadow-sm hover:bg-brand-soft"><i className="fa-solid fa-plus" aria-hidden="true" />Agregar otra pieza o grupo</button>
+                    <p className="text-[10px] leading-relaxed text-content-3">Si una pieza comparte ubicación y responsable con el bien, déjalos vacíos. Para piezas del mismo tipo en lugares distintos, registra un grupo separado.</p>
                   </div>}
                   {!tieneComponentes && <p className="mt-3 text-[11px] text-content-3">Desactivado para bienes individuales. No cambia la forma actual de registrar bienes simples.</p>}
                 </section>

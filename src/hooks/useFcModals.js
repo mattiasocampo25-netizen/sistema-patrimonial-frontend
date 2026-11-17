@@ -657,6 +657,8 @@ export function useFcModals({
     
     // Duplicado: bienEditing sin id se trata como alta nueva.
     const esEdicion = Boolean(bienEditing?.id);
+    const ahoraRegistro = new Date().toISOString();
+    const usuarioRegistro = currentUser?.username || 'Usuario';
     const bienData = { 
         id: esEdicion ? bienEditing.id : generateId(), 
         dependencia: dependenciaActual, 
@@ -678,6 +680,10 @@ export function useFcModals({
         estadoConservacion: formData.get('estadoConservacion') || 'Muy bueno', 
         observaciones: String(formData.get('observaciones') || '').trim(),
         componentes,
+        fechaCarga: bienEditing?.fechaCarga || bienEditing?.created_at || (!esEdicion ? ahoraRegistro : ''),
+        creadoPor: bienEditing?.creadoPor || (!esEdicion ? usuarioRegistro : ''),
+        modificadoEn: ahoraRegistro,
+        modificadoPor: usuarioRegistro,
         vidaUtil: formData.get('vidaUtil') || '', 
         hasFC10: esEdicion ? bienEditing.hasFC10 : false, 
         hasQR: formData.get('hasQR') === 'on',
@@ -705,7 +711,7 @@ export function useFcModals({
         let res;
         const payload = conSello({ id: bienData.id, data: bienData });
         if (esEdicion) {
-            const cambiosUsuario = detectarCambios(bienEditing, bienData);
+            const cambiosUsuario = detectarCambios(bienEditing, bienData, ['updated_at', 'id', 'fechaCarga', 'creadoPor', 'modificadoEn', 'modificadoPor']);
             let guardado = false;
             // Relee y aplica solo los campos editados. Si otra persona guarda
             // entre la lectura y la escritura, vuelve a intentarlo con su versión.
@@ -720,7 +726,13 @@ export function useFcModals({
                     ...camposEnConflicto,
                     ...detectarConflictos(bienEditing, datosFrescos, cambiosUsuario)
                 ])];
-                bienGuardado = fusionarSobreFresco(datosFrescos, cambiosUsuario, bienData);
+                bienGuardado = {
+                    ...fusionarSobreFresco(datosFrescos, cambiosUsuario, bienData),
+                    fechaCarga: datosFrescos.fechaCarga || bienData.fechaCarga || '',
+                    creadoPor: datosFrescos.creadoPor || bienData.creadoPor || '',
+                    modificadoEn: ahoraRegistro,
+                    modificadoPor: usuarioRegistro
+                };
                 const sello = conSello({ id: bienData.id, data: bienGuardado });
                 let update = supabase.from('bens').update(sello).eq('id', bienData.id);
                 if (fila.updated_at) update = update.eq('updated_at', fila.updated_at);

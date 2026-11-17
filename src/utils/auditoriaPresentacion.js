@@ -1,4 +1,4 @@
-const CAMPOS_TECNICOS = new Set(['id', 'updated_at', 'created_at', 'updatedat', 'createdat']);
+const CAMPOS_TECNICOS = new Set(['id', 'updated_at', 'created_at', 'updatedat', 'createdat', 'fechacarga', 'creadopor', 'modificadoen', 'modificadopor']);
 
 const ETIQUETAS_CAMPO = {
   funcionario: 'Responsable',

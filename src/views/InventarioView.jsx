@@ -19,6 +19,11 @@ const VISTAS_RECIENTES_INICIALES = [];
 const normalizarDensidad = value => value === 'compacta' ? 'compacta' : 'comoda';
 const normalizarColumnas = value => ({ ...COLUMNAS_INICIALES, ...(value && typeof value === 'object' ? value : {}) });
 const normalizarRecientes = value => Array.isArray(value) ? value.filter(x => typeof x === 'string').slice(0, 6) : VISTAS_RECIENTES_INICIALES;
+const fechaHoraLegible = (valor) => {
+  if (!valor) return '';
+  const fecha = new Date(valor);
+  return Number.isNaN(fecha.getTime()) ? '' : new Intl.DateTimeFormat('es-PY', { dateStyle: 'medium', timeStyle: 'short' }).format(fecha);
+};
 
 function ComponentesInventario({ bien, compacto = false }) {
   let componentes = bien?.componentes;
@@ -50,6 +55,16 @@ function ComponentesInventario({ bien, compacto = false }) {
       </div>
     </details>
   );
+}
+
+function ResumenObservacion({ bien, onClick }) {
+  const texto = String(bien?.observaciones || '').trim();
+  if (!texto) return null;
+  return <button type="button" onClick={onClick} aria-label={`Leer observación del bien ${bien.rotulo || ''}`} className="mt-2 block w-full rounded-lg border border-amber-300/80 bg-amber-50/80 p-2.5 text-left transition hover:border-amber-400 hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 dark:border-amber-400/25 dark:bg-amber-400/5 dark:hover:bg-amber-400/10">
+    <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-800 dark:text-amber-200"><i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />Observación</span>
+    <span className="mt-1 block line-clamp-2 whitespace-pre-wrap break-words text-[11px] leading-relaxed text-content-2">{texto}</span>
+    <span className="mt-1 block text-right text-[9px] font-bold text-amber-800 dark:text-amber-200">Leer nota completa <i className="fa-solid fa-arrow-up-right-from-square ml-1" aria-hidden="true" /></span>
+  </button>;
 }
 
 // Vista del inventario general (extraída de App.jsx, Fase 5).
@@ -712,10 +727,12 @@ export default function InventarioView({
                               <div className="min-w-0 flex-1">
                                 <span className="font-mono font-semibold text-xs text-content-1 dark:text-white bg-surface-3 dark:bg-surface-3/20 px-2 py-0.5 rounded-lg">{item.rotulo || 'S/R'}</span>
                                 <p className="font-semibold text-content-1 dark:text-white text-sm leading-snug line-clamp-2 mt-1.5">{repairMojibake(item.descripcion)}</p>
+                                <ResumenObservacion bien={item} onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones || '').trim(), ubicacion: item.ubicacion, funcionario: item.funcionario, fecha: item.modificadoEn || item.updated_at, usuario: item.modificadoPor })} />
                                 <ComponentesInventario bien={item} compacto />
                                 <p className="text-xs text-content-3 dark:text-content-3 mt-1 truncate"><i className="fa-solid fa-user-check text-ok text-[10px] mr-1"></i>{esBienLibreParaAsignar(item) ? 'Libre para asignar' : item.funcionario || 'Sin asignación'}</p>
                                 {item.funcionarioAlternativo && <p className="text-[10px] text-content-3 truncate"><i className="fa-solid fa-user-clock mr-1"></i>Otro turno: {item.funcionarioAlternativo}</p>}
                                 <p className="text-xs text-content-3 dark:text-content-3 truncate"><i className="fa-solid fa-location-dot text-danger text-[10px] mr-1"></i>{item.ubicacion || 'Sin ubicación'}</p>
+                                <ResumenObservacion bien={item} onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones || '').trim(), ubicacion: item.ubicacion, funcionario: item.funcionario, fecha: item.modificadoEn || item.updated_at, usuario: item.modificadoPor })} />
                               </div>
                             </div>
                             <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-line dark:border-zinc-700/50">
@@ -820,20 +837,6 @@ export default function InventarioView({
                                           {item.rotulo || 'S/R'}
                                           {item.rotulo && <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(String(item.rotulo)); setRotuloCopiado(item.id); window.setTimeout(() => setRotuloCopiado(actual => actual === item.id ? '' : actual), 1500); } catch { /* Copia manual disponible. */ } }} title={rotuloCopiado === item.id ? 'Rótulo copiado' : 'Copiar rótulo'} aria-label={`Copiar rótulo ${item.rotulo}`} className="rounded px-1 text-content-3 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className={`fa-solid ${rotuloCopiado === item.id ? 'fa-check text-ok' : 'fa-copy'}`} aria-hidden="true" /></button>}
                                         </span>
-                                        {String(item.observaciones || '').trim() && (
-                                          <span className="inline-flex">
-                                            <button
-                                              type="button"
-                                              aria-label={`Ver observación del bien ${item.rotulo || ''}`}
-                                              title={String(item.observaciones).trim()}
-                                              onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones).trim() })}
-                                              className="inline-flex h-7 items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 text-[10px] font-bold text-amber-800 shadow-sm transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-200 dark:hover:bg-amber-400/20"
-                                            >
-                                              <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
-                                              Observado
-                                            </button>
-                                          </span>
-                                        )}
                                         {cols.fecha && item.fechaAdquisicion && (
                                           <span className="text-[10px] font-bold text-content-3 flex items-center gap-1">
                                             <i className="fa-regular fa-calendar text-[9px]"></i>
@@ -844,6 +847,7 @@ export default function InventarioView({
                                       <p className={`font-semibold text-content-1 dark:text-white text-sm leading-snug ${compacto ? 'line-clamp-1' : 'line-clamp-2'}`} >
                                         {repairMojibake(item.descripcion)}
                                       </p>
+                                      <ResumenObservacion bien={item} onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones || '').trim(), ubicacion: item.ubicacion, funcionario: item.funcionario, fecha: item.modificadoEn || item.updated_at, usuario: item.modificadoPor })} />
                                       <ComponentesInventario bien={item} compacto={compacto} />
                                       {cols.cuenta && item.cuenta && (
                                         <span className="inline-block text-[10px] font-medium text-content-3 bg-surface-3 dark:bg-surface-3/50 px-2 py-0.5 rounded-lg">
@@ -1073,14 +1077,16 @@ export default function InventarioView({
           <section className={`${STYLES.modalContent} max-w-xl`} role="dialog" aria-modal="true" aria-labelledby="observacion-bien-titulo" onClick={(event) => event.stopPropagation()}>
             <header className="flex items-start justify-between gap-4 border-b border-line bg-surface-2 px-5 py-4 sm:px-6">
               <div className="min-w-0">
-                <h2 id="observacion-bien-titulo" className="text-base font-bold text-content-1">Observación del bien</h2>
-                <p className="mt-1 text-xs text-content-3">Rótulo: {observacionAbierta.rotulo}</p>
+                <h2 id="observacion-bien-titulo" className="flex items-center gap-2 text-base font-bold text-content-1"><i className="fa-solid fa-triangle-exclamation text-amber-600" aria-hidden="true" />Observación del bien</h2>
+                <p className="mt-1 text-xs text-content-3">Rótulo: <span className="font-mono font-bold text-content-1">{observacionAbierta.rotulo}</span></p>
+                <p className="mt-1 text-[10px] text-content-3">{observacionAbierta.ubicacion ? `Ubicación: ${observacionAbierta.ubicacion}` : ''}{observacionAbierta.funcionario ? `${observacionAbierta.ubicacion ? ' · ' : ''}Responsable: ${observacionAbierta.funcionario}` : ''}</p>
               </div>
               <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setObservacionAbierta(null)} />
             </header>
-            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] overflow-y-auto overscroll-contain whitespace-pre-wrap break-words px-5 py-5 text-sm leading-relaxed text-content-1 custom-scrollbar sm:px-6">
-              {observacionAbierta.texto}
+            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] overflow-y-auto overscroll-contain bg-amber-50/50 px-5 py-5 text-sm leading-relaxed text-content-1 custom-scrollbar dark:bg-amber-400/5 sm:px-6">
+              <div className="whitespace-pre-wrap break-words">{observacionAbierta.texto}</div>
             </div>
+            {(observacionAbierta.usuario || fechaHoraLegible(observacionAbierta.fecha)) && <p className="border-t border-line px-5 py-2.5 text-[10px] text-content-3 sm:px-6">{observacionAbierta.usuario ? `Último cambio del registro: ${observacionAbierta.usuario}` : ''}{fechaHoraLegible(observacionAbierta.fecha) ? `${observacionAbierta.usuario ? ' · ' : ''}${fechaHoraLegible(observacionAbierta.fecha)}` : ''}</p>}
             <footer className="flex justify-end border-t border-line bg-surface-2 px-5 py-3 sm:px-6">
               <Button variante="primary" tamano="md" onClick={() => setObservacionAbierta(null)}>Cerrar</Button>
             </footer>

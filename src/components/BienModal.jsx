@@ -615,14 +615,10 @@ export default function BienModal({
                       </label>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div>
-                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">C.I. Custodio</label>
-                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
-                    </div>
-                    <div className="md:col-span-2 relative" ref={custodioDropdownRef}>
+                  <div className="mb-4">
+                    <div className="relative" ref={custodioDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Funcionario responsable</label>
-                        <p className="mb-2 text-[11px] leading-relaxed text-content-3">Busca por nombre o cédula. Al elegirlo, se completan automáticamente su cargo, documento y ubicación.</p>
+                        <p className="mb-2 text-[11px] leading-relaxed text-content-3">Busca por nombre o cédula. Al seleccionarlo se completan sus datos.</p>
                         <input
                             name="funcionario"
                             value={custodioTexto}
@@ -689,10 +685,14 @@ export default function BienModal({
                     </div>
                   </section>}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div>
+                        <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">C.I. del custodio</label>
+                        <input name="funcionarioDoc" defaultValue={defecto('funcionarioDoc', bienEditing?.funcionarioDoc)} readOnly className={`${STYLES.input} tabular-nums bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Se completa al elegir" />
+                    </div>
                     <div>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Cargo Funcional</label>
-                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Auto-completado" />
+                        <input name="funcionarioCargo" defaultValue={defecto('funcionarioCargo', bienEditing?.funcionarioCargo)} readOnly className={`${STYLES.input} bg-surface-3 dark:bg-surface-1/80 text-content-3 cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Se completa al elegir" />
                     </div>
                     <div className="relative" ref={ubicacionDropdownRef}>
                         <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Ubicación Operativa</label>

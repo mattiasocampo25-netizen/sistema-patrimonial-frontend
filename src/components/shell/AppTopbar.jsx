@@ -114,7 +114,7 @@ export default function AppTopbar({
               <i className="fa-solid fa-building-columns text-xs" />
             </span>
             {isAdmin ? (
-              <div className="min-w-0 max-w-[min(220px,42vw)] sm:max-w-[280px]">
+              <div className="min-w-0 max-w-[min(300px,52vw)] sm:max-w-[340px]">
                 <FiltroCombo
                   valor={dependenciaActual}
                   opciones={todasDependencias}

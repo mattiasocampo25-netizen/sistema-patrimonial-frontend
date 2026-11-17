@@ -152,8 +152,8 @@ export default function AuditoriaView({
           <div><h2 className="text-sm font-extrabold text-content-1">Revisión de integridad del inventario</h2><p className="mt-1 max-w-3xl text-xs leading-relaxed text-content-3">Revisión de solo lectura. Las alertas no modifican datos y algunas pueden ser válidas; abre cada grupo y verifica los registros antes de corregirlos.</p></div>
           <Button variante="secondary" tamano="sm" icono="fa-file-csv" onClick={descargarInformeSalud}>Descargar informe</Button>
         </div>
-      <div className="overflow-hidden rounded-[26px] border border-line/70 bg-surface-1 shadow-sm">
-          <div className="flex items-center justify-between gap-3 mb-1">
+      <div className="overflow-hidden rounded-[26px] border border-line/70 bg-surface-1 p-4 shadow-sm sm:p-5">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
                   <i className="fa-solid fa-heart-pulse text-danger"></i> Salud de datos
               </h3>
@@ -204,12 +204,12 @@ export default function AuditoriaView({
             <i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />Los proyectos Free pueden pausarse tras 7 días de poca actividad. Revisa el panel de uso de Supabase si el sistema deja de responder.
             {' '}<a href="https://supabase.com/docs/guides/deployment/going-into-prod" target="_blank" rel="noreferrer" className="font-bold text-brand-text underline underline-offset-2">Ver disponibilidad y límites</a>
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 mb-4">
+          <div className="mb-4 grid auto-rows-fr grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {saludDatos.map(s => (
-                  <button key={s.id} type="button" aria-pressed={hallazgoActivo === s.id} onClick={() => setHallazgoActivo(actual => actual === s.id ? '' : s.id)} className={`rounded-card border px-3 py-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${hallazgoActivo === s.id ? 'border-brand bg-brand-soft/60' : 'border-line/70 dark:border-white/10'}`}>
+                  <button key={s.id} type="button" aria-pressed={hallazgoActivo === s.id} onClick={() => setHallazgoActivo(actual => actual === s.id ? '' : s.id)} className={`flex h-full min-h-[112px] flex-col rounded-2xl border p-3.5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${hallazgoActivo === s.id ? 'border-brand bg-brand-soft/60' : 'border-line/70 dark:border-white/10'}`}>
                       <span className="flex items-center justify-between gap-2"><i className={`fa-solid ${s.icon} text-sm text-content-3`} aria-hidden="true"/><span className={`text-xl sm:text-2xl font-black tabular-nums ${s.count ? 'text-content-1 dark:text-white' : 'text-content-3'}`}>{s.count.toLocaleString('es-PY')}</span></span>
-                      <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-content-3 leading-tight">{s.label}</span>
-                      <span className="mt-1 block text-[10px] text-brand-text">{s.count ? 'Ver registros' : 'Sin hallazgos'} <i className="fa-solid fa-chevron-right ml-1" aria-hidden="true"/></span>
+                      <span className="mt-2 block min-h-8 text-[10px] font-bold uppercase leading-snug tracking-wider text-content-3">{s.label}</span>
+                      <span className="mt-auto block pt-1 text-[10px] font-semibold text-brand-text">{s.count ? 'Ver registros' : 'Sin hallazgos'} <i className="fa-solid fa-chevron-right ml-1" aria-hidden="true"/></span>
                   </button>
               ))}
           </div>

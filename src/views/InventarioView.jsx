@@ -1082,16 +1082,22 @@ export default function InventarioView({
 
       {observacionAbierta && (
         <Dialogo className={STYLES.modalOverlay} onCerrar={() => setObservacionAbierta(null)}>
-          <section className={`${STYLES.modalContent} max-w-xl`} role="dialog" aria-modal="true" aria-labelledby="observacion-bien-titulo" onClick={(event) => event.stopPropagation()}>
+          <section className={`${STYLES.modalContent} !w-[min(42rem,calc(100vw-2rem))] !max-w-none overflow-hidden`} role="dialog" aria-modal="true" aria-labelledby="observacion-bien-titulo" onClick={(event) => event.stopPropagation()}>
             <header className="flex items-start justify-between gap-4 border-b border-line bg-surface-2 px-5 py-4 sm:px-6">
-              <div className="min-w-0">
-                <h2 id="observacion-bien-titulo" className="flex items-center gap-2 text-base font-bold text-content-1"><i className="fa-solid fa-triangle-exclamation text-amber-600" aria-hidden="true" />Observación del bien</h2>
-                <p className="mt-1 text-xs text-content-3">Rótulo: <span className="font-mono font-bold text-content-1">{observacionAbierta.rotulo}</span></p>
-                <p className="mt-1 text-[10px] text-content-3">{observacionAbierta.ubicacion ? `Ubicación: ${observacionAbierta.ubicacion}` : ''}{observacionAbierta.funcionario ? `${observacionAbierta.ubicacion ? ' · ' : ''}Responsable: ${observacionAbierta.funcionario}` : ''}</p>
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-300"><i className="fa-solid fa-triangle-exclamation" aria-hidden="true" /></span>
+                <div className="min-w-0">
+                  <h2 id="observacion-bien-titulo" className="text-base font-bold text-content-1">Observación del bien</h2>
+                  <span className="mt-1 inline-flex max-w-full items-center rounded-md border border-line bg-surface-1 px-2 py-1 font-mono text-[11px] font-bold text-content-1">{observacionAbierta.rotulo}</span>
+                  <div className="mt-2 flex flex-wrap gap-2 text-[10px] text-content-2">
+                    {observacionAbierta.ubicacion && <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-surface-1 px-2.5 py-1"><i className="fa-solid fa-location-dot text-danger" aria-hidden="true" /><span className="break-words">{observacionAbierta.ubicacion}</span></span>}
+                    {observacionAbierta.funcionario && <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-surface-1 px-2.5 py-1"><i className="fa-solid fa-user-check text-ok" aria-hidden="true" /><span className="break-words">{observacionAbierta.funcionario}</span></span>}
+                  </div>
+                </div>
               </div>
               <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setObservacionAbierta(null)} />
             </header>
-            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] overflow-y-auto overscroll-contain bg-amber-50/50 px-5 py-5 text-sm leading-relaxed text-content-1 custom-scrollbar dark:bg-amber-400/5 sm:px-6">
+            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] min-h-28 overflow-y-auto overscroll-contain bg-amber-50/40 px-5 py-5 text-sm leading-7 text-content-1 custom-scrollbar dark:bg-amber-400/[0.04] sm:px-6">
               <div className="whitespace-pre-wrap break-words">{observacionAbierta.texto}</div>
             </div>
             {(observacionAbierta.usuario || fechaHoraLegible(observacionAbierta.fecha)) && <p className="border-t border-line px-5 py-2.5 text-[10px] text-content-3 sm:px-6">{observacionAbierta.usuario ? `Último cambio del registro: ${observacionAbierta.usuario}` : ''}{fechaHoraLegible(observacionAbierta.fecha) ? `${observacionAbierta.usuario ? ' · ' : ''}${fechaHoraLegible(observacionAbierta.fecha)}` : ''}</p>}

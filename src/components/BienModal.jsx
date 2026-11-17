@@ -341,13 +341,13 @@ export default function BienModal({
     const handleCustodioChange = (e) => {
         const valorInput = e.target.value;
         setCustodioTexto(valorInput);
-        setShowCustodioDropdown(true);
+        setShowCustodioDropdown(Boolean(valorInput.trim()));
 
         if (!bienFormRef.current) return;
 
-        const match = funcionariosPadron.find(f =>
+        const match = valorInput.trim() && funcionariosPadron.find(f =>
             normalizeStr(f.nombre) === normalizeStr(valorInput) ||
-            String(f.cedula).trim() === String(valorInput).trim()
+            (f.cedula && String(f.cedula).trim() === valorInput.trim())
         );
 
         const inputCargo = bienFormRef.current.elements['funcionarioCargo'];
@@ -628,6 +628,16 @@ export default function BienModal({
                             placeholder="Escribe un nombre o número de cédula..."
                             autoComplete="off"
                         />
+                        {custodioTexto && <button type="button" onClick={() => {
+                            setHayCambiosSinGuardar(true);
+                            setCustodioTexto('');
+                            setShowCustodioDropdown(false);
+                            const form = bienFormRef.current;
+                            if (form?.elements['funcionarioDoc']) form.elements['funcionarioDoc'].value = '';
+                            if (form?.elements['funcionarioCargo']) form.elements['funcionarioCargo'].value = '';
+                        }} className="mt-2 inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold text-danger hover:bg-danger-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                            <i className="fa-solid fa-user-minus" aria-hidden="true" /> Quitar responsable
+                        </button>}
 
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && filteredCustodios.length > 0 && (

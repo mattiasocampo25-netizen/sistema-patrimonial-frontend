@@ -7,6 +7,8 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import ExportScheduleMenu from '../components/ExportScheduleMenu';
 import { formatDateText, repairMojibake } from '../utils/helpers';
 import { esBienLibreParaAsignar } from '../utils/asignacionBien';
+import { piezasCoincidentes } from '../utils/componentesInventario';
+import { normalizeStr } from '../utils/helpers';
 import { imprimirInformeBajaBien } from '../utils/informeBaja';
 import { useIdioma } from '../utils/i18n';
 import Dialogo from '../components/ui/Dialogo';
@@ -856,6 +858,8 @@ export default function InventarioView({
                                         {repairMojibake(item.descripcion)}
                                       </p>
                                       <ResumenObservacion bien={item} onClick={() => setObservacionAbierta({ rotulo: item.rotulo || 'Sin rótulo', texto: String(item.observaciones || '').trim(), ubicacion: item.ubicacion, funcionario: item.funcionario, fecha: item.modificadoEn || item.updated_at, usuario: item.modificadoPor })} />
+                                      {filtroUbicacion && normalizeStr(item.ubicacion || '') !== normalizeStr(filtroUbicacion) && piezasCoincidentes(item, 'ubicacion', filtroUbicacion).length > 0 && <p className="mt-2 rounded-lg bg-brand-soft px-2.5 py-2 text-xs text-brand-text">Piezas en {filtroUbicacion}: {piezasCoincidentes(item, 'ubicacion', filtroUbicacion).map(p => `${p.nombre || 'Pieza'} · ${p.funcionario || item.funcionario || 'Sin responsable'}`).join('; ')}</p>}
+                                      {filtroFuncionario && normalizeStr(item.funcionario || '') !== normalizeStr(filtroFuncionario) && piezasCoincidentes(item, 'funcionario', filtroFuncionario).length > 0 && <p className="mt-2 rounded-lg bg-brand-soft px-2.5 py-2 text-xs text-brand-text">Piezas a cargo: {piezasCoincidentes(item, 'funcionario', filtroFuncionario).map(p => `${p.nombre || 'Pieza'} · ${p.ubicacion || item.ubicacion || 'Sin ubicación'}`).join('; ')}</p>}
                                       <ComponentesInventario bien={item} compacto={compacto} />
                                       {cols.cuenta && item.cuenta && (
                                         <span className="inline-block text-[10px] font-medium text-content-3 bg-surface-3 dark:bg-surface-3/50 px-2 py-0.5 rounded-lg">

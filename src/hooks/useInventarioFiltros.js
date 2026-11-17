@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { normalizeStr, parseDateInfo, matchBienSearch, toInputDateFormat } from '../utils/helpers';
+import { componentesDe, coincideBienOPieza } from '../utils/componentesInventario';
 import { ESTADOS_FC10, estadoInicialFC10 } from '../utils/fc10Firmas';
 import { aplicarSeleccionRango, construirLinkInventario, idsEntre } from '../utils/inventarioInteracciones';
 import { esBienLibreParaAsignar, esCampoSinAsignar } from '../utils/asignacionBien';
@@ -326,7 +327,7 @@ useEffect(() => {
   const funcionariosUnicos = useMemo(() => {
       const funcMap = new Map();
       bienesDependencia.forEach(b => {
-        [b.funcionario, b.funcionarioAlternativo].filter(val => val && String(val).trim()).forEach(nombre => {
+        [b.funcionario, b.funcionarioAlternativo, ...componentesDe(b).map(pieza => pieza.funcionario)].filter(val => val && String(val).trim()).forEach(nombre => {
           const val = String(nombre).trim();
           const key = normalizeStr(val);
           if(!funcMap.has(key)) funcMap.set(key, val);
@@ -342,6 +343,10 @@ useEffect(() => {
           const key = normalizeStr(val);
           if(!ubiMap.has(key)) ubiMap.set(key, val);
       });
+      bienesDependencia.forEach(b => componentesDe(b).forEach(pieza => {
+          const val = String(pieza.ubicacion || '').trim();
+          if (val && !ubiMap.has(normalizeStr(val))) ubiMap.set(normalizeStr(val), val);
+      }));
       fc10List.filter(fc => fc.dependencia === dependenciaActual && fc.entregadoLugar).forEach(fc => {
           const val = String(fc.entregadoLugar).trim();
           const key = normalizeStr(val);
@@ -356,10 +361,12 @@ useEffect(() => {
   const ubicacionesConBienes = useMemo(() => {
       const ubiMap = new Map();
       bienesDependencia.forEach(b => {
-          const val = String(b.ubicacion || '').trim();
-          if (!val) return;
-          const key = normalizeStr(val);
-          if (!ubiMap.has(key)) ubiMap.set(key, val);
+          [b.ubicacion, ...componentesDe(b).map(pieza => pieza.ubicacion)].forEach(ubicacion => {
+            const val = String(ubicacion || '').trim();
+            if (!val) return;
+            const key = normalizeStr(val);
+            if (!ubiMap.has(key)) ubiMap.set(key, val);
+          });
       });
       return Array.from(ubiMap.values()).sort((a, b) => a.localeCompare(b, 'es'));
   }, [bienesDependencia]);
@@ -435,8 +442,8 @@ useEffect(() => {
     // Compara ignorando mayúsculas, tildes y espacios extra (antes el ===
     // exacto partía los resultados si el nombre tenía variantes de carga)
     let filtered = [...bienesDependencia];
-    if (filtroFuncionario) filtered = filtered.filter(b => [b.funcionario, b.funcionarioAlternativo].some(nombre => normalizeStr(nombre || '') === normalizeStr(filtroFuncionario)));
-    if (filtroUbicacion) filtered = filtered.filter(b => normalizeStr(b.ubicacion || '') === normalizeStr(filtroUbicacion));
+    if (filtroFuncionario) filtered = filtered.filter(b => coincideBienOPieza(b, 'funcionario', filtroFuncionario) || normalizeStr(b.funcionarioAlternativo || '') === normalizeStr(filtroFuncionario));
+    if (filtroUbicacion) filtered = filtered.filter(b => coincideBienOPieza(b, 'ubicacion', filtroUbicacion));
     if (filtroAnio) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).year === filtroAnio);
     if (filtroMes) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).month === filtroMes);
     if (filtroSubcuenta) filtered = filtered.filter(b => String(b.subcuenta||'').trim() === filtroSubcuenta);

@@ -11,6 +11,7 @@ import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
 import { enqueueOfflineAction, esFalloDeConexion } from '../services/offlineSyncService';
 import { detectarCambios, detectarConflictos, fusionarSobreFresco, describirCampos } from '../services/escrituraSegura';
 import { FORMATO_PDF } from '../constants/appConstants';
+import { componentesDe, coincideBienOPieza, piezasCoincidentes } from '../utils/componentesInventario';
 
 // Normalización de rótulo para comparar bienes. Vive a nivel de módulo porque
 // la usan dos guardados distintos (saveBien y saveFC04); antes estaba definida
@@ -153,10 +154,10 @@ export function useFcModals({
     let funcText = "TODOS LOS RESPONSABLES";
 
     if (!idsSeleccionados && fc03Config.tipoFiltro === 'ubicacion' && fc03Config.filtroValor) {
-        bienesToPrint = bienesToPrint.filter(b => normalizeStr(b.ubicacion) === normalizeStr(fc03Config.filtroValor));
+        bienesToPrint = bienesToPrint.filter(b => coincideBienOPieza(b, 'ubicacion', fc03Config.filtroValor));
         repText = fc03Config.filtroValor.toUpperCase();
     } else if (!idsSeleccionados && fc03Config.tipoFiltro === 'funcionario' && fc03Config.filtroValor) {
-        bienesToPrint = bienesToPrint.filter(b => normalizeStr(b.funcionario) === normalizeStr(fc03Config.filtroValor));
+        bienesToPrint = bienesToPrint.filter(b => coincideBienOPieza(b, 'funcionario', fc03Config.filtroValor));
         funcText = fc03Config.filtroValor.toUpperCase();
         const bienRef = bienesToPrint.find(b => b.ubicacion);
         if (bienRef) repText = bienRef.ubicacion.toUpperCase();
@@ -180,20 +181,23 @@ export function useFcModals({
         let totalValor = 0;
         
         const tableRows = bienesToPrint.map(b => {
-            const valor = parseInt(String(b.valorUnitario).replace(/\D/g, ''), 10) || 0;
+            const campoFiltro = !idsSeleccionados && fc03Config.filtroValor && ['ubicacion', 'funcionario'].includes(fc03Config.tipoFiltro) ? fc03Config.tipoFiltro : '';
+            const soloPiezas = campoFiltro && normalizeStr(b[campoFiltro] || '') !== normalizeStr(fc03Config.filtroValor);
+            const piezas = campoFiltro ? piezasCoincidentes(b, campoFiltro, fc03Config.filtroValor) : componentesDe(b);
+            const valor = soloPiezas ? 0 : (parseInt(String(b.valorUnitario).replace(/\D/g, ''), 10) || 0);
             totalValor += valor;
-            const detalleComponentes = Array.isArray(b.componentes) ? b.componentes.map(componente => {
+            const detalleComponentes = piezas.map(componente => {
                 const cantidad = Math.max(1, Number.parseInt(componente.cantidad, 10) || 1);
                 const ubicacion = componente.ubicacion || b.ubicacion || 'Ubicación del bien';
                 const funcionario = componente.funcionario || b.funcionario || 'Encargado del bien';
                 return `${componente.nombre || 'Componente'} ×${cantidad} · ${ubicacion} · ${funcionario}${componente.observaciones ? ` · ${componente.observaciones}` : ''}`;
-            }).join('\n') : '';
-            const descripcionFC03 = [b.descripcion || '', detalleComponentes && `Componentes:\n${detalleComponentes}`].filter(Boolean).join('\n');
+            }).join('\n');
+            const descripcionFC03 = [b.descripcion || '', soloPiezas && `Bien principal en ${b.ubicacion || 'ubicación no indicada'}. Valor del conjunto no incluido en este filtro.`, detalleComponentes && `Componentes${soloPiezas ? ' en este filtro' : ''}:\n${detalleComponentes}`].filter(Boolean).join('\n');
             return [
                 b.cuenta || '', b.subcuenta || '', b.analitico1 || '', b.analitico2 || '', 
-                descripcionFC03, b.ubicacion || '-', b.funcionario || 'Sin Asignar',
+                descripcionFC03, soloPiezas ? [...new Set(piezas.map(p => p.ubicacion || b.ubicacion || '-'))].join('\n') : b.ubicacion || '-', soloPiezas ? [...new Set(piezas.map(p => p.funcionario || b.funcionario || 'Sin asignar'))].join('\n') : b.funcionario || 'Sin Asignar',
                 formatDateText(b.fechaAdquisicion) || '', b.rotulo || 'S/Rótulo', '1', 
-                formatCurrency(valor), formatCurrency(valor), 'C', getEstadoAbbr(b.estadoConservacion), '', String(b.observaciones || '').trim()
+                soloPiezas ? '—' : formatCurrency(valor), soloPiezas ? '—' : formatCurrency(valor), 'C', getEstadoAbbr(b.estadoConservacion), '', String(b.observaciones || '').trim()
             ];
         });
 

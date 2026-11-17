@@ -769,7 +769,7 @@ select:focus {
 .users-summary-tile strong { color: var(--content-1); font-size: 1.35rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .audit-hero { border: 1px solid color-mix(in srgb, var(--brand) 42%, #10263a); background: linear-gradient(118deg, #10283c 0%, color-mix(in srgb, var(--brand) 76%, #14384e) 60%, #155e6b 100%); box-shadow: var(--shadow-panel); }
 .audit-hero::after { content: ''; position: absolute; right: -4rem; bottom: -13rem; width: 26rem; height: 26rem; border: 1px solid rgb(255 255 255 / .12); border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / .08), transparent 68%); pointer-events: none; }
-.audit-hero > * { position: relative; z-index: 1; }
+.audit-hero > .relative { z-index: 1; }
 .audit-nav { position: sticky; top: .5rem; z-index: 10; }
 .audit-tab { min-height: 4.2rem; }
 .audit-workspace .audit-tab[aria-selected="true"] { color: #fff; background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 72%, #10283c)); box-shadow: 0 7px 18px color-mix(in srgb, var(--brand) 20%, transparent); }

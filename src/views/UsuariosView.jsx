@@ -3,6 +3,8 @@ import { useMemo, useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Badge, Button, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
+const rolNormalizado = usuario => normalizeStr(usuario?.cargo || '').trim();
+
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
   esDesarrollador, currentUser, setItemToDelete, isLoading
@@ -13,14 +15,15 @@ export default function UsuariosView({
   const porPagina = 10;
   const usuariosVisibles = useMemo(() => usuariosList.filter(u => {
     const coincideTexto = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).includes(normalizeStr(busqueda));
-    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'desarrollador'].includes(u.cargo) : u.cargo === 'funcionario');
+    const rol = rolNormalizado(u);
+    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'desarrollador'].includes(rol) : rol === 'funcionario');
     return coincideTexto && coincideRol;
   }), [usuariosList, busqueda, filtroRol]);
   const paginas = Math.max(1, Math.ceil(usuariosVisibles.length / porPagina));
   const paginaActual = Math.min(pagina, paginas);
   const usuariosPagina = usuariosVisibles.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
-  const totalAdministracion = usuariosList.filter(u => ['admin', 'desarrollador'].includes(u.cargo)).length;
-  const totalFuncionarios = usuariosList.filter(u => u.cargo === 'funcionario').length;
+  const totalAdministracion = usuariosList.filter(u => ['admin', 'desarrollador'].includes(rolNormalizado(u))).length;
+  const totalFuncionarios = usuariosList.filter(u => rolNormalizado(u) === 'funcionario').length;
   return (
     <div className="module-screen users-workspace flex flex-col flex-1 space-y-4 pb-12">
       <section className="users-hero rounded-panel p-4 sm:p-6">
@@ -89,21 +92,21 @@ export default function UsuariosView({
                           </div>
                       </TD>
                       <TD className="px-4 py-3 align-middle">
-                          {u.cargo === 'desarrollador'
+                          {rolNormalizado(u) === 'desarrollador'
                               ? <Badge tono="brand" icono="fa-code">Desarrollador</Badge>
-                              : u.cargo === 'admin'
+                              : rolNormalizado(u) === 'admin'
                               ? <Badge tono="info" icono="fa-shield-halved">Administrador</Badge>
                               : <Badge icono="fa-user">Funcionario</Badge>
                           }
                       </TD>
                       <TD className="relative py-3 pl-4 pr-6 align-middle text-right">
                           <div className="flex items-center justify-end gap-1">
-                            {u.cargo === 'desarrollador' && !esDesarrollador ? (
+                            {rolNormalizado(u) === 'desarrollador' && !esDesarrollador ? (
                                 <IconButton titulo="Solo el Desarrollador gestiona esta cuenta" icono="fa-lock" variante="ghost" tamano="sm" disabled />
                             ) : (
                             <>
                             <IconButton titulo="Editar usuario" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setUsuarioEditing(u); setIsUsuarioModalOpen(true); }} />
-                            {u.username !== currentUser.username && (
+                            {u.username !== currentUser?.username && (
                                 <IconButton titulo="Eliminar usuario" icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({type:'usuario', username: u.username, cargo: u.cargo, item: u})} />
                             )}
                             </>

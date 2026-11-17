@@ -577,14 +577,15 @@ export function useFcModals({
     }
     const componentes = tieneComponentes ? componentesCapturados.map((componente, indice) => {
         const nombreFuncionario = String(componente.funcionario || '').trim();
-        const funcionarioComponente = funcionariosPadron.find(f => normalizeStr(f.nombre) === normalizeStr(nombreFuncionario));
+        const documentoComponente = String(componente.funcionarioDoc || '').trim();
+        const funcionarioComponente = funcionariosPadron.find(f => documentoComponente && String(f.cedula || '').trim() === documentoComponente && normalizeStr(f.nombre) === normalizeStr(nombreFuncionario)) || (!documentoComponente ? funcionariosPadron.find(f => nombreFuncionario && normalizeStr(f.nombre) === normalizeStr(nombreFuncionario)) : null);
         return {
             id: componente.id || generateId(),
             nombre: String(componente.nombre || '').trim(),
             cantidad: Math.max(1, Math.min(999, Number.parseInt(componente.cantidad, 10) || 1)),
             ubicacion: String(componente.ubicacion || '').trim(),
             funcionario: nombreFuncionario,
-            funcionarioDoc: funcionarioComponente?.cedula || '',
+            funcionarioDoc: funcionarioComponente?.cedula || documentoComponente,
             funcionarioCargo: funcionarioComponente?.cargo || '',
             estadoConservacion: String(componente.estadoConservacion || '').trim(),
             observaciones: String(componente.observaciones || '').trim(),

@@ -225,7 +225,7 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
               <div className="grid gap-2 sm:grid-cols-2">{componentesBien.map((componente, indice) => <article key={componente.id || `${componente.nombre}-${indice}`} className="rounded-control border border-line bg-surface-1 p-3">
                 <p className="text-xs font-bold text-content-1">{componente.nombre || `Pieza ${indice + 1}`} <span className="font-semibold text-content-3">× {componente.cantidad || 1}</span></p>
                 <p className="mt-1.5 text-[10px] leading-relaxed text-content-2"><i className="fa-solid fa-location-dot mr-1 text-danger" aria-hidden="true" />{componente.ubicacion || bien.ubicacion || 'Sin ubicación'}<br /><i className="fa-solid fa-user-check mr-1 text-ok" aria-hidden="true" />{componente.funcionario || bien.funcionario || 'Sin funcionario'}</p>
-                {(componente.estadoConservacion || componente.observaciones) && <p className="mt-2 whitespace-pre-wrap break-words border-t border-line pt-2 text-[10px] leading-relaxed text-content-2">{componente.estadoConservacion && <><b>Estado:</b> {componente.estadoConservacion}. </>}{componente.observaciones && <><b>Observación:</b> {componente.observaciones}</>}</p>}
+                {componente.observaciones && <p className="mt-2 whitespace-pre-wrap break-words border-t border-line pt-2 text-[10px] leading-relaxed text-content-2"><b>Observación:</b> {componente.observaciones}</p>}
               </article>)}</div>
             </section>
           )}

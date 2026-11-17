@@ -398,31 +398,31 @@ export default function InventarioView({
 
     </div>
 
-    <div className="flex flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+    <div className="grid min-h-[76px] grid-cols-1 items-center gap-3 rounded-2xl border border-emerald-700/15 bg-emerald-50/70 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-4 dark:bg-emerald-500/[0.06]">
       <button
         type="button"
         aria-pressed={filtroPendiente === 'libresParaAsignar'}
         onClick={() => { setFiltroPendiente(filtroPendiente === 'libresParaAsignar' ? '' : 'libresParaAsignar'); setCurrentPage(1); }}
-        className={`flex min-w-0 items-center gap-3 rounded-xl px-2 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
+        className={`flex min-w-0 items-center gap-3 rounded-xl px-2 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-box-open" aria-hidden="true" /></span>
         <span className="min-w-0">
           <span className="block text-sm font-extrabold text-content-1">Libres para asignar</span>
           <span className="block text-xs text-content-3">Sin funcionario ni ubicación, o marcados expresamente para asignación</span>
         </span>
-        <span className="ml-1 rounded-full border border-emerald-600/20 bg-surface-1 px-2.5 py-1 text-xs font-black tabular-nums text-emerald-800 dark:text-emerald-300">{Number(stats.libresParaAsignar || 0).toLocaleString('es-PY')}</span>
+        <span className="ml-auto min-w-[68px] rounded-full border border-emerald-700/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-emerald-800 dark:bg-slate-900 dark:text-emerald-300">{Number(stats.libresParaAsignar || 0).toLocaleString('es-PY')}</span>
       </button>
-      <div className="flex shrink-0 items-center gap-2 pl-1 sm:pl-0">
+      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-emerald-700/10 pt-2 sm:border-0 sm:pt-0">
         <Button variante="subtle" tamano="sm" icono="fa-file-csv" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en CSV">Descargar CSV</Button>
         <Button variante="subtle" tamano="sm" icono="fa-file-excel" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en Excel">Excel</Button>
         <Button variante="secondary" tamano="sm" icono="fa-file-pdf" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} title="Descargar informe PDF de bienes libres para asignar">PDF</Button>
       </div>
     </div>
 
-    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-500/[0.035] hover:bg-amber-500/[0.08]'}`}>
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
+    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex min-h-[76px] w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
       <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
-      <span className="rounded-full border border-amber-600/20 bg-surface-1 px-2.5 py-1 text-xs font-black tabular-nums text-amber-800 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
+      <span className="min-w-[68px] rounded-full border border-amber-600/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-amber-800 dark:bg-slate-900 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
     </button>
 
     <div>
@@ -783,7 +783,15 @@ export default function InventarioView({
                     </div>
                     ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                      <Table sinContenedor minWidth={false} className="anim-rows w-full text-left border-collapse min-w-[900px]">
+                      <Table sinContenedor minWidth={false} className="anim-rows w-full table-fixed text-left border-collapse min-w-[1180px]">
+
+                        <colgroup>
+                          <col style={{ width: '4%' }} />
+                          <col style={{ width: '33%' }} />
+                          <col style={{ width: '27%' }} />
+                          <col style={{ width: '16%' }} />
+                          <col style={{ width: '20%' }} />
+                        </colgroup>
 
                                                   <THead sticky>
                           <TRow className="text-[10px] sm:text-[11px] font-semibold text-content-3 dark:text-content-3 uppercase tracking-widest">
@@ -795,14 +803,14 @@ export default function InventarioView({
                                 className="h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer align-middle"
                               />
                             </TH>
-                            <TH className="py-4 pr-4 w-[38%]">
+                            <TH className="py-4 pr-4">
                               <button onClick={() => ciclarOrden('rotulo')} title="Ordenar por rótulo" className="inline-flex items-center gap-1.5 uppercase tracking-widest hover:text-content-1 dark:hover:text-white transition-colors cursor-pointer">
                                 Identificación y Descripción <i className={`fa-solid ${flechaOrden('rotulo')} text-[9px]`}></i>
                               </button>
                             </TH>
-                            <TH className="px-4 py-4 w-[28%]">Localización y Custodio</TH>
-                            <TH className="px-4 py-4 w-[18%]">Condición y Estado</TH>
-                            <TH className="py-4 pl-4 pr-6 sm:pr-8 text-right w-[16%]">Acciones</TH>
+                            <TH className="px-4 py-4">Localización y Custodio</TH>
+                            <TH className="px-4 py-4">Condición y Estado</TH>
+                            <TH className="py-4 pl-4 pr-6 sm:pr-8 text-right">Acciones</TH>
                           </TRow>
                         </THead>
 
@@ -886,7 +894,7 @@ export default function InventarioView({
                                 </TD>
 
                                 {/* Columna 3: Condición y QR (Botón interactivo) */}
-                                <TD className={`px-4 align-middle ${compacto ? 'py-2' : 'py-4'}`} >
+                                <TD className={`px-4 align-top ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span className={`inline-flex items-center justify-center px-2.5 py-1 min-w-[76px] text-center rounded-control text-[11px] font-bold border uppercase tracking-wider ${getCondicionBadge(item.estadoConservacion)}`}>
                                       {item.estadoConservacion || 'Regular'}

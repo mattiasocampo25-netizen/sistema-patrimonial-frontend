@@ -113,32 +113,36 @@ export default function AuditoriaView({
         <StatTile etiqueta="Bajas y eliminaciones" valor={kpisAud.bajas} icono="fa-flag" tono="danger" animado />
       </div>
 
-      <div className="overflow-hidden rounded-[26px] border border-line/70 bg-surface-1 shadow-sm">
-          <div className="flex items-center justify-between gap-3 mb-1">
-              <h3 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-chart-line text-ok"></i> Evolución del valor patrimonial
+      <div className="overflow-hidden rounded-[24px] border border-line bg-surface-1 p-4 shadow-sm sm:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="flex items-center gap-2 text-sm font-bold text-content-1">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-ok-soft text-ok"><i className="fa-solid fa-chart-line" aria-hidden="true" /></span>
+                Evolución del valor patrimonial
               </h3>
-              <span className="text-[11px] font-bold text-content-3 dark:text-content-3 uppercase tracking-wider">Últimos 12 meses</span>
+              <p className="mt-1.5 text-xs text-content-3">Valor incorporado por mes. Selecciona un mes para filtrar el inventario.</p>
+            </div>
+            <span className="rounded-full border border-line bg-surface-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-content-3">Últimos 12 meses</span>
           </div>
-          <p className="text-xs text-content-3 dark:text-content-3 mb-5">Valor incorporado por mes · clic en una barra para filtrar el inventario.</p>
-          <div className="flex items-end gap-1.5 sm:gap-2 h-40">
-              {evolucionValor.map(e => (
-                  <button
-                      key={e.key}
-                      onClick={() => { clearAllFilters(); setFiltroAnio(e.year); setFiltroMes(e.month); setActiveTab('inventario'); }}
-                      title={`${e.etiqueta}: Gs. ${Number(e.valor).toLocaleString('es-PY')} — clic para filtrar`}
-                      className="flex-1 h-full flex flex-col items-center justify-end gap-1.5 rounded-lg group/bar focus-visible:ring-2 focus-visible:ring-brand outline-none cursor-pointer"
-                  >
-                      <span className="text-[10px] font-bold tabular-nums text-content-3 opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
-                          {e.valor > 0 ? formatoCortoGs(e.valor) : ''}
-                      </span>
-                      <span
-                          className={`w-full rounded-t-lg transition-all ${e.valor > 0 ? 'bg-emerald-500 group-hover/bar:bg-emerald-400' : 'bg-surface-3 dark:bg-surface-1/10'}`}
-                          style={{ height: e.valor > 0 ? `${Math.max(6, (e.valor / maxEvolucion) * 100)}%` : '4px' }}
-                      ></span>
-                      <span className="text-[9px] font-bold text-content-3 dark:text-content-3 uppercase">{e.etiqueta}</span>
-                  </button>
-              ))}
+          <div className="mt-5 overflow-x-auto rounded-2xl border border-line/70 bg-surface-2/50 px-3 py-3 sm:px-4">
+            <div className="grid h-44 min-w-[760px] grid-cols-12 items-end gap-2 sm:gap-3">
+              {evolucionValor.map(e => {
+                const porcentaje = e.valor > 0 ? Math.max(6, (e.valor / maxEvolucion) * 100) : 0;
+                return <button
+                  key={e.key}
+                  onClick={() => { clearAllFilters(); setFiltroAnio(e.year); setFiltroMes(e.month); setActiveTab('inventario'); }}
+                  title={`${e.etiqueta}: Gs. ${Number(e.valor).toLocaleString('es-PY')} — clic para filtrar`}
+                  aria-label={`${e.etiqueta}, Gs. ${Number(e.valor).toLocaleString('es-PY')}. Filtrar inventario por este mes.`}
+                  className="group/bar flex h-full min-w-0 flex-col items-center justify-end gap-1 rounded-xl px-1 pt-1 outline-none transition hover:bg-surface-1 focus-visible:ring-2 focus-visible:ring-brand"
+                >
+                  <span className={`h-4 whitespace-nowrap text-[9px] font-bold tabular-nums text-content-2 transition-opacity ${e.valor > 0 ? 'opacity-100 sm:opacity-0 sm:group-hover/bar:opacity-100' : 'opacity-0'}`}>{e.valor > 0 ? formatoCortoGs(e.valor) : ' '}</span>
+                  <span className="flex h-28 w-full items-end border-b border-line px-1">
+                    <span className={`w-full rounded-t-md transition-colors ${e.valor > 0 ? 'bg-emerald-600 group-hover/bar:bg-emerald-500' : 'h-1 bg-line-strong'}`} style={e.valor > 0 ? { height: `${porcentaje}%` } : undefined} />
+                  </span>
+                  <span className="h-4 whitespace-nowrap text-[9px] font-bold uppercase text-content-3">{e.etiqueta}</span>
+                </button>;
+              })}
+            </div>
           </div>
       </div>
       </>}

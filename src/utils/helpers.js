@@ -171,7 +171,9 @@ export const matchBienSearch = (bien, query, registrosRelacionados = [], { codig
   const b = bien || {};
   const tokens = normalizeStr(query).split(' ').filter(Boolean);
   const esConsultaNumerica = tokens.length > 0 && tokens.every(tok => /^[\d.,/#_-]+$/.test(tok));
-  const camposCodigo = [b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial, b.id]
+  // El ID interno (UUID) no es un código patrimonial. Sus dígitos aleatorios
+  // provocaban falsos positivos al buscar números como "4035".
+  const camposCodigo = [b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial]
     .map(v => String(v ?? ''));
   // Al buscar un número que coincide con un rótulo/código, no incluir bienes
   // cuyo único match está en una CI, fecha u otro dato relacionado. Eso hacía
@@ -205,7 +207,8 @@ export const matchBienSearch = (bien, query, registrosRelacionados = [], { codig
     b.rotulo, b.etiqueta, b.codigo, b.codigoPatrimonial, b.descripcion,
     b.cuenta, b.subcuenta, b.analitico1, b.analitico2, b.ubicacion,
     b.funcionario, b.funcionarioAlternativo, b.funcionarioNombre, b.responsable, b.responsableNombre,
-    b.custodio, b.funcionarioDoc, b.cedulaResponsable, b.funcionarioCargo, b.id,
+    b.custodio, b.funcionarioDoc, b.cedulaResponsable, b.funcionarioCargo,
+    ...(esConsultaNumerica ? [] : [b.id]),
     ...(Array.isArray(b.componentes) ? b.componentes.flatMap(componente => [componente.nombre, componente.ubicacion, componente.funcionario, componente.observaciones]) : []),
     ...registrosRelacionados.flatMap(registro => [
       registro?.funcionarioNombre, registro?.funcionarioDoc, registro?.funcionarioCargo,

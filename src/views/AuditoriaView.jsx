@@ -73,8 +73,8 @@ export default function AuditoriaView({
     return grupos;
   }, []);
   return (
-    <div className="flex flex-col flex-1 space-y-6 pb-12">
-      <section className="relative isolate overflow-hidden rounded-[28px] border border-slate-700/30 bg-gradient-to-br from-slate-950 via-[#123a60] to-[#165b73] px-5 py-6 text-white shadow-[0_22px_60px_-35px_rgba(15,45,75,.65)] sm:px-8 sm:py-8">
+    <div className="module-screen audit-workspace flex flex-col flex-1 space-y-4 pb-12">
+      <section className="audit-hero relative isolate overflow-hidden rounded-panel px-5 py-6 sm:px-8 sm:py-7">
         <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-28 h-72 w-72 rounded-full border border-white/10 bg-white/[0.04]" />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 right-32 h-64 w-64 rounded-full border border-white/[0.08]" />
         <div className="relative flex flex-wrap items-end justify-between gap-5">
@@ -92,13 +92,13 @@ export default function AuditoriaView({
         </div>
       </section>
 
-      <nav className="grid grid-cols-1 gap-2 rounded-[22px] border border-line bg-surface-1 p-2 shadow-sm sm:grid-cols-3" role="tablist" aria-label="Secciones de auditoría">
+      <nav className="audit-nav grid grid-cols-1 gap-2 rounded-panel border border-line bg-surface-1 p-2 shadow-card sm:grid-cols-3" role="tablist" aria-label="Secciones de auditoría">
         {[
           { id: 'actividad', titulo: 'Actividad', descripcion: 'Historial de cambios', icono: 'fa-clock-rotate-left' },
           { id: 'calidad', titulo: 'Calidad de datos', descripcion: 'Alertas y recursos', icono: 'fa-shield-halved' },
           { id: 'conteo', titulo: 'Verificación física', descripcion: 'Conteo y muestreo', icono: 'fa-clipboard-check' },
         ].map(tab => (
-          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`flex min-h-[66px] items-center gap-2 rounded-2xl px-3 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-md dark:bg-white dark:text-slate-950' : 'border border-transparent text-content-2 hover:border-line hover:bg-surface-2'}`}>
+          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`audit-tab flex min-h-[66px] items-center gap-2 rounded-control px-3 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-md dark:bg-white dark:text-slate-950' : 'border border-transparent text-content-2 hover:border-line hover:bg-surface-2'}`}>
             <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:flex ${seccionAuditoria === tab.id ? 'bg-white/15 dark:bg-slate-900/10' : 'bg-brand-soft text-brand-text'}`}><i className={`fa-solid ${tab.icono}`} aria-hidden="true" /></span>
             <span className="min-w-0"><span className="block truncate text-xs font-bold sm:text-sm">{tab.titulo}</span><span className={`mt-0.5 hidden truncate text-[10px] sm:block ${seccionAuditoria === tab.id ? 'text-white/70 dark:text-slate-600' : 'text-content-3'}`}>{tab.descripcion}</span></span>
           </button>

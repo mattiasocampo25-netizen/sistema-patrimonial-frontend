@@ -19,16 +19,18 @@ export default function FuncionariosView({
   const [mostrarCedulas, setMostrarCedulas] = useState(false);
   const funcionariosVisibles = funcionariosPurosDependencia?.length || 0;
   return (
-    <div className="flex flex-col flex-1 space-y-6 pb-12">
+    <div className="module-screen staff-workspace flex flex-col flex-1 space-y-4 pb-12">
 
       {/* CABECERA DE SECCIÓN */}
       <div className="space-y-4">
-        <Card className="p-0">
-          <div className="p-5 sm:p-6">
+        <section className="staff-hero rounded-panel p-4 sm:p-6">
+          <div className="staff-hero-content">
+            <p className="mb-2 text-label font-extrabold uppercase tracking-[0.18em] text-brand-text">Directorio institucional</p>
             <PageHeader
               titulo={'Plantel de Funcionarios'}
               descripcion={<>Padrón de personal de <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong>. Busca por nombre, cédula o cargo; edita desde la fila.</>}
               icono="fa-address-book"
+              className="staff-page-header"
               contador={(
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2.5 py-1 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
@@ -68,10 +70,10 @@ export default function FuncionariosView({
   
             </Toolbar>
           </div>
-        </Card>
+        </section>
 
         {/* Barra de búsqueda del padrón */}
-        <Card className="p-4 sm:p-5">
+        <Card className="staff-filter-panel p-4 sm:p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div><h2 className="text-sm font-bold text-content-1">Buscar en el padrón</h2><p className="mt-0.5 text-xs text-content-3">{funcionariosVisibles.toLocaleString('es-PY')} resultados en {dependenciaActual}</p></div>
             {(searchFuncionarioInput || filtroCargo) && <button type="button" onClick={() => { setSearchFuncionarioInput(''); setFiltroCargo(''); setCurrentPaginaFuncionarios(1); }} className="inline-flex h-9 items-center gap-2 rounded-control px-3 text-xs font-semibold text-brand-text hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-filter-circle-xmark" aria-hidden="true"/>Limpiar filtros</button>}
@@ -115,7 +117,7 @@ export default function FuncionariosView({
            los datos aún no llegaban. */
         <SkeletonLoader />
       ) : (
-      <div className="flex-1 bg-surface-1 dark:bg-surface-1/[0.04] shadow-sm border border-line/70 dark:border-white/10 rounded-panel flex flex-col overflow-hidden relative min-h-[450px]">
+      <div className="staff-table-panel flex-1 bg-surface-1 shadow-card border border-line rounded-panel flex flex-col overflow-hidden relative min-h-[450px]">
           <div className="flex-1 overflow-auto custom-scrollbar">
             <Table sinContenedor minWidth={false} className="min-w-full text-left border-collapse">
               <THead>

@@ -38,26 +38,28 @@ export default function ResumenView({
   const nombresEstado = { bueno: 'Bueno', regular: 'Regular', malo: 'Requiere atención' };
 
   return (
-    <div className="space-y-6 pb-12">
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
+    <div className="module-screen dependency-workspace space-y-5 pb-12">
+      <section className="dependency-hero rounded-panel p-4 sm:p-6">
+        <div className="dependency-hero-content">
+          <p className="mb-2 text-label font-extrabold uppercase tracking-[0.18em] text-brand-text">Resumen operativo · Dependencia activa</p>
           <PageHeader
             titulo={<>Mi Dependencia · {dependenciaActual}</>}
             descripcion="Resumen de bienes, regularización y movimientos recientes. Selecciona una tarjeta para abrir su detalle."
             icono="fa-house-user"
             acciones={<Button variante="secondary" icono="fa-boxes-stacked" onClick={() => irInventario()}>Abrir inventario</Button>}
+            className="dependency-page-header"
           />
         </div>
-      </Card>
+      </section>
 
-      <KpiGrid columnas={4} className="gap-3">
+      <KpiGrid columnas={4} className="dependency-kpis gap-3">
         <StatTile etiqueta="Bienes activos" valor={stats.totalItems || 0} icono="fa-boxes-stacked" tono="brand" animado onClick={() => irInventario()} />
         <StatTile etiqueta="Valor patrimonial" valor={`Gs. ${formatCurrency(stats.totalValue || 0)}`} icono="fa-coins" tono="ok" onClick={() => irInventario()} />
         <StatTile etiqueta="Pendientes de QR" valor={stats.withoutQR || 0} icono="fa-qrcode" tono="warn" animado onClick={() => irInventario(() => setFiltroQR?.('NO'))} />
         <StatTile etiqueta="Sin acta FC-10" valor={stats.withoutFc10 || 0} icono="fa-file-signature" tono="warn" animado onClick={() => irInventario(() => setFiltroFC10?.('NO'))} />
       </KpiGrid>
 
-      <Card tamaño="sm" className="overflow-hidden p-0">
+      <Card tamaño="sm" className="dependency-requests overflow-hidden p-0">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
           <div>
             <h2 className="text-sm font-bold text-content-1"><i className="fa-solid fa-file-circle-check mr-2 text-brand-text" aria-hidden="true" />Seguimiento de mis solicitudes de baja</h2>
@@ -103,7 +105,7 @@ export default function ResumenView({
         )}
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="dependency-panels grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card tamaño="sm" className="p-5 sm:p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h3 className="text-sm font-bold text-content-1 dark:text-white"><i className="fa-solid fa-list-check text-content-3 mr-2" aria-hidden="true" />Estado de regularización</h3>
@@ -139,7 +141,7 @@ export default function ResumenView({
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="dependency-panels grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card tamaño="sm" className="p-5 sm:p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between gap-3">
             <h3 className="text-sm font-bold text-content-1 dark:text-white"><i className="fa-solid fa-chart-line text-brand-text mr-2" aria-hidden="true" />Movimientos FC-10</h3>

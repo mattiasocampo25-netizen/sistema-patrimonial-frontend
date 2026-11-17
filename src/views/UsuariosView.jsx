@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
-import { Badge, Button, Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
+import { Badge, Button, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
   esDesarrollador, currentUser, setItemToDelete, isLoading
@@ -19,26 +19,30 @@ export default function UsuariosView({
   const paginas = Math.max(1, Math.ceil(usuariosVisibles.length / porPagina));
   const paginaActual = Math.min(pagina, paginas);
   const usuariosPagina = usuariosVisibles.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
+  const totalAdministracion = usuariosList.filter(u => ['admin', 'desarrollador'].includes(u.cargo)).length;
+  const totalFuncionarios = usuariosList.filter(u => u.cargo === 'funcionario').length;
   return (
-    <div className="flex flex-col flex-1 space-y-6">
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
+    <div className="module-screen users-workspace flex flex-col flex-1 space-y-4 pb-12">
+      <section className="users-hero rounded-panel p-4 sm:p-6">
+        <div className="users-hero-content">
+          <p className="mb-2 text-label font-extrabold uppercase tracking-[0.18em] text-brand-text">Seguridad y acceso</p>
           <PageHeader
             titulo={'Gestión de Usuarios'}
             descripcion={'Gestión de cuentas y roles de acceso al sistema'}
             icono="fa-users-gear"
+            className="users-page-header"
             contador={(
               <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-surface-3 dark:bg-surface-1/10 text-content-2 dark:text-content-3 border border-line dark:border-white/10">
                 {usuariosVisibles.length} / {usuariosList.length}
               </span>
             )}
           />
-          <Toolbar className="mt-4">
+          <Toolbar className="users-actions mt-4">
           <Button variante="primary" tamano="md" icono="fa-user-plus" onClick={() => { setUsuarioEditing(null); setIsUsuarioModalOpen(true); }}>
             Nuevo Usuario
           </Button>
           </Toolbar>
-          <div className="mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="users-filter-row mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <label className="sr-only" htmlFor="usuarios-search">Buscar usuarios</label>
             <input id="usuarios-search" value={busqueda} onChange={e => { setBusqueda(e.target.value); setPagina(1); }} placeholder="Buscar por nombre, usuario o dependencia…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
             <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar usuarios por rol">
@@ -46,7 +50,13 @@ export default function UsuariosView({
             </div>
           </div>
         </div>
-      </Card>
+      </section>
+
+      <section className="users-summary grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Resumen de cuentas">
+        <div className="users-summary-tile"><span className="users-summary-icon"><i className="fa-solid fa-users" aria-hidden="true" /></span><span><span className="users-summary-label">Cuentas registradas</span><strong>{usuariosList.length.toLocaleString('es-PY')}</strong></span></div>
+        <div className="users-summary-tile"><span className="users-summary-icon users-summary-admin"><i className="fa-solid fa-shield-halved" aria-hidden="true" /></span><span><span className="users-summary-label">Administración</span><strong>{totalAdministracion.toLocaleString('es-PY')}</strong></span></div>
+        <div className="users-summary-tile"><span className="users-summary-icon users-summary-staff"><i className="fa-solid fa-user" aria-hidden="true" /></span><span><span className="users-summary-label">Funcionarios</span><strong>{totalFuncionarios.toLocaleString('es-PY')}</strong></span></div>
+      </section>
 
       {isLoading ? (
         /* Durante la carga inicial se muestra el esqueleto en vez del estado
@@ -54,7 +64,7 @@ export default function UsuariosView({
            aún no llegaban. */
         <SkeletonLoader />
       ) : (
-      <div className="flex-1 bg-surface-1 dark:bg-surface-1/[0.04] border border-line/70 dark:border-white/10 rounded-panel flex flex-col overflow-hidden relative">
+      <div className="users-table-panel flex-1 bg-surface-1 border border-line rounded-panel flex flex-col overflow-hidden relative">
           <div className="flex-1 overflow-auto custom-scrollbar">
             <Table sinContenedor minWidth={false} className="min-w-[560px] text-left">
               <THead>

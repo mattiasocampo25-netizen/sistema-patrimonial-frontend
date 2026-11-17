@@ -722,6 +722,70 @@ select:focus {
 .ui-toast-info { border-left-color: var(--info); }
 .toast-dismiss { opacity: .72; }
 .toast-dismiss:hover { opacity: 1; }
+
+/* Rediseño de espacios administrativos: lectura por tarea y herramientas preservadas. */
+.module-screen { --module-gap: 1rem; gap: var(--module-gap); }
+.dependency-hero,
+.staff-hero,
+.users-hero {
+  border: 1px solid color-mix(in srgb, var(--brand) 19%, var(--line));
+  background: linear-gradient(118deg, color-mix(in srgb, var(--brand) 11%, var(--surface-1)), var(--surface-1) 55%, color-mix(in srgb, var(--brand) 5%, var(--surface-1)));
+  box-shadow: var(--shadow-card);
+}
+.dependency-page-header,
+.staff-page-header,
+.users-page-header { padding: .2rem 0; border: 0; background: transparent; box-shadow: none; }
+.dependency-page-header .module-page-header,
+.staff-page-header .module-page-header,
+.users-page-header .module-page-header { border-left: 0; }
+.dependency-kpis > *, .users-summary-tile { min-height: 6.1rem; }
+.dependency-requests { box-shadow: var(--shadow-card); }
+.dependency-requests > div:first-child { background: linear-gradient(90deg, color-mix(in srgb, var(--brand) 7%, var(--surface-1)), var(--surface-1)); }
+.dependency-workspace .dependency-panels > * { box-shadow: var(--shadow-card); }
+.staff-hero-content .module-page-header,
+.users-hero-content .module-page-header { animation-delay: 35ms; }
+.staff-filter-panel { box-shadow: var(--shadow-card); }
+.staff-filter-panel input:focus-visible,
+.users-filter-row input:focus-visible,
+.audit-workspace input:focus-visible { box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 13%, transparent); }
+.staff-table-panel,
+.users-table-panel { box-shadow: var(--shadow-panel); }
+.staff-table-panel thead,
+.users-table-panel thead { position: sticky; top: 0; z-index: 2; background: var(--surface-2); box-shadow: 0 1px 0 var(--line); }
+.staff-table-panel tbody tr,
+.users-table-panel tbody tr { transition: background-color var(--dur-fast) var(--ease-standard); }
+.staff-table-panel tbody tr:hover,
+.users-table-panel tbody tr:hover { background: color-mix(in srgb, var(--brand) 5%, var(--surface-1)); }
+.staff-table-panel tbody td,
+.users-table-panel tbody td { border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent); }
+.users-actions { justify-content: flex-end; }
+.users-filter-row { align-items: stretch; }
+.users-summary-tile { display: flex; align-items: center; gap: .85rem; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface-1); padding: .9rem 1rem; box-shadow: var(--shadow-card); }
+.users-summary-icon { display: inline-flex; width: 2.6rem; height: 2.6rem; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, var(--brand) 18%, transparent); border-radius: .9rem; background: var(--brand-soft); color: var(--brand-text); }
+.users-summary-admin { color: var(--info); background: var(--info-soft); border-color: color-mix(in srgb, var(--info) 18%, transparent); }
+.users-summary-staff { color: var(--ok); background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 18%, transparent); }
+.users-summary-tile > span:last-child { display: grid; gap: .12rem; }
+.users-summary-label { color: var(--content-3); font-size: var(--text-label); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.users-summary-tile strong { color: var(--content-1); font-size: 1.35rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.audit-hero { border: 1px solid color-mix(in srgb, var(--brand) 42%, #10263a); background: linear-gradient(118deg, #10283c 0%, color-mix(in srgb, var(--brand) 76%, #14384e) 60%, #155e6b 100%); box-shadow: var(--shadow-panel); }
+.audit-hero::after { content: ''; position: absolute; right: -4rem; bottom: -13rem; width: 26rem; height: 26rem; border: 1px solid rgb(255 255 255 / .12); border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / .08), transparent 68%); pointer-events: none; }
+.audit-hero > * { position: relative; z-index: 1; }
+.audit-nav { position: sticky; top: .5rem; z-index: 10; }
+.audit-tab { min-height: 4.2rem; }
+.audit-workspace .audit-tab[aria-selected="true"] { color: #fff; background: linear-gradient(135deg, var(--brand), color-mix(in srgb, var(--brand) 72%, #10283c)); box-shadow: 0 7px 18px color-mix(in srgb, var(--brand) 20%, transparent); }
+.dark .audit-workspace .audit-tab[aria-selected="true"] { color: var(--content-1); background: color-mix(in srgb, var(--brand) 20%, var(--surface-2)); }
+.audit-workspace [data-tour="aud-kpis"] > * { min-height: 7rem; }
+.audit-workspace article { box-shadow: var(--shadow-card); }
+.audit-workspace article:hover { border-color: color-mix(in srgb, var(--brand) 34%, var(--line)); }
+.audit-workspace :is(section, article, nav, [role="tabpanel"]) { scroll-margin-top: 1rem; }
+@media (max-width: 640px) {
+  .module-screen { --module-gap: .8rem; }
+  .dependency-hero, .staff-hero, .users-hero { border-radius: var(--radius-card); padding: .9rem; }
+  .audit-hero { padding: 1.1rem; }
+  .audit-nav { position: static; }
+  .users-summary-tile { min-height: 4.5rem; }
+  .users-actions { justify-content: flex-start; }
+}
 @keyframes app-processing-enter { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes app-processing-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 0%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--brand) 10%, transparent); } }
 @keyframes app-processing-ring { 0% { opacity: .65; transform: scale(.94); } 100% { opacity: 0; transform: scale(1.12); } }

@@ -802,7 +802,7 @@ export function useFcModals({
             await localforage.setItem(`bienes_cache_${dependenciaActual}`, nuevoCache);
 
             if (keepOpen) {
-                notify(`"${rotuloInput}" guardado y sincronizado.`, "success");
+                if (!camposEnConflicto.length) notify(`"${rotuloInput}" guardado y sincronizado.`, "success");
                 form.elements['rotulo'].value = '';
                 form.elements['descripcion'].value = '';
                 if(form.elements['hasQR']) form.elements['hasQR'].checked = false;
@@ -810,10 +810,10 @@ export function useFcModals({
                 setBienEditing(null);
             } else {
                 setIsBienModalOpen(false); 
-                notify("Bien guardado y actualizado con el padrón", "success"); 
+                if (!camposEnConflicto.length) notify("Bien guardado correctamente.", "success");
             }
             if (camposEnConflicto.length) {
-                notify(`Se guardó tu edición. También se detectaron cambios simultáneos en ${describirCampos(camposEnConflicto)}; tu valor quedó aplicado y se conservaron los demás cambios.`, 'warning');
+                notify(`${describirCampos(camposEnConflicto)} cambió durante tu edición. Se guardó tu valor.`, 'warning');
             }
         } else {
             notify("Error al guardar en el servidor.", "error", { action: { label: 'Reintentar', onClick: () => saveBien(null, keepOpen) } });

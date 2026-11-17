@@ -1,9 +1,10 @@
 // Vista de gestión de usuarios -solo admin- (extraída de App.jsx, Fase 4).
 import { useMemo, useState } from 'react';
 import { normalizeStr } from '../utils/helpers';
+import { rolDesdeCargo } from '../utils/postgrest';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Badge, Button, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, IconButton } from '../components/ui';
-const rolNormalizado = usuario => normalizeStr(usuario?.cargo || '').trim();
+const rolNormalizado = usuario => rolDesdeCargo(usuario?.cargo);
 
 export default function UsuariosView({
   usuariosList, setUsuarioEditing, setIsUsuarioModalOpen,
@@ -14,16 +15,17 @@ export default function UsuariosView({
   const [pagina, setPagina] = useState(1);
   const porPagina = 10;
   const usuariosVisibles = useMemo(() => usuariosList.filter(u => {
-    const coincideTexto = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).includes(normalizeStr(busqueda));
+    const textoUsuario = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).toLocaleLowerCase('es');
+    const coincideTexto = textoUsuario.includes(normalizeStr(busqueda).toLocaleLowerCase('es'));
     const rol = rolNormalizado(u);
-    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'desarrollador'].includes(rol) : rol === 'funcionario');
+    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'dev'].includes(rol) : rol === 'user');
     return coincideTexto && coincideRol;
   }), [usuariosList, busqueda, filtroRol]);
   const paginas = Math.max(1, Math.ceil(usuariosVisibles.length / porPagina));
   const paginaActual = Math.min(pagina, paginas);
   const usuariosPagina = usuariosVisibles.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
-  const totalAdministracion = usuariosList.filter(u => ['admin', 'desarrollador'].includes(rolNormalizado(u))).length;
-  const totalFuncionarios = usuariosList.filter(u => rolNormalizado(u) === 'funcionario').length;
+  const totalAdministracion = usuariosList.filter(u => ['admin', 'dev'].includes(rolNormalizado(u))).length;
+  const totalFuncionarios = usuariosList.filter(u => rolNormalizado(u) === 'user').length;
   return (
     <div className="module-screen users-workspace flex flex-col flex-1 space-y-4 pb-12">
       <section className="users-hero rounded-panel p-4 sm:p-6">
@@ -92,7 +94,7 @@ export default function UsuariosView({
                           </div>
                       </TD>
                       <TD className="px-4 py-3 align-middle">
-                          {rolNormalizado(u) === 'desarrollador'
+                          {rolNormalizado(u) === 'dev'
                               ? <Badge tono="brand" icono="fa-code">Desarrollador</Badge>
                               : rolNormalizado(u) === 'admin'
                               ? <Badge tono="info" icono="fa-shield-halved">Administrador</Badge>
@@ -101,7 +103,7 @@ export default function UsuariosView({
                       </TD>
                       <TD className="relative py-3 pl-4 pr-6 align-middle text-right">
                           <div className="flex items-center justify-end gap-1">
-                            {rolNormalizado(u) === 'desarrollador' && !esDesarrollador ? (
+                            {rolNormalizado(u) === 'dev' && !esDesarrollador ? (
                                 <IconButton titulo="Solo el Desarrollador gestiona esta cuenta" icono="fa-lock" variante="ghost" tamano="sm" disabled />
                             ) : (
                             <>

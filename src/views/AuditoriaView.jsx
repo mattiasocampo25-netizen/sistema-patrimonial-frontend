@@ -83,7 +83,7 @@ export default function AuditoriaView({
             <h1 className="text-2xl font-black tracking-tight sm:text-3xl">Trazabilidad patrimonial</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-200">Revisa cada acción, quién la realizó y cómo cambió cada dato. Las alertas de calidad ayudan a localizar inconsistencias antes de corregirlas.</p>
           </div>
-          <Button variante="secondary" tamano="md" icono="fa-rotate" onClick={() => fetchAuditoria(1)} title="Actualizar historial" className="relative border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/15 hover:text-white">{isLoadingAud ? 'Actualizando…' : 'Actualizar datos'}</Button>
+          <Button variante="secondary" tamano="md" icono="fa-rotate" cargando={isLoadingAud} onClick={() => fetchAuditoria(1)} title="Actualizar historial" className="relative border-white/20 bg-white/10 text-white hover:border-white/30 hover:bg-white/15 hover:text-white">{isLoadingAud ? 'Actualizando…' : 'Actualizar datos'}</Button>
         </div>
         <div className="relative mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 pt-4 text-[11px] font-medium text-slate-200">
           <span><i className="fa-solid fa-clock-rotate-left mr-2 text-cyan-200" aria-hidden="true" />Historial con filtros por fecha, usuario y cambio</span>

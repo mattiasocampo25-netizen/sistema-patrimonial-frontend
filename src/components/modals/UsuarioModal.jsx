@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react';
 import Dialogo from '../ui/Dialogo';
 import FiltroCombo from '../FiltroCombo';
 import { FORM } from '../../constants/designTokens';
+import { rolDesdeCargo } from '../../utils/postgrest';
 
 const LABEL = FORM.label;
 
 export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsuario, todasDependencias, esDesarrollador, STYLES }) {
-    const [rolSeleccionado, setRolSeleccionado] = useState(usuarioEditing?.cargo || 'user');
+    const [rolSeleccionado, setRolSeleccionado] = useState(rolDesdeCargo(usuarioEditing?.cargo));
     const [dependenciaSeleccionada, setDependenciaSeleccionada] = useState(usuarioEditing?.dependencia || 'Rectorado');
     useEffect(() => {
-      setRolSeleccionado(usuarioEditing?.cargo || 'user');
+      setRolSeleccionado(rolDesdeCargo(usuarioEditing?.cargo));
       setDependenciaSeleccionada(usuarioEditing?.dependencia || 'Rectorado');
     }, [usuarioEditing, isOpen]);
     if (!isOpen) return null;

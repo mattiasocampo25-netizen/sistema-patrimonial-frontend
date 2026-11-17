@@ -8,11 +8,17 @@ export function escaparFiltroPostgrest(valor) {
 }
 
 export function rolDesdeCargo(cargo) {
-  if (cargo === 'admin') return 'admin';
-  if (cargo === 'desarrollador') return 'dev';
+  const valor = String(cargo ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLocaleLowerCase('es');
+  if (['admin', 'administrator', 'administracion', 'administrador', 'administrador general', 'administrador del sistema'].includes(valor)) return 'admin';
+  if (['desarrollador', 'desarrollador del sistema', 'developer', 'dev'].includes(valor)) return 'dev';
   return 'user';
 }
 
 export function rolEsPrivilegiado(roleOCargo) {
-  return roleOCargo === 'admin' || roleOCargo === 'dev' || roleOCargo === 'desarrollador';
+  const rol = rolDesdeCargo(roleOCargo);
+  return rol === 'admin' || rol === 'dev';
 }

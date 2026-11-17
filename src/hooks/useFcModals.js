@@ -12,6 +12,7 @@ import { enqueueOfflineAction, esFalloDeConexion } from '../services/offlineSync
 import { detectarCambios, detectarConflictos, fusionarSobreFresco, describirCampos } from '../services/escrituraSegura';
 import { FORMATO_PDF } from '../constants/appConstants';
 import { componentesDe, coincideBienOPieza, piezasCoincidentes } from '../utils/componentesInventario';
+import { rolDesdeCargo } from '../utils/postgrest';
 
 // Normalización de rótulo para comparar bienes. Vive a nivel de módulo porque
 // la usan dos guardados distintos (saveBien y saveFC04); antes estaba definida
@@ -856,11 +857,11 @@ export function useFcModals({
     // La clave vive en Supabase Auth: nunca guardar texto plano en la tabla
     delete userData.password;
     // Solo el desarrollador puede otorgar rol de desarrollador
-    if (userData.cargo === 'desarrollador' && !esDesarrollador) {
+    if (rolDesdeCargo(userData.cargo) === 'dev' && !esDesarrollador) {
       return notify('Solo el Desarrollador del Sistema puede otorgar ese rol.', 'error');
     }
     // Proteger cuentas de desarrollador existentes
-    if (usuarioEditing?.cargo === 'desarrollador' && !esDesarrollador) {
+    if (rolDesdeCargo(usuarioEditing?.cargo) === 'dev' && !esDesarrollador) {
       return notify('Solo el Desarrollador del Sistema gestiona esa cuenta.', 'error');
     }
     
@@ -1590,7 +1591,7 @@ export function useFcModals({
                   };
               }
               else if (type === 'usuario') {
-                  if (itemToDelete.cargo === 'desarrollador' && !esDesarrollador) {
+                  if (rolDesdeCargo(itemToDelete.cargo) === 'dev' && !esDesarrollador) {
                       return notify('Solo el Desarrollador del Sistema gestiona esa cuenta.', 'error');
                   }
                   plan = {

@@ -1063,3 +1063,18 @@ html.font-lg { font-size: 18px; }
     }
   }
 }
+@keyframes ui-refresh-turn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.ui-button-refresh-icon { transform-origin: 50% 50%; }
+.ui-button:hover .ui-button-refresh-icon,
+.ui-button:focus-visible .ui-button-refresh-icon { animation: ui-refresh-turn 520ms cubic-bezier(.2,.75,.25,1); }
+.ui-button:active .ui-button-refresh-icon { animation: ui-refresh-turn 320ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-button:hover .ui-button-refresh-icon,
+  .ui-button:focus-visible .ui-button-refresh-icon,
+  .ui-button:active .ui-button-refresh-icon { animation: none; }
+}

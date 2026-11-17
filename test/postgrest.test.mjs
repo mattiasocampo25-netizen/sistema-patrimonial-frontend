@@ -12,10 +12,17 @@ test('rolDesdeCargo mapea cargos conocidos', () => {
   assert.equal(rolDesdeCargo('admin'), 'admin');
   assert.equal(rolDesdeCargo('desarrollador'), 'dev');
   assert.equal(rolDesdeCargo('funcionario'), 'user');
+  assert.equal(rolDesdeCargo('Administrador'), 'admin');
+  assert.equal(rolDesdeCargo('ADMINISTRADOR GENERAL'), 'admin');
+  assert.equal(rolDesdeCargo('Desarrollador del sistema'), 'dev');
+  assert.equal(rolDesdeCargo('Funcionario Local'), 'user');
+  assert.equal(rolDesdeCargo('user'), 'user');
 });
 
 test('rolEsPrivilegiado cubre admin y desarrollador', () => {
   assert.equal(rolEsPrivilegiado('dev'), true);
   assert.equal(rolEsPrivilegiado('admin'), true);
+  assert.equal(rolEsPrivilegiado('Administrador'), true);
+  assert.equal(rolEsPrivilegiado('Desarrollador del sistema'), true);
   assert.equal(rolEsPrivilegiado('user'), false);
 });

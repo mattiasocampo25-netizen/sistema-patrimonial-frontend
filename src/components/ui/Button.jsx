@@ -85,7 +85,7 @@ export default function Button({
       {cargando ? (
         <i className="fa-solid fa-circle-notch fa-spin" aria-hidden="true" />
       ) : icono ? (
-        <i className={`fa-solid ${icono} text-[0.9em]`} aria-hidden="true" />
+        <i className={`fa-solid ${icono} text-[0.9em] ${/rotate|arrows-rotate/.test(icono) ? 'ui-button-refresh-icon' : ''}`} aria-hidden="true" />
       ) : null}
       {!soloIcono && children}
       {iconoDerecha && !cargando ? (

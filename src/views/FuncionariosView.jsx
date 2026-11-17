@@ -17,6 +17,13 @@ export default function FuncionariosView({
   isLoading, bienesDependenciaCount = 0
 }) {
   const [mostrarCedulas, setMostrarCedulas] = useState(false);
+  const [actualizandoResponsables, setActualizandoResponsables] = useState(false);
+  const ejecutarActualizacion = async () => {
+    if (actualizandoResponsables) return;
+    setActualizandoResponsables(true);
+    try { await sincronizarBienesConPadron(); }
+    finally { setActualizandoResponsables(false); }
+  };
   const funcionariosVisibles = funcionariosPurosDependencia?.length || 0;
   return (
     <div className="module-screen staff-workspace flex flex-col flex-1 space-y-4 pb-12">
@@ -48,8 +55,8 @@ export default function FuncionariosView({
   
             {/* Botones de Acción Principal */}
             <div className="flex flex-wrap items-center gap-2">
-                <Button variante="subtle" tamano="md" icono="fa-rotate" onClick={sincronizarBienesConPadron} title="Actualizar los responsables de bienes usando el padrón">
-                Actualizar responsables
+                <Button variante="subtle" tamano="md" icono="fa-rotate" cargando={actualizandoResponsables} onClick={ejecutarActualizacion} title="Actualizar los responsables de bienes usando el padrón">
+                {actualizandoResponsables ? 'Actualizando responsables…' : 'Actualizar responsables'}
               </Button>
                 <Button variante="subtle" tamano="md" icono="fa-file-excel" onClick={handleDownloadTemplateFuncionarios} title="Descargar el archivo modelo para importar funcionarios">
                 Plantilla CSV

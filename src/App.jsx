@@ -1721,13 +1721,18 @@ if (publicBienId) {
       {/* El cuadro para confirmar el nombre de descarga debe quedar accesible
           por encima del indicador global de generación. */}
       {isProcessing.active && !solicitudNombreArchivo && (
-        <div className="fixed inset-0 bg-surface-1/80 dark:bg-black/80 backdrop-blur-sm z-[500] flex flex-col items-center justify-center animate-fade-in">
-          <div className="proc-track"><div className={`proc-fill ${isProcessing.pct == null ? 'indete' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined}></div></div>
-          <i className="fa-solid fa-circle-notch fa-spin text-4xl text-brand-text mb-4"></i>
-          <h2 className="text-xl font-medium text-content-1 dark:text-white tracking-tight">{isProcessing.text}</h2>
-          {isProcessing.pct != null && (
-            <p className="text-sm font-bold text-content-3 dark:text-content-3 mt-2 tabular-nums">{Math.round(isProcessing.pct)}%</p>
-          )}
+        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-slate-950/55 px-4 backdrop-blur-sm animate-fade-in" role="status" aria-live="polite" aria-busy="true">
+          <div className="w-full max-w-sm rounded-[26px] border border-line bg-surface-1 p-6 text-center shadow-pop sm:p-8">
+            <div className="processing-orbit mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-brand-text" aria-hidden="true">
+              <i className="fa-solid fa-cloud-arrow-up text-xl" />
+            </div>
+            <h2 className="text-lg font-bold leading-snug text-content-1">{isProcessing.text || 'Procesando la operación…'}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-content-3">Un momento, estamos procesando tu solicitud.</p>
+            <div className="mt-5 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label="Progreso de la operación" aria-valuemin={0} aria-valuemax={100} aria-valuenow={isProcessing.pct != null ? Math.min(100, Math.max(0, Math.round(isProcessing.pct))) : undefined}>
+              <div className={`processing-bar ${isProcessing.pct == null ? 'processing-indeterminate' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined} />
+            </div>
+            {isProcessing.pct != null && <p className="mt-2 text-xs font-bold tabular-nums text-content-2">{Math.min(100, Math.max(0, Math.round(isProcessing.pct)))}%</p>}
+          </div>
         </div>
       )}
       <AppShell

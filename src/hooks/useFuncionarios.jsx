@@ -407,16 +407,19 @@ export function useFuncionarios({
             notify('El departamento seleccionado no pertenece a la dependencia elegida.', 'warning');
             return;
           }
-          const { error } = await supabase
+          const { data: guardado, error } = await supabase
             .from('funcionarios')
             .update({ nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion, dependencia: nuevaDependencia })
-            .eq('id', funcionarioToEdit.id);
+            .eq('id', funcionarioToEdit.id)
+            .select('id, nombre, cargo, ubicacion, dependencia')
+            .maybeSingle();
           if (error) throw error;
+          if (!guardado) throw new Error('La base no confirmó el cambio. Verifica tus permisos e inténtalo de nuevo.');
           setFuncionariosPadron(prev => prev.map(f => f.id === funcionarioToEdit.id ? { ...f, nombre: nuevoNombre, cargo: nuevoCargo, ubicacion: nuevaUbicacion, dependencia: nuevaDependencia } : f));
           notify("Funcionario actualizado exitosamente", "success");
           setIsFuncionarioModalOpen(false);
-      } catch {
-          notify("Error al actualizar el funcionario", "error");
+      } catch (error) {
+          notify(error?.message || "Error al actualizar el funcionario", "error");
       }
     };
 

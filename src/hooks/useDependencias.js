@@ -330,11 +330,14 @@ export function useDependencias({
         addToast('Ese departamento no pertenece a la dependencia del funcionario.', 'warning');
         return;
       }
-      const { error } = await supabase
+      const { data: funcionarioGuardado, error } = await supabase
         .from('funcionarios')
         .update({ ubicacion })
-        .eq('id', funcId);
+        .eq('id', funcId)
+        .select('id, ubicacion')
+        .maybeSingle();
       if (error) throw error;
+      if (!funcionarioGuardado) throw new Error('La base no confirmó el cambio del funcionario. Verifica tus permisos e inténtalo de nuevo.');
       setFuncionariosPadron((prev) =>
         prev.map((f) => (f.id === funcId ? { ...f, ubicacion } : f))
       );
@@ -348,26 +351,28 @@ export function useDependencias({
           if (normalizeStr(b.dependencia) !== normalizeStr(func.dependencia)) return false;
           if (normalizeStr(b.ubicacion || '') === normalizeStr(ubicacion)) return false;
           const cedBien = String(b.funcionarioDoc || '').replace(/\D/g, '');
-          if (cedFunc && cedBien && cedFunc === cedBien) return true;
+          if (cedFunc && cedBien) return cedFunc === cedBien;
           return nomFunc && normalizeStr(b.funcionario || '') === nomFunc;
         });
-        const idsActualizados = new Set();
+        const sellosActualizados = new Map();
         for (let i = 0; i < afectados.length; i += 10) {
           const lote = afectados.slice(i, i + 10);
-          const resultados = await Promise.all(lote.map((b) =>
-            supabase.from('bens').update(conSello({ data: { ...b, ubicacion } })).eq('id', b.id)
-          ));
+          const resultados = await Promise.all(lote.map((b) => {
+            let consulta = supabase.from('bens').update(conSello({ data: { ...b, ubicacion } })).eq('id', b.id);
+            if (b.updated_at) consulta = consulta.eq('updated_at', b.updated_at);
+            return consulta.select('id, updated_at').maybeSingle();
+          }));
           resultados.forEach((resultado, index) => {
-            if (resultado?.error) fallidosBien++;
+            if (resultado?.error || !resultado?.data) fallidosBien++;
             else {
               movidos++;
-              idsActualizados.add(lote[index].id);
+              sellosActualizados.set(lote[index].id, resultado.data.updated_at);
             }
           });
         }
         if (movidos > 0) {
           setBienes((prev) =>
-            prev.map((b) => (idsActualizados.has(b.id) ? { ...b, ubicacion } : b))
+            prev.map((b) => (sellosActualizados.has(b.id) ? { ...b, ubicacion, updated_at: sellosActualizados.get(b.id) || b.updated_at } : b))
           );
         }
       }
@@ -379,10 +384,10 @@ export function useDependencias({
               ? `Funcionario asignado. ${movidos} bien(es) actualizados.`
               : 'Funcionario asignado al departamento.'
           : 'Funcionario sin ubicación.',
-        'success'
+        fallidosBien > 0 ? 'warning' : 'success'
       );
-    } catch {
-      addToast('No se pudo asignar.', 'error');
+    } catch (error) {
+      addToast(error?.message || 'No se pudo asignar.', 'error');
     }
   };
 

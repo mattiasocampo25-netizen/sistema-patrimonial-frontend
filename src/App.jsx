@@ -1700,7 +1700,7 @@ if (publicBienId) {
         {toasts.map(t => (
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
-          <div key={t.id} role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-line motion animate-slide-up">
+          <div key={t.id} role="status" aria-live="polite" className="ui-toast pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-line motion">
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${ t.type === 'success' ? 'bg-ok-soft dark:bg-emerald-950/50 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/50' : t.type === 'error' ? 'bg-danger-soft dark:bg-rose-950/50 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/50' : t.type === 'warning' ? 'bg-warn-soft dark:bg-amber-950/50 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/50' : 'bg-blue-50 dark:bg-blue-950/50 text-brand dark:text-blue-400 border border-brand/25 dark:border-blue-900/50' }`}>
               <i className={`fa-solid ${ t.type === 'success' ? 'fa-circle-check text-sm' : t.type === 'error' ? 'fa-circle-exclamation text-sm' : t.type === 'warning' ? 'fa-triangle-exclamation text-sm' : 'fa-circle-info text-sm' }`}></i>
             </div>

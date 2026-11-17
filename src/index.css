@@ -655,6 +655,15 @@ select:focus {
 .tab-enter { animation: app-tab-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 /* Micro-interacciones */
+.ui-dialog-enter { animation: app-fade-in 180ms ease-out both; }
+.ui-toast { animation: app-slide-up 260ms var(--ease-out) both; }
+.ui-button > i { transition: transform 180ms var(--ease-out); }
+.ui-stat-interactive { transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), border-color 180ms var(--ease-out); }
+@media (hover: hover) {
+  .ui-button:not(:disabled):hover > i { transform: translateY(-1px); }
+  .ui-stat-interactive:hover { transform: translateY(-2px); }
+}
+.ui-stat-interactive:active { transform: scale(0.99); }
 .btn-press { transition: transform var(--dur-fast) var(--ease-standard); }
 .btn-press:active { transform: scale(0.94); }
 .bell-attention { animation: app-bell-ring var(--dur-slow) var(--ease-standard) both; transform-origin: top center; }

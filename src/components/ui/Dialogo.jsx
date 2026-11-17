@@ -114,7 +114,7 @@ export default function Dialogo({ className = '', children, onCerrar, onClick, .
   return (
     <div
       ref={setRef}
-      className={className}
+      className={`ui-dialog-enter ${className}`}
       onClick={(e) => {
         // El clic del fondo se reenvia; el del contenido, no.
         if (e.target === e.currentTarget) {

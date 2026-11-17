@@ -61,7 +61,7 @@ export default function Button({
   ...resto
 }) {
   const base =
-    'inline-flex items-center justify-center font-semibold whitespace-nowrap ' +
+    'ui-button inline-flex items-center justify-center font-semibold whitespace-nowrap ' +
     'transition-[background-color,border-color,color,transform,box-shadow] duration-[var(--dur-base)] ' +
     'ease-[var(--ease-standard)] active:scale-[0.98] ' +
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ' +

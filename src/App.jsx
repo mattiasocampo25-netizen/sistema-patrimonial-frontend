@@ -1680,31 +1680,32 @@ if (publicBienId) {
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2.5 pointer-events-none">
         
         {!isOnline && (
-          <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-card shadow-xl text-xs font-black bg-amber-500/90 text-white backdrop-blur-md border border-amber-400/30 motion animate-slide-up">
-            <i className="fa-solid fa-wifi-slash text-base"></i>
-            <span className="flex-1">{ti('off.solo_dispositivo')}{colaOffline > 0 ? ` · ${colaOffline} ${colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}` : ''}</span>
+          <div role="status" aria-live="polite" className="sync-banner sync-banner-offline pointer-events-auto flex items-center gap-3 px-4 py-3 min-w-[280px] max-w-[calc(100vw-3rem)] rounded-panel shadow-pop text-body font-semibold backdrop-blur-xl motion animate-slide-up">
+            <span className="sync-banner-icon" aria-hidden="true"><i className="fa-solid fa-wifi-slash text-sm" /></span>
+            <span className="min-w-0 flex-1 leading-relaxed"><strong className="block text-sm">Trabajando sin conexión</strong><span className="block text-xs font-medium">{ti('off.solo_dispositivo')}{colaOffline > 0 ? ` · ${colaOffline} ${colaOffline === 1 ? ti('off.pendiente') : ti('off.pendientes')}` : ''}</span></span>
           </div>
         )}
         {isOnline && colaOffline > 0 && (
-          <div role="status" aria-live="polite" className="pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-info/30 motion animate-slide-up">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control bg-info-soft text-info" aria-hidden="true">
-              <i className="fa-solid fa-cloud-arrow-up text-sm"></i>
+          <div role="status" aria-live="polite" className={`sync-banner sync-banner-online pointer-events-auto flex flex-col gap-3 px-4 py-3.5 min-w-[300px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold backdrop-blur-xl motion animate-slide-up ${estaSincronizandoOffline ? 'sync-banner-active' : ''}`}>
+            <div className="flex items-center gap-3">
+              <span className="sync-banner-icon" aria-hidden="true"><i className={`fa-solid ${estaSincronizandoOffline ? 'fa-arrows-rotate sync-indicator-spin' : 'fa-cloud-arrow-up'} text-sm`} /></span>
+              <span className="min-w-0 flex-1 leading-relaxed"><strong className="block text-sm">{estaSincronizandoOffline ? 'Sincronizando cambios' : 'Cambios pendientes de sincronizar'}</strong><span className="block text-xs font-medium">{estaSincronizandoOffline ? `${colaOffline} ${colaOffline === 1 ? 'cambio se está enviando' : 'cambios se están enviando'}. Puedes seguir trabajando.` : `${colaOffline} ${ti('off.cambios_pendientes')}`}</span></span>
+              <button type="button" onClick={reintentarSincronizacion} disabled={estaSincronizandoOffline} className="shrink-0 rounded-control border border-info/25 bg-info-soft px-3 py-2 text-label font-bold text-info hover:bg-info/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info disabled:cursor-wait disabled:opacity-60 motion" aria-label={estaSincronizandoOffline ? "Sincronización en curso" : "Reintentar sincronización"}>
+                <i className={`fa-solid ${estaSincronizandoOffline ? "fa-spinner sync-indicator-spin" : "fa-rotate-right"} mr-1.5`} aria-hidden="true" />{estaSincronizandoOffline ? "En curso" : ti('off.reintentar')}
+              </button>
             </div>
-            <span className="flex-1 leading-relaxed">{estaSincronizandoOffline ? `Sincronizando ${colaOffline} cambios guardados… Puedes seguir usando el sistema.` : `${colaOffline} ${ti('off.cambios_pendientes')}`}</span>
-            <button type="button" onClick={reintentarSincronizacion} disabled={estaSincronizandoOffline} className="shrink-0 rounded-control border border-info/30 bg-info-soft px-3 py-2 text-label font-bold text-info hover:bg-info/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-info disabled:cursor-wait disabled:opacity-60" aria-label={estaSincronizandoOffline ? "Sincronización en curso" : "Reintentar sincronización"}>
-              <i className={`fa-solid ${estaSincronizandoOffline ? "fa-spinner fa-spin" : "fa-rotate-right"} mr-1.5`} aria-hidden="true" />{estaSincronizandoOffline ? "Sincronizando" : ti('off.reintentar')}
-            </button>
+            {estaSincronizandoOffline && <div className="sync-progress-track" aria-hidden="true"><span /></div>}
           </div>
         )}
 
         {toasts.map(t => (
           // role="status": hace que un lector de pantalla anuncie el aviso
           // (antes no se anunciaba nada) y permite detectarlo en los tests.
-          <div key={t.id} role="status" aria-live="polite" className="ui-toast pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-line motion">
+          <div key={t.id} role={t.type === 'error' ? 'alert' : 'status'} aria-live={t.type === 'error' ? 'assertive' : 'polite'} className={`ui-toast ui-toast-${t.type || 'info'} pointer-events-auto flex items-center gap-3 px-4 py-3.5 min-w-[280px] max-w-[calc(100vw-2rem)] rounded-panel shadow-pop text-body font-semibold bg-surface-1/95 text-content-1 backdrop-blur-xl border border-line motion`}>
             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-control shadow-inner ${ t.type === 'success' ? 'bg-ok-soft dark:bg-emerald-950/50 text-ok dark:text-emerald-400 border border-ok/25 dark:border-emerald-900/50' : t.type === 'error' ? 'bg-danger-soft dark:bg-rose-950/50 text-danger dark:text-rose-400 border border-danger/25 dark:border-rose-900/50' : t.type === 'warning' ? 'bg-warn-soft dark:bg-amber-950/50 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/50' : 'bg-blue-50 dark:bg-blue-950/50 text-brand dark:text-blue-400 border border-brand/25 dark:border-blue-900/50' }`}>
               <i className={`fa-solid ${ t.type === 'success' ? 'fa-circle-check text-sm' : t.type === 'error' ? 'fa-circle-exclamation text-sm' : t.type === 'warning' ? 'fa-triangle-exclamation text-sm' : 'fa-circle-info text-sm' }`}></i>
             </div>
-            <span className="flex-1 leading-relaxed">{t.message}</span>
+            <span className="min-w-0 flex-1 leading-relaxed">{t.message}</span>
             {t.action && (
               <button
                 onClick={() => { try { t.action.onClick(); } catch {} quitarToast(t.id); }}
@@ -1713,6 +1714,7 @@ if (publicBienId) {
                 {t.action.label}
               </button>
             )}
+            <button type="button" onClick={() => quitarToast(t.id)} className="toast-dismiss ml-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-content-3 hover:bg-surface-2 hover:text-content-1 motion" aria-label="Cerrar aviso"><i className="fa-solid fa-xmark text-xs" aria-hidden="true" /></button>
           </div>
         ))}
         
@@ -1721,13 +1723,14 @@ if (publicBienId) {
       {/* El cuadro para confirmar el nombre de descarga debe quedar accesible
           por encima del indicador global de generación. */}
       {isProcessing.active && !solicitudNombreArchivo && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center bg-slate-950/55 px-4 backdrop-blur-sm animate-fade-in" role="status" aria-live="polite" aria-busy="true">
-          <div className="w-full max-w-sm rounded-[26px] border border-line bg-surface-1 p-6 text-center shadow-pop sm:p-8">
+        <div className="processing-overlay fixed inset-0 z-[500] flex items-center justify-center px-4 backdrop-blur-md animate-fade-in" role="status" aria-live="polite" aria-busy="true">
+          <div className="processing-card w-full max-w-sm rounded-panel border border-line bg-surface-1 p-6 text-center shadow-pop sm:p-8">
             <div className="processing-orbit mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-brand-text" aria-hidden="true">
-              <i className="fa-solid fa-cloud-arrow-up text-xl" />
+              <i className={`fa-solid ${/guard|sincron|actualiz|import|export|envi|subiendo/i.test(isProcessing.text || '') ? 'fa-cloud-arrow-up' : 'fa-wand-magic-sparkles'} text-xl`} />
             </div>
-            <h2 className="text-lg font-bold leading-snug text-content-1">{isProcessing.text || 'Procesando la operación…'}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-content-3">Un momento, estamos procesando tu solicitud.</p>
+            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text">SIGEP UNP · PROCESO EN CURSO</p>
+            <h2 className="font-display text-lg font-extrabold leading-snug tracking-tight text-content-1">{isProcessing.text || 'Procesando la operación…'}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-content-2">Tus cambios se están procesando de forma segura. Esta ventana se cerrará al terminar.</p>
             <div className="mt-5 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label="Progreso de la operación" aria-valuemin={0} aria-valuemax={100} aria-valuenow={isProcessing.pct != null ? Math.min(100, Math.max(0, Math.round(isProcessing.pct))) : undefined}>
               <div className={`processing-bar ${isProcessing.pct == null ? 'processing-indeterminate' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined} />
             </div>
@@ -1766,6 +1769,10 @@ if (publicBienId) {
         handleLogout={() => setShowLogoutConfirm(true)}
         actasPorFirmarCount={actasPorFirmarCount}
         ultimoSyncBienes={ultimoSyncBienes}
+        isOnline={isOnline}
+        colaOffline={colaOffline}
+        estaSincronizandoOffline={estaSincronizandoOffline}
+        isLoading={isLoading}
         errorBanner={dbError ? (
           <div className="flex items-center justify-center gap-x-6 bg-danger-soft px-6 py-2.5 sm:px-3.5 border-b border-danger/30 z-50">
             <p className="text-body leading-6 text-danger font-medium">

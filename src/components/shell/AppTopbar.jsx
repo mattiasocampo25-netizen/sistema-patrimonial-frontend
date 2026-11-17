@@ -46,7 +46,11 @@ export default function AppTopbar({
   isAdmin,
   handleLogout,
   actasPorFirmarCount,
-  ultimoSyncBienes
+  ultimoSyncBienes,
+  isOnline = true,
+  colaOffline = 0,
+  estaSincronizandoOffline = false,
+  isLoading = false
 }) {
   const [filtroNotif, setFiltroNotif] = useState('todas');
   const { lang, setLang, t } = useIdioma();
@@ -140,14 +144,25 @@ export default function AppTopbar({
             )}
           </div>
 
-          <span
-            title={ultimoSyncBienes ? `Inventario sincronizado el ${new Date(ultimoSyncBienes).toLocaleString('es-PY')}` : 'Aún no hay una sincronización confirmada para esta dependencia'}
-            className="hidden xl:inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line/70 bg-surface-2/60 px-2.5 py-1.5 text-[10px] font-semibold text-content-3"
-            aria-live="polite"
-          >
-            <i className={`fa-solid ${ultimoSyncBienes ? 'fa-cloud-check text-ok' : 'fa-cloud-arrow-down'}`} aria-hidden="true" />
-            {ultimoSyncBienes ? `Actualizado ${new Date(ultimoSyncBienes).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' })}` : 'Sincronizando'}
-          </span>
+          {(() => {
+            const estadoSync = !isOnline
+              ? { icon: 'fa-cloud', label: 'Sin conexión', tone: 'text-warn bg-warn-soft border-warn/25', title: 'Sin conexión con el servidor' }
+              : estaSincronizandoOffline
+                ? { icon: 'fa-arrows-rotate sync-indicator-spin', label: colaOffline ? `Sincronizando ${colaOffline}` : 'Sincronizando', tone: 'text-info bg-info-soft border-info/25', title: 'Los cambios guardados sin conexión se están enviando' }
+                : colaOffline > 0
+                  ? { icon: 'fa-cloud-arrow-up', label: `${colaOffline} pendiente${colaOffline === 1 ? '' : 's'}`, tone: 'text-warn bg-warn-soft border-warn/25', title: 'Hay cambios guardados en este dispositivo que aún no llegaron al servidor' }
+                  : isLoading
+                    ? { icon: 'fa-arrows-rotate sync-indicator-spin', label: 'Actualizando', tone: 'text-info bg-info-soft border-info/25', title: 'Cargando los datos de esta dependencia' }
+                    : ultimoSyncBienes
+                      ? { icon: 'fa-cloud-check', label: `Actualizado ${new Date(ultimoSyncBienes).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit' })}`, tone: 'text-ok bg-ok-soft border-ok/20', title: `Inventario sincronizado el ${new Date(ultimoSyncBienes).toLocaleString('es-PY')}` }
+                      : { icon: 'fa-cloud-check', label: 'Conexión activa', tone: 'text-ok bg-ok-soft border-ok/20', title: 'Conexión con el servidor activa' };
+            return (
+              <span title={estadoSync.title} className={`hidden xl:inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-label font-bold ${estadoSync.tone}`} aria-live="polite" aria-atomic="true">
+                <i className={`fa-solid ${estadoSync.icon}`} aria-hidden="true" />
+                <span>{estadoSync.label}</span>
+              </span>
+            );
+          })()}
 
           {/* Acciones */}
           <div className="flex items-center gap-1.5 shrink-0">

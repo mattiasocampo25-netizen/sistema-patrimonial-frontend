@@ -36,6 +36,28 @@ body {
   overflow: hidden;
 } 
 
+/* Tipografía nítida y consistente en Windows, macOS y pantallas de alta densidad. */
+body {
+  font-kerning: normal;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+}
+
+:where(h1, h2, h3, h4, .font-display) {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+:where(p, label) { text-wrap: pretty; }
+
+/* Microinteracciones compartidas, sin cambiar el comportamiento de controles. */
+:where(button, a, [role="button"]) { -webkit-tap-highlight-color: transparent; }
+:where(button:not(:disabled), a, [role="button"]) { transition: color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-base) var(--ease-out), transform var(--dur-fast) var(--ease-standard); }
+:where(input, select, textarea) { transition: border-color var(--dur-base) var(--ease-standard), box-shadow var(--dur-base) var(--ease-standard), background-color var(--dur-base) var(--ease-standard); }
+
 /* Preferencia de densidad para consultar más filas sin cambiar la escala global. */
 html.density-compact table th,
 html.density-compact table td {
@@ -676,6 +698,34 @@ select:focus {
 .processing-orbit { animation: app-float-y 2.4s ease-in-out infinite; }
 .processing-bar { height: 6px; border-radius: 9999px; background: var(--brand); transition: width 250ms ease; }
 .processing-indeterminate { width: 35%; animation: app-proc-slide 1.5s ease-in-out infinite; }
+.processing-overlay { background: rgb(8 22 35 / 0.58); }
+.processing-card { animation: app-processing-enter 360ms var(--ease-out) both; }
+.processing-orbit { position: relative; animation: app-processing-pulse 1.8s ease-in-out infinite; }
+.processing-orbit::after { content: ''; position: absolute; inset: -6px; border: 1px solid color-mix(in srgb, var(--brand) 26%, transparent); border-radius: 1.15rem; animation: app-processing-ring 2.2s ease-out infinite; }
+.processing-bar { position: relative; overflow: hidden; background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 66%, #8ce0d2)); box-shadow: 0 0 12px color-mix(in srgb, var(--brand) 30%, transparent); }
+.processing-indeterminate::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .42), transparent); animation: app-proc-shimmer 1.15s linear infinite; }
+.sync-indicator-spin { animation: app-spin 1.2s linear infinite; }
+.sync-banner { overflow: hidden; border: 1px solid var(--line); }
+.sync-banner-offline { color: #713f12; background: rgb(255 251 235 / .97); border-color: rgb(217 119 6 / .3); }
+.dark .sync-banner-offline { color: #fde68a; background: rgb(69 26 3 / .95); }
+.sync-banner-online { color: var(--content-1); background: color-mix(in srgb, var(--surface-1) 96%, transparent); border-color: color-mix(in srgb, var(--info) 26%, var(--line)); }
+.sync-banner-active { border-color: color-mix(in srgb, var(--info) 40%, var(--line)); }
+.sync-banner-icon { display: inline-flex; width: 2.15rem; height: 2.15rem; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid color-mix(in srgb, currentColor 15%, transparent); border-radius: .75rem; color: var(--info); background: var(--info-soft); }
+.sync-banner-offline .sync-banner-icon { color: #b45309; background: #fef3c7; }
+.dark .sync-banner-offline .sync-banner-icon { color: #fbbf24; background: rgb(251 191 36 / .12); }
+.sync-progress-track { height: 3px; overflow: hidden; margin-left: 2.9rem; border-radius: 999px; background: var(--surface-3); }
+.sync-progress-track span { display: block; width: 36%; height: 100%; border-radius: inherit; background: var(--info); animation: app-proc-slide 1.6s ease-in-out infinite; }
+.ui-toast { border-left: 3px solid var(--brand); }
+.ui-toast-success { border-left-color: var(--ok); }
+.ui-toast-warning { border-left-color: var(--warn); }
+.ui-toast-error { border-left-color: var(--danger); }
+.ui-toast-info { border-left-color: var(--info); }
+.toast-dismiss { opacity: .72; }
+.toast-dismiss:hover { opacity: 1; }
+@keyframes app-processing-enter { from { opacity: 0; transform: translateY(8px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes app-processing-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 0%, transparent); } 50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--brand) 10%, transparent); } }
+@keyframes app-processing-ring { 0% { opacity: .65; transform: scale(.94); } 100% { opacity: 0; transform: scale(1.12); } }
+@keyframes app-proc-shimmer { from { transform: translateX(-110%); } to { transform: translateX(110%); } }
 .proc-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 600; background: transparent; overflow: hidden; }
 .proc-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #1d4ed8, #60a5fa); transition: width 0.25s ease; }
 .proc-fill.indete { width: 30%; animation: app-proc-slide 1.1s ease-in-out infinite; }

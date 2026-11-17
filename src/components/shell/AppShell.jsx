@@ -52,6 +52,10 @@ export default function AppShell({
   handleLogout,
   actasPorFirmarCount,
   ultimoSyncBienes,
+  isOnline,
+  colaOffline,
+  estaSincronizandoOffline,
+  isLoading,
   // Contenido
   errorBanner
 }) {
@@ -114,6 +118,10 @@ export default function AppShell({
           handleLogout={handleLogout}
           actasPorFirmarCount={actasPorFirmarCount}
           ultimoSyncBienes={ultimoSyncBienes}
+          isOnline={isOnline}
+          colaOffline={colaOffline}
+          estaSincronizandoOffline={estaSincronizandoOffline}
+          isLoading={isLoading}
         />
 
         <main id="contenido" className="workspace-main mt-2 min-w-0 flex-1 overflow-y-auto bg-canvas custom-scrollbar sm:mt-3 lg:mt-4">

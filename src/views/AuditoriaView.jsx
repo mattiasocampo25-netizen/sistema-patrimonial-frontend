@@ -3,7 +3,7 @@ import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
-import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, resumenAccionAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import { etiquetaAccionAuditoria, leerMensajeAuditoria, obtenerCambiosAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 import { csvRowsSafe } from '../utils/csvSafe.js';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
@@ -25,6 +25,8 @@ export default function AuditoriaView({
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
   const [seccionAuditoria, setSeccionAuditoria] = useState('actividad');
+  const [mostrarResumenActividad, setMostrarResumenActividad] = useState(false);
+  const [filtrosAvanzadosAbiertos, setFiltrosAvanzadosAbiertos] = useState(false);
   const [hallazgoActivo, setHallazgoActivo] = useState('');
   const [filtrosGuardados, setFiltrosGuardados] = useState(() => { try { return JSON.parse(localStorage.getItem('auditoria_filtros_guardados') || 'null'); } catch { return null; } });
   const guardarFiltrosAuditoria = () => { const filtros = { searchAud, filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud }; try { localStorage.setItem('auditoria_filtros_guardados', JSON.stringify(filtros)); setFiltrosGuardados(filtros); } catch {} };
@@ -107,6 +109,12 @@ export default function AuditoriaView({
       </nav>
 
       {seccionAuditoria === 'actividad' && <>
+      <section className="overflow-hidden rounded-2xl border border-line bg-surface-1 shadow-sm">
+        <button type="button" aria-expanded={mostrarResumenActividad} onClick={() => setMostrarResumenActividad(value => !value)} className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-surface-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand">
+          <span className="flex min-w-0 items-center gap-2 text-xs font-bold text-content-1"><i className="fa-solid fa-chart-simple text-brand-text" aria-hidden="true" />Resumen de actividad <span className="hidden truncate font-normal text-content-3 sm:inline">Eventos recientes y valor incorporado</span></span>
+          <span className="shrink-0 text-[11px] font-semibold text-brand-text">{mostrarResumenActividad ? 'Ocultar resumen' : 'Ver resumen'} <i className={`fa-solid ${mostrarResumenActividad ? 'fa-chevron-up' : 'fa-chevron-down'} ml-1`} aria-hidden="true" /></span>
+        </button>
+        {mostrarResumenActividad && <div className="space-y-4 border-t border-line p-3 sm:p-4">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-tour="aud-kpis">
         <StatTile etiqueta="Eventos (30 días)" valor={kpisAud.total} icono="fa-bolt" tono="brand" animado />
         <StatTile etiqueta="Altas registradas" valor={kpisAud.altas} icono="fa-plus" tono="ok" animado />
@@ -146,6 +154,8 @@ export default function AuditoriaView({
             </div>
           </div>
       </div>
+      </div>}
+      </section>
       </>}
 
       {seccionAuditoria === 'calidad' && <>
@@ -394,10 +404,11 @@ export default function AuditoriaView({
             </div>
           </div>
           <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-            <label className="relative sm:col-span-2 xl:col-span-1">
+            <label className="relative sm:col-span-2 xl:col-span-2">
               <i className="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-content-3" aria-hidden="true" />
-              <input type="search" value={searchAud} onChange={event => setSearchAud(event.target.value)} placeholder="Buscar usuario, bien o cambio realizado" aria-label="Buscar en auditoría; incluye los valores anteriores y nuevos" className="h-11 w-full rounded-xl border border-line bg-surface-1 pl-10 pr-3 text-sm text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15" />
+              <input type="search" value={searchAud} onChange={event => setSearchAud(event.target.value)} placeholder="Busca quién hizo qué o un dato modificado" aria-label="Buscar en auditoría por usuario, bien o valor anterior y nuevo" className="h-11 w-full rounded-xl border border-line bg-surface-1 pl-10 pr-3 text-sm text-content-1 placeholder:text-content-3 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15" />
             </label>
+            {filtrosAvanzadosAbiertos && <>
             <FiltroCombo valor={filtroAccionAud} opciones={accionesUnicasAud} onElegir={setFiltroAccionAud} etiquetaTodos="Todas las acciones" titulo="Filtrar por acción" ancho="w-full" />
             <FiltroCombo valor={tipoEntidadAud} opciones={[{ label: 'Bienes', value: 'BIEN' }, { label: 'Actas FC-10', value: 'FC10' }, { label: 'Traslados FC-11', value: 'FC11' }, { label: 'Funcionarios', value: 'FUNCIONARIO' }, { label: 'Dependencias', value: 'DEPENDENCIA' }, { label: 'Usuarios', value: 'USUARIO' }, { label: 'Solicitudes', value: 'SOLICITUD' }]} onElegir={setTipoEntidadAud} etiquetaTodos="Todos los registros" titulo="Filtrar por tipo de registro" ancho="w-full" />
             <FiltroCombo valor={campoAud} opciones={[{ label: 'Responsable', value: 'funcionario' }, { label: 'Ubicación', value: 'ubicacion' }, { label: 'Observaciones', value: 'observaciones' }, { label: 'Estado de conservación', value: 'estadoConservacion' }, { label: 'Valor unitario', value: 'valorUnitario' }, { label: 'Fotografías', value: 'fotos' }, { label: 'Dependencia', value: 'dependencia' }]} onElegir={setCampoAud} etiquetaTodos="Todos los campos" titulo="Filtrar por dato modificado" ancho="w-full" />
@@ -406,8 +417,13 @@ export default function AuditoriaView({
               <label className="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">Desde<input type="date" value={desdeAud} max={hastaAud || undefined} onChange={event => setDesdeAud(event.target.value)} aria-label="Desde la fecha" className="min-w-0 w-full bg-transparent text-xs text-content-1" /></label>
               <label className="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface-1 px-2.5 text-[10px] font-semibold text-content-3">Hasta<input type="date" value={hastaAud} min={desdeAud || undefined} onChange={event => setHastaAud(event.target.value)} aria-label="Hasta la fecha" className="min-w-0 w-full bg-transparent text-xs text-content-1" /></label>
             </div>
+            </>}
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button type="button" aria-expanded={filtrosAvanzadosAbiertos} onClick={() => setFiltrosAvanzadosAbiertos(value => !value)} className="min-h-8 rounded-lg border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 hover:border-brand/40 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+              <i className="fa-solid fa-sliders mr-1.5" aria-hidden="true" />{filtrosAvanzadosAbiertos ? 'Ocultar filtros' : 'Filtros avanzados'}
+              {Boolean(filtroAccionAud || filtroUsuarioAud || tipoEntidadAud || campoAud || desdeAud || hastaAud) && <span className="ml-1.5 rounded-full bg-brand-soft px-1.5 py-0.5 text-brand-text">{[filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud].filter(Boolean).length}</span>}
+            </button>
             <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-content-3">Período rápido</span>
             {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-8 rounded-lg border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 hover:border-brand/40 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Últimos {dias} días</button>)}
             <div className="ml-auto flex flex-wrap gap-2">
@@ -430,23 +446,28 @@ export default function AuditoriaView({
             const campos = obtenerCambiosAuditoria(r);
             const mostrarTodos = eventoExpandido === r.id;
             const camposVisibles = mostrarTodos ? campos : campos.slice(0, 3);
-            const existeBien = bienes.some(b => String(b.id) === String(r.bienid));
+            const bienRelacionado = bienes.find(b => String(b.id) === String(r.bienid));
+            const existeBien = Boolean(bienRelacionado);
+            const mensajeEvento = leerMensajeAuditoria(r);
+            const rotuloEvento = mensajeEvento?.rotulo || mensajeEvento?.cambios?.nuevo?.rotulo || mensajeEvento?.cambios?.anterior?.rotulo || bienRelacionado?.rotulo;
+            const descripcionEvento = mensajeEvento?.descripcion || mensajeEvento?.cambios?.nuevo?.descripcion || mensajeEvento?.cambios?.anterior?.descripcion || bienRelacionado?.descripcion;
             const fechaEvento = r.fecha ? new Date(r.fecha) : null;
             return (
               <article key={r.id} className="relative ml-3 rounded-2xl border border-line bg-surface-1 p-4 shadow-[0_8px_28px_-22px_rgba(15,35,55,.55)] transition-all hover:-translate-y-px hover:border-brand/30 hover:shadow-md sm:ml-5 sm:p-5">
                 <span className="absolute -left-[22px] top-6 z-[1] h-3 w-3 rounded-full border-[3px] border-surface-2 bg-brand sm:-left-[30px]" aria-hidden="true" />
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line/70 pb-3">
                   <span className="inline-flex items-center gap-2 text-xs font-bold tabular-nums text-content-2"><i className="fa-regular fa-clock text-content-3" aria-hidden="true" />{fechaEvento ? fechaEvento.toLocaleString('es-PY', { dateStyle: 'medium', timeStyle: 'short' }) : 'Fecha no registrada'}</span>
-                  <span className="hidden h-4 w-px bg-line sm:block" aria-hidden="true" />
-                  <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold text-content-2" aria-label={`Usuario: ${actorAud(r)}`}><i className="fa-regular fa-user text-content-3" aria-hidden="true" /><span className="truncate">{actorAud(r)}</span></span>
-                  <button type="button" onClick={() => navigator.clipboard?.writeText(String(r.id || '')).catch(() => {})} className="rounded-md px-2 py-1 text-[10px] font-semibold text-content-3 hover:bg-surface-2 hover:text-content-1" title={`Copiar identificador ${r.id}`}>ID · {String(r.id || '').slice(0, 8)} <i className="fa-regular fa-copy ml-1" aria-hidden="true" /></button>
+                  <button type="button" onClick={() => navigator.clipboard?.writeText(String(r.id || '')).catch(() => {})} className="flex h-7 w-7 items-center justify-center rounded-md text-content-3 hover:bg-surface-2 hover:text-content-1" aria-label="Copiar identificador técnico del evento" title="Copiar identificador técnico"><i className="fa-regular fa-copy text-[11px]" aria-hidden="true" /></button>
                   <span className={`ml-auto inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${tonoAccionAud(r.accion)}`}><i className={`fa-solid ${String(r.accion).includes('ALTA') ? 'fa-plus' : String(r.accion).includes('BAJA') ? 'fa-trash-can' : 'fa-pen'}`} aria-hidden="true" />{etiquetaAccionAuditoria(r.accion)}</span>
                 </div>
 
                 <div className="flex flex-wrap items-start justify-between gap-3 py-3">
                   <div className="min-w-0">
-                    <h3 className="text-sm font-black leading-relaxed text-content-1">{resumenAccionAuditoria(r, actorAud(r))}</h3>
-                    <p className="mt-1 text-xs text-content-3">{detalleAudCorto(r)}</p>
+                    <h3 className="text-sm font-black leading-relaxed text-content-1">{tituloEventoAuditoria(r)}</h3>
+                    <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-content-2"><i className="fa-regular fa-user text-content-3" aria-hidden="true" />Realizado por {actorAud(r)}</p>
+                    {rotuloEvento && <p className="mt-1 text-xs font-semibold text-brand-text">Rótulo: {rotuloEvento}</p>}
+                    {descripcionEvento && <p className="mt-1 text-xs leading-relaxed text-content-2">{descripcionEvento}</p>}
+                    <p className="mt-1 text-xs leading-relaxed text-content-3">{campos.length ? `Se modificaron ${campos.length} ${campos.length === 1 ? 'dato' : 'datos'}; compara los valores abajo.` : detalleAudCorto(r)}</p>
                   </div>
                   {r.bienid && /BIEN/i.test(r.titulo || '') && (
                     <button type="button" onClick={() => {

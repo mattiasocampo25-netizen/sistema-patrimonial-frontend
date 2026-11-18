@@ -49,9 +49,9 @@ export default function RestoreBackupModal({ restore }) {
 
   return createPortal((
     <Dialogo className={STYLES.modalOverlay}>
-      <div className={STYLES.modalContent + " max-w-3xl"}>
+      <div className={STYLES.modalContent + " restore-dialog max-w-4xl"}>
         {/* Encabezado */}
-        <div className="flex items-start justify-between gap-4 border-b border-line dark:border-white/10 px-6 py-5">
+        <div className="restore-dialog-header flex items-start justify-between gap-4 border-b border-line dark:border-white/10 px-6 py-5">
           <div className="flex items-start gap-3 min-w-0">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-amber-100 dark:bg-amber-500/15 text-warn dark:text-amber-400">
               <i className="fa-solid fa-clock-rotate-left"></i>

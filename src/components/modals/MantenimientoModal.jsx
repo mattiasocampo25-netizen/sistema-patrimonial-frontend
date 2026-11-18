@@ -36,8 +36,8 @@ export default function MantenimientoModal({ isOpen, onClose, initial, onSave, i
       // se cierra con Escape o con los botones explícitos.
       onClick={(e) => e.stopPropagation()}
     >
-      <div className={STYLES.modalContent + " max-w-md"} onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
+      <div className={STYLES.modalContent + " maintenance-dialog max-w-lg"} onClick={(e) => e.stopPropagation()}>
+        <div className="maintenance-dialog-header flex justify-between items-center px-6 py-5 border-b border-line dark:border-zinc-800/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-card bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-white">
               <i className="fa-solid fa-screwdriver-wrench text-base"></i>

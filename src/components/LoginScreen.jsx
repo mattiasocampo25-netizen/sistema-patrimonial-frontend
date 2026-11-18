@@ -59,7 +59,7 @@ export default function LoginScreen({
       </div>
 
       <div className="relative z-10 flex w-full items-center justify-center max-w-6xl">
-        <div className="login-card-in grid w-full overflow-hidden rounded-[28px] border border-white/40 bg-surface-1 shadow-pop md:grid-cols-[1fr_1fr]">
+        <div className="login-card-in login-experience grid w-full overflow-hidden rounded-[28px] border border-white/40 bg-surface-1 shadow-pop md:grid-cols-[1fr_1fr]">
             <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-[#102b40] p-10 text-white md:flex lg:p-14">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-65" />

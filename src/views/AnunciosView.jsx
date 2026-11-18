@@ -62,10 +62,10 @@ export default function AnunciosView({
   }), [anunciosGrupos, busqueda, filtroAlcance]);
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
+    <div className="module-screen announcement-workspace space-y-4 pb-12 font-sans">
       {/* Encabezado con métricas */}
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
+      <Card className="announcement-hero overflow-hidden border-brand/15 p-0 shadow-panel">
+        <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 p-5 sm:p-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
           <PageHeader
             titulo={'Anuncios del Sistema'}
             descripcion={'Comunicados oficiales del desarrollador a todos o a un usuario específico'}
@@ -97,7 +97,7 @@ export default function AnunciosView({
       </Card>
 
       {/* Formulario: Nuevo anuncio */}
-      <div className="bg-surface-1 dark:bg-surface-1 p-5 sm:p-6 rounded-panel border border-line/70 dark:border-line shadow-sm space-y-4">
+      <div className="announcement-compose rounded-2xl border border-line bg-surface-1 p-5 shadow-card sm:p-6">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-content-1 dark:text-white flex items-center gap-2">
           <i className="fa-solid fa-paper-plane text-brand-text"></i> Nuevo anuncio
         </h3>

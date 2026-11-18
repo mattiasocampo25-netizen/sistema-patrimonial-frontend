@@ -120,7 +120,7 @@ export default function AprobacionesView({
   ];
 
   return (
-    <div className="flex flex-col flex-1 space-y-6">
+    <div className="module-screen approvals-workspace flex flex-col flex-1 space-y-4 pb-12">
       <Card className="p-0">
           <div className="p-5 sm:p-6">
           <section className="relative isolate overflow-hidden rounded-[26px] bg-gradient-to-br from-slate-950 via-[#123a60] to-[#176475] p-5 text-white shadow-[0_22px_60px_-38px_rgba(15,45,75,.75)] sm:p-7">

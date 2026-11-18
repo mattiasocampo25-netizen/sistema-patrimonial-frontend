@@ -16,9 +16,9 @@ export default function Fc04View({
     return filteredFC04.filter(fc => [fc.numeroFormulario, fc.origenMovimiento, fc.observaciones, fc.id, ...(fc.bienes || []).map(b => `${b.rotulo || ''} ${b.descripcion || ''}`)].filter(Boolean).join(' ').toLocaleLowerCase('es').includes(q));
   }, [filteredFC04, busqueda]);
   return (
-    <div className="flex flex-col flex-1 space-y-6">
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
+    <div className="module-screen records-workspace flex flex-col flex-1 space-y-4 pb-12">
+      <Card className="records-hero overflow-hidden border-brand/15 p-0 shadow-panel">
+        <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 p-5 sm:p-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
           <PageHeader
             titulo={'Registro Mensual FC-04'}
             descripcion={'Gestión contable de altas y bajas patrimoniales'}

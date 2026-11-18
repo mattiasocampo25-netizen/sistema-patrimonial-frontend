@@ -111,10 +111,10 @@ export default function AyudaView({ setTourPaso, STYLES, version = APP_VERSION }
   ];
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="module-screen help-workspace space-y-4 pb-12">
       {/* Encabezado */}
-      <Card className="p-0">
-        <div className="p-5 sm:p-6">
+      <Card className="help-hero overflow-hidden border-brand/15 p-0 shadow-panel">
+        <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 p-5 sm:p-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
           <PageHeader
             titulo="Ayuda y guía de uso"
             descripcion="Respuestas prácticas para gestionar el inventario, las actas y las firmas."

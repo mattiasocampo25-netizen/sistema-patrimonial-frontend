@@ -155,8 +155,8 @@ export default function DependenciasModal({
 
   return (
     <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
-      <div className={STYLES.modalContent + " max-w-7xl !max-h-[94dvh] overflow-hidden !rounded-[28px] shadow-2xl"} onClick={(e) => e.stopPropagation()}>
-        <div className="relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-white/10 bg-[#145a75] px-5 py-5 text-white sm:px-7">
+      <div className={STYLES.modalContent + " organization-dialog max-w-7xl !max-h-[94dvh] overflow-hidden !rounded-[28px] shadow-2xl"} onClick={(e) => e.stopPropagation()}>
+        <div className="organization-dialog-header relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-white/10 bg-[#145a75] px-5 py-5 text-white sm:px-7">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-inner">
               <i className="fa-solid fa-sitemap text-lg" aria-hidden="true"></i>
@@ -176,7 +176,7 @@ export default function DependenciasModal({
 
         <div className="grid min-h-0 flex-1 overflow-hidden bg-surface-2/40 dark:bg-surface-2/30 md:grid-cols-[320px_minmax(0,1fr)]">
           {/* Panel izquierdo: lista de dependencias */}
-          <div className="flex max-h-64 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r md:p-5">
+          <div className="organization-dialog-sidebar flex max-h-64 min-h-0 flex-col border-b border-line bg-surface-1 p-4 dark:bg-surface-1/80 md:max-h-none md:border-b-0 md:border-r md:p-5">
             <div className="mb-3 flex items-center justify-between gap-2 px-1">
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-content-3">UNIDADES</p>

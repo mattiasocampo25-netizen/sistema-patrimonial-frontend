@@ -13,6 +13,7 @@ import { registrarAuditoria } from '../services/auditService';
 import { aplanarImagen, guardarPDF } from '../utils/pdfSanear';
 import { fechaParaArchivo, nombreDescargaFC10, nombreFC10Archivo, normalizarSegmentoArchivo, solicitarNombreArchivo } from '../utils/fileNames.js';
 import { etiquetaEstadoAsignacion } from '../utils/asignacionBien';
+import { csvCellSafe } from '../utils/csvSafe.js';
 
 const resumenComponentes = (bien) => Array.isArray(bien?.componentes)
   ? bien.componentes.map(c => `${c.nombre || 'Componente'} x${Number.parseInt(c.cantidad, 10) || 1} | Ubicación: ${c.ubicacion || bien.ubicacion || 'la del bien'} | Encargado: ${c.funcionario || bien.funcionario || 'el del bien'}${c.observaciones ? ` | ${c.observaciones}` : ''}`).join(' ; ')
@@ -467,12 +468,12 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
               formatDateText(fc.entregadoFecha || fc.fechaGeneracion),
               fc.dependencia, fc.unidad || '-', fc.reparticion || '-', fc.area || '-',
               fc.funcionarioNombre, formatCI(fc.funcionarioDoc), fc.funcionarioCargo,
-              b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`, cuentaFull || '-',
+              b.rotulo || '-', b.descripcion || '', cuentaFull || '-',
               fc.estadoConservacion, (fc.valorTotal || b.valorUnitario || 0),
               fc.devolucionFecha ? formatDateText(fc.devolucionFecha) : 'Vigente',
-              `"${(fc.observaciones || '').replace(/"/g, '""')}"`
+              fc.observaciones || ''
           ];
-          csvContent += row.join(';') + "\n";
+          csvContent += row.map(csvCellSafe).join(';') + "\n";
       });
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -508,11 +509,11 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
                 fc.numeroFormulario, formatDateText(fc.fecha),
                 fc.dependenciaRemitente || fc.remitente, fc.areaRemitente || '-',
                 fc.dependenciaDestinataria || fc.destinatario, fc.areaDestinataria || '-',
-                b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`,
+                b.rotulo || '-', b.descripcion || '',
                 b.estadoConservacion || fc.estadoConservacion, fc.motivo,
-                `"${(fc.observaciones || '').replace(/"/g, '""')}"`
+                fc.observaciones || ''
             ];
-            csvContent += row.join(';') + "\n";
+            csvContent += row.map(csvCellSafe).join(';') + "\n";
           });
       });
       
@@ -652,7 +653,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
       setTimeout(async () => {
           try {
             const filas = ["Cuenta;Subcuenta;Analitico 1;Analitico 2;Rotulo;Descripcion;Componentes (ubicación y encargado);Dependencia;Ubicacion;Funcionario;Estado de asignacion;Funcionario Alternativo;Fecha Adquisicion;Valor Unitario (Gs.);Estado Conservacion;Vida Util;Tiene FC10;Tiene QR"];
-            const celda = (valor) => `"${String(valor ?? '-').replace(/"/g, '""')}"`;
+            const celda = csvCellSafe;
             const lote = 400;
             for (let inicio = 0; inicio < registros.length; inicio += lote) {
               const bloque = registros.slice(inicio, inicio + lote);

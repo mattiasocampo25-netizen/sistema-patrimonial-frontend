@@ -4,6 +4,7 @@ import FiltroCombo from '../components/FiltroCombo';
 import { Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
 import { etiquetaAccionAuditoria, obtenerCambiosAuditoria, resumenAccionAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import { csvRowsSafe } from '../utils/csvSafe.js';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -31,7 +32,7 @@ export default function AuditoriaView({
   const exportarEventosCSV = () => {
     if (!auditoriaList.length) return;
     const filas = [['Fecha', 'Usuario', 'Acción', 'Registro', 'Detalle', 'Identificador'], ...auditoriaList.map(row => [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : '', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), detalleAudCorto(row), row.id])];
-    const csv = '\uFEFF' + filas.map(fila => fila.map(valor => `"${String(valor ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const csv = csvRowsSafe(filas);
     const enlace = document.createElement('a'); enlace.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); enlace.download = `auditoria_pagina_${paginaAud}.csv`; enlace.click(); setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
   };
   const exportarEventosPDF = () => {
@@ -59,7 +60,7 @@ export default function AuditoriaView({
         item.dependencia || '', item.cedula ? `Documento ${item.cedula}` : item.funcionario || item.motivo || '',
       ]));
     });
-    const csv = '\uFEFF' + filas.map((fila) => fila.map((valor) => `"${String(valor ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const csv = csvRowsSafe(filas);
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const link = document.createElement('a'); link.href = url; link.download = 'revision_calidad_datos.csv'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);

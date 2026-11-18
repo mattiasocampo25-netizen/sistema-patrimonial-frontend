@@ -153,6 +153,8 @@ export default function InventarioView({
   onQRLoteSeleccion,
   onMoverEstado,
   onCopiarLink,
+  enlacesCompartidosSesion = [],
+  onRevocarEnlace,
   onExportarProgramado,
   STYLES,
   isLoading,
@@ -566,6 +568,23 @@ export default function InventarioView({
               <i className="fa-solid fa-share-nodes text-[10px]"></i>
               <span className="hidden sm:inline">{seleccionados.length > 0 ? `Compartir (${seleccionados.length})` : 'Compartir bienes'}</span>
             </button>
+          )}
+          {enlacesCompartidosSesion.length > 0 && (
+            <div className="inline-flex max-w-[min(36rem,45vw)] flex-wrap items-center gap-1.5" aria-label="Enlaces compartidos recientes">
+              {enlacesCompartidosSesion.map((enlace) => (
+                <button
+                  key={enlace.token}
+                  type="button"
+                  onClick={() => onRevocarEnlace?.(enlace.token)}
+                  title={`Revocar el enlace compartido para ${enlace.cantidad} bienes`}
+                  aria-label={`Revocar enlace compartido de ${enlace.cantidad} bienes`}
+                  className="inline-flex h-8 items-center gap-1 rounded-control border border-danger/25 bg-danger-soft/50 px-2 text-[10px] font-bold text-danger hover:bg-danger-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
+                >
+                  <i className="fa-solid fa-link-slash" aria-hidden="true" />
+                  Revocar · {enlace.cantidad}
+                </button>
+              ))}
+            </div>
           )}
           <ExportScheduleMenu onEjecutarAhora={onExportarProgramado} />
           <div className="hidden xl:flex items-center gap-1 shrink-0" title="Orden rápido">

@@ -9,6 +9,7 @@ import { estimarUsoDB, alertaUso } from '../services/supabaseFreeTier';
 import { tomarMuestra } from '../utils/muestreo';
 import { detalleAuditoriaLegible } from '../utils/auditoriaPresentacion';
 import { analizarSaludDatos } from '../utils/saludDatos';
+import { csvRowsSafe } from '../utils/csvSafe.js';
 
 // La regla de dependencias de hooks se desactiva en este archivo a proposito:
 //
@@ -289,9 +290,9 @@ export function useAuditoria({
   };
   const exportarConteoCSV = () => {
     const rows = [['Estado', 'Rotulo', 'Descripcion', 'Codigo detectado']];
-    resultadoConteo.faltantes.forEach(b => rows.push(['FALTANTE', b.rotulo || '', `"${String(b.descripcion || '').replace(/"/g, '""')}"`, '']));
+    resultadoConteo.faltantes.forEach(b => rows.push(['FALTANTE', b.rotulo || '', b.descripcion || '', '']));
     resultadoConteo.noRegistrados.forEach(c => rows.push(['NO REGISTRADO', '', '', c]));
-    const blob = new Blob(["\uFEFF" + rows.map(r => r.join(';')).join('\n')], { type: 'text/csv;charset=utf-8' });
+    const blob = new Blob([csvRowsSafe(rows, { eol: '\n' })], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `Conciliacion_${dependenciaActual.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;

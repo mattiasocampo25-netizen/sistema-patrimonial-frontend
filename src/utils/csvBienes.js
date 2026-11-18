@@ -1,4 +1,5 @@
 import { normalizeStr, generateId } from './helpers.js';
+import { csvCellSafe } from './csvSafe.js';
 
 export const MAX_CSV_BIENES_BYTES = 25 * 1024 * 1024;
 export const MAX_CSV_BIENES_FILAS = 100_000;
@@ -233,15 +234,9 @@ export const mapearFilasBienes = (rows, fields, bienes, dependenciaActual, corre
   return { validos, duplicados, errores, problemasEncabezado: headerIssues, columnasMapeadas: mapped };
 };
 
-const csvCell = (value) => {
-  let text = String(value ?? '');
-  if (/^\s*[=+@-]/.test(text)) text = `'${text}`;
-  return `"${text.replace(/"/g, '""')}"`;
-};
-
 export const descargarReporteImportacionCSV = (resultados, nombre = 'informe_importacion_bienes.csv') => {
   const rows = [['Fila', 'Rótulo', 'Resultado', 'Detalle'], ...(resultados || []).map((row) => [row.linea, row.rotulo, row.resultado, row.detalle])];
-  const content = `\uFEFF${rows.map(row => row.map(csvCell).join(';')).join('\r\n')}`;
+  const content = `\uFEFF${rows.map(row => row.map(csvCellSafe).join(';')).join('\r\n')}`;
   const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');

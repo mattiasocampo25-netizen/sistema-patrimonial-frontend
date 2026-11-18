@@ -6,6 +6,7 @@ import FiltroCombo from '../components/FiltroCombo';
 import { Card, Chip, ChipGroup, EmptyState, Toolbar, Table, THead, TBody, TRow, TH, TD } from '../components/ui';
 import { descargarInformeSolicitudBaja } from '../utils/informeBaja';
 import useScopedPreference from '../hooks/useScopedPreference';
+import { csvRowsSafe } from '../utils/csvSafe.js';
 
 const ESTADO_INFO = {
   PENDIENTE: { label: 'Pendiente', color: 'bg-warn-soft dark:bg-amber-950/20 text-warn dark:text-amber-400 border border-warn/25 dark:border-amber-900/30', dot: 'bg-amber-500' },
@@ -104,7 +105,7 @@ export default function AprobacionesView({
   const exportarCSV = () => {
     const filas = [['Tipo', 'Bien/funcionario', 'Descripción', 'Solicitante', 'Dependencia', 'Responsable', 'Estado', 'Fecha', 'Motivo']];
     listaFiltrada.forEach(n => filas.push([n.tipo || '', n.rotulo || n.cedula || '', n.descripcion || n.nombre || '', n.solicitante || '', n.dependencia || '', n.responsable || '', n.estado || 'PENDIENTE', n.created_at || n.fecha || '', n.motivo || '']));
-    const csv = '\ufeff' + filas.map(f => f.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const csv = csvRowsSafe(filas);
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     const a = document.createElement('a'); a.href = url; a.download = `aprobaciones-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(url);
   };

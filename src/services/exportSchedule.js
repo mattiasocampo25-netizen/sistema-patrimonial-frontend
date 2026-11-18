@@ -18,6 +18,7 @@
 // QuotaExceededError.
 import localforage from 'localforage';
 import { normalizarSegmentoArchivo } from '../utils/fileNames.js';
+import { csvCellSafe } from '../utils/csvSafe.js';
 
 const CLAVE_CFG = 'export_programada';
 
@@ -154,13 +155,13 @@ export const construirCSVInventario = (bienes, _dependenciaActual) => {
   (bienes || []).forEach(b => {
     const row = [
       b.cuenta || '-', b.subcuenta || '-', b.analitico1 || '-', b.analitico2 || '-',
-      b.rotulo || '-', `"${(b.descripcion || '').replace(/"/g, '""')}"`,
+      b.rotulo || '-', b.descripcion || '',
       b.dependencia || '-', b.ubicacion || '-', b.funcionario || '-',
       FECHA_TXT(b.fechaAdquisicion), b.valorUnitario || '0',
       b.estadoConservacion || '-', b.vidaUtil || '-',
       b.hasFC10 ? 'SI' : 'NO', b.hasQR ? 'SI' : 'NO'
     ];
-    csv += row.join(';') + "\n";
+    csv += row.map(csvCellSafe).join(';') + "\n";
   });
   return new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 };

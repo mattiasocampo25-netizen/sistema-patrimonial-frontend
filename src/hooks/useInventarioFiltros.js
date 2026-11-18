@@ -23,9 +23,14 @@ const normalizarVistaInventario = value => ['tabla', 'tarjetas', 'kanban', 'gale
 const obtenerAnioAdquisicion = valor => {
   if (valor == null || valor === '') return '';
   const texto = String(valor).trim();
-  const anioIso = texto.match(/^(\d{4})(?:[-/.]|$)/)?.[1];
+  // Si por una exportación o una carga antigua la fecha quedó concatenada al
+  // rótulo, tomar el último patrón de fecha evita confundirlo con códigos como
+  // 2803-01-05-4818 y recupera la fecha final 2026-11-30.
+  const fechasIso = [...texto.matchAll(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/g)];
+  const anioIso = fechasIso.at(-1)?.[1] || texto.match(/^(\d{4})(?:[-/.]|$)/)?.[1];
   if (anioIso) return anioIso;
-  const anioLocal = texto.match(/^\d{1,2}[-/.]\d{1,2}[-/.](\d{4})(?:\D|$)/)?.[1];
+  const fechasLocales = [...texto.matchAll(/\d{1,2}[-/.]\d{1,2}[-/.](\d{4})/g)];
+  const anioLocal = fechasLocales.at(-1)?.[1] || texto.match(/^\d{1,2}[-/.]\d{1,2}[-/.](\d{4})(?:\D|$)/)?.[1];
   if (anioLocal) return anioLocal;
   return parseDateInfo(texto).year || (/^\d{4}$/.test(texto) ? texto : '');
 };

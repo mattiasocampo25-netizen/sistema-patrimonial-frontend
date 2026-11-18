@@ -167,6 +167,7 @@ export default function InventarioView({
   const [buscadorRapidoVisible, setBuscadorRapidoVisible] = useState(false);
   const [buscadorRapidoFijado, setBuscadorRapidoFijado] = useState(false);
   const [buscadorRapidoOculto, setBuscadorRapidoOculto] = useState(false);
+  const mostrarBuscadorFlotante = (buscadorRapidoVisible || buscadorRapidoFijado) && !buscadorRapidoOculto;
   const [rotuloCopiado, setRotuloCopiado] = useState('');
   const [observacionAbierta, setObservacionAbierta] = useState(null);
   const cambiarDensidad = () => {
@@ -342,12 +343,13 @@ export default function InventarioView({
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
   <div className="w-full min-w-0 space-y-3 rounded-2xl border border-line bg-surface-1 p-3 shadow-sm sm:p-4">
 
-    {/* Campo de Búsqueda Principal */}
+    {/* Solo se muestra una instancia del buscador: la flotante reemplaza a la de arriba mientras se desplaza. */}
+    <div className={mostrarBuscadorFlotante ? 'hidden' : 'space-y-2'}>
     <div className="relative block w-full min-w-0">
       <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input
         type="search"
-        ref={searchRef}
+        ref={mostrarBuscadorFlotante ? undefined : searchRef}
         aria-label="Buscar bienes por rótulo, descripción, responsable o código"
         autoComplete="off"
         title="Busca por rótulo, descripción, funcionario, ubicación o código (atajo: /)"
@@ -403,6 +405,7 @@ export default function InventarioView({
         )}
       </p>
     )}
+    </div>
 
     {/* Filtros frecuentes primero; los contables quedan agrupados para reducir ruido. */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
@@ -1176,12 +1179,13 @@ export default function InventarioView({
         </Dialogo>
       )}
 
-      {(buscadorRapidoVisible || buscadorRapidoFijado) && !buscadorRapidoOculto && (
+      {mostrarBuscadorFlotante && (
         <div className="inventory-floating-search fixed bottom-4 left-1/2 z-[110] w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 animate-slide-up sm:bottom-6" role="search" aria-label="Búsqueda rápida del inventario">
           <div className="flex min-h-14 items-center gap-2 rounded-full border border-brand/20 bg-surface-1/95 px-2.5 py-2 shadow-[0_16px_44px_rgba(14,45,62,.22)] backdrop-blur-xl ring-1 ring-white/60 transition-[box-shadow,transform] duration-200 focus-within:shadow-[0_18px_50px_rgba(14,45,62,.28)] dark:ring-white/5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text" aria-hidden="true"><i className="fa-solid fa-magnifying-glass text-xs" /></span>
             <input
               type="search"
+              ref={searchRef}
               aria-label="Buscar bien sin volver al inicio"
               placeholder="Buscar bien por rótulo, nombre o funcionario…"
               value={searchTerm}

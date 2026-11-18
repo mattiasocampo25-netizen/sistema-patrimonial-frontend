@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { PENDIENTE_LABELS, ESTADOS_CONSERVACION } from '../constants/appConstants';
 import FiltroCombo from '../components/FiltroCombo';
 import CompararBienesModal from '../components/CompararBienesModal';
@@ -1199,7 +1200,7 @@ export default function InventarioView({
       )}
 
       {mostrarBuscadorFlotante && (
-        <div className="inventory-floating-search fixed bottom-4 left-1/2 z-[110] w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 animate-slide-up sm:bottom-6" role="search" aria-label="Búsqueda rápida del inventario">
+        createPortal(<div className="inventory-floating-search fixed bottom-4 left-1/2 z-[110] w-[min(38rem,calc(100vw-2rem))] -translate-x-1/2 animate-slide-up sm:bottom-6" role="search" aria-label="Búsqueda rápida del inventario">
           <div className="flex min-h-14 items-center gap-2 rounded-full border border-brand/20 bg-surface-1/95 px-2.5 py-2 shadow-[0_16px_44px_rgba(14,45,62,.22)] backdrop-blur-xl ring-1 ring-white/60 transition-[box-shadow,transform] duration-200 focus-within:shadow-[0_18px_50px_rgba(14,45,62,.28)] dark:ring-white/5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text" aria-hidden="true"><i className="fa-solid fa-magnifying-glass text-xs" /></span>
             <input
@@ -1217,7 +1218,7 @@ export default function InventarioView({
             <span className="hidden h-6 w-px bg-line sm:block" aria-hidden="true" />
             <button type="button" onClick={() => { setBuscadorRapidoFijado(false); setBuscadorRapidoVisible(false); setBuscadorRapidoOculto(true); document.activeElement?.blur?.(); }} title="Ocultar búsqueda flotante" aria-label="Ocultar búsqueda rápida hasta volver al inicio" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-content-3 transition-colors hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-chevron-down text-[10px]" /></button>
           </div>
-        </div>
+        </div>, document.body)
       )}
 
                 </div>

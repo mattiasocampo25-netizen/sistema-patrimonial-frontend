@@ -234,22 +234,45 @@ export default function InventarioView({
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
   return (
-<div className="inventory-view inventory-stagger min-w-0 space-y-6 pb-12 font-sans text-content-1 dark:text-content-1">
+<div className="inventory-view inventory-stagger min-w-0 space-y-4 pb-12 font-sans text-content-1 dark:text-content-1">
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
-  <Card className="p-0">
-    <div className="p-5 sm:p-6">
-      <PageHeader
-        titulo={'Inventario General'}
-        descripcion={'Gestión integral e inventario consolidado de activos de la Universidad'}
-        icono="fa-boxes-stacked"
-      />
+  <Card className="overflow-hidden border-brand/15 p-0 shadow-panel">
+    <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 px-5 py-5 sm:px-7 sm:py-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="mb-1.5 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text"><i className="fa-solid fa-layer-group" aria-hidden="true" /> Gestión patrimonial</p>
+          <PageHeader
+            titulo={'Inventario General'}
+            descripcion={'Consulta, filtra y administra los bienes registrados en la Universidad.'}
+            icono="fa-boxes-stacked"
+            className="!mb-0"
+          />
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-1/90 px-3 py-2 shadow-xs">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-soft text-brand-text"><i className="fa-solid fa-boxes-stacked text-xs" aria-hidden="true" /></span>
+          <span><span className="block text-[10px] font-semibold uppercase tracking-wide text-content-3">Bienes en esta vista</span><span className="block text-sm font-extrabold tabular-nums text-content-1">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
+        </div>
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-2 border-t border-line/70 pt-4 sm:grid-cols-4">
+        {[
+          { label: 'Bienes registrados', value: stats.totalItems, icon: 'fa-boxes-stacked', tone: 'text-brand-text' },
+          { label: 'Libres para asignar', value: stats.libresParaAsignar, icon: 'fa-box-open', tone: 'text-emerald-700 dark:text-emerald-300' },
+          { label: 'Con observación', value: stats.observados, icon: 'fa-triangle-exclamation', tone: 'text-amber-700 dark:text-amber-300' },
+          { label: 'Pendientes de QR', value: stats.withoutQR, icon: 'fa-qrcode', tone: 'text-sky-700 dark:text-sky-300' }
+        ].map(item => <div key={item.label} className="flex min-w-0 items-center gap-2.5 px-1 py-1.5">
+          <i className={`fa-solid ${item.icon} ${item.tone} text-xs`} aria-hidden="true" />
+          <span className="min-w-0"><span className="block truncate text-[10px] font-medium text-content-3">{item.label}</span><span className="block text-sm font-bold tabular-nums text-content-1">{Number(item.value || 0).toLocaleString('es-PY')}</span></span>
+        </div>)}
+      </div>
+    </div>
       {/* Antes el `contador` de la cabecera mostraba "Añadir Registro", que
           repetía el botón de la toolbar de abajo (línea ~262) y además no era
           un contador. El total de bienes ya se ve en la paginación
           ("Mostrando X de Y"), así que la cabecera queda solo con la
           identidad del módulo. */}
-      <Toolbar className="mt-4">
+      <div className="border-t border-line bg-surface-2/50 px-4 py-3 sm:px-6">
+      <Toolbar>
 
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
       <div className="flex items-center gap-2 min-w-0">
@@ -297,7 +320,7 @@ export default function InventarioView({
   </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
-  <div className="w-full min-w-0 bg-surface-1 p-4 sm:p-5 rounded-panel border border-line shadow-sm space-y-4">
+  <div className="w-full min-w-0 space-y-3 rounded-2xl border border-line bg-surface-1 p-3 shadow-sm sm:p-4">
 
     {/* Campo de Búsqueda Principal */}
     <div className="relative block w-full min-w-0">
@@ -402,7 +425,8 @@ export default function InventarioView({
 
     </div>
 
-    <div className="grid min-h-[76px] grid-cols-1 items-center gap-3 rounded-2xl border border-emerald-700/15 bg-emerald-50/70 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-4 dark:bg-emerald-500/[0.06]">
+    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+    <div className="grid min-h-[68px] grid-cols-1 items-center gap-3 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3 dark:bg-emerald-500/[0.06]">
       <button
         type="button"
         aria-pressed={filtroPendiente === 'libresParaAsignar'}
@@ -423,11 +447,12 @@ export default function InventarioView({
       </div>
     </div>
 
-    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex min-h-[76px] w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
+    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
       <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
       <span className="min-w-[68px] rounded-full border border-amber-600/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-amber-800 dark:bg-slate-900 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
     </button>
+    </div>
 
     <div>
       <button

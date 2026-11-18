@@ -18,6 +18,17 @@ const URL_KEYS = {
 };
 const normalizarTamPagina = value => [10, 20, 50].includes(Number(value)) ? Number(value) : 10;
 const normalizarVistaInventario = value => ['tabla', 'tarjetas', 'kanban', 'galeria'].includes(value) ? value : 'galeria';
+// Acepta fechas ISO, ISO con hora y fechas locales dd/mm/aaaa o dd-mm-aaaa.
+// Algunos registros históricos vienen con una hora añadida o como texto.
+const obtenerAnioAdquisicion = valor => {
+  if (valor == null || valor === '') return '';
+  const texto = String(valor).trim();
+  const anioIso = texto.match(/^(\d{4})(?:[-/.]|$)/)?.[1];
+  if (anioIso) return anioIso;
+  const anioLocal = texto.match(/^\d{1,2}[-/.]\d{1,2}[-/.](\d{4})(?:\D|$)/)?.[1];
+  if (anioLocal) return anioLocal;
+  return parseDateInfo(texto).year || (/^\d{4}$/.test(texto) ? texto : '');
+};
 
 // Filtros, búsqueda, paginación y derivados del inventario (extraído de
 // App.jsx, Fase 3 del split). La UI sigue usando los mismos nombres vía
@@ -371,7 +382,7 @@ useEffect(() => {
       return Array.from(ubiMap.values()).sort((a, b) => a.localeCompare(b, 'es'));
   }, [bienesDependencia]);
 
-  const aniosUnicos = useMemo(() => { const years = bienesDependencia.filter(b => b.fechaAdquisicion).map(b => parseDateInfo(b.fechaAdquisicion).year).filter(y => y && !isNaN(parseInt(y))); return [...new Set(years)].sort((a, b) => b - a); }, [bienesDependencia]);
+  const aniosUnicos = useMemo(() => { const years = bienesDependencia.map(b => obtenerAnioAdquisicion(b.fechaAdquisicion)).filter(y => y && Number(y) >= 1900 && Number(y) <= 2100); return [...new Set(years)].sort((a, b) => Number(b) - Number(a)); }, [bienesDependencia]);
 
   const subcuentasUnicas = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.subcuenta || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
   const analiticos1Unicos = useMemo(() => [...new Set(bienesDependencia.map(b => String(b.analitico1 || '').trim()).filter(Boolean))].sort(), [bienesDependencia]);
@@ -444,7 +455,7 @@ useEffect(() => {
     let filtered = [...bienesDependencia];
     if (filtroFuncionario) filtered = filtered.filter(b => coincideBienOPieza(b, 'funcionario', filtroFuncionario) || normalizeStr(b.funcionarioAlternativo || '') === normalizeStr(filtroFuncionario));
     if (filtroUbicacion) filtered = filtered.filter(b => coincideBienOPieza(b, 'ubicacion', filtroUbicacion));
-    if (filtroAnio) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).year === filtroAnio);
+    if (filtroAnio) filtered = filtered.filter(b => obtenerAnioAdquisicion(b.fechaAdquisicion) === String(filtroAnio));
     if (filtroMes) filtered = filtered.filter(b => parseDateInfo(b.fechaAdquisicion).month === filtroMes);
     if (filtroSubcuenta) filtered = filtered.filter(b => String(b.subcuenta||'').trim() === filtroSubcuenta);
     if (filtroAnalitico1) filtered = filtered.filter(b => String(b.analitico1||'').trim() === filtroAnalitico1);

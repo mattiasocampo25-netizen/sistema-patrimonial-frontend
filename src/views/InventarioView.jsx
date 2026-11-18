@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PENDIENTE_LABELS, ESTADOS_CONSERVACION } from '../constants/appConstants';
 import FiltroCombo from '../components/FiltroCombo';
 import CompararBienesModal from '../components/CompararBienesModal';
@@ -167,6 +167,7 @@ export default function InventarioView({
   const [buscadorRapidoVisible, setBuscadorRapidoVisible] = useState(false);
   const [buscadorRapidoFijado, setBuscadorRapidoFijado] = useState(false);
   const [buscadorRapidoOculto, setBuscadorRapidoOculto] = useState(false);
+  const buscadorPrincipalRef = useRef(null);
   const mostrarBuscadorFlotante = (buscadorRapidoVisible || buscadorRapidoFijado) && !buscadorRapidoOculto;
   const [rotuloCopiado, setRotuloCopiado] = useState('');
   const [observacionAbierta, setObservacionAbierta] = useState(null);
@@ -223,10 +224,10 @@ export default function InventarioView({
   const { t } = useIdioma();
   useEffect(() => {
     const contenedor = document.getElementById('contenido');
-    if (!contenedor) return undefined;
-    const actualizarVisibilidad = () => {
-      const desplazado = contenedor.scrollTop > 360;
-      if (!desplazado) {
+    const buscadorPrincipal = buscadorPrincipalRef.current;
+    if (!contenedor || !buscadorPrincipal) return undefined;
+    const actualizarVisibilidad = (estaVisible) => {
+      if (estaVisible) {
         setBuscadorRapidoVisible(false);
         setBuscadorRapidoFijado(false);
         setBuscadorRapidoOculto(false);
@@ -234,9 +235,26 @@ export default function InventarioView({
       }
       setBuscadorRapidoVisible(!buscadorRapidoOculto);
     };
-    actualizarVisibilidad();
-    contenedor.addEventListener('scroll', actualizarVisibilidad, { passive: true });
-    return () => contenedor.removeEventListener('scroll', actualizarVisibilidad);
+    if (typeof window.IntersectionObserver !== 'undefined') {
+      const observer = new window.IntersectionObserver(([entry]) => actualizarVisibilidad(entry.isIntersecting), {
+        root: contenedor,
+        threshold: 0
+      });
+      observer.observe(buscadorPrincipal);
+      return () => observer.disconnect();
+    }
+    const actualizarDesdeGeometria = () => {
+      const caja = buscadorPrincipal.getBoundingClientRect();
+      const area = contenedor.getBoundingClientRect();
+      actualizarVisibilidad(caja.bottom > area.top && caja.top < area.bottom);
+    };
+    actualizarDesdeGeometria();
+    contenedor.addEventListener('scroll', actualizarDesdeGeometria, { passive: true });
+    window.addEventListener('resize', actualizarDesdeGeometria);
+    return () => {
+      contenedor.removeEventListener('scroll', actualizarDesdeGeometria);
+      window.removeEventListener('resize', actualizarDesdeGeometria);
+    };
   }, [buscadorRapidoOculto]);
   const bienesSeleccionados = itemsPaginados.filter(i => seleccionados.includes(i.id));
   const selFueraPagina = seleccionados.length - bienesSeleccionados.length;
@@ -344,12 +362,13 @@ export default function InventarioView({
   <div className="w-full min-w-0 space-y-3 rounded-2xl border border-line bg-surface-1 p-3 shadow-sm sm:p-4">
 
     {/* Solo se muestra una instancia del buscador: la flotante reemplaza a la de arriba mientras se desplaza. */}
-    <div className={mostrarBuscadorFlotante ? 'hidden' : 'space-y-2'}>
+    <div ref={buscadorPrincipalRef} aria-hidden={mostrarBuscadorFlotante} className={`space-y-2 transition-opacity duration-150 ${mostrarBuscadorFlotante ? 'pointer-events-none invisible' : ''}`}>
     <div className="relative block w-full min-w-0">
       <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input
         type="search"
         ref={mostrarBuscadorFlotante ? undefined : searchRef}
+        tabIndex={mostrarBuscadorFlotante ? -1 : 0}
         aria-label="Buscar bienes por rótulo, descripción, responsable o código"
         autoComplete="off"
         title="Busca por rótulo, descripción, funcionario, ubicación o código (atajo: /)"

@@ -401,7 +401,8 @@ export function useFuncionarios({
       }
       try {
           const ubicacionValida = !nuevaUbicacion || ubicacionesDependencia.some(u =>
-            normalizeStr(u.nombre) === normalizeStr(nuevaUbicacion) && normalizeStr(u.dependencia) === normalizeStr(nuevaDependencia)
+            normalizeStr(typeof u === 'string' ? u : u?.nombre) === normalizeStr(nuevaUbicacion) &&
+            normalizeStr(typeof u === 'string' ? dependenciaActual : u?.dependencia) === normalizeStr(nuevaDependencia)
           );
           if (!ubicacionValida) {
             notify('El departamento seleccionado no pertenece a la dependencia elegida.', 'warning');

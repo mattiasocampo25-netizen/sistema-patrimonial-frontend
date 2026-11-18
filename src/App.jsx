@@ -789,7 +789,7 @@ export default function App() {
   const [pendingCSVImport, setPendingCSVImport] = useState(null);
   // Dominio de funcionarios/padrón: hook extraído (Fase 6). La UI usa los mismos nombres.
   const { setCurrentPaginaFuncionarios, isFuncionarioModalOpen, setIsFuncionarioModalOpen, funcionarioToEdit, isNewFuncionarioModalOpen, setIsNewFuncionarioModalOpen, isCSVPreviewOpen, setIsCSVPreviewOpen, csvPreviewData, setCsvPreviewData, searchFuncionarioInput, setSearchFuncionarioInput, funcionariosPurosDependencia, funcionariosPaginados, funcionariosConDatos, filtroCargo, setFiltroCargo, cargosFuncionarios, sincronizarBienesConPadron, handleFileUploadFuncionarios, executeProcessFuncionariosCSV, handleSaveManualFuncionario, confirmCSVImportFuncionarios, handleDeleteFuncionario, handleEditFuncionario, saveFuncionarioEdit, renderPaginationFuncionarios } = useFuncionarios({
-    funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias, ubicacionesDependencia: ubicacionesDep,
+    funcionariosPadron, setFuncionariosPadron, dependenciaActual, todasDependencias, ubicacionesDependencia: ubicacionesList,
     bienes, setBienes, fc10List, currentUser, isAdmin,
     notify: addToast, setIsProcessing, setItemToDelete, fileInputFuncionariosRef,
     setPendingCSVImport

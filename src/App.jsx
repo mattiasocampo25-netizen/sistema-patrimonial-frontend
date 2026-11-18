@@ -33,7 +33,7 @@ import { pendienteDeFirma } from './utils/fc10Firmas';
 import { detectarCambios, fusionarSobreFresco, detectarConflictos, describirCampos } from './services/escrituraSegura';
 import { normalizarBien } from './utils/bienPublico';
 import { copiarAlPortapapeles } from './utils/inventarioInteracciones.js';
-import MaintenanceScreen from './components/MaintenanceScreen';
+const MaintenanceScreen = lazyConReintento(() => import('./components/MaintenanceScreen'));
 const AyudaView = lazyConReintento(() => import('./views/AyudaView'));
 const ResumenView = lazyConReintento(() => import('./views/ResumenView'));
 const UsuariosView = lazyConReintento(() => import('./views/UsuariosView'));
@@ -48,9 +48,9 @@ const DashboardView = lazyConReintento(() => import('./views/DashboardView'));
 const InventarioView = lazyConReintento(() => import('./views/InventarioView'));
 import { registrarAuditoria } from './services/auditService';
 import { MAX_FOTOS_POR_BIEN } from './services/supabaseFreeTier';
-import ErrorView from './views/ErrorView';
-import InventarioCompartidoView from './views/InventarioCompartidoView';
-import BienQrPublicoView from './views/BienQrPublicoView';
+const ErrorView = lazyConReintento(() => import('./views/ErrorView'));
+const InventarioCompartidoView = lazyConReintento(() => import('./views/InventarioCompartidoView'));
+const BienQrPublicoView = lazyConReintento(() => import('./views/BienQrPublicoView'));
 import { parseIdleSegundos } from './utils/kiosk';
 import { obtenerProgramacion, guardarProgramacion, tocaEjecutar, construirCSVInventario, nombreArchivoInventario, descargarYArchivar } from './services/exportSchedule';
 
@@ -1662,7 +1662,7 @@ useEffect(() => {
 // --- VISTA PaBLICA DE ESCANEO QR REDISEÑADA Y OPTIMIZADA PARA MÓVILES ---
 // --- VISTA PÚBLICA DE ESCANEO QR CLARA, MODERNA Y OPTIMIZADA PARA MÓVILES (iOS / ANDROID) ---
 if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && !mostrarLoginDev) {
-  return <MaintenanceScreen config={mantenimiento} onAccesoDesarrollador={() => setMostrarLoginDev(true)} />;
+  return <Suspense fallback={<CargaModulo />}><MaintenanceScreen config={mantenimiento} onAccesoDesarrollador={() => setMostrarLoginDev(true)} /></Suspense>;
 }
 if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && mostrarLoginDev) {
   return (
@@ -1670,13 +1670,13 @@ if (mantenimiento?.en_mantenimiento && !mantBypass && !esDesarrollador && mostra
   );
 }
 if (rutaDesconocida && !publicBienId && !publicShareToken) {
-  return <ErrorView variante="404" onAccion={() => { window.location.href = window.location.origin; }} />;
+  return <Suspense fallback={<CargaModulo />}><ErrorView variante="404" onAccion={() => { window.location.href = window.location.origin; }} /></Suspense>;
 }
 if (publicShareToken) {
-  return <InventarioCompartidoView token={publicShareToken} />;
+  return <Suspense fallback={<CargaModulo />}><InventarioCompartidoView token={publicShareToken} /></Suspense>;
 }
 if (publicBienId) {
-  return <BienQrPublicoView bien={publicBienData} autorizado={publicBienAutorizado} appLogo={appLogo} publicBienId={publicBienId} kioscoActivo={kioscoActivo} kioscoIdle={kioscoIdle} />;
+  return <Suspense fallback={<CargaModulo />}><BienQrPublicoView bien={publicBienData} autorizado={publicBienAutorizado} appLogo={appLogo} publicBienId={publicBienId} kioscoActivo={kioscoActivo} kioscoIdle={kioscoIdle} /></Suspense>;
 }
 
   // 2. LUEGO EL RESTO DE VALIDACIONES (Mantenimiento global, Login, etc.)

@@ -56,6 +56,13 @@ const GRUPOS = [
   }
 ];
 
+function LogoInstitucional({ className = '' }) {
+  return <>
+    <img src="/UNP-Site-Logo-negro.webp" alt="Universidad Nacional de Pilar" className={`block h-full w-full object-contain object-left dark:hidden ${className}`} onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = '/UNP-Site-Logo-negro.png'; }} />
+    <img src="/UNP-Site-Logo.webp" alt="Universidad Nacional de Pilar" className={`hidden h-full w-full object-contain object-left dark:block ${className}`} onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = '/UNP-Site-Logo.png'; }} />
+  </>;
+}
+
 /**
  * Item de navegacion.
  *
@@ -227,8 +234,6 @@ export default function AppSidebar({
   }, [isSidebarOpen]);
   const { t } = useIdioma();
   // El sidebar usa fondo oscuro en ambos temas; mantener siempre el logo claro.
-  const LOGO_SISTEMA = '/UNP-Site-Logo.webp';
-  const LOGO_SISTEMA_PNG = '/UNP-Site-Logo.png';
 
   const cerrar = () => setIsSidebarOpen && setIsSidebarOpen(false);
 
@@ -256,7 +261,7 @@ export default function AppSidebar({
         <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[76px] px-5 py-4 lg:min-h-[100px] lg:flex-col lg:justify-center lg:gap-2 lg:px-2 lg:py-2' : 'min-h-[76px] px-5 py-4'}`}>
           {appLogo ? (
             <div className={`flex min-w-0 items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-2 shadow-card border border-sidebar-line overflow-hidden p-1.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control border border-sidebar-line bg-white p-1.5 shadow-card overflow-hidden">
                 <img src={appLogo} alt="Logo Institucional" className="w-full h-full object-contain" />
               </div>
               <div className={`min-w-0 flex-1 animate-fade-in ${compacta ? 'lg:hidden' : ''}`}>
@@ -273,9 +278,9 @@ export default function AppSidebar({
               {/* El logotipo acompaña el tono del sidebar en ambos temas. */}
               {compacta ? <>
                 <span className="hidden lg:flex h-10 w-10 items-center justify-center rounded-control border border-sidebar-line bg-surface-1/10 text-sm font-black tracking-tight text-sidebar-content" aria-label="Universidad Nacional de Pilar" title="Universidad Nacional de Pilar">UNP</span>
-                <img src={LOGO_SISTEMA} alt="Universidad Nacional de Pilar" className="h-8 w-auto max-w-[150px] object-contain object-left lg:hidden" onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }} />
+                <span className="h-8 w-[150px] lg:hidden"><LogoInstitucional /></span>
               </> : (
-                <img src={LOGO_SISTEMA} alt="Universidad Nacional de Pilar" className="h-9 w-auto max-w-[150px] object-contain object-left" onError={(e) => { e.target.onerror = null; e.target.src = LOGO_SISTEMA_PNG; }} />
+                <span className="h-9 w-[150px]"><LogoInstitucional /></span>
               )}
               {!compacta ? <div className="flex-1" /> : null}
             </div>

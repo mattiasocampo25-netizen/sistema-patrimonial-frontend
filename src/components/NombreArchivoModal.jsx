@@ -19,16 +19,16 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
       icono="fa-file-arrow-down"
       tamano="sm"
       pie={(
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button variante="secondary" onClick={onUsarSugerido}>Usar nombre sugerido</Button>
-          <Button variante="primary" icono="fa-download" onClick={() => onAceptar(nombre)}>Descargar</Button>
+        <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:justify-end">
+          <Button variante="secondary" className="w-full sm:w-auto" onClick={onUsarSugerido}>Usar nombre sugerido</Button>
+          <Button variante="primary" icono="fa-download" className="w-full sm:w-auto" onClick={() => onAceptar(nombre)}>Descargar</Button>
         </div>
       )}
     >
-      <form className="space-y-4" onSubmit={(event) => { event.preventDefault(); onAceptar(nombre); }}>
-        <div className="space-y-1.5">
-          <label htmlFor="nombre-archivo" className="text-label font-semibold text-content-2 uppercase tracking-wide">Nombre del archivo</label>
-          <div className="flex items-center gap-2">
+      <form className="space-y-4 p-5 sm:p-6" onSubmit={(event) => { event.preventDefault(); onAceptar(nombre); }}>
+        <div className="min-w-0 space-y-2">
+          <label htmlFor="nombre-archivo" className="block text-label font-semibold text-content-2 uppercase tracking-wide">Nombre del archivo</label>
+          <div className="flex min-w-0 items-stretch gap-2">
             <Input
               id="nombre-archivo"
               autoFocus
@@ -38,7 +38,7 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
               className="min-w-0 flex-1"
               maxLength={64}
             />
-            <span className="shrink-0 rounded-lg bg-surface-2 px-2.5 py-2 text-sm font-bold text-content-3">.{solicitud.extension}</span>
+            <span className="inline-flex shrink-0 items-center rounded-control border border-line bg-surface-2 px-3 text-sm font-bold text-content-3">.{solicitud.extension}</span>
           </div>
           <p className="text-label text-content-3">La extensión se agrega automáticamente.</p>
         </div>

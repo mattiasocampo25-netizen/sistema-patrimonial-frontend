@@ -26,7 +26,7 @@ import { supabase } from '../supabaseClient';
 import {
   analizarRespaldo, previsualizarRestauracion, armarLote,
   dividirEnLotes, calcularPerdidas, TABLAS_RESTORABLES, ORDEN_RESTAURACION,
-  normalizarFilaActual
+  normalizarFilaActual, verificarIntegridadRespaldo
 } from '../services/restore';
 
 const TAMANO_LOTE = 500;
@@ -87,7 +87,15 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
       // Un respaldo de 1800 bienes pesa algunos MB; JSON.parse bloquearía el
       // hilo unos cientos de ms. Aceptable para una operación de administración.
       const crudo = JSON.parse(texto);
+      const integridad = await verificarIntegridadRespaldo(crudo);
+      if (integridad.disponible && !integridad.valido) {
+        throw new Error('La suma SHA-256 no coincide. El archivo pudo dañarse o modificarse; no se permite restaurarlo.');
+      }
       const res = analizarRespaldo(crudo);
+      if (integridad.valido) {
+        res.avisos = res.avisos.filter(a => !a.startsWith('Este respaldo no tiene una suma de verificación'));
+        res.avisos.push('Integridad SHA-256 verificada.');
+      }
       setAnalisis(res);
       setNombreArchivo(archivo.name);
 
@@ -162,9 +170,16 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
     for (const t of TABLAS_RESTORABLES) {
       if (!tablasElegidas[t.clave]) continue;
       const entrantes = analisis.tablas[t.clave] || [];
-      const { data, error } = await supabase.from(t.tabla).select(t.pk);
-      if (error) continue;
-      salida[t.clave] = calcularPerdidas(entrantes, (data || []).map(f => ({ [t.pk]: f[t.pk] })), t.pk);
+      const actuales = [];
+      let desde = 0;
+      for (;;) {
+        const { data, error } = await supabase.from(t.tabla).select(t.pk).order(t.pk).range(desde, desde + 999);
+        if (error) throw new Error(`${t.etiqueta}: no se pudo contar lo actual (${error.message}).`);
+        actuales.push(...(data || []));
+        if (!data || data.length < 1000) break;
+        desde += 1000;
+      }
+      salida[t.clave] = calcularPerdidas(entrantes, actuales, t.pk);
     }
     return salida;
   }, [modo, analisis, tablasElegidas]);
@@ -190,12 +205,23 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
       // escribir. Si se hiciera después, un fallo a medio camino dejaría la tabla
       // vacía sin los datos del respaldo.
       if (modo === 'reemplazar') {
-        for (const clave of claves) {
+        // Elimina en orden inverso a la restauración para conservar referencias
+        // si el esquema incorpora claves foráneas entre tablas.
+        for (const clave of [...claves].reverse()) {
           const t = TABLAS_RESTORABLES.find(x => x.clave === clave);
           const entrantes = analisis.tablas[clave] || [];
-          const { data: actuales, error: errLee } = await supabase.from(t.tabla).select(t.pk);
+          const actuales = [];
+          let desde = 0;
+          let errLee = null;
+          for (;;) {
+            const { data, error } = await supabase.from(t.tabla).select(t.pk).order(t.pk).range(desde, desde + 999);
+            if (error) { errLee = error; break; }
+            actuales.push(...(data || []));
+            if (!data || data.length < 1000) break;
+            desde += 1000;
+          }
           if (errLee) { errores.push(`${t.etiqueta}: no se pudo leer lo actual (${errLee.message}).`); continue; }
-          const aBorrar = calcularPerdidas(entrantes, (actuales || []).map(f => ({ [t.pk]: f[t.pk] })), t.pk);
+          const aBorrar = calcularPerdidas(entrantes, actuales, t.pk);
           if (aBorrar.length === 0) continue;
           setProgreso({ tabla: t.etiqueta, hechas: 0, total: aBorrar.length, texto: 'Borrando lo que no viene en el archivo...' });
           for (const lote of dividirEnLotes(aBorrar, 200)) {
@@ -226,6 +252,20 @@ export const useRestoreBackup = ({ notify, registrarAuditoria, currentUser, depe
             .upsert(paraEscribir, { onConflict: t.pk });
           if (error) { falloTabla = `${t.etiqueta}: ${error.message}`; break; }
           escritas += lote.length;
+        }
+
+        // Upsert por clave primaria evita duplicar filas. Confirmamos que todas
+        // las claves del archivo están presentes al terminar cada tabla.
+        if (!falloTabla) {
+          let verificadas = 0;
+          for (const clavesLote of dividirEnLotes(filas.map(f => String(f[t.pk])), 200)) {
+            const { data, error } = await supabase.from(t.tabla).select(t.pk).in(t.pk, clavesLote);
+            if (error) { falloTabla = `${t.etiqueta}: se escribió, pero no se pudo verificar (${error.message}).`; break; }
+            verificadas += data?.length || 0;
+          }
+          if (!falloTabla && verificadas !== filas.length) {
+            falloTabla = `${t.etiqueta}: verificación incompleta; el archivo contiene ${filas.length} claves y se encontraron ${verificadas}.`;
+          }
         }
 
         porTabla.push({ clave, etiqueta: t.etiqueta, ok: !falloTabla, escritas, error: falloTabla });

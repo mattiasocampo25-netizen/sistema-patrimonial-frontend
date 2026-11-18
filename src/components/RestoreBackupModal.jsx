@@ -61,7 +61,7 @@ export default function RestoreBackupModal({ restore }) {
                 Restaurar copia de seguridad
               </h3>
               <p className="mt-0.5 text-xs font-medium text-content-3 dark:text-content-3">
-                Lee un archivo .json generado por este sistema y vuelve a escribir sus datos.
+                Analiza una copia sin escribir nada; confirma solo después de revisar el alcance.
               </p>
             </div>
           </div>
@@ -107,9 +107,10 @@ export default function RestoreBackupModal({ restore }) {
               </p>
             )}
             {!nombreArchivo && <div className="mt-3 rounded-control border border-info/20 bg-info-soft/50 p-3 text-[11px] leading-relaxed text-content-2 dark:border-sky-500/20 dark:bg-sky-500/5 dark:text-content-3">
-              <p className="font-bold text-content-1 dark:text-zinc-100"><i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />El archivo contiene datos de hasta 9 tablas</p>
-              <p className="mt-1">Usuarios, funcionarios, estructuras, bienes, actas FC-10, traslados FC-11, expedientes FC-04, notificaciones y auditoría. Primero verás el análisis; nada se escribe hasta que confirmes.</p>
-              <p className="mt-1 font-semibold">No incluye contraseñas de Auth ni archivos adjuntos binarios, como las fotos almacenadas aparte.</p>
+              <p className="font-bold text-content-1 dark:text-zinc-100"><i className="fa-solid fa-circle-info mr-1.5 text-info" aria-hidden="true" />Copia de datos de 11 tablas</p>
+              <p className="mt-1">Incluye dependencias, ubicaciones, usuarios, funcionarios, estructuras, bienes, FC-10, FC-11, FC-04, notificaciones y auditoría. La vista previa es de solo lectura; no modifica la base.</p>
+              <p className="mt-1 font-semibold">No incluye contraseñas de Auth, archivos binarios de Storage (fotos) ni configuración global transitoria. Las referencias de fotos sí permanecen en los bienes.</p>
+              <p className="mt-1">Al combinar, se usa la clave primaria de cada tabla: actualizará coincidencias y agregará nuevas, sin duplicarlas. Para probar una restauración real, usa primero un proyecto Supabase de prueba aislado.</p>
             </div>}
           </section>
 

@@ -560,7 +560,7 @@ export function useFcModals({
     if (!form || !form.reportValidity()) return;
 
     setIsSaving(true);
-    setIsProcessing({ active: true, text: 'Guardando y sincronizando activo...' });
+    setIsProcessing({ active: true, text: 'Guardando bien…' });
 
     const formData = new FormData(form);
     let componentesCapturados = [];

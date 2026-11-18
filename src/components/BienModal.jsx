@@ -6,6 +6,17 @@ import Dialogo from './ui/Dialogo';
 import Button, { IconButton } from './ui/Button';
 import FiltroCombo from './FiltroCombo';
 import { detectarBienesSimilares } from '../utils/inventarioInteracciones';
+import { coincidePorTerminos } from '../utils/busqueda';
+
+const coincideFuncionario = (funcionario, consulta) => {
+    const texto = String(consulta || '').trim();
+    if (!texto) return true;
+    const soloDigitos = texto.replace(/\D/g, '');
+    const terminosNombre = texto.split(/\s+/).filter(t => !/\d/.test(t));
+    const nombreCoincide = terminosNombre.length > 0 && coincidePorTerminos(funcionario?.nombre, terminosNombre.join(' '));
+    const documentoCoincide = soloDigitos.length > 0 && String(funcionario?.cedula || '').replace(/\D/g, '').includes(soloDigitos);
+    return nombreCoincide && (!soloDigitos || documentoCoincide) || documentoCoincide;
+};
 
 const normalizarComponentes = (valor) => {
     let lista = valor;
@@ -242,9 +253,7 @@ export default function BienModal({
 
     const filteredCustodios = (() => {
         const lista = funcionariosPadron.filter(f => {
-            if (!custodioTexto) return true;
-            const query = normalizeStr(custodioTexto);
-            return normalizeStr(f.nombre).includes(query) || String(f.cedula || '').includes(query);
+            return coincideFuncionario(f, custodioTexto);
         });
         // Fusionar homónimos (misma persona, filas repetidas con distinto cargo/CI)
         const vistos = new Map();
@@ -278,9 +287,7 @@ export default function BienModal({
     }).slice(0, 10);
 
     const filteredAlternativos = funcionariosPadron.filter(f => {
-        if (!custodioAlternativoTexto) return true;
-        const query = normalizeStr(custodioAlternativoTexto);
-        return normalizeStr(f.nombre).includes(query) || String(f.cedula || '').includes(query);
+        return coincideFuncionario(f, custodioAlternativoTexto);
     }).filter(f => normalizeStr(f.nombre) !== normalizeStr(custodioTexto)).slice(0, 10);
 
     const autocompletarDesdeFuncionario = (f) => {
@@ -639,7 +646,7 @@ export default function BienModal({
                         </button>}
 
                         {/* Custom Dropdown Custodios */}
-                        {showCustodioDropdown && filteredCustodios.length > 0 && (
+                        {showCustodioDropdown && (
                             <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-72 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
                                 <p className="sticky top-0 z-10 border-b border-line bg-surface-1 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-content-3">{custodioTexto.trim() ? `${filteredCustodios.length} coincidencia${filteredCustodios.length === 1 ? '' : 's'}` : 'Funcionarios de la dependencia'}</p>
                                 {filteredCustodios.map((f) => (
@@ -661,7 +668,7 @@ export default function BienModal({
                                         <span className="shrink-0 rounded-lg border border-line bg-surface-2 px-2 py-1 text-[10px] font-mono tabular-nums text-content-2">CI {f.cedula || 'S/C'}</span>
                                     </button>
                                 ))}
-                                {filteredCustodios.length === 0 && <p className="px-4 py-5 text-center text-xs font-medium text-content-3">No hay coincidencias. Puedes continuar con el nombre escrito.</p>}
+                                {filteredCustodios.length === 0 && <p role="status" className="px-4 py-5 text-center text-xs font-medium text-content-3">No hay coincidencias. Prueba con otras palabras o la cédula.</p>}
                             </div>
                         )}
                     </div>
@@ -679,11 +686,12 @@ export default function BienModal({
                       <div className="relative" ref={alternativoDropdownRef}>
                         <label htmlFor="funcionarioAlternativo" className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-content-3">Funcionario del otro turno</label>
                         <input id="funcionarioAlternativo" name="funcionarioAlternativo" value={custodioAlternativoTexto} onChange={handleAlternativoChange} onFocus={() => setShowAlternativoDropdown(true)} autoComplete="off" className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Escribe o selecciona funcionario…" />
-                        {showAlternativoDropdown && filteredAlternativos.length > 0 && <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-card border border-line bg-surface-1 py-1 shadow-2xl">
+                        {showAlternativoDropdown && <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-card border border-line bg-surface-1 py-1 shadow-2xl">
                           {filteredAlternativos.map(f => <button key={f.id || f.cedula || f.nombre} type="button" onClick={() => handleSelectCustodioAlternativo(f)} className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
                             <span className="min-w-0"><span className="block truncate text-xs font-semibold text-content-1">{f.nombre}</span><span className="block truncate text-[10px] text-content-3">{f.cargo || 'Funcionario'}</span></span>
                             {f.cedula && <span className="shrink-0 font-mono text-[10px] text-content-3">{f.cedula}</span>}
                           </button>)}
+                          {filteredAlternativos.length === 0 && <p role="status" className="px-3 py-3 text-center text-[11px] font-medium text-content-3">No hay coincidencias. Prueba con otras palabras o la cédula.</p>}
                         </div>}
                       </div>
                       <div>

@@ -166,6 +166,7 @@ export default function InventarioView({
   const compacto = densidad === 'compacta';
   const [buscadorRapidoVisible, setBuscadorRapidoVisible] = useState(false);
   const [buscadorRapidoFijado, setBuscadorRapidoFijado] = useState(false);
+  const [buscadorRapidoOculto, setBuscadorRapidoOculto] = useState(false);
   const [rotuloCopiado, setRotuloCopiado] = useState('');
   const [observacionAbierta, setObservacionAbierta] = useState(null);
   const cambiarDensidad = () => {
@@ -222,11 +223,20 @@ export default function InventarioView({
   useEffect(() => {
     const contenedor = document.getElementById('contenido');
     if (!contenedor) return undefined;
-    const actualizarVisibilidad = () => setBuscadorRapidoVisible(contenedor.scrollTop > 360);
+    const actualizarVisibilidad = () => {
+      const desplazado = contenedor.scrollTop > 360;
+      if (!desplazado) {
+        setBuscadorRapidoVisible(false);
+        setBuscadorRapidoFijado(false);
+        setBuscadorRapidoOculto(false);
+        return;
+      }
+      setBuscadorRapidoVisible(!buscadorRapidoOculto);
+    };
     actualizarVisibilidad();
     contenedor.addEventListener('scroll', actualizarVisibilidad, { passive: true });
     return () => contenedor.removeEventListener('scroll', actualizarVisibilidad);
-  }, []);
+  }, [buscadorRapidoOculto]);
   const bienesSeleccionados = itemsPaginados.filter(i => seleccionados.includes(i.id));
   const selFueraPagina = seleccionados.length - bienesSeleccionados.length;
   // Chips de filtros activos con limpieza individual
@@ -1166,7 +1176,7 @@ export default function InventarioView({
         </Dialogo>
       )}
 
-      {(buscadorRapidoVisible || buscadorRapidoFijado) && (
+      {(buscadorRapidoVisible || buscadorRapidoFijado) && !buscadorRapidoOculto && (
         <div className="inventory-floating-search fixed bottom-4 right-4 z-[110] w-[min(23rem,calc(100vw-2rem))] animate-slide-up sm:bottom-6 sm:right-6" role="search" aria-label="Búsqueda rápida del inventario">
           <div className="flex items-center gap-2 rounded-2xl border border-brand/20 bg-surface-1/95 p-2 shadow-[0_16px_44px_rgba(14,45,62,.22)] backdrop-blur-xl ring-1 ring-white/60 dark:ring-white/5">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text" aria-hidden="true"><i className="fa-solid fa-magnifying-glass text-xs" /></span>
@@ -1182,7 +1192,7 @@ export default function InventarioView({
             />
             {searchTerm && <button type="button" onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); }} title="Limpiar búsqueda" aria-label="Limpiar búsqueda rápida" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-xmark text-xs" /></button>}
             <span className="hidden h-6 w-px bg-line sm:block" aria-hidden="true" />
-            <button type="button" onClick={() => { setBuscadorRapidoFijado(false); document.activeElement?.blur?.(); }} title="Ocultar búsqueda rápida" aria-label="Ocultar búsqueda rápida" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-chevron-down text-[10px]" /></button>
+            <button type="button" onClick={() => { setBuscadorRapidoFijado(false); setBuscadorRapidoVisible(false); setBuscadorRapidoOculto(true); document.activeElement?.blur?.(); }} title="Ocultar hasta volver arriba" aria-label="Ocultar búsqueda rápida hasta volver al inicio" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-chevron-down text-[10px]" /></button>
           </div>
           <p className="mr-2 mt-1 text-right text-[9px] font-medium text-content-3 drop-shadow-sm">Búsqueda rápida · filtros compartidos con la vista</p>
         </div>

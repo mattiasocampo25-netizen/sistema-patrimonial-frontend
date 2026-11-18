@@ -1740,14 +1740,12 @@ if (publicBienId) {
           por encima del indicador global de generación. */}
       {isProcessing.active && !solicitudNombreArchivo && (
         <div className="processing-overlay fixed inset-0 z-[500] flex items-center justify-center px-4 backdrop-blur-md animate-fade-in" role="status" aria-live="polite" aria-busy="true">
-          <div className="processing-card w-full max-w-sm rounded-panel border border-line bg-surface-1 p-6 text-center shadow-pop sm:p-8">
-            <div className="processing-orbit mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-soft text-brand-text" aria-hidden="true">
-              <i className={`fa-solid ${/guard|sincron|actualiz|import|export|envi|subiendo/i.test(isProcessing.text || '') ? 'fa-cloud-arrow-up' : 'fa-wand-magic-sparkles'} text-xl`} />
+          <div className="processing-card w-full max-w-xs rounded-panel border border-line bg-surface-1 p-5 text-center shadow-pop sm:p-6">
+            <div className="processing-orbit mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand-text" aria-hidden="true">
+              <i className={`fa-solid ${/guard|sincron|actualiz|import|export|envi|subiendo/i.test(isProcessing.text || '') ? 'fa-arrows-rotate sync-indicator-spin' : 'fa-wand-magic-sparkles'} text-lg`} />
             </div>
-            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text">SIGEP UNP · PROCESO EN CURSO</p>
-            <h2 className="font-display text-lg font-extrabold leading-snug tracking-tight text-content-1">{isProcessing.text || 'Procesando la operación…'}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-content-2">Tus cambios se están procesando de forma segura. Esta ventana se cerrará al terminar.</p>
-            <div className="mt-5 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label="Progreso de la operación" aria-valuemin={0} aria-valuemax={100} aria-valuenow={isProcessing.pct != null ? Math.min(100, Math.max(0, Math.round(isProcessing.pct))) : undefined}>
+            <h2 className="font-display text-base font-extrabold leading-snug tracking-tight text-content-1">{isProcessing.text || 'Procesando…'}</h2>
+            <div className="mt-4 overflow-hidden rounded-full bg-surface-3" role="progressbar" aria-label="Progreso de la operación" aria-valuemin={0} aria-valuemax={100} aria-valuenow={isProcessing.pct != null ? Math.min(100, Math.max(0, Math.round(isProcessing.pct))) : undefined}>
               <div className={`processing-bar ${isProcessing.pct == null ? 'processing-indeterminate' : ''}`} style={isProcessing.pct != null ? { width: `${Math.min(100, Math.max(0, isProcessing.pct))}%` } : undefined} />
             </div>
             {isProcessing.pct != null && <p className="mt-2 text-xs font-bold tabular-nums text-content-2">{Math.min(100, Math.max(0, Math.round(isProcessing.pct)))}%</p>}

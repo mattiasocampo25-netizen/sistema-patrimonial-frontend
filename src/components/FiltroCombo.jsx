@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { normalizeStr } from '../utils/helpers';
-import { puntuarOpcion } from '../utils/busqueda';
+import { puntuarOpcion, coincidePorTerminos } from '../utils/busqueda';
 
 // Combo con buscador que reemplaza a los <select> nativos. Motivo: el popup del
 // <select> lo dibuja el sistema operativo (listado blanco sobre la app oscura,
@@ -88,7 +88,7 @@ export default function FiltroCombo({
 
   const lista = useMemo(() => {
     const base = items.map(o => ({ ...o, norm: normalizeStr(o.label) }));
-    const filtrada = q ? base.filter(o => o.norm.includes(q)) : base;
+    const filtrada = q ? base.filter(o => coincidePorTerminos(o.norm, q)) : base;
     // Sin texto de busqueda NO se reordena: el orden de las opciones es el
     // que tiene sentido (los meses en orden del calendario, las
     // dependencias en el suyo). Antes se ordenaba por localeCompare y la
@@ -102,7 +102,7 @@ export default function FiltroCombo({
 
   const total = useMemo(() => {
     if (!q) return items.length;
-    return items.filter(o => normalizeStr(o.label).includes(q)).length;
+    return items.filter(o => coincidePorTerminos(o.label, q)).length;
   }, [items, q]);
 
   const valorTexto = items.find(o => String(o.value) === String(valorActual))?.label || '';

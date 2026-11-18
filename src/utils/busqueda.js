@@ -11,6 +11,14 @@ export function puntuarOpcion(textoNorm, q) {
   return 3;
 }
 
+// Busca por palabras independientes y en cualquier orden. Por ejemplo,
+// "Gustavo Ferreira" coincide con "Gustavo Ramón Ferreira".
+export function coincidePorTerminos(texto, consulta) {
+  const destino = normalizeStr(texto);
+  const terminos = normalizeStr(consulta).split(/\s+/).filter(Boolean);
+  return terminos.length === 0 || terminos.every(termino => destino.includes(termino));
+}
+
 // Ordena opciones por cercanía a la búsqueda (normaliza adentro).
 // Devuelve hasta `tope` elementos { original }.
 export function ordenarPorCercania(opciones, texto, tope = 100) {

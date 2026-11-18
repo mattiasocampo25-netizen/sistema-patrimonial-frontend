@@ -30,6 +30,8 @@
  *   'plana' → el objeto plano (usuarios)
  */
 export const TABLAS_RESTORABLES = [
+  { clave: 'dependencias', tabla: 'dependencias', etiqueta: 'Dependencias', pk: 'id', envoltura: 'fila' },
+  { clave: 'ubicaciones', tabla: 'ubicaciones', etiqueta: 'Ubicaciones', pk: 'id', envoltura: 'fila' },
   { clave: 'usuarios', tabla: 'usuarios', etiqueta: 'Usuarios', pk: 'username', envoltura: 'plana' },
   { clave: 'funcionarios', tabla: 'funcionarios', etiqueta: 'Padrón de funcionarios', pk: 'id', envoltura: 'data' },
   { clave: 'estructuras', tabla: 'estructuras', etiqueta: 'Estructuras', pk: 'id', envoltura: 'data' },
@@ -76,6 +78,13 @@ export const normalizarFila = (fila, defTabla) => {
     // Forma plana (archivo armado a mano): se acepta tal cual.
     if (fila[pk] !== undefined) return { ...fila };
     return null;
+  }
+
+  // Tablas relacionales con columnas propias (catálogos). Se conserva la fila
+  // completa, incluidos created_at/updated_at y campos añadidos por migraciones.
+  if (defTabla.envoltura === 'fila') {
+    const { password: _password, password_hash: _passwordHash, encrypted_password: _encryptedPassword, ...segura } = fila;
+    return segura;
   }
 
   // Forma plana (usuarios). Se descartan claves de autenticación heredadas por
@@ -132,11 +141,22 @@ export const analizarRespaldo = (crudo) => {
     avisos.push(`El archivo dice provenir de "${metadata.sistema}", que no es exactamente este sistema.`);
   }
 
+  // Verificación de integridad cuando el archivo fue generado por versiones
+  // que incluyen SHA-256. Los respaldos antiguos siguen siendo legibles, pero
+  // se identifican como no verificados.
+  if (metadata.integridad?.algoritmo === 'SHA-256' && metadata.integridad?.sha256) {
+    avisos.push('La integridad criptográfica de este respaldo debe verificarse antes de restaurar.');
+  } else {
+    avisos.push('Este respaldo no tiene una suma de verificación; no se puede confirmar que el archivo esté íntegro.');
+  }
+
   const tablas = {};
   let totalFilas = 0;
+  let hayClavesDuplicadas = false;
   for (const t of TABLAS_RESTORABLES) {
     const brutas = Array.isArray(crudo[t.clave]) ? crudo[t.clave] : [];
     const limpias = [];
+    const clavesVistas = new Set();
     let descartadas = 0, sinClave = 0;
 
     for (const fila of brutas) {
@@ -144,8 +164,14 @@ export const analizarRespaldo = (crudo) => {
       if (!obj) { descartadas++; continue; }
       const valorPk = obj[t.pk];
       if (valorPk === undefined || valorPk === null || String(valorPk).trim() === '') { sinClave++; continue; }
+      const pk = String(valorPk);
+      if (clavesVistas.has(pk)) { hayClavesDuplicadas = true; continue; }
+      clavesVistas.add(pk);
       limpias.push({ ...obj, [t.pk]: String(valorPk) });
     }
+
+    const duplicadas = brutas.length - limpias.length - descartadas - sinClave;
+    if (duplicadas > 0) avisos.push(`${t.etiqueta}: ${duplicadas} clave(s) primaria(s) duplicada(s); no se restaurará un archivo ambiguo.`);
 
     if (descartadas || sinClave) {
       avisos.push(`${t.etiqueta}: ${descartadas} fila(s) con formato ilegible y ${sinClave} sin "${t.pk}" fueron descartadas.`);
@@ -157,6 +183,9 @@ export const analizarRespaldo = (crudo) => {
   if (totalFilas === 0) {
     return { ...vacio, tablas, metadata, error: 'El respaldo no contiene ninguna fila válida. Revisarlo antes de restaurar.' };
   }
+  if (hayClavesDuplicadas) {
+    return { ...vacio, tablas, metadata, totalFilas, error: 'El respaldo contiene claves duplicadas. No se puede restaurar con seguridad hasta corregir el archivo.' };
+  }
 
   // Aviso específico del respaldo v2.1, que perdió la dependencia de los
   // usuarios: restaurarlo tal cual dejaría cuentas sin inventario asignado.
@@ -166,6 +195,21 @@ export const analizarRespaldo = (crudo) => {
   }
 
   return { ok: true, avisos, tablas, metadata, totalFilas };
+};
+
+/** SHA-256 sobre el JSON canónico generado por el exportador. */
+export const verificarIntegridadRespaldo = async (crudo) => {
+  const integridad = crudo?.metadata?.integridad;
+  if (!integridad?.sha256 || integridad.algoritmo !== 'SHA-256') return { disponible: false, valido: null };
+  if (!globalThis.crypto?.subtle) throw new Error('Este navegador no puede verificar SHA-256. Abre el sistema en HTTPS o en un navegador actualizado.');
+  const copia = globalThis.structuredClone
+    ? globalThis.structuredClone(crudo)
+    : JSON.parse(JSON.stringify(crudo));
+  delete copia.metadata.integridad;
+  const bytes = new TextEncoder().encode(JSON.stringify(copia));
+  const hash = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  const calculado = Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join('');
+  return { disponible: true, valido: calculado === integridad.sha256 };
 };
 
 /** Compara dos objetos ignorando el orden de las claves. */
@@ -241,6 +285,13 @@ export const armarLote = (clave, filas, ahora = new Date().toISOString()) => {
       tabla: def.tabla,
       esPlana: true,
       filas: filas.map(f => ({ ...f, username: f.username, updated_at: ahora }))
+    };
+  }
+  if (def.envoltura === 'fila') {
+    return {
+      tabla: def.tabla,
+      esPlana: true,
+      filas: filas.map(f => ({ ...f }))
     };
   }
   return {

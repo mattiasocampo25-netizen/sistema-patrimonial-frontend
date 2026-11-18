@@ -558,7 +558,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         return filas;
       };
 
-      const [bienesDb, fc10Db, fc11Db, fc04Db, estructurasDb, usuariosDb, funcionariosDb, notifDb, auditDb] = await Promise.all([
+      const [bienesDb, fc10Db, fc11Db, fc04Db, estructurasDb, usuariosDb, funcionariosDb, notifDb, auditDb, dependenciasDb, ubicacionesDb] = await Promise.all([
         drenar("bens"),
         drenar("fc10"),
         drenar("fc11"),
@@ -567,19 +567,29 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         drenar("usuarios", "username, nombre, cargo, dependencia"),
         drenar("funcionarios"),
         drenar("notificaciones"),
-        drenar("auditoria")
+        drenar("auditoria"),
+        drenar("dependencias"),
+        drenar("ubicaciones")
       ]);
 
       const backupData = {
         metadata: {
-          version: "2.2",
+          version: "2.3",
           sistema: "Sistema de Gestión Patrimonial UNP",
           fechaGeneracion: new Date().toISOString(),
           generadoPor: currentUser?.username || "Admin",
           totalBienes: bienesDb.length,
           totalFuncionarios: funcionariosDb.length,
+          conteos: {
+            bienes: bienesDb.length, fc10: fc10Db.length, fc11: fc11Db.length,
+            fc04: fc04Db.length, estructuras: estructurasDb.length, usuarios: usuariosDb.length,
+            funcionarios: funcionariosDb.length, notificaciones: notifDb.length,
+            auditoria: auditDb.length, dependencias: dependenciasDb.length, ubicaciones: ubicacionesDb.length
+          },
+          cobertura: ["bienes", "fc10", "fc11", "fc04", "estructuras", "usuarios", "funcionarios", "notificaciones", "auditoria", "dependencias", "ubicaciones"],
           warning: "Este archivo contiene datos personales de funcionarios (cedulas) y detalles de bienes patrimoniales. Tratarlo como informacion sensible.",
-          notaUsuarios: "Los usuarios NO incluyen contrasena (vive en Supabase Auth). La dependencia se incluye: sin ella el usuario perderia acceso a su inventario al restaurar."
+          notaUsuarios: "Los usuarios NO incluyen contrasena (vive en Supabase Auth). La dependencia se incluye: sin ella el usuario perderia acceso a su inventario al restaurar.",
+          notaArchivos: "Las fotos binarias de Storage y la configuración global transitoria no se incluyen en este archivo. Las referencias de fotos dentro de los bienes sí se conservan."
         },
         bienes: bienesDb,
         fc10: fc10Db,
@@ -593,7 +603,19 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
         usuarios: usuariosDb.map(u => ({ username: u.username, nombre: u.nombre, cargo: u.cargo, dependencia: u.dependencia })),
         funcionarios: funcionariosDb,
         notificaciones: notifDb,
-        auditoria: auditDb
+        auditoria: auditDb,
+        dependencias: dependenciasDb,
+        ubicaciones: ubicacionesDb
+      };
+
+      // Manifiesto de integridad: permite detectar archivos dañados o
+      // alterados antes de que el restaurador escriba una sola fila.
+      if (!globalThis.crypto?.subtle) throw new Error("Este navegador no permite calcular SHA-256. Abre SIGEP por HTTPS e intenta de nuevo.");
+      const bytesIntegridad = new TextEncoder().encode(JSON.stringify(backupData));
+      const digest = await globalThis.crypto.subtle.digest('SHA-256', bytesIntegridad);
+      backupData.metadata.integridad = {
+        algoritmo: 'SHA-256',
+        sha256: Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('')
       };
 
       const jsonString = JSON.stringify(backupData);

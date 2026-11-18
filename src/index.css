@@ -697,13 +697,13 @@ select:focus {
 /* Barra de progreso superior */
 .processing-orbit { animation: app-float-y 2.4s ease-in-out infinite; }
 .processing-bar { height: 6px; border-radius: 9999px; background: var(--brand); transition: width 250ms ease; }
-.processing-indeterminate { width: 35%; animation: app-proc-slide 1.5s ease-in-out infinite; }
+.processing-indeterminate { width: 35%; animation: app-proc-slide .95s ease-in-out infinite; }
 .processing-overlay { background: rgb(8 22 35 / 0.58); }
-.processing-card { animation: app-processing-enter 360ms var(--ease-out) both; }
-.processing-orbit { position: relative; animation: app-processing-pulse 1.8s ease-in-out infinite; }
-.processing-orbit::after { content: ''; position: absolute; inset: -6px; border: 1px solid color-mix(in srgb, var(--brand) 26%, transparent); border-radius: 1.15rem; animation: app-processing-ring 2.2s ease-out infinite; }
+.processing-card { animation: app-processing-enter 180ms var(--ease-out) both; }
+.processing-orbit { position: relative; animation: app-processing-pulse .9s ease-in-out infinite; }
+.processing-orbit::after { content: ''; position: absolute; inset: -5px; border: 1px solid color-mix(in srgb, var(--brand) 26%, transparent); border-radius: 1.15rem; animation: app-processing-ring 1.2s ease-out infinite; }
 .processing-bar { position: relative; overflow: hidden; background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 66%, #8ce0d2)); box-shadow: 0 0 12px color-mix(in srgb, var(--brand) 30%, transparent); }
-.processing-indeterminate::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .42), transparent); animation: app-proc-shimmer 1.15s linear infinite; }
+.processing-indeterminate::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .42), transparent); animation: app-proc-shimmer .8s linear infinite; }
 .sync-indicator-spin { animation: app-spin 1.2s linear infinite; }
 .sync-banner { overflow: hidden; border: 1px solid var(--line); }
 .sync-banner-offline { color: #713f12; background: rgb(255 251 235 / .97); border-color: rgb(217 119 6 / .3); }

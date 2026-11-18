@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
 import { pendienteDeFirma } from '../utils/fc10Firmas';
-import { Card, StatTile, KpiGrid } from '../components/ui';
+import { Card } from '../components/ui';
 import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 import useScopedPreference from '../hooks/useScopedPreference';
@@ -248,365 +248,221 @@ export default function DashboardView({
     : 0;
 
   return (
-    <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-5 pb-16 sm:space-y-6">
-
-      {/* 1. ENCABEZADO DE PÁGINA */}
-      <Card className="dashboard-welcome-card relative overflow-hidden !border-[#173f59] !bg-gradient-to-br !from-[#11344d] via-[#155369] !to-[#167b80] !text-white shadow-panel dark:!border-[#286278] dark:!from-[#10283c] dark:via-[#123d50] dark:!to-[#14545c] p-0">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.12] [background-image:radial-gradient(circle_at_85%_10%,white_0,transparent_34%),linear-gradient(120deg,transparent_55%,rgba(255,255,255,.22))]" />
-        <div className="relative grid gap-5 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(320px,.76fr)] lg:items-center lg:p-8">
-          <div className="flex min-w-0 items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/25 bg-white/12 text-lg font-black text-white shadow-sm backdrop-blur sm:h-14 sm:w-14 sm:text-xl">
-              {currentUser?.nombre ? currentUser.nombre.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[10px] font-extrabold uppercase tracking-[0.2em] text-teal-100 sm:text-[11px]">SIGEP UNP <span className="mx-1.5 text-white/50">/</span> {dependenciaActual}</p>
-              <h1 className="mt-1 truncate font-display text-2xl font-black tracking-tight text-white sm:text-3xl">{saludoBienvenida}, {currentUser?.nombre || 'Usuario'}</h1>
-              <p className="mt-2 max-w-xl text-xs leading-relaxed text-white/80 sm:text-sm">Resumen de inventario, asignaciones y tareas que requieren atención.</p>
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white backdrop-blur"><i className={`h-2 w-2 rounded-full ${isOnline ? 'bg-emerald-300' : 'bg-amber-300'}`} aria-hidden="true" />{isOnline ? 'Conexión activa' : 'Modo sin conexión'}</span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white backdrop-blur"><i className="fa-solid fa-boxes-stacked text-teal-100" aria-hidden="true" />{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes activos</span>
-                <div className="relative">
-                  <button
-                    ref={widgetButtonRef}
-                    onClick={() => setMenuWidgets(v => !v)}
-                    title="Personalizar panel" aria-label="Personalizar panel"
-                    className="flex h-9 items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-3 text-[11px] font-bold text-white shadow-sm backdrop-blur transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                  >
-                    <i className="fa-solid fa-sliders text-xs" aria-hidden="true"></i><span>Personalizar</span>
-                  </button>
-                  {menuWidgets && widgetMenuStyle && createPortal(
-                    <>
-                      <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)}></button>
-                      <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
-                        <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Widgets visibles</p>
-                        {WIDGETS_DASHBOARD.map(([k, label]) => (
-                          <button
-                            key={k} onClick={() => alternarWidget(k)}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-control text-xs font-semibold text-content-1 hover:bg-surface-3 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                          >
-                            <span className={'flex h-4 w-4 items-center justify-center rounded border' + (widgets[k] ? 'bg-brand border-brand text-content-inverse' : 'border-line-strong dark:border-zinc-600 text-transparent')}>
-                              <i className="fa-solid fa-check text-[9px]"></i>
-                            </span>
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </>, document.body
-                  )}
-                </div>
-              </div>
-            </div>
+    <div className="dashboard-stagger mx-auto w-full max-w-[1680px] space-y-6 pb-16">
+      <header className="flex flex-col justify-between gap-5 border-b border-line pb-5 sm:flex-row sm:items-end">
+        <div className="min-w-0">
+          <div className="mb-3 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.2em] text-brand-text">
+            <span className="h-1.5 w-7 rounded-full bg-brand" />
+            Centro de control patrimonial
           </div>
-
-          <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/20 bg-[#0c2c3d]/55 p-3 text-white shadow-card backdrop-blur-md sm:gap-3 sm:p-4">
-            <div className="col-span-2 flex items-center justify-between gap-3 border-b border-white/15 pb-3">
-              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-teal-100">Avance de asignación</p><p className="mt-1 text-[10px] text-white/70">Bienes con responsable en inventario</p></div>
-              <span className="text-2xl font-black tabular-nums text-white sm:text-3xl">{resumenActual?.asignados == null ? '—' : `${Math.round(porcentajeVinculadoFuncionario)}%`}</span>
-            </div>
-            <div className="rounded-xl border border-white/15 bg-white/10 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-white/65">Con responsable</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</p></div>
-            <div className="rounded-xl border border-white/15 bg-white/10 p-3"><p className="text-[9px] font-bold uppercase tracking-wide text-white/65">Pendientes</p><p className="mt-1 text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</p></div>
-            <div className="col-span-2 h-2 overflow-hidden rounded-full bg-black/20" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-gradient-to-r from-teal-200 to-emerald-300 transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, porcentajeVinculadoFuncionario))}%` }} /></div>
-            <p className="col-span-2 text-[9px] leading-relaxed text-white/65">{resumenActual?.asignados == null ? 'Conteo del inventario por responsable, independiente del FC-10.' : `${bienesVinculadosFuncionario.toLocaleString('es-PY')} de ${totalBienesDashboard.toLocaleString('es-PY')} bienes con funcionario responsable.`}</p>
-          </div>
+          <h1 className="truncate font-display text-3xl font-black tracking-tight text-content-1 sm:text-4xl">
+            {saludoBienvenida}, {currentUser?.nombre || 'Usuario'}
+          </h1>
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-content-2">
+            <span className="font-semibold text-content-1">{dependenciaActual}</span>
+            <span aria-hidden="true" className="text-content-3">·</span>
+            <span>Resumen operativo de bienes, asignaciones y tareas</span>
+          </p>
         </div>
-
-      </Card>
-
-      {/* 2. TARJETAS DE MÉTRICAS ACCIONABLES (simétricas, un solo sistema de tonos) */}
-      {widgets.metricas && (
-        <KpiGrid columnas={4} className="gap-3" data-tour="dash-stats">
-          {METRIC_CARDS.map((card) => (
-            <StatTile
-              key={card.id}
-              etiqueta={card.label}
-              valor={isLoading ? '…' : card.valor}
-              sub={card.sub}
-              icono={card.icono}
-              tono={card.tono}
-              animado={!isLoading && typeof card.valor === 'number'}
-              onClick={card.onClick}
-              progress={card.progress}
-              progressColor="brand"
-              className={`!bg-white dark:!bg-[#1e3544] border-t-4 ${card.tono === 'warn' ? 'border-t-amber-500' : card.tono === 'ok' ? 'border-t-emerald-500' : card.tono === 'info' ? 'border-t-sky-500' : 'border-t-[#1688a3]'}`}
-            />
-          ))}
-        </KpiGrid>
-      )}
-
-      {/* 2A. ACTAS POR FIRMAR */}
-      {actasPorFirmar.length > 0 && (
-        <div className="bg-surface-1 dark:!bg-[#172d3b] rounded-card border border-brand/20 dark:border-[#2c4958] shadow-sm overflow-hidden" data-tour="dash-firmas">
-          <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 bg-brand/5 border-b border-brand/15">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand text-content-inverse shadow-xs shadow-brand/20">
-                <i className="fa-solid fa-file-signature text-[10px]"></i>
-              </span>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-bold text-content-1 dark:text-white tracking-tight">
-                    Actas por firmar
-                  </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black tabular-nums bg-brand text-content-inverse">
-                    {actasPorFirmar.length}
-                  </span>
-                </div>
-                <p className="text-[10px] text-content-3 dark:text-content-3 mt-0.5">
-                  {actasPorFirmar.length === 1
-                    ? 'Una firma pendiente. Revisa el acta antes de registrarla.'
-                    : `${actasPorFirmar.length} actas con una firma pendiente. Revisa el documento en FC-10.`}
-                </p>
-              </div>
-            </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <span className="inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 text-xs font-bold text-content-2">
+            <i className={'h-2 w-2 rounded-full ' + (isOnline ? 'bg-emerald-500' : 'bg-amber-500')} aria-hidden="true" />
+            {isOnline ? 'Conexión activa' : 'Modo sin conexión'}
+          </span>
+          <div className="relative">
             <button
-              onClick={() => setActiveTab('fc10')}
-              className="inline-flex items-center gap-2 h-10 px-4 rounded-control bg-brand hover:bg-brand-hover text-content-inverse text-[11px] font-black shadow-xs shadow-brand/25 motion active:scale-95 cursor-pointer shrink-0"
+              ref={widgetButtonRef}
+              type="button"
+              onClick={() => setMenuWidgets(v => !v)}
+              title="Personalizar panel"
+              aria-label="Personalizar panel"
+              aria-expanded={menuWidgets}
+              className="flex h-10 items-center gap-2 rounded-xl border border-line bg-surface-1 px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
             >
-              Revisar actas
+              <i className="fa-solid fa-sliders" aria-hidden="true" />
+              <span>Personalizar</span>
             </button>
-          </div>
-
-          <div className="divide-y divide-line">
-            {actasPorFirmar.slice(0, 5).map(({ fc, bien, pendiente }) => (
-              <div key={fc.id} className="flex items-center gap-2.5 px-5 sm:px-6 py-3 hover:bg-brand/5 transition-colors">
-                <button
-                  onClick={() => setActiveTab('fc10')}
-                  className="flex items-center gap-2.5 min-w-0 flex-1 text-left cursor-pointer"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-text dark:text-brand">
-                    <i className="fa-solid fa-file-signature text-[9px]"></i>
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-bold text-content-1 dark:text-white truncate" title={bien?.descripcion || bien?.rotulo || 'Bien sin rótulo'}>
-                      {bien?.rotulo || 'Bien sin rótulo'}
-                    </span>
-                    <span className="block text-[10px] text-content-3 dark:text-content-3 truncate">
-                      {fc.funcionarioNombre || 'Sin responsable'} · Falta la firma {pendiente.orden}: {pendiente.puesto}
-                    </span>
-                  </span>
-                </button>
-              </div>
-            ))}
-            {actasPorFirmar.length > 5 && (
-              <button
-                onClick={() => setActiveTab('fc10')}
-                className="w-full px-5 sm:px-6 py-2.5 text-left text-[11px] font-bold text-brand-text dark:text-brand hover:bg-brand/5 transition-colors cursor-pointer"
-              >
-                Ver las {actasPorFirmar.length} actas en FC-10
-              </button>
+            {menuWidgets && widgetMenuStyle && createPortal(
+              <>
+                <button type="button" aria-label="Cerrar personalización" className="fixed inset-0 z-[100] cursor-default" onClick={() => setMenuWidgets(false)} />
+                <div style={widgetMenuStyle} role="dialog" aria-label="Widgets visibles" className="overflow-y-auto rounded-card border border-line bg-surface-1 p-1.5 text-content-1 shadow-pop animate-pop">
+                  <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-content-3">Secciones visibles</p>
+                  {WIDGETS_DASHBOARD.map(([key, label]) => (
+                    <button key={key} type="button" onClick={() => alternarWidget(key)} className="flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-left text-xs font-semibold text-content-1 transition-colors hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                      <span className={'flex h-4 w-4 items-center justify-center rounded border ' + (widgets[key] ? 'border-brand bg-brand text-white' : 'border-line-strong text-transparent')}>
+                        <i className="fa-solid fa-check text-[9px]" aria-hidden="true" />
+                      </span>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </>, document.body
             )}
           </div>
         </div>
-      )}
+      </header>
 
-      {/* 2B. BANDEJA DE PENDIENTES */}
-      {widgets.pendientes && (
-      <div className="bg-surface-1 dark:!bg-[#172d3b] rounded-panel border border-line dark:border-[#2c4958] shadow-card p-4 sm:p-5" data-tour="dash-pendientes" aria-label="Mi bandeja de trabajo">
-          <div className="flex items-center justify-between gap-3 mb-4">
-              <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-                  <i className="fa-solid fa-list-check text-content-3" aria-hidden="true"></i> Mi bandeja de trabajo
-              </h2>
-              {(actasPorFirmar.length > 0 || pendientes.some(item => item.count > 0)) && <span className="text-[11px] font-semibold text-content-3">
-                {actasPorFirmar.length} firmas · {pendientes.reduce((total, item) => total + Number(item.count || 0), 0).toLocaleString('es-PY')} acciones de inventario
-              </span>}
-              {pendientes.every(p => p.count === 0) && actasPorFirmar.length === 0 && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-ok dark:text-emerald-400">
-                      <i className="fa-solid fa-circle-check"></i> Todo al día
-                  </span>
-              )}
+      {widgets.metricas && (
+        <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Indicadores del inventario" data-tour="dash-stats">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3.5">
+            <div>
+              <h2 className="text-xs font-extrabold uppercase tracking-[0.14em] text-content-1">Indicadores del inventario</h2>
+              <p className="mt-1 text-[11px] text-content-3">Selecciona un indicador para abrir el detalle</p>
+            </div>
+            <span className="text-[10px] font-semibold text-content-3">{Number(stats?.totalItems || 0).toLocaleString('es-PY')} bienes en {dependenciaActual}</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5">
-              {pendientes.map(p => (
-                  <button
-                      key={p.id}
-                      onClick={() => { irInventario(() => setFiltroPendiente(p.id)); }}
-                      title={`Atender: ${p.label}`}
-                      className="group flex items-center gap-3 rounded-card border border-line bg-surface-1 dark:!border-[#345362] dark:!bg-[#203a49] hover:border-line-strong hover:bg-surface-2 dark:hover:!bg-[#274657] px-3.5 py-3 text-left motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand outline-none"
-                  >
-                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-control border` + p.box}>
-                          <i className={`fa-solid ${p.icon} text-xs`}></i>
-                      </span>
-                      <span className="min-w-0 flex-1">
-                          <span className="block text-lg font-black tabular-nums text-content-1 leading-tight"><AnimatedNumber value={p.count} /></span>
-                          <span className="block text-[11px] font-semibold text-content-3 dark:text-content-3 truncate">{p.label}</span>
-                      </span>
-                      <i className="fa-solid fa-chevron-right text-[10px] text-content-3 dark:text-content-2 group-hover:text-content-3 group-hover:translate-x-0.5 motion shrink-0"></i>
-                  </button>
-              ))}
-          </div>
-      </div>
-      )}
-
-
-      {/* 2b. TILES POR DEPENDENCIA */}
-      {widgets.metricas && tilesPorDependencia.length > 0 && (
-        <details open className="group overflow-hidden rounded-[26px] border border-line bg-surface-1 shadow-card dark:!border-[#2c4958] dark:!bg-[#172d3b]">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-            <span className="flex items-center gap-2.5"><i className="fa-solid fa-building-columns text-brand-text"></i> Desglose por dependencia</span>
-            <span className="flex items-center gap-2 text-[11px] font-semibold text-content-3"><span>{tilesPorDependencia.length} áreas</span><i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180"></i></span>
-          </summary>
-          <div className="grid grid-cols-1 gap-3 border-t border-line bg-surface-2/40 p-4 dark:bg-[#1b3342] sm:grid-cols-2 xl:grid-cols-3 sm:p-5">
-            {tilesPorDependencia.map((t) => (
-              <button key={t.dep} type="button" disabled={!requestDependenciaChange || t.dep === dependenciaActual} onClick={() => requestDependenciaChange?.(t.dep)} className="group/dep min-w-0 rounded-2xl border border-line bg-surface-1 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-default disabled:hover:translate-y-0 disabled:hover:border-line disabled:hover:shadow-sm dark:border-[#345362] dark:bg-[#203a49]">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line bg-surface-2 p-1.5">{t.logo ? <img src={t.logo} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" />}</span>
-                  <span className="min-w-0 flex-1"><span className="block truncate text-xs font-extrabold text-content-1">{t.dep}</span><span className="mt-0.5 block text-[10px] text-content-3">{t.total.toLocaleString('es-PY')} bienes en inventario</span></span>
-                  {t.dep !== dependenciaActual && requestDependenciaChange && <i className="fa-solid fa-arrow-up-right-from-square text-[10px] text-content-3 opacity-0 transition group-hover/dep:opacity-100" aria-hidden="true" />}
-                </div>
-                <div className="mt-4 flex items-end justify-between gap-2"><span className="text-[10px] font-bold uppercase tracking-wide text-content-3">Responsable en Inventario</span><span className="text-sm font-black tabular-nums text-content-1">{t.asignados == null ? '—' : `${t.asignados.toLocaleString('es-PY')} / ${t.total.toLocaleString('es-PY')}`}</span></div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-3" role={t.asignados == null ? undefined : 'progressbar'} aria-label={t.asignados == null ? undefined : `Bienes con responsable en ${t.dep}`} aria-valuemin={t.asignados == null ? undefined : 0} aria-valuemax={t.asignados == null ? undefined : 100} aria-valuenow={t.pctAsignados == null ? undefined : Math.round(t.pctAsignados)}>
-                  {t.pctAsignados != null && <span className="block h-full rounded-full bg-gradient-to-r from-brand to-emerald-500 transition-[width] duration-700" style={{ width: `${Math.min(100, Math.max(0, t.pctAsignados))}%` }} />}
-                </div>
-                <div className="mt-2 flex items-center justify-between text-[10px]"><span className="font-bold text-brand-text">{t.pctAsignados == null ? 'Avance no disponible' : `${Math.round(t.pctAsignados)}% con responsable`}</span><span className="text-content-3">{t.buenos.toLocaleString('es-PY')} en buen estado</span></div>
+          <div className="grid grid-cols-2 divide-x divide-y divide-line md:grid-cols-4 md:divide-y-0">
+            {METRIC_CARDS.map((card, index) => (
+              <button key={card.id} type="button" onClick={card.onClick} className="group min-w-0 px-4 py-4 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand sm:px-5">
+                <span className="flex items-center justify-between gap-2">
+                  <span className="truncate text-[10px] font-extrabold uppercase tracking-wide text-content-3">{card.label}</span>
+                  <i className={'fa-solid ' + card.icono + ' text-xs ' + (card.tono === 'warn' ? 'text-amber-600 dark:text-amber-400' : 'text-brand-text')} aria-hidden="true" />
+                </span>
+                <span className="mt-2 block text-2xl font-black leading-none tabular-nums text-content-1 sm:text-3xl">{isLoading ? '…' : <AnimatedNumber value={Number(card.valor) || 0} />}</span>
+                <span className="mt-2 block truncate text-[10px] font-medium text-content-3">{card.sub}</span>
+                {card.progress != null && <span className="mt-3 block h-1 overflow-hidden rounded-full bg-surface-3"><span className="block h-full rounded-full bg-brand transition-[width] duration-700" style={{ width: Number(card.progress) + '%' }} /></span>}
+                <span className="sr-only">{index === 0 ? 'Ver todos los bienes' : 'Abrir filtro de ' + card.label}</span>
               </button>
             ))}
+          </div>
+        </section>
+      )}
+
+      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,.8fr)]">
+        <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Trabajo pendiente" data-tour="dash-pendientes">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+            <div>
+              <p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-brand-text">Bandeja de trabajo</p>
+              <h2 className="mt-1 text-lg font-black tracking-tight text-content-1">Lo que requiere atención</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              {actasPorFirmar.length > 0 && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-extrabold text-amber-800 dark:bg-amber-400/10 dark:text-amber-300">{actasPorFirmar.length} firmas</span>}
+              <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[10px] font-bold text-content-2">{pendientes.reduce((total, item) => total + Number(item.count || 0), 0).toLocaleString('es-PY')} tareas</span>
+            </div>
+          </div>
+          {actasPorFirmar.length > 0 && (
+            <div className="border-b border-line">
+              <div className="flex items-center justify-between gap-3 bg-amber-50/70 px-5 py-3 dark:bg-amber-400/5">
+                <span className="flex items-center gap-2 text-xs font-extrabold text-content-1"><i className="fa-solid fa-file-signature text-amber-600 dark:text-amber-400" aria-hidden="true" /> Actas FC-10 por firmar</span>
+                <button type="button" onClick={() => setActiveTab('fc10')} className="rounded-lg px-2.5 py-1.5 text-[10px] font-extrabold text-brand-text hover:bg-brand-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Abrir FC-10 <i className="fa-solid fa-arrow-right ml-1" aria-hidden="true" /></button>
+              </div>
+              <ul className="divide-y divide-line">
+                {actasPorFirmar.slice(0, 4).map(({ fc, bien, pendiente }) => (
+                  <li key={fc.id}>
+                    <button type="button" onClick={() => setActiveTab('fc10')} className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300"><i className="fa-solid fa-signature text-xs" aria-hidden="true" /></span>
+                      <span className="min-w-0 flex-1"><span className="block truncate text-xs font-bold text-content-1">{bien?.rotulo || bien?.descripcion || 'Bien sin rótulo'}</span><span className="mt-1 block truncate text-[10px] text-content-3">{fc.funcionarioNombre || 'Sin responsable'} · Falta firma {pendiente.orden}: {pendiente.puesto}</span></span>
+                      <i className="fa-solid fa-chevron-right text-[10px] text-content-3" aria-hidden="true" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {actasPorFirmar.length > 4 && <button type="button" onClick={() => setActiveTab('fc10')} className="w-full border-t border-line px-5 py-2.5 text-left text-[10px] font-bold text-brand-text hover:bg-surface-2">Ver las {actasPorFirmar.length} actas pendientes</button>}
+            </div>
+          )}
+          {widgets.pendientes && (
+            <div className="divide-y divide-line">
+              {pendientes.map(p => (
+                <button key={p.id} type="button" onClick={() => irInventario(() => setFiltroPendiente(p.id))} title={'Atender: ' + p.label} className="group flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand">
+                  <span className={'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border ' + p.box}><i className={'fa-solid ' + p.icon + ' text-xs'} aria-hidden="true" /></span>
+                  <span className="min-w-0 flex-1"><span className="block text-sm font-black tabular-nums text-content-1"><AnimatedNumber value={Number(p.count) || 0} /></span><span className="block truncate text-[11px] font-semibold text-content-3">{p.label}</span></span>
+                  {p.count > 0 ? <span className="rounded-full bg-surface-2 px-2 py-1 text-[10px] font-extrabold tabular-nums text-content-2">Revisar</span> : <i className="fa-solid fa-check text-xs text-emerald-600 dark:text-emerald-400" aria-label="Completo" />}
+                  <i className="fa-solid fa-arrow-right text-[10px] text-content-3 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </button>
+              ))}
+              {pendientes.length === 0 && actasPorFirmar.length === 0 && <p className="px-5 py-8 text-center text-xs text-content-3">No hay tareas pendientes para esta dependencia.</p>}
+            </div>
+          )}
+          {!widgets.pendientes && actasPorFirmar.length === 0 && <div className="px-5 py-8 text-center text-xs text-content-3">La bandeja está oculta. Actívala desde “Personalizar”.</div>}
+        </section>
+
+        <aside className="space-y-4">
+          <section className="rounded-panel border border-line bg-[#102d40] p-5 text-white shadow-card dark:bg-[#0f2635]" aria-label="Avance de asignación">
+            <div className="flex items-start justify-between gap-4">
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-teal-200">Responsables registrados</p><h2 className="mt-1 text-sm font-bold text-white">Avance de asignación</h2></div>
+              <span className="font-display text-4xl font-black leading-none tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.round(porcentajeVinculadoFuncionario) + '%'}</span>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3"><span className="block text-[9px] font-bold uppercase tracking-wide text-white/60">Con responsable</span><span className="mt-1 block text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</span></div>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3"><span className="block text-[9px] font-bold uppercase tracking-wide text-white/60">Sin responsable</span><span className="mt-1 block text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</span></div>
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/15" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300 transition-[width] duration-700" style={{ width: Math.min(100, Math.max(0, porcentajeVinculadoFuncionario)) + '%' }} /></div>
+            <p className="mt-3 text-[10px] leading-relaxed text-white/60">Según el responsable guardado en inventario; independiente de las firmas FC-10.</p>
+          </section>
+
+          {widgets.metricas && tilesPorDependencia.length > 0 && (
+            <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 text-xs font-extrabold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                <span className="flex items-center gap-2"><i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" /> Dependencias</span>
+                <span className="flex items-center gap-2 text-[10px] font-semibold text-content-3">{tilesPorDependencia.length} áreas <i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180" aria-hidden="true" /></span>
+              </summary>
+              <div className="max-h-72 divide-y divide-line overflow-y-auto border-t border-line">
+                {tilesPorDependencia.map(t => (
+                  <button key={t.dep} type="button" disabled={!requestDependenciaChange || t.dep === dependenciaActual} onClick={() => requestDependenciaChange?.(t.dep)} className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 disabled:cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-2 p-1.5">{t.logo ? <img src={t.logo} alt="" loading="lazy" className="max-h-full max-w-full object-contain" /> : <i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" />}</span>
+                    <span className="min-w-0 flex-1"><span className="block truncate text-[11px] font-bold text-content-1">{t.dep}</span><span className="mt-0.5 block text-[10px] text-content-3">{t.total.toLocaleString('es-PY')} bienes · {t.pctAsignados == null ? 'avance —' : Math.round(t.pctAsignados) + '% con responsable'}</span></span>
+                    {t.dep === dependenciaActual ? <span className="rounded-full bg-brand-soft px-2 py-1 text-[9px] font-extrabold text-brand-text">Actual</span> : <i className="fa-solid fa-arrow-up-right-from-square text-[10px] text-content-3" aria-hidden="true" />}
+                  </button>
+                ))}
+              </div>
+            </details>
+          )}
+        </aside>
+      </div>
+
+      {widgets.accesos && (
+        <section className="rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Acciones rápidas">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3.5">
+            <div><h2 className="text-xs font-extrabold uppercase tracking-[0.14em] text-content-1">Acciones rápidas</h2><p className="mt-1 text-[11px] text-content-3">Tareas frecuentes de inventario</p></div>
+            <div className="relative">
+              <button type="button" aria-expanded={menuAccesos} onClick={() => setMenuAccesos(v => !v)} className="flex h-9 items-center gap-2 rounded-lg px-3 text-[11px] font-bold text-content-2 transition hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"><i className="fa-solid fa-sliders" aria-hidden="true" />Personalizar acciones</button>
+              {menuAccesos && <div className="absolute right-0 z-30 mt-2 w-56 rounded-card border border-line bg-surface-1 p-2 shadow-pop" role="group" aria-label="Personalizar acciones rápidas">
+                {ACCESOS.map(([id, label]) => <label key={id} className="flex cursor-pointer items-center gap-2 rounded-control px-2.5 py-2 text-xs font-medium text-content-1 hover:bg-surface-2"><input type="checkbox" checked={accesosVisibles.includes(id)} onChange={() => alternarAcceso(id)} className="h-4 w-4 accent-[var(--brand-primary)]" />{label}</label>)}
+                <button type="button" onClick={() => setMenuAccesos(false)} className="mt-1 w-full rounded-control px-2 py-1.5 text-right text-[11px] font-bold text-brand-text hover:bg-surface-2">Listo</button>
+              </div>}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-3 lg:grid-cols-5 lg:divide-y-0">
+            {accesosVisibles.includes('nuevo') && <button type="button" onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} className="group flex min-h-16 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-white"><i className="fa-solid fa-plus" aria-hidden="true" /></span><span><span className="block text-xs font-extrabold text-content-1">Nuevo registro</span><span className="mt-1 block text-[10px] text-content-3">Agregar un bien</span></span></button>}
+            {accesosVisibles.includes('importar') && <button type="button" onClick={() => fileInputRef.current?.click()} className="group flex min-h-16 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300"><i className="fa-solid fa-file-import" aria-hidden="true" /></span><span><span className="block text-xs font-extrabold text-content-1">Importar CSV</span><span className="mt-1 block text-[10px] text-content-3">Cargar inventario</span></span></button>}
+            {accesosVisibles.includes('exportar') && <button type="button" onClick={handleExportInventarioCSV} className="group flex min-h-16 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-700 dark:bg-sky-400/10 dark:text-sky-300"><i className="fa-solid fa-file-export" aria-hidden="true" /></span><span><span className="block text-xs font-extrabold text-content-1">Exportar CSV</span><span className="mt-1 block text-[10px] text-content-3">Descargar datos</span></span></button>}
+            {accesosVisibles.includes('qr') && <button type="button" onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} className="group flex min-h-16 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-400/10 dark:text-violet-300"><i className="fa-solid fa-qrcode" aria-hidden="true" /></span><span><span className="block text-xs font-extrabold text-content-1">Lote de QRs</span><span className="mt-1 block text-[10px] text-content-3">Etiquetas masivas</span></span></button>}
+            {accesosVisibles.includes('fc03') && <button type="button" onClick={openFC03Modal} className="group flex min-h-16 items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300"><i className="fa-solid fa-print" aria-hidden="true" /></span><span><span className="block text-xs font-extrabold text-content-1">Reporte FC-03</span><span className="mt-1 block text-[10px] text-content-3">Inventario oficial</span></span></button>}
+            {accesosVisibles.length === 0 && <p className="col-span-full px-4 py-6 text-center text-xs text-content-3">No hay acciones visibles. Usa «Personalizar acciones» para agregar alguna.</p>}
+          </div>
+        </section>
+      )}
+
+      {widgets.tendencias && (
+        <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-extrabold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+            <span><span className="block text-[10px] uppercase tracking-[0.15em] text-brand-text">Evolución</span><span className="mt-1 block">Cobertura y actividad</span></span>
+            <i className="fa-solid fa-chevron-down text-content-3 transition-transform group-open:rotate-180" aria-hidden="true" />
+          </summary>
+          <div className="grid gap-5 border-t border-line bg-surface-2/40 p-4 sm:p-5 lg:grid-cols-2">
+            <section className="rounded-xl border border-line bg-surface-1 p-5">
+              <h2 className="text-xs font-extrabold uppercase tracking-wide text-content-1">Cobertura</h2>
+              <div className="mt-5 space-y-5">
+                {[{ label: 'FC-10', count: stats.withFc10, pct: stats.percFC10, icon: 'fa-file-signature', color: 'bg-emerald-500' }, { label: 'Etiquetado QR', count: stats.withQR, pct: stats.percQR, icon: 'fa-qrcode', color: 'bg-brand' }].map(row => (
+                  <div key={row.label}>
+                    <div className="mb-2 flex items-end justify-between gap-3"><span><span className="flex items-center gap-2 text-xs font-bold text-content-1"><i className={'fa-solid ' + row.icon + ' text-content-3'} aria-hidden="true" />{row.label}</span><span className="mt-1 block text-[10px] text-content-3">{Number(row.count || 0).toLocaleString('es-PY')} de {Number(stats.totalItems || 0).toLocaleString('es-PY')} bienes</span></span><span className="text-lg font-black tabular-nums text-content-1">{Number(row.pct || 0).toFixed(1)}%</span></div>
+                    <div className="h-2 overflow-hidden rounded-full bg-surface-3"><span className={'block h-full rounded-full transition-[width] duration-700 ' + row.color} style={{ width: Math.max(1.5, Number(row.pct || 0)) + '%' }} /></div>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <section className="rounded-xl border border-line bg-surface-1 p-5">
+              <div className="flex items-center justify-between"><h2 className="text-xs font-extrabold uppercase tracking-wide text-content-1">Actividad anual</h2><span className="text-[10px] font-semibold text-content-3">Adquisiciones y FC-10</span></div>
+              <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                <div><h3 className="mb-3 text-[10px] font-bold uppercase tracking-wide text-content-3">Adquisiciones</h3><div className="space-y-3">{timeStats.adqByYear.length === 0 ? <p className="py-3 text-center text-[11px] text-content-3">Sin adquisiciones.</p> : timeStats.adqByYear.map((item, index) => <SimpleBar key={item.year} label={item.year} value={item.count} max={timeStats.adqMax} colorClass={index === 0 ? 'bg-brand' : 'bg-slate-400'} bgClass="bg-surface-3" title={'Filtrar inventario por año ' + item.year} onClick={() => irInventario(() => setFiltroAnio(item.year))} />)}</div></div>
+                <div><h3 className="mb-3 text-[10px] font-bold uppercase tracking-wide text-content-3">Asignaciones FC-10</h3><div className="space-y-5"><SimpleBar label={'Actual (' + timeStats.currentMonthName + ')'} value={timeStats.asigCurrentMonth} max={timeStats.asigMax} colorClass="bg-emerald-500" bgClass="bg-surface-3" title="Ver asignaciones de este mes" onClick={() => { setFc10Year(timeStats.asigCurrent.year); setFc10Month(timeStats.asigCurrent.month); setActiveTab('fc10'); }} /><SimpleBar label={'Anterior (' + timeStats.prevMonthName + ')'} value={timeStats.asigPreviousMonth} max={timeStats.asigMax} colorClass="bg-slate-400" bgClass="bg-surface-3" title="Ver asignaciones del mes anterior" onClick={() => { setFc10Year(timeStats.asigPrev.year); setFc10Month(timeStats.asigPrev.month); setActiveTab('fc10'); }} /></div></div>
+              </div>
+            </section>
           </div>
         </details>
       )}
 
-      {/* 3. ACCESOS DIRECTOS */}
-      {widgets.accesos && (
-      <div className="rounded-panel border border-line/70 bg-surface-1 p-5 shadow-sm dark:border-[#2c4958] dark:!bg-[#172d3b] sm:p-6">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-bolt" aria-hidden="true" /></span>
-              <div><p className="text-sm font-black text-content-1 dark:text-white">Accesos directos</p><p className="mt-0.5 text-[11px] text-content-3">Atajos para tareas frecuentes</p></div>
-            </div>
-            <div className="relative">
-              <button type="button" aria-expanded={menuAccesos} onClick={() => setMenuAccesos((v) => !v)} className="flex h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-bold text-content-2 transition hover:bg-surface-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-                <i className="fa-solid fa-sliders" aria-hidden="true" /><span className="hidden sm:inline">Personalizar</span>
-              </button>
-              {menuAccesos && <div className="absolute right-0 z-30 mt-2 w-56 rounded-card border border-line bg-surface-1 p-2 shadow-pop" role="group" aria-label="Personalizar accesos directos">
-                {ACCESOS.map(([id, label]) => <label key={id} className="flex cursor-pointer items-center gap-2 rounded-control px-2.5 py-2 text-label font-medium text-content-1 hover:bg-surface-2">
-                  <input type="checkbox" checked={accesosVisibles.includes(id)} onChange={() => alternarAcceso(id)} className="h-4 w-4 accent-[var(--brand-primary)]" />{label}
-                </label>)}
-                <button type="button" onClick={() => setMenuAccesos(false)} className="mt-1 w-full rounded-control px-2 py-1.5 text-right text-label font-bold text-brand-text hover:bg-surface-2">Listo</button>
-              </div>}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 items-stretch gap-2.5 sm:grid-cols-3 xl:grid-cols-5">
-              {accesosVisibles.includes('nuevo') && (
-<button onClick={() => { setBienEditing(null); setIsBienModalOpen(true); }} title="Añadir nuevo registro" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-brand/20 bg-brand-soft px-3 py-3 text-left font-bold text-brand-text transition hover:border-brand/40 hover:bg-brand/10 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-sm"><i className="fa-solid fa-plus text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Nuevo registro</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Agregar un bien</span></span>
-              </button>
-              )}
-              {accesosVisibles.includes('importar') && <button onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ok-soft text-ok dark:text-emerald-400"><i className="fa-solid fa-file-import text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Importar CSV</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Cargar inventario</span></span>
-              </button>}
-              {accesosVisibles.includes('exportar') && <button onClick={handleExportInventarioCSV} title="Exportar archivo CSV" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-info-soft text-info"><i className="fa-solid fa-file-export text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Exportar CSV</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Descargar datos</span></span>
-              </button>}
-              {accesosVisibles.includes('qr') && <button onClick={() => { setIsBulkQR(true); setQrTargetBien(null); setIsQRModalOpen(true); }} title="Generar lote masivo de QRs" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400"><i className="fa-solid fa-qrcode text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Lote de QRs</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Etiquetas masivas</span></span>
-              </button>}
-              {accesosVisibles.includes('fc03') && <button onClick={openFC03Modal} title="Generar reporte FC-03" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface-1 px-3 py-3 text-left font-semibold text-content-2 transition hover:border-line-strong hover:bg-surface-2 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:px-4 dark:bg-surface-1/5 dark:hover:bg-surface-1/10">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-warn-soft text-warn dark:text-amber-400"><i className="fa-solid fa-print text-sm" aria-hidden="true" /></span><span className="min-w-0"><span className="block truncate text-xs sm:text-[13px]">Reporte FC-03</span><span className="mt-0.5 hidden text-[10px] font-medium text-content-3 sm:block">Inventario oficial</span></span>
-              </button>}
-              {accesosVisibles.length === 0 && <p className="px-3 py-2 text-label text-content-3">No hay accesos visibles. Usa “Personalizar” para agregar alguno.</p>}
-          </div>
-      </div>
-      )}
-
-      {/* 4. GRÁFICOS Y TENDENCIAS */}
-      {widgets.tendencias && (
-      <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card dark:border-[#2c4958] dark:!bg-[#172d3b]">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-bold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-          <span className="flex items-center gap-2.5"><i className="fa-solid fa-chart-line text-brand-text"></i> Tendencias y cobertura</span>
-          <i className="fa-solid fa-chevron-down text-content-3 transition-transform group-open:rotate-180"></i>
-        </summary>
-        <div className="border-t border-line bg-surface-2/40 p-4 dark:bg-[#1b3342] sm:p-5">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Estado de Regularización */}
-        <div className="bg-surface-1 dark:bg-[#203a49] rounded-panel border border-line/70 dark:border-[#345362] shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-               <i className="fa-solid fa-chart-pie text-ok"></i> Metas de Cobertura
-            </h2>
-            <span className="text-[10px] font-bold text-content-3 uppercase tracking-wider bg-surface-3 dark:bg-surface-1/5 px-2.5 py-1 rounded-lg border border-line dark:border-white/5">Metas</span>
-          </div>
-
-          <div className="flex flex-1 flex-col gap-6 justify-center">
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <p className="text-xs font-bold text-content-1 dark:text-white uppercase tracking-wider">Cobertura FC-10</p>
-                  <p className="text-[11px] text-content-3 font-medium mt-1">{stats.withFc10} de {stats.totalItems} activos asignados</p>
-                </div>
-                <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percFC10.toFixed(1)}%</span>
-              </div>
-              <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-emerald-500/40" style={{ width: `${Math.max(1.5, stats.percFC10)}%` }}></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-end mb-3">
-                <div>
-                  <p className="text-xs font-bold text-content-1 dark:text-white uppercase tracking-wider">Etiquetado QR</p>
-                  <p className="text-[11px] text-content-3 font-medium mt-1">{stats.withQR} de {stats.totalItems} activos con código</p>
-                </div>
-                <span className="text-2xl font-black text-content-1 dark:text-white tracking-tight">{stats.percQR.toFixed(1)}%</span>
-              </div>
-              <div className="h-2 w-full bg-surface-3/50 dark:bg-surface-1/5 rounded-full overflow-hidden">
-                <div className="h-full bg-brand rounded-full motion duration-[var(--dur-slow)] shadow-sm shadow-brand/40" style={{ width: `${Math.max(1.5, stats.percQR)}%` }}></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tendencias Operativas */}
-        <div className="bg-surface-1 dark:bg-[#203a49] rounded-panel border border-line/70 dark:border-[#345362] shadow-sm flex flex-col overflow-hidden p-6 sm:p-7">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-sm font-bold text-content-1 dark:text-white flex items-center gap-2">
-               <i className="fa-solid fa-chart-line text-brand-text"></i> Gestión Anual
-            </h2>
-          </div>
-          <div className="flex flex-1 flex-col sm:flex-row gap-8">
-
-            <div className="flex-1 flex flex-col border-b sm:border-b-0 sm:border-r border-line/60 dark:border-white/10 pb-6 sm:pb-0 sm:pr-6">
-              <h3 className="text-[10px] font-bold text-content-3 uppercase tracking-widest mb-6">Adquisiciones Anuales</h3>
-              <div className="flex-1 flex flex-col justify-center gap-5">
-                {timeStats.adqByYear.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center text-center py-4 opacity-50">
-                        <p className="text-xs font-medium text-content-3">Sin adquisiciones.</p>
-                    </div>
-                ) : timeStats.adqByYear.map((item, idx) => {
-                    const colors = ["bg-zinc-900 dark:bg-surface-1", "bg-zinc-600 dark:bg-zinc-400", "bg-zinc-400 dark:bg-zinc-600", "bg-zinc-300 dark:bg-zinc-700"];
-                    return <SimpleBar key={item.year} label={item.year} value={item.count} max={timeStats.adqMax} colorClass={colors[idx] || "bg-zinc-400"} bgClass="bg-surface-3 dark:bg-surface-1/5" title={`Filtrar inventario por año ${item.year}`} onClick={() => { irInventario(() => setFiltroAnio(item.year)); }} />;
-                })}
-              </div>
-            </div>
-
-            <div className="flex-1 flex flex-col">
-              <h3 className="text-[10px] font-bold text-content-3 uppercase tracking-widest mb-6">Asignaciones (FC-10)</h3>
-              <div className="flex-1 flex flex-col justify-center gap-7">
-                <SimpleBar label={`Actual (${timeStats.currentMonthName})`} value={timeStats.asigCurrentMonth} max={timeStats.asigMax} colorClass="bg-emerald-500" bgClass="bg-surface-3 dark:bg-surface-1/5" title="Ver asignaciones de este mes" onClick={() => { setFc10Year(timeStats.asigCurrent.year); setFc10Month(timeStats.asigCurrent.month); setActiveTab('fc10'); }} />
-                <SimpleBar label={`Anterior (${timeStats.prevMonthName})`} value={timeStats.asigPreviousMonth} max={timeStats.asigMax} colorClass="bg-zinc-300 dark:bg-zinc-600" bgClass="bg-surface-3 dark:bg-surface-1/5" title="Ver asignaciones del mes anterior" onClick={() => { setFc10Year(timeStats.asigPrev.year); setFc10Month(timeStats.asigPrev.month); setActiveTab('fc10'); }} />
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-        </div>
-      </details>
-      )}
-
-      {widgets.agenda && (
-        <AgendaPatrimonial
-          bienes={bienes}
-          fc10List={fc10List}
-          dependenciaActual={dependenciaActual}
-          onAbrirBien={(evento) => irInventario(() => setFiltroAnio(evento.anioAdquisicion || evento.fecha.slice(0, 4)))}
-          onAbrirFC10={(evento) => {
-            setFc10Year(evento.fecha.slice(0, 4));
-            setFc10Month(evento.fecha.slice(5, 7));
-            setActiveTab('fc10');
-          }}
-        />
-      )}
-
+      {widgets.agenda && <AgendaPatrimonial bienes={bienes} fc10List={fc10List} dependenciaActual={dependenciaActual} onAbrirBien={evento => irInventario(() => setFiltroAnio(evento.anioAdquisicion || evento.fecha.slice(0, 4)))} onAbrirFC10={evento => { setFc10Year(evento.fecha.slice(0, 4)); setFc10Month(evento.fecha.slice(5, 7)); setActiveTab('fc10'); }} />}
     </div>
   );
 }

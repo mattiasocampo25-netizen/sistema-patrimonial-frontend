@@ -130,7 +130,6 @@ export default function AppSidebar({
   isSidebarOpen,
   setIsSidebarOpen,
   compacta = false,
-  darkMode = false,
   onToggleCompacta,
   appLogo,
   activeTab,
@@ -257,7 +256,7 @@ export default function AppSidebar({
         <div className={`relative flex shrink-0 items-center border-b border-sidebar-line ${compacta ? 'min-h-[76px] px-5 py-4 lg:min-h-[100px] lg:flex-col lg:justify-center lg:gap-2 lg:px-2 lg:py-2' : 'min-h-[76px] px-5 py-4'}`}>
           {appLogo ? (
             <div className={`flex min-w-0 items-center gap-3 ${compacta ? 'pr-8 lg:justify-center lg:pr-0' : 'pr-8'}`}>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-1/10 shadow-card border border-white/10 overflow-hidden p-1.5">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control bg-surface-2 shadow-card border border-sidebar-line overflow-hidden p-1.5">
                 <img src={appLogo} alt="Logo Institucional" className="w-full h-full object-contain" />
               </div>
               <div className={`min-w-0 flex-1 animate-fade-in ${compacta ? 'lg:hidden' : ''}`}>

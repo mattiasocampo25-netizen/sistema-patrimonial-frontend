@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PENDIENTE_LABELS, ESTADOS_CONSERVACION } from '../constants/appConstants';
 import FiltroCombo from '../components/FiltroCombo';
 import CompararBienesModal from '../components/CompararBienesModal';
@@ -164,6 +164,8 @@ export default function InventarioView({
   // Densidad, columnas y búsquedas recientes por persona en equipos compartidos.
   const [densidad, setDensidad] = useScopedPreference('inv_densidad', username, 'comoda', normalizarDensidad);
   const compacto = densidad === 'compacta';
+  const [buscadorRapidoVisible, setBuscadorRapidoVisible] = useState(false);
+  const [buscadorRapidoFijado, setBuscadorRapidoFijado] = useState(false);
   const [rotuloCopiado, setRotuloCopiado] = useState('');
   const [observacionAbierta, setObservacionAbierta] = useState(null);
   const cambiarDensidad = () => {
@@ -217,6 +219,14 @@ export default function InventarioView({
   const [mostrarAsignacionMasiva, setMostrarAsignacionMasiva] = useState(false);
   const [asignacionMasiva, setAsignacionMasiva] = useState({ funcionario: '__MANTENER__', ubicacion: '__MANTENER__' });
   const { t } = useIdioma();
+  useEffect(() => {
+    const contenedor = document.getElementById('contenido');
+    if (!contenedor) return undefined;
+    const actualizarVisibilidad = () => setBuscadorRapidoVisible(contenedor.scrollTop > 360);
+    actualizarVisibilidad();
+    contenedor.addEventListener('scroll', actualizarVisibilidad, { passive: true });
+    return () => contenedor.removeEventListener('scroll', actualizarVisibilidad);
+  }, []);
   const bienesSeleccionados = itemsPaginados.filter(i => seleccionados.includes(i.id));
   const selFueraPagina = seleccionados.length - bienesSeleccionados.length;
   // Chips de filtros activos con limpieza individual
@@ -1154,6 +1164,28 @@ export default function InventarioView({
             </footer>
           </section>
         </Dialogo>
+      )}
+
+      {(buscadorRapidoVisible || buscadorRapidoFijado) && (
+        <div className="inventory-floating-search fixed bottom-4 right-4 z-[110] w-[min(23rem,calc(100vw-2rem))] animate-slide-up sm:bottom-6 sm:right-6" role="search" aria-label="Búsqueda rápida del inventario">
+          <div className="flex items-center gap-2 rounded-2xl border border-brand/20 bg-surface-1/95 p-2 shadow-[0_16px_44px_rgba(14,45,62,.22)] backdrop-blur-xl ring-1 ring-white/60 dark:ring-white/5">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-text" aria-hidden="true"><i className="fa-solid fa-magnifying-glass text-xs" /></span>
+            <input
+              type="search"
+              aria-label="Buscar bien sin volver al inicio"
+              placeholder="Buscar bien por rótulo, nombre o funcionario…"
+              value={searchTerm}
+              onFocus={() => setBuscadorRapidoFijado(true)}
+              onChange={event => { setSearchTerm(event.target.value); setSearchInput(event.target.value); setCurrentPage(1); }}
+              onKeyDown={event => { if (event.key === 'Enter' && event.currentTarget.value.trim()) guardarReciente(event.currentTarget.value); }}
+              className="min-w-0 flex-1 border-0 bg-transparent px-1 py-2 text-xs font-semibold text-content-1 outline-none placeholder:font-medium placeholder:text-content-3 focus:ring-0"
+            />
+            {searchTerm && <button type="button" onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); }} title="Limpiar búsqueda" aria-label="Limpiar búsqueda rápida" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-xmark text-xs" /></button>}
+            <span className="hidden h-6 w-px bg-line sm:block" aria-hidden="true" />
+            <button type="button" onClick={() => { setBuscadorRapidoFijado(false); document.activeElement?.blur?.(); }} title="Ocultar búsqueda rápida" aria-label="Ocultar búsqueda rápida" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-chevron-down text-[10px]" /></button>
+          </div>
+          <p className="mr-2 mt-1 text-right text-[9px] font-medium text-content-3 drop-shadow-sm">Búsqueda rápida · filtros compartidos con la vista</p>
+        </div>
       )}
 
                 </div>

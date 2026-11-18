@@ -93,7 +93,7 @@ export const repairMojibake = (value) => {
 //
 // OJO: no cambiar la version a mano. Se cambia con:
 //   npm run aviso:cerrar -- --mensaje "..." --mejoras "..." --version 2.13.1
-export const APP_VERSION = '2.19.30';
+export const APP_VERSION = '2.19.31';
 
 // Comprime una imagen al mínimo peso razonable (objetivo ≤120KB):
 // 1024px/q0.70, y si sigue pesada reintenta más agresivo. Quita metadatos EXIF.
@@ -197,8 +197,6 @@ export const matchBienSearch = (bien, query, registrosRelacionados = [], { codig
     return tokens.every(token => camposCodigo.some(campo => coincideCodigo(campo, token)));
   }
   if (esConsultaNumerica && tokens.some(token => {
-    const digitos = token.replace(/\D/g, '');
-    const sinCeros = digitos.replace(/^0+/, '') || '0';
     return camposCodigo.some(campo => coincideCodigo(campo, token));
   })) {
     return tokens.every(token => camposCodigo.some(campo => coincideCodigo(campo, token)));

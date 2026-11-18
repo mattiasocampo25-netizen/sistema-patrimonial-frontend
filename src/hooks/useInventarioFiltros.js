@@ -234,7 +234,7 @@ useEffect(() => {
       .map(b => String(b.id)));
     setSeleccionados(idsCompartidos.filter(id => disponibles.has(id)));
     refSeleccionCompartidaAplicada.current = true;
-  }, [bienes, dependenciaActual, leerUrl, VALORES, debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroQR, filtroFC10, filtroEstado, filtroPendiente]);
+  }, [bienes, dependenciaActual, leerUrl, VALORES, hasFilters, clearAllFilters, debouncedSearchTerm, filtroFuncionario, filtroUbicacion, filtroAnio, filtroMes, filtroSubcuenta, filtroAnalitico1, filtroAnalitico2, filtroQR, filtroFC10, filtroEstado, filtroPendiente]);
 
   // "Copiar link" de la vista actual.
   const urlFiltrosActual = useCallback((ids = seleccionados) => {

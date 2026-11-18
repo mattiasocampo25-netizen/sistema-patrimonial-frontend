@@ -77,7 +77,6 @@ export default function AppShell({
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         compacta={sidebarCompacta}
-        darkMode={darkMode}
         onToggleCompacta={() => setSidebarCompacta((actual) => !actual)}
         appLogo={appLogo}
         activeTab={activeTab}

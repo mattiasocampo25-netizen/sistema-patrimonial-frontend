@@ -224,10 +224,10 @@ html.density-compact table th { letter-spacing: 0.035em; }
 .sidebar-premium {
   background-color: var(--sidebar);
   background-image:
-    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 15%, transparent), transparent 52%),
-    linear-gradient(165deg, var(--sidebar) 0%, color-mix(in srgb, var(--sidebar) 88%, #07131d) 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 7%, transparent), transparent 54%),
+    linear-gradient(135deg, var(--surface-1), color-mix(in srgb, var(--surface-2) 50%, var(--surface-1)));
   border-color: var(--sidebar-line);
-  box-shadow: 0 16px 40px rgb(8 25 39 / 0.2), 0 4px 12px rgb(8 25 39 / 0.09);
+  box-shadow: var(--shadow-card);
   border-width: 1px;
 }
 
@@ -243,16 +243,16 @@ html.density-compact table th { letter-spacing: 0.035em; }
 
 .dark .sidebar-premium {
   background-image:
-    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 20%, transparent), transparent 48%),
-    linear-gradient(165deg, var(--sidebar) 0%, #0a1723 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 50%),
+    linear-gradient(135deg, var(--surface-1), color-mix(in srgb, var(--surface-2) 65%, var(--surface-1)));
   border-color: var(--sidebar-line);
   box-shadow: 0 18px 42px rgb(0 0 0 / 0.3), 0 5px 14px rgb(0 0 0 / 0.16);
 }
 
 .dark .sidebar-premium {
   background-image:
-    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 48%),
-    linear-gradient(165deg, var(--sidebar) 0%, #0a1723 100%);
+    radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 50%),
+    linear-gradient(135deg, var(--surface-1), color-mix(in srgb, var(--surface-2) 65%, var(--surface-1)));
   border-color: var(--sidebar-line);
 }
 

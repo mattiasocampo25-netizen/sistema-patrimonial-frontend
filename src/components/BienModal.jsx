@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { toInputDateFormat, formatearMiles, normalizeStr } from '../utils/helpers';
-import { SECTION, FORM } from '../constants/designTokens';
+import { SECTION } from '../constants/designTokens';
 import { useDraft, serializarForm } from '../hooks/useDraft';
 import Dialogo from './ui/Dialogo';
 import Button, { IconButton } from './ui/Button';

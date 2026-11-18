@@ -54,7 +54,7 @@ function declaraciones(lineas) {
       }
       return;
     }
-    m = t.match(/^const\s+[\{\[]\s*$/);
+    m = t.match(/^const\s+[{[]\s*$/);
     if (m) { dentro = i + 1; return; }
     m = t.match(/^const\s+\{([^}]*)\}/);
     if (m) { anotar(m[1], i + 1); return; }

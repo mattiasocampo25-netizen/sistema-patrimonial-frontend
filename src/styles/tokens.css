@@ -120,12 +120,12 @@
   --line: #dce5e9;
   --line-strong: #c3d1d8;
 
-  /* Sidebar claro y limpio */
-  --sidebar: #132a3f;
-  --sidebar-content: #f4f8fb;
-  --sidebar-content-2: #bfced8;
-  --sidebar-content-3: #8299a8;
-  --sidebar-line: #294356;
+  /* El sidebar comparte superficie, contraste y bordes con la barra superior. */
+  --sidebar: #ffffff;
+  --sidebar-content: #183247;
+  --sidebar-content-2: #496273;
+  --sidebar-content-3: #718391;
+  --sidebar-line: #dce5e9;
 
   /* Marca azul profesional */
   --brand: #146f82;
@@ -177,7 +177,7 @@
   --line: #2b4556;
   --line-strong: #3b5b6d;
 
-  --sidebar: #0c1a28;
+  --sidebar: #172838;
   --sidebar-content: #f2f7f9;
   --sidebar-content-2: #b5c7d1;
   --sidebar-content-3: #829daa;

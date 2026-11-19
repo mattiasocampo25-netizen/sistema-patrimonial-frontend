@@ -104,10 +104,10 @@
   color-scheme: light;
 
   /* Fondo institucional neutro, superficies con separación clara */
-  --canvas: #edf2f3;
+  --canvas: #f3f6f6;
   --surface-1: #ffffff;
-  --surface-2: #f5f7f6;
-  --surface-3: #e7eeed;
+  --surface-2: #f6f9f9;
+  --surface-3: #e8efef;
   --surface-glass: rgb(255 255 255 / 0.82);
 
   /* Texto con excelente contraste */
@@ -121,17 +121,17 @@
   --line-strong: #c3d1d8;
 
   /* El sidebar comparte superficie, contraste y bordes con la barra superior. */
-  --sidebar: #ffffff;
-  --sidebar-content: #183247;
-  --sidebar-content-2: #496273;
-  --sidebar-content-3: #718391;
-  --sidebar-line: #dce5e9;
+  --sidebar: #102d38;
+  --sidebar-content: #f3f8f8;
+  --sidebar-content-2: #bad0d3;
+  --sidebar-content-3: #8daab0;
+  --sidebar-line: #2b4a54;
 
   /* Marca azul profesional */
-  --brand: #146f82;
-  --brand-hover: #10596b;
-  --brand-soft: #e3f1f1;
-  --brand-text: #115b6d;
+  --brand: #087f83;
+  --brand-hover: #06686d;
+  --brand-soft: #e0f3f1;
+  --brand-text: #08666a;
 
   /* Estados */
   --danger: #dc2626;
@@ -183,10 +183,10 @@
   --sidebar-content-3: #829daa;
   --sidebar-line: #20384b;
 
-  --brand: #5bb8c0;
-  --brand-hover: #79cbd0;
-  --brand-soft: #123944;
-  --brand-text: #8cdae0;
+  --brand: #55c7bb;
+  --brand-hover: #78d8ce;
+  --brand-soft: #153b40;
+  --brand-text: #82e2d6;
 
   --danger: #f87171;
   --danger-soft: #450a0a;

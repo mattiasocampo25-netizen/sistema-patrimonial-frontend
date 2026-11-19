@@ -49,7 +49,7 @@ export default function ResumenView({
 
   return (
     <div className="module-screen space-y-5 pb-12">
-      <section className="rounded-2xl border border-line bg-surface-1 p-5 shadow-sm sm:p-7">
+      <section className="summary-hero rounded-2xl border border-line bg-surface-1 p-5 shadow-sm sm:p-7">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div className="min-w-0 flex-1">
             <p className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-text">

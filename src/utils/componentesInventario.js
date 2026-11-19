@@ -6,6 +6,26 @@ export function componentesDe(bien) {
   return Array.isArray(valor) ? valor : [];
 }
 
+// IDs internos, orden de persistencia y datos derivados del padrón (documento
+// y cargo) no son cambios hechos por quien edita el componente.
+export function componentesComparables(valor) {
+  let lista = valor;
+  if (typeof lista === 'string') { try { lista = JSON.parse(lista); } catch { lista = []; } }
+  if (!Array.isArray(lista)) return [];
+  return lista.map(pieza => ({
+    nombre: String(pieza?.nombre || '').trim(),
+    cantidad: Math.max(1, Number.parseInt(pieza?.cantidad, 10) || 1),
+    ubicacion: String(pieza?.ubicacion || '').trim(),
+    funcionario: String(pieza?.funcionario || '').trim(),
+    estadoConservacion: String(pieza?.estadoConservacion || '').trim(),
+    observaciones: String(pieza?.observaciones || '').trim()
+  }));
+}
+
+export function componentesEquivalentes(a, b) {
+  return JSON.stringify(componentesComparables(a)) === JSON.stringify(componentesComparables(b));
+}
+
 export function piezasCoincidentes(bien, campo, valor) {
   const buscado = normalizeStr(valor || '');
   if (!buscado) return [];

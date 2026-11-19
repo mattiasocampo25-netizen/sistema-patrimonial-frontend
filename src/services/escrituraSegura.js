@@ -1,4 +1,6 @@
 // ============================================================================
+import { componentesEquivalentes } from '../utils/componentesInventario.js';
+
 // ESCRITURA CON PROTECCIÓN CONTRA EDICIONES SIMULTÁNEAS
 // ============================================================================
 // El sistema guarda cada bien como un JSONB completo en la columna `data`. Una
@@ -39,7 +41,10 @@ export const detectarCambios = (anterior, posterior, camposIgnorados = ['updated
     const vb = b[clave];
     // Se comparan como texto porque del JSONB pueden volver tipos distintos
     // (número 1 vs string "1") sin que sea un cambio real.
-    if (JSON.stringify(va ?? null) !== JSON.stringify(vb ?? null)) {
+    const iguales = clave === 'componentes'
+      ? componentesEquivalentes(va, vb)
+      : JSON.stringify(va ?? null) === JSON.stringify(vb ?? null);
+    if (!iguales) {
       cambiados[clave] = vb;
     }
   });
@@ -79,7 +84,10 @@ export const detectarConflictos = (antesDeEscribir, fresco, cambios) => {
     // y se reportaría conflicto en cada guardado.
     const loQueTeniamos = (antesDeEscribir || {})[clave];
     const loQueHayAhora = (fresco || {})[clave];
-    if (JSON.stringify(loQueTeniamos ?? null) !== JSON.stringify(loQueHayAhora ?? null)) {
+    const iguales = clave === 'componentes'
+      ? componentesEquivalentes(loQueTeniamos, loQueHayAhora)
+      : JSON.stringify(loQueTeniamos ?? null) === JSON.stringify(loQueHayAhora ?? null);
+    if (!iguales) {
       conflictos.push(clave);
     }
   });

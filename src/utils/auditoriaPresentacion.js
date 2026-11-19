@@ -1,3 +1,5 @@
+import { componentesComparables, componentesEquivalentes } from './componentesInventario.js';
+
 const CAMPOS_TECNICOS = new Set(['id', 'updated_at', 'created_at', 'updatedat', 'createdat', 'fechacarga', 'fechamodificacion', 'createdby', 'updatedby', 'creadopor', 'modificadoen', 'modificadopor', 'syncat', 'version']);
 
 const ETIQUETAS_CAMPO = {
@@ -59,7 +61,9 @@ const normalizarValorComparacion = valor => {
   return typeof valor === 'string' ? valor.trim() : valor;
 };
 
-const valoresEquivalentes = (a, b) => JSON.stringify(normalizarValorComparacion(a)) === JSON.stringify(normalizarValorComparacion(b));
+const valoresEquivalentes = (a, b, campo) => campo === 'componentes'
+  ? componentesEquivalentes(a, b)
+  : JSON.stringify(normalizarValorComparacion(a)) === JSON.stringify(normalizarValorComparacion(b));
 
 export function obtenerCambiosAuditoria(row) {
   const mensaje = leerMensajeAuditoria(row);
@@ -72,7 +76,7 @@ export function obtenerCambiosAuditoria(row) {
     const nuevo = entrada?.nuevo;
     if (!anterior || !nuevo || typeof anterior !== 'object' || typeof nuevo !== 'object') return;
     Object.keys(nuevo).forEach(campo => {
-      if (CAMPOS_TECNICOS.has(String(campo).toLowerCase()) || valoresEquivalentes(nuevo[campo], anterior[campo])) return;
+      if (CAMPOS_TECNICOS.has(String(campo).toLowerCase()) || valoresEquivalentes(nuevo[campo], anterior[campo], campo)) return;
       const sujeto = entradas.length > 1 ? (entrada.rotulo || `Bien ${indice + 1}`) : '';
       cambios.push({
         campo: entradas.length > 1 ? `${entrada.bienId || indice}.${campo}` : campo,
@@ -209,6 +213,18 @@ export function etiquetaAccionAuditoria(accion) {
 export function valorAuditoriaLegible(valor, campo) {
   if (valor === null || valor === undefined || String(valor).trim() === '') return 'Sin dato';
   if (typeof valor === 'boolean') return valor ? 'Sí' : 'No';
+  if (String(campo).toLowerCase() === 'componentes') {
+    const componentes = componentesComparables(valor);
+    if (!componentes.length) return 'Ninguno';
+    return componentes.map(pieza => [
+      pieza.nombre || 'Componente sin nombre',
+      `Cantidad: ${pieza.cantidad}`,
+      pieza.ubicacion && `Ubicación: ${pieza.ubicacion}`,
+      pieza.funcionario && `Responsable: ${pieza.funcionario}`,
+      pieza.estadoConservacion && `Estado: ${pieza.estadoConservacion}`,
+      pieza.observaciones && `Observación: ${pieza.observaciones}`
+    ].filter(Boolean).join(' · ')).join(' | ');
+  }
   if (Array.isArray(valor)) {
     if (!valor.length) return 'Ninguno';
     if (String(campo).toLowerCase() === 'fotos') {

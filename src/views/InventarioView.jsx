@@ -278,15 +278,15 @@ export default function InventarioView({
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <Card className="overflow-hidden border-brand/15 p-0 shadow-panel">
-    <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 px-5 py-5 sm:px-7 sm:py-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
+    <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 px-4 py-3 sm:px-5 sm:py-3.5 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="mb-1.5 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text"><i className="fa-solid fa-layer-group" aria-hidden="true" /> Gestión patrimonial</p>
+          <p className="mb-1 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text"><i className="fa-solid fa-layer-group" aria-hidden="true" /> Gestión patrimonial</p>
           <PageHeader
             titulo={'Inventario General'}
             descripcion={'Consulta, filtra y administra los bienes registrados en la Universidad.'}
             icono="fa-boxes-stacked"
-            className="!mb-0"
+            className="!mb-0 !p-0"
           />
         </div>
         <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-1/90 px-3 py-2 shadow-xs">
@@ -294,7 +294,7 @@ export default function InventarioView({
           <span><span className="block text-[10px] font-semibold uppercase tracking-wide text-content-3">Bienes en esta vista</span><span className="block text-sm font-extrabold tabular-nums text-content-1">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-2 gap-2 border-t border-line/70 pt-4 sm:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-1.5 border-t border-line/70 pt-2.5 sm:grid-cols-4">
         {[
           { label: 'Bienes registrados', value: stats.totalItems, icon: 'fa-boxes-stacked', tone: 'text-brand-text' },
           { label: 'Libres para asignar', value: stats.libresParaAsignar, icon: 'fa-box-open', tone: 'text-emerald-700 dark:text-emerald-300' },
@@ -311,7 +311,7 @@ export default function InventarioView({
           un contador. El total de bienes ya se ve en la paginación
           ("Mostrando X de Y"), así que la cabecera queda solo con la
           identidad del módulo. */}
-      <div className="border-t border-line bg-surface-2/50 px-4 py-3 sm:px-6">
+      <div className="border-t border-line bg-surface-2/50 px-3 py-2 sm:px-4">
       <Toolbar>
 
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
@@ -360,10 +360,10 @@ export default function InventarioView({
   </Card>
 
   {/* 2. PANEL DE FILTROS BaSQUEDA Y SELECCIÓN EN GRID */}
-  <div className="w-full min-w-0 space-y-3 rounded-2xl border border-line bg-surface-1 p-3 shadow-sm sm:p-4">
+    <div className="w-full min-w-0 space-y-2 rounded-2xl border border-line bg-surface-1 p-2.5 shadow-sm sm:p-3">
 
     {/* Solo se muestra una instancia del buscador: la flotante reemplaza a la de arriba mientras se desplaza. */}
-    <div ref={buscadorPrincipalRef} aria-hidden={mostrarBuscadorFlotante} className={`space-y-2 transition-opacity duration-150 ${mostrarBuscadorFlotante ? 'pointer-events-none invisible' : ''}`}>
+    <div ref={buscadorPrincipalRef} aria-hidden={mostrarBuscadorFlotante} className={`space-y-1.5 transition-opacity duration-150 ${mostrarBuscadorFlotante ? 'pointer-events-none invisible' : ''}`}>
     <div className="relative block w-full min-w-0">
       <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm pointer-events-none"></i>
       <input
@@ -380,7 +380,7 @@ export default function InventarioView({
         onFocus={() => setShowHistorial(true)}
         onBlur={() => setTimeout(() => setShowHistorial(false), 150)}
         onKeyDown={(e) => { if (e.key === 'Enter' && searchTerm.trim()) { guardarReciente(searchTerm); setShowHistorial(false); } }}
-        className="inventory-search-input block h-12 w-full min-w-0 rounded-control border border-line bg-surface-1 py-3 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
+        className="inventory-search-input block h-10 w-full min-w-0 rounded-control border border-line bg-surface-1 py-2 pl-11 pr-11 text-sm font-medium text-content-1 placeholder:text-content-3 focus:border-brand focus:ring-2 focus:ring-brand/20 outline-none transition-[border-color,box-shadow] duration-[var(--dur-fast)]"
       />
       {showHistorial && !searchTerm && recientes.length > 0 && (
         <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-700 shadow-2xl py-1.5 animate-pop">
@@ -428,7 +428,7 @@ export default function InventarioView({
     </div>
 
     {/* Filtros frecuentes primero; los contables quedan agrupados para reducir ruido. */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-0.5">
 
       {/* Responsables */}
       <FiltroCombo
@@ -468,30 +468,30 @@ export default function InventarioView({
 
     </div>
 
-    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-    <div className="inventory-free-filter grid min-h-[68px] grid-cols-1 items-center gap-3 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3 dark:bg-emerald-500/[0.06]">
+    <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
+    <div className="inventory-free-filter grid min-h-[58px] grid-cols-1 items-center gap-2 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-2 dark:bg-emerald-500/[0.06]">
       <button
         type="button"
         aria-pressed={filtroPendiente === 'libresParaAsignar'}
         onClick={() => { setFiltroPendiente(filtroPendiente === 'libresParaAsignar' ? '' : 'libresParaAsignar'); setCurrentPage(1); }}
-        className={`flex min-w-0 items-center gap-3 rounded-xl px-2 py-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
+        className={`flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-box-open" aria-hidden="true" /></span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-box-open" aria-hidden="true" /></span>
         <span className="min-w-0">
           <span className="block text-sm font-extrabold text-content-1">Libres para asignar</span>
           <span className="block text-xs text-content-3">Sin funcionario ni ubicación, o marcados expresamente para asignación</span>
         </span>
         <span className="ml-auto min-w-[68px] rounded-full border border-emerald-700/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-emerald-800 dark:bg-slate-900 dark:text-emerald-300">{Number(stats.libresParaAsignar || 0).toLocaleString('es-PY')}</span>
       </button>
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-emerald-700/10 pt-2 sm:border-0 sm:pt-0">
+      <div className="flex flex-wrap items-center justify-end gap-1.5 border-t border-emerald-700/10 pt-1.5 sm:border-0 sm:pt-0">
         <Button variante="subtle" tamano="sm" icono="fa-file-csv" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en CSV">Descargar CSV</Button>
         <Button variante="subtle" tamano="sm" icono="fa-file-excel" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en Excel">Excel</Button>
         <Button variante="secondary" tamano="sm" icono="fa-file-pdf" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} title="Descargar informe PDF de bienes libres para asignar">PDF</Button>
       </div>
     </div>
 
-    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`inventory-observed-filter flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
+    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`inventory-observed-filter flex min-h-[58px] w-full items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
       <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
       <span className="min-w-[68px] rounded-full border border-amber-600/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-amber-800 dark:bg-slate-900 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
     </button>
@@ -502,7 +502,7 @@ export default function InventarioView({
         type="button"
         aria-expanded={mostrarFiltrosAvanzados}
         onClick={() => setMostrarFiltrosAvanzados(v => !v)}
-        className="inline-flex items-center gap-2 rounded-control px-2.5 py-2 text-xs font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
+        className="inline-flex items-center gap-2 rounded-control px-2 py-1.5 text-xs font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand motion"
       >
         <i className={`fa-solid fa-sliders text-brand-text`} aria-hidden="true"></i>
         Más filtros
@@ -520,7 +520,7 @@ export default function InventarioView({
     </div>
 
     {/* Vistas guardadas + Restablecer */}
-    <div className="flex flex-wrap items-center gap-2 pt-1">
+    <div className="flex flex-wrap items-center gap-2 pt-0.5">
       {vistasGuardadas.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 mr-auto">
           <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-content-3 dark:text-content-3">Vistas:</span>

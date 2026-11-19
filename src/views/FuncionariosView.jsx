@@ -3,6 +3,7 @@ import { formatCI } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button } from '../components/ui';
 import FiltroCombo from '../components/FiltroCombo';
+import { ContextMenuTarget } from '../components/ui/ContextualMenu';
 
 // Vista del plantel de funcionarios (extraída de App.jsx, Fase 5).
 export default function FuncionariosView({
@@ -153,7 +154,17 @@ export default function FuncionariosView({
                   const inicial = f.nombre ? f.nombre.charAt(0).toUpperCase() : 'F';
 
                   return (
-                    <TRow key={f.id} className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group">
+                    <ContextMenuTarget
+                      as={TRow}
+                      key={f.id}
+                      label={`Acciones del funcionario ${f.nombre || ''}`}
+                      actions={[
+                        { label: 'Editar funcionario', icon: 'fa-pen-to-square', onSelect: () => handleEditFuncionario(f) },
+                        { label: 'Copiar cédula', icon: 'fa-copy', onSelect: () => navigator.clipboard?.writeText(String(f.cedula || '')) },
+                        { label: isAdmin ? 'Eliminar funcionario' : 'Solicitar eliminación', icon: isAdmin ? 'fa-trash-can' : 'fa-paper-plane', danger: true, onSelect: () => handleDeleteFuncionario(f.id) }
+                      ]}
+                      className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group"
+                    >
                         <TD className="py-4 pl-8 pr-4 align-middle tabular-nums font-semibold text-content-1 dark:text-content-3 text-sm">
                             {mostrarCedulas ? formatCI(f.cedula) : `••••${String(f.cedula || '').replace(/\D/g, '').slice(-2) || '••'}`}
                         </TD>
@@ -188,7 +199,7 @@ export default function FuncionariosView({
                                 </button>
                             </div>
                         </TD>
-                    </TRow>
+                    </ContextMenuTarget>
                   );
                 })}
                 {funcionariosPurosDependencia.length === 0 && (

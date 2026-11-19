@@ -16,6 +16,7 @@ import Dialogo from '../components/ui/Dialogo';
 import InlineInventoryField from '../components/InlineInventoryField';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, IconButton } from '../components/ui';
 import useScopedPreference from '../hooks/useScopedPreference';
+import { ContextMenuTarget } from '../components/ui/ContextualMenu';
 
 const COLUMNAS_INICIALES = { fecha: true, cuenta: true, qr: true };
 const VISTAS_RECIENTES_INICIALES = [];
@@ -187,6 +188,19 @@ export default function InventarioView({
   const [showHistorial, setShowHistorial] = useState(false);
   const [mostrarFiltrosAvanzados, setMostrarFiltrosAvanzados] = useState(false);
   const filtrosAvanzadosActivos = [filtroSubcuenta, filtroAnalitico1, filtroAnalitico2].filter(Boolean).length + (filtroEstado !== 'ALL' ? 1 : 0);
+  const accionesContextualesBien = (item) => [
+    { label: 'Ver ficha y trazabilidad', icon: 'fa-arrow-up-right-from-square', onSelect: () => openFichaBien(item) },
+    { label: item.hasQR ? 'Ver o descargar QR' : 'Generar QR', icon: 'fa-qrcode', onSelect: () => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); } },
+    { label: 'Exportar este bien a CSV', icon: 'fa-file-csv', onSelect: () => handleExportInventarioCSV?.([item]) },
+    { label: 'Exportar este bien a Excel', icon: 'fa-file-excel', onSelect: () => handleExportInventarioExcel?.([item]) },
+    ...(isAdmin && openFC10Modal ? [{ label: 'Crear o gestionar acta FC-10', icon: 'fa-file-signature', onSelect: () => openFC10Modal(item) }] : []),
+    ...(isAdmin && openFC11Modal ? [{ label: 'Registrar traslado FC-11', icon: 'fa-truck-fast', onSelect: () => openFC11Modal(item) }] : []),
+    ...(!isInventoryViewer ? [
+      { label: 'Editar bien', icon: 'fa-pen-to-square', onSelect: () => { setBienEditing(item); setIsBienModalOpen(true); } },
+      { label: isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien', icon: 'fa-trash-can', danger: true, onSelect: () => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item }) }
+    ] : []),
+    { label: 'Copiar rótulo', icon: 'fa-copy', onSelect: () => navigator.clipboard?.writeText(String(item.rotulo || item.id)) }
+  ];
   const [recientes, setRecientes] = useScopedPreference('inv_recientes', username, VISTAS_RECIENTES_INICIALES, normalizarRecientes);
   const guardarReciente = (texto) => {
     const v = String(texto || '').trim();
@@ -751,7 +765,16 @@ export default function InventarioView({
                        alarmaba al usuario mientras los datos aún no llegaban. */
                     <SkeletonLoader />
                   ) : (
-                  <div className="bg-surface-1 dark:bg-surface-1/40 border border-line/70 dark:border-zinc-700/30 rounded-panel shadow-sm overflow-hidden" data-tour="inv-table">
+                  <ContextMenuTarget
+                    actions={[
+                      { label: 'Limpiar filtros del inventario', icon: 'fa-filter-circle-xmark', onSelect: clearAllFilters },
+                      { label: 'Exportar resultados filtrados a CSV', icon: 'fa-file-csv', onSelect: () => handleExportInventarioCSV?.(filteredBienes) },
+                      { label: 'Exportar resultados filtrados a Excel', icon: 'fa-file-excel', onSelect: () => handleExportInventarioExcel?.(filteredBienes) }
+                    ]}
+                    label="Acciones de la vista de inventario"
+                    className="bg-surface-1 dark:bg-surface-1/40 border border-line/70 dark:border-zinc-700/30 rounded-panel shadow-sm overflow-hidden"
+                    data-tour="inv-table"
+                  >
                     {vistaInv === 'galeria' ? (
                     <div className="p-4 sm:p-6">
                       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
@@ -769,7 +792,7 @@ export default function InventarioView({
                               ? 'bg-ok-soft text-ok border-ok/25'
                               : estado.includes('bueno') ? 'bg-info-soft text-info border-info/25' : 'bg-warn-soft text-warn border-warn/25';
                             return (
-                              <article key={item.id} className={`group rounded-panel border bg-surface-1 p-4 shadow-card transition-[border-color,box-shadow,transform] duration-[var(--dur-base)] hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-panel ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line'}`}>
+                              <ContextMenuTarget as="article" key={item.id} actions={accionesContextualesBien(item)} label={`Acciones del bien ${item.rotulo || item.descripcion}`} className={`group rounded-panel border bg-surface-1 p-4 shadow-card transition-[border-color,box-shadow,transform] duration-[var(--dur-base)] hover:-translate-y-0.5 hover:border-brand/35 hover:shadow-panel ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line'}`}>
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex min-w-0 items-start gap-3">
                                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-brand-soft text-brand-text"><i className="fa-solid fa-box" aria-hidden="true" /></span>
@@ -801,7 +824,7 @@ export default function InventarioView({
                                   {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                                   {!isInventoryViewer && <IconButton titulo={isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien'} icono="fa-trash-can" variante="danger" tamano="sm" onClick={() => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item })} />}
                                 </div>
-                              </article>
+                              </ContextMenuTarget>
                             );
                           })}
                         </div>
@@ -811,7 +834,7 @@ export default function InventarioView({
                     <div className="p-4 sm:p-5">
                       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                         {itemsPaginados.map((item) => (
-                          <div key={item.id} className={`inventory-item-card relative rounded-card border p-4 shadow-xs bg-surface-1 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
+                          <ContextMenuTarget as="article" key={item.id} actions={accionesContextualesBien(item)} label={`Acciones del bien ${item.rotulo || item.descripcion}`} className={`inventory-item-card relative rounded-card border p-4 shadow-xs bg-surface-1 ${lastMutatedBienId === item.id ? 'row-flash border-brand/50' : 'border-line/70 dark:border-zinc-700/30'}`}>
                             <div className="flex items-start gap-2.5">
                               <input type="checkbox" checked={seleccionados.includes(item.id)} onChange={(e) => toggleSeleccion(item.id, { shiftKey: e.nativeEvent.shiftKey, visibles: itemsPaginados.map(b => b.id), seleccionado: e.target.checked })} title="Seleccionar (Mayús + clic para un rango)" aria-label={`Seleccionar ${item.rotulo}`} className="mt-1 h-4 w-4 rounded border-line-strong text-brand-text cursor-pointer" />
                               <div className="min-w-0 flex-1">
@@ -832,7 +855,7 @@ export default function InventarioView({
                               {!isInventoryViewer && <IconButton titulo="Editar" icono="fa-pen-to-square" variante="ghost" tamano="sm" onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }} />}
                               {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
                             </div>
-                          </div>
+                          </ContextMenuTarget>
                         ))}
                         {itemsPaginados.length === 0 && (
                           <div className="col-span-full">
@@ -917,7 +940,7 @@ export default function InventarioView({
                             };
 
                             return (
-                              <TRow key={item.id} className={`hover:bg-surface-2/50 dark:hover:bg-surface-3/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
+                              <ContextMenuTarget as={TRow} key={item.id} actions={accionesContextualesBien(item)} label={`Acciones del bien ${item.rotulo || item.descripcion}`} className={`hover:bg-surface-2/50 dark:hover:bg-surface-3/20 transition-colors group ${lastMutatedBienId === item.id ? 'row-flash' : ''}`}>
 
                                 {/* Selección */}
                                 <TD className={`pl-4 sm:pl-5 pr-1 align-middle ${compacto ? 'py-2' : 'py-4'}`}>
@@ -1074,7 +1097,7 @@ export default function InventarioView({
                                   </div>
                                 </TD>
 
-                              </TRow>
+                              </ContextMenuTarget>
                             );
                           })}
 
@@ -1101,7 +1124,7 @@ export default function InventarioView({
 
                     {/* Paginación Integrada */}
                     {renderPagination()}
-                  </div>
+                  </ContextMenuTarget>
                   )}
 
       {comparando && (

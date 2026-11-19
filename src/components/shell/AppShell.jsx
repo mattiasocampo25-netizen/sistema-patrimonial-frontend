@@ -3,6 +3,7 @@ import AppSidebar from './AppSidebar';
 import AppTopbar from './AppTopbar';
 import MobileNav from './MobileNav';
 import useScopedPreference from '../../hooks/useScopedPreference';
+import { ContextualMenuProvider } from '../ui/ContextualMenu';
 
 const preferenciaBooleana = value => value === true;
 
@@ -127,9 +128,11 @@ export default function AppShell({
           isLoading={isLoading}
         />
 
-        <main id="contenido" tabIndex={-1} className="workspace-main mt-2 min-w-0 flex-1 overflow-y-auto bg-canvas custom-scrollbar sm:mt-3 lg:mt-4">
-          {children}
-        </main>
+        <ContextualMenuProvider>
+          <main id="contenido" tabIndex={-1} className="workspace-main mt-2 min-w-0 flex-1 overflow-y-auto bg-canvas custom-scrollbar sm:mt-3 lg:mt-4">
+            {children}
+          </main>
+        </ContextualMenuProvider>
         <MobileNav activeTab={activeTab} setActiveTab={setActiveTab} setIsSidebarOpen={setIsSidebarOpen} solicitudesBaja={solicitudesBaja} isInventoryViewer={isInventoryViewer} />
       </div>
     </div>

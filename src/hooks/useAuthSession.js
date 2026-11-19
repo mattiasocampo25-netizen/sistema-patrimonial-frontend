@@ -18,6 +18,7 @@ export function useAuthSession({ notify }) {
   // rol sino el nombre del campo: cualquier registro con ese texto quedaba como
   // administrador.
   const isAdmin = useMemo(() => currentUser?.role === 'admin' || currentUser?.role === 'dev', [currentUser]);
+  const isInventoryViewer = useMemo(() => currentUser?.role === 'inventory_viewer', [currentUser]);
   // Desarrollador: mismas capacidades que admin, pero nunca bloqueado por mantenimiento
   // y único con acceso al módulo de mantenimiento.
   const esDesarrollador = useMemo(() => currentUser?.role === 'dev', [currentUser]);
@@ -285,7 +286,7 @@ const saveMantenimiento = async (data) => {
 
   return {
     isAuthenticated, setIsAuthenticated, currentUser, setCurrentUser,
-    isAdmin, esDesarrollador,
+    isAdmin, esDesarrollador, isInventoryViewer,
     loginUser, setLoginUser, loginPass, setLoginPass,
     showPassword, setShowPassword, loginError, setLoginError,
     isProcessing, setIsProcessing,

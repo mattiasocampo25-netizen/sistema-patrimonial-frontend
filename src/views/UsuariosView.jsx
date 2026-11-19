@@ -18,14 +18,14 @@ export default function UsuariosView({
     const textoUsuario = normalizeStr(`${u.username || ''} ${u.nombre || ''} ${u.cargo || ''} ${u.dependencia || ''}`).toLocaleLowerCase('es');
     const coincideTexto = textoUsuario.includes(normalizeStr(busqueda).toLocaleLowerCase('es'));
     const rol = rolNormalizado(u);
-    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'dev'].includes(rol) : rol === 'user');
+    const coincideRol = filtroRol === 'todos' || (filtroRol === 'admin' ? ['admin', 'dev'].includes(rol) : filtroRol === 'consulta' ? rol === 'inventory_viewer' : rol === 'user');
     return coincideTexto && coincideRol;
   }), [usuariosList, busqueda, filtroRol]);
   const paginas = Math.max(1, Math.ceil(usuariosVisibles.length / porPagina));
   const paginaActual = Math.min(pagina, paginas);
   const usuariosPagina = usuariosVisibles.slice((paginaActual - 1) * porPagina, paginaActual * porPagina);
   const totalAdministracion = usuariosList.filter(u => ['admin', 'dev'].includes(rolNormalizado(u))).length;
-  const totalFuncionarios = usuariosList.filter(u => rolNormalizado(u) === 'user').length;
+  const totalFuncionarios = usuariosList.filter(u => ['user', 'inventory_viewer'].includes(rolNormalizado(u))).length;
   return (
     <div className="module-screen users-workspace flex flex-col flex-1 space-y-4 pb-12">
       <section className="users-hero rounded-panel p-4 sm:p-6">
@@ -50,8 +50,8 @@ export default function UsuariosView({
           <div className="users-filter-row mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <label className="sr-only" htmlFor="usuarios-search">Buscar usuarios</label>
             <input id="usuarios-search" value={busqueda} onChange={e => { setBusqueda(e.target.value); setPagina(1); }} placeholder="Buscar por nombre, usuario o dependencia…" className="h-10 w-full rounded-control border border-line bg-surface-2 px-3 text-sm text-content-1 outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" />
-            <div className="flex gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar usuarios por rol">
-              {[['todos', 'Todos'], ['admin', 'Administración'], ['funcionario', 'Funcionarios']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroRol === id} onClick={() => { setFiltroRol(id); setPagina(1); }} className={`rounded px-3 text-xs font-semibold ${filtroRol === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
+            <div className="flex flex-wrap gap-1 rounded-control border border-line bg-surface-2 p-1" role="group" aria-label="Filtrar usuarios por rol">
+              {[['todos', 'Todos'], ['admin', 'Administración'], ['funcionario', 'Funcionarios'], ['consulta', 'Consulta']].map(([id, label]) => <button key={id} type="button" aria-pressed={filtroRol === id} onClick={() => { setFiltroRol(id); setPagina(1); }} className={`rounded px-3 text-xs font-semibold ${filtroRol === id ? 'bg-surface-1 text-brand-text shadow-sm' : 'text-content-3 hover:text-content-1'}`}>{label}</button>)}
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function UsuariosView({
       <section className="users-summary grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Resumen de cuentas">
         <div className="users-summary-tile"><span className="users-summary-icon"><i className="fa-solid fa-users" aria-hidden="true" /></span><span><span className="users-summary-label">Cuentas registradas</span><strong>{usuariosList.length.toLocaleString('es-PY')}</strong></span></div>
         <div className="users-summary-tile"><span className="users-summary-icon users-summary-admin"><i className="fa-solid fa-shield-halved" aria-hidden="true" /></span><span><span className="users-summary-label">Administración</span><strong>{totalAdministracion.toLocaleString('es-PY')}</strong></span></div>
-        <div className="users-summary-tile"><span className="users-summary-icon users-summary-staff"><i className="fa-solid fa-user" aria-hidden="true" /></span><span><span className="users-summary-label">Funcionarios</span><strong>{totalFuncionarios.toLocaleString('es-PY')}</strong></span></div>
+        <div className="users-summary-tile"><span className="users-summary-icon users-summary-staff"><i className="fa-solid fa-user" aria-hidden="true" /></span><span><span className="users-summary-label">Usuarios operativos</span><strong>{totalFuncionarios.toLocaleString('es-PY')}</strong></span></div>
       </section>
 
       {isLoading ? (
@@ -98,6 +98,8 @@ export default function UsuariosView({
                               ? <Badge tono="brand" icono="fa-code">Desarrollador</Badge>
                               : rolNormalizado(u) === 'admin'
                               ? <Badge tono="info" icono="fa-shield-halved">Administrador</Badge>
+                              : rolNormalizado(u) === 'inventory_viewer'
+                              ? <Badge tono="ok" icono="fa-eye">Consulta de inventario</Badge>
                               : <Badge icono="fa-user">Funcionario</Badge>
                           }
                       </TD>

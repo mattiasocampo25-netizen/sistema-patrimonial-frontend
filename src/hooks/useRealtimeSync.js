@@ -29,7 +29,7 @@ import { seleccionarNotificacionesPurgables } from '../utils/anuncios';
 //   setUsuariosList, setFuncionariosPadron, setDbError, setIsLoading,
 //   setFichaBien: setters que viven en App.
 export function useRealtimeSync({
-  notify, currentUser, setCurrentUser, dependenciaActual, setDependenciaActual, clearAllFilters, activeTab, isAuthenticated, isAdmin,
+  notify, currentUser, setCurrentUser, dependenciaActual, setDependenciaActual, clearAllFilters, activeTab, isAuthenticated, isAdmin, isInventoryViewer = false,
   handleLogout, setBienes, setFc10List, setFc11List, setFc04List,
   setEstructurasDB, setUsuariosList, setFuncionariosPadron,
   setDbError, setIsLoading, setFichaBien
@@ -228,7 +228,7 @@ export function useRealtimeSync({
         // autoritativo de `usuarios`. Si un admin reasigna al funcionario
         // mientras su sesión sigue abierta, el inventario previo queda activo
         // hasta el próximo inicio de sesión y aparenta estar incompleto.
-        if (!isAdmin && dbUser.dependencia &&
+        if (!isAdmin && !isInventoryViewer && dbUser.dependencia &&
             normalizeStr(dependenciaActual) !== normalizeStr(dbUser.dependencia)) {
           // La caché está separada por dependencia, pero pudo haberse creado
           // antes de la reasignación o con una carga incompleta. Rehacer una
@@ -451,7 +451,7 @@ export function useRealtimeSync({
         // no debe apagar el estado de carga de la que está realmente corriendo.
         if (guardaGen.vigente(turno)) setIsLoading(false);
     }
-  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser, setDependenciaActual, clearAllFilters, isAdmin,
+  }, [dependenciaActual, currentUser, handleLogout, notify, setCurrentUser, setDependenciaActual, clearAllFilters, isAdmin, isInventoryViewer,
     queryNotificacionesAcotadas,
     setBienes, setFc10List, setFc11List, setFc04List, setEstructurasDB,
     setUsuariosList, setFuncionariosPadron, setIsLoading, setDbError,

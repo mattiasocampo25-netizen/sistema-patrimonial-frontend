@@ -18,9 +18,9 @@ export default function InlineInventoryField({ bien, campo, valor, etiqueta, onS
   if (!editando) return (
     <span className="group/inline flex min-w-0 items-center gap-1">
       <span className="min-w-0 truncate" title={valor || `Sin ${etiqueta.toLowerCase()}`}>{valor || `Sin ${etiqueta.toLowerCase()}`}</span>
-      <button type="button" onClick={() => { setValorTemporal(valor || ''); setEditando(true); }} title={`Editar ${etiqueta.toLowerCase()}`} aria-label={`Editar ${etiqueta.toLowerCase()} de ${bien.rotulo || 'bien'}`} className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-content-3 opacity-0 transition-opacity group-hover/inline:opacity-100 hover:bg-surface-3 hover:text-content-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+      {onSave && <button type="button" onClick={() => { setValorTemporal(valor || ''); setEditando(true); }} title={`Editar ${etiqueta.toLowerCase()}`} aria-label={`Editar ${etiqueta.toLowerCase()} de ${bien.rotulo || 'bien'}`} className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-control text-content-3 opacity-0 transition-opacity group-hover/inline:opacity-100 hover:bg-surface-3 hover:text-content-1 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
         <i className="fa-solid fa-pen text-[10px]" aria-hidden="true" />
-      </button>
+      </button>}
     </span>
   );
 

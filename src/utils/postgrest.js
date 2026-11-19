@@ -15,6 +15,7 @@ export function rolDesdeCargo(cargo) {
     .toLocaleLowerCase('es');
   if (['admin', 'administrator', 'administracion', 'administrador', 'administrador general', 'administrador del sistema'].includes(valor)) return 'admin';
   if (['desarrollador', 'desarrollador del sistema', 'developer', 'dev'].includes(valor)) return 'dev';
+  if (['consulta de inventario', 'consultor de inventario', 'visor de inventario', 'inventory_viewer'].includes(valor)) return 'inventory_viewer';
   return 'user';
 }
 

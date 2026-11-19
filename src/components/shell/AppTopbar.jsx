@@ -44,6 +44,7 @@ export default function AppTopbar({
   onMarkAllRead,
   currentUser,
   isAdmin,
+  isInventoryViewer = false,
   handleLogout,
   actasPorFirmarCount,
   ultimoSyncBienes,
@@ -117,7 +118,7 @@ export default function AppTopbar({
             <span className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand-text" aria-hidden="true">
               <i className="fa-solid fa-building-columns text-xs" />
             </span>
-            {isAdmin ? (
+            {isAdmin || isInventoryViewer ? (
               <div className="min-w-0 max-w-[min(300px,52vw)] sm:max-w-[340px]">
                 <FiltroCombo
                   valor={dependenciaActual}
@@ -128,7 +129,7 @@ export default function AppTopbar({
                     if (clearAllFilters) clearAllFilters();
                   }}
                   etiquetaTodos="Elegí dependencia"
-                  titulo="Cambiar entorno de trabajo"
+                  titulo={isAdmin ? 'Cambiar entorno de trabajo' : 'Consultar inventario de otra dependencia'}
                   ancho="w-full"
                   className="!h-9 !rounded-full !border-transparent !bg-surface-2/70 font-semibold hover:!border-line hover:!bg-surface-2"
                 />
@@ -383,7 +384,7 @@ export default function AppTopbar({
             <div className="flex items-center gap-2 pl-2 ml-1 border-l border-line">
               <div className="hidden xl:flex flex-col text-right leading-tight">
                 <span className="text-label font-bold text-content-3 uppercase tracking-[0.14em] mt-0.5">
-                  {isAdmin ? (currentUser?.role === 'dev' ? 'Desarrollador' : 'Administrador') : 'Funcionario'}
+                  {isAdmin ? (currentUser?.role === 'dev' ? 'Desarrollador' : 'Administrador') : isInventoryViewer ? 'Consulta de inventario' : 'Funcionario'}
                 </span>
               </div>
               <div

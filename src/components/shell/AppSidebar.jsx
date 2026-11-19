@@ -28,9 +28,9 @@ const GRUPOS = [
     titulo: 'Documentos',
     icon: 'fa-folder-open',
     items: [
-      { id: 'fc04', label: 'nav.fc04', icon: 'fa-file-invoice' },
+      { id: 'fc04', label: 'nav.fc04', icon: 'fa-file-invoice', soloAdmin: true },
       { id: 'fc10', label: 'nav.fc10', icon: 'fa-file-signature' },
-      { id: 'fc11', label: 'nav.fc11', icon: 'fa-truck-fast' }
+      { id: 'fc11', label: 'nav.fc11', icon: 'fa-truck-fast', soloAdmin: true }
     ]
   },
   {
@@ -140,6 +140,7 @@ export default function AppSidebar({
   setActiveTab,
   isAdmin,
   esDesarrollador,
+  isInventoryViewer = false,
   solicitudesBaja,
   onExportBackup,
   onOpenRestore,
@@ -162,13 +163,14 @@ export default function AppSidebar({
   const busquedaRef = useRef(null);
   const usuarioKey = currentUser?.username || currentUser?.id || 'sesion';
   const gruposKey = `sidebar_grupos_${usuarioKey}`;
-  const itemsPermitidos = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).flatMap(g => g.items);
+  const itemVisible = item => (!item.soloAdmin || isAdmin) && (!isInventoryViewer || ['inventario', 'ayuda'].includes(item.id));
+  const itemsPermitidos = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).flatMap(g => g.items).filter(itemVisible);
   const terminoBusqueda = busquedaModulos.trim().toLocaleLowerCase('es');
   const contieneBusqueda = (texto) => String(texto || '').toLocaleLowerCase('es').normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(terminoBusqueda.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
   const favoritosVisibles = itemsPermitidos.filter(item => favoritos.includes(item.id) && (!terminoBusqueda || contieneBusqueda(t(item.label))));
   const gruposVisibles = GRUPOS.filter(g => (!g.soloAdmin || isAdmin) && (!g.soloDesarrollador || esDesarrollador)).map(grupo => ({
     ...grupo,
-    items: grupo.items.filter(item => !terminoBusqueda || contieneBusqueda(t(item.label)) || contieneBusqueda(grupo.titulo)),
+    items: grupo.items.filter(itemVisible).filter(item => !terminoBusqueda || contieneBusqueda(t(item.label)) || contieneBusqueda(grupo.titulo)),
   })).filter(grupo => grupo.items.length > 0);
 
   useEffect(() => {
@@ -384,7 +386,7 @@ export default function AppSidebar({
             </span>
             <span className={`min-w-0 flex-1 ${compacta ? 'lg:hidden' : ''}`}>
               <span className="block truncate text-xs font-bold text-sidebar-content">{currentUser?.nombre || currentUser?.username || 'Usuario'}</span>
-              <span className="block truncate text-[10px] font-medium text-sidebar-content-3">{esDesarrollador ? 'Desarrollador' : isAdmin ? 'Administrador' : 'Usuario del sistema'}</span>
+              <span className="block truncate text-[10px] font-medium text-sidebar-content-3">{esDesarrollador ? 'Desarrollador' : isAdmin ? 'Administrador' : isInventoryViewer ? 'Consulta de inventario' : 'Usuario del sistema'}</span>
             </span>
           </div>
         </div>

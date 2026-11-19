@@ -17,6 +17,7 @@ export default function UsuarioModal({ isOpen, onClose, usuarioEditing, saveUsua
     if (!isOpen) return null;
     const permisosPorRol = {
       user: ['Gestionar bienes y funcionarios de su dependencia', 'Crear y consultar formularios FC-04, FC-10 y FC-11', 'Enviar solicitudes para revisión administrativa'],
+      inventory_viewer: ['Consultar el inventario de todas las dependencias', 'Cambiar entre Rectorado y las facultades', 'Solo lectura: sin altas, edición, bajas, traslados ni administración'],
       admin: ['Gestionar bienes y movimientos de las dependencias', 'Revisar solicitudes e informes administrativos', 'Administrar usuarios, catálogos y auditoría'],
       desarrollador: ['Incluye permisos de administrador', 'Gestionar avisos y mantenimiento del sistema']
     };
@@ -88,6 +89,7 @@ return (
                       valor={rolSeleccionado}
                       opciones={[
                         { label: 'Funcionario Local (lectura y creación)', value: 'user' },
+                        { label: 'Consulta de inventario (solo lectura)', value: 'inventory_viewer' },
                         { label: 'Administrador General (control total)', value: 'admin' },
                         ...(esDesarrollador ? [{ label: 'Desarrollador del sistema', value: 'desarrollador' }] : []),
                       ]}

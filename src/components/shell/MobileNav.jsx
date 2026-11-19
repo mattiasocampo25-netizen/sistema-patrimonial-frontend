@@ -7,10 +7,11 @@ const DESTINOS = [
   { id: 'funcionarios', label: 'Funcionarios', icon: 'fa-address-book' },
 ];
 
-export default function MobileNav({ activeTab, setActiveTab, setIsSidebarOpen, solicitudesBaja = [] }) {
+export default function MobileNav({ activeTab, setActiveTab, setIsSidebarOpen, solicitudesBaja = [], isInventoryViewer = false }) {
+  const destinos = isInventoryViewer ? DESTINOS.filter(destino => destino.id === 'inventario') : DESTINOS;
   return (
     <nav className="mobile-nav lg:hidden" aria-label="Navegación rápida">
-      {DESTINOS.map((destino) => {
+      {destinos.map((destino) => {
         const activo = activeTab === destino.id;
         return (
           <button
@@ -28,7 +29,7 @@ export default function MobileNav({ activeTab, setActiveTab, setIsSidebarOpen, s
           </button>
         );
       })}
-      <button
+      {!isInventoryViewer && <button
         type="button"
         onClick={() => setIsSidebarOpen(true)}
         aria-controls="sidebar-navigation"
@@ -37,7 +38,7 @@ export default function MobileNav({ activeTab, setActiveTab, setIsSidebarOpen, s
       >
         <span className="mobile-nav-icon-wrap"><i className="fa-solid fa-ellipsis" aria-hidden="true" /></span>
         <span>Más</span>
-      </button>
+      </button>}
     </nav>
   );
 }

@@ -1344,6 +1344,21 @@ html.font-lg { font-size: 18px; }
 .records-hero .toolbar :is(.text-content-3, .text-content-2),
 .announcement-hero .toolbar :is(.text-content-3, .text-content-2),
 .help-hero .toolbar :is(.text-content-3, .text-content-2) { color: #d2e5e7; }
+/* El selector de periodo conserva una superficie clara dentro de la cabecera;
+   no debe heredar los rótulos claros de la franja oscura. */
+.records-hero .toolbar [role="group"] {
+  color: #183247;
+  background: #f7fbfb;
+  border-color: #c3d1d8;
+}
+.records-hero .toolbar [role="group"] :is(.text-content-3, .text-content-2) { color: #526b7b; }
+.records-hero .toolbar [role="group"] .text-content-1 { color: #183247; }
+.records-hero .toolbar [role="group"] .ui-button:not(.bg-brand) {
+  color: #183247;
+  background: #fff;
+  border-color: #c3d1d8;
+}
+.records-hero .toolbar [role="group"] .ui-button:not(.bg-brand):hover { color: #102d38; background: #edf5f5; }
 .records-workspace > :not(.records-hero),
 .announcement-workspace > :not(.announcement-hero),
 .help-workspace > :not(.help-hero) { border-radius: 1.1rem; }
@@ -1366,6 +1381,33 @@ html.font-lg { font-size: 18px; }
 .inventory-view .toolbar { min-width: 0; flex-wrap: wrap; row-gap: .55rem; }
 .inventory-view .toolbar > * { min-width: 0; }
 .inventory-view :is(.overflow-x-auto, .overflow-auto) { max-width: 100%; }
+/* Las acciones de inventario están en una banda clara bajo la cabecera. */
+.inventory-view > .overflow-hidden:first-child > div:nth-child(2) { background: #edf2f2; }
+.inventory-view > .overflow-hidden:first-child > div:nth-child(2) .ui-button:not(.bg-brand) {
+  color: #294657;
+  background: #fff;
+  border-color: #cfdbde;
+  box-shadow: 0 1px 2px rgb(18 44 54 / .05);
+}
+.inventory-view > .overflow-hidden:first-child > div:nth-child(2) .ui-button:not(.bg-brand):hover:not(:disabled) {
+  color: #123744;
+  background: #f5f9f9;
+  border-color: #a8c2c5;
+}
+.inventory-view > .overflow-hidden:first-child > div:nth-child(2) .ui-button:disabled {
+  color: #617785;
+  background: #e3e9e9;
+  border-color: #d3dddd;
+  box-shadow: none;
+  opacity: 1;
+}
+.ui-button:disabled {
+  color: var(--content-3);
+  background-color: var(--surface-3);
+  border-color: var(--line);
+  box-shadow: none;
+  opacity: 1;
+}
 
 .staff-hero, .users-hero { padding: 1.4rem 1.5rem; }
 .staff-hero .staff-page-header, .users-hero .users-page-header { padding: 0; }

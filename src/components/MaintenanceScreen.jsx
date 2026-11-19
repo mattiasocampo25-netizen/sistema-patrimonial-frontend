@@ -14,95 +14,79 @@ export default function MaintenanceScreen({ config, onAccesoDesarrollador }) {
   const estimado = config?.estimado || '';
 
   return (
-    <div className="dark min-h-dvh flex flex-col w-full bg-slate-950 font-sans antialiased relative overflow-hidden text-content-1 selection:bg-brand/30">
-      {/* Fondo decorativo premium */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#071a29] via-[#0b2637] to-[#0b4850]"></div>
-        <div className="absolute -top-48 left-1/2 -translate-x-1/2 h-96 w-[44rem] rounded-full bg-brand/10 blur-[100px]"></div>
-        <div className="absolute top-1/3 -right-40 h-80 w-80 rounded-full bg-brand/10 blur-[100px]"></div>
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-brand/10 blur-[80px]"></div>
-      </div>
+    <div className="maintenance-screen dark relative flex min-h-dvh w-full flex-col overflow-hidden font-sans antialiased text-white selection:bg-teal-300/30">
+      <div aria-hidden="true" className="maintenance-orb maintenance-orb-one" />
+      <div aria-hidden="true" className="maintenance-orb maintenance-orb-two" />
 
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
-        <div className="w-full max-w-2xl text-center">
-          <img
-            src="/UNP-Site-Logo.webp"
-            alt="Universidad Nacional de Pilar"
-            className="h-14 w-auto mx-auto object-contain drop-shadow-lg mb-6 sm:mb-8"
-            onError={(e) => { e.target.onerror = null; e.target.src = '/UNP-Site-Logo.png'; }}
-          />
-
-          {/* Estado del mantenimiento con indicador animado */}
-          <div role="status" aria-live="polite" className="inline-flex items-center gap-3 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-[0.14em] bg-warn-soft text-warn border border-warn/25 mb-6 backdrop-blur-sm">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warn opacity-70"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-warn"></span>
-            </span>
-            Sistema en mantenimiento
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8 sm:py-7">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+          <div className="flex h-12 w-36 shrink-0 items-center justify-center rounded-xl bg-white px-3 shadow-lg sm:h-14 sm:w-44">
+            <img src="/UNP-Site-Logo-negro.webp" alt="Universidad Nacional de Pilar" className="max-h-full max-w-full object-contain" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/UNP-Site-Logo-negro.png'; }} />
           </div>
+          <div className="hidden min-w-0 border-l border-white/20 pl-4 sm:block">
+            <p className="text-xs font-bold uppercase tracking-[.16em] text-teal-100">Patrimonio</p>
+            <p className="mt-1 text-xs text-slate-300">Universidad Nacional de Pilar</p>
+          </div>
+        </div>
+        <span className="rounded-full border border-white/15 bg-white/[.07] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-slate-200 sm:text-xs">SIGEP · v{version}</span>
+      </header>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-content-1 dark:text-white tracking-tight mb-4">
-            {config?.titulo || 'Estamos mejorando el sistema'}
-          </h1>
-          <p className="text-base text-content-2 leading-relaxed mt-2 max-w-xl mx-auto mb-7 sm:mb-9">
-            {config?.mensaje || 'El sistema está pausado por unos minutos mientras aplicamos mejoras. Vuelve pronto.'}
-          </p>
-
-          {/* Información de progreso */}
-          {(transcurrido || estimado) && <dl className="mb-7 grid grid-cols-1 gap-3 rounded-panel border border-line bg-surface-1 p-4 text-left sm:grid-cols-2 sm:p-5">
-            {transcurrido && <div><dt className="text-[10px] font-bold uppercase tracking-wider text-content-3">Tiempo transcurrido</dt><dd className="mt-1 text-sm font-semibold text-content-1">{transcurrido}</dd></div>}
-            {estimado && <div><dt className="text-[10px] font-bold uppercase tracking-wider text-content-3">Tiempo estimado</dt><dd className="mt-1 text-sm font-semibold text-content-1">{estimado}</dd></div>}
-          </dl>}
-
-          {mejoras.length > 0 && (
-            <div className="mb-7 rounded-panel border border-line bg-surface-1 p-4 text-left shadow-card sm:mb-9 sm:p-6">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-content-3 mb-5">
-                Mejoras en curso
-              </p>
-              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {mejoras.map((m, i) => (
-                  <li key={i} className="flex min-w-0 items-start gap-3 rounded-xl border border-line bg-surface-2/70 p-3 text-sm text-content-1">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand-text">
-                      <span className="text-xs font-bold tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                    </span>
-                    <span className="leading-relaxed">{m}</span>
-                  </li>
-                ))}
-              </ul>
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 items-center px-5 py-8 sm:px-8 sm:py-12">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,.95fr)] lg:gap-16">
+          <section className="maintenance-copy max-w-2xl">
+            <div role="status" aria-live="polite" className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-teal-200/20 bg-teal-200/[.08] px-4 py-2 text-[10px] font-bold uppercase tracking-[.16em] text-teal-100 sm:mb-8 sm:text-xs">
+              <span className="maintenance-status-dot" aria-hidden="true" /> Mejoras en curso
             </div>
-          )}
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.08] tracking-[-.04em] text-white sm:text-5xl lg:text-6xl">
+              {config?.titulo || 'Estamos preparando una nueva versión'}
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-300 sm:mt-6 sm:text-lg sm:leading-8">
+              {config?.mensaje || 'Estamos trabajando en mejoras para ofrecerte una experiencia más clara, rápida y cómoda. El sistema volverá a estar disponible pronto.'}
+            </p>
+            <div className="maintenance-progress mt-8 max-w-md sm:mt-10" aria-label="Actualización en curso">
+              <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-slate-300">
+                <span>Preparando la actualización</span><span className="text-teal-200">En progreso</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className="maintenance-progress-bar h-full w-2/5 rounded-full bg-gradient-to-r from-teal-300 to-cyan-200" /></div>
+            </div>
+            <div className="mt-8 flex flex-col gap-3 sm:mt-9 sm:flex-row">
+              <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-400 px-5 text-sm font-bold text-slate-950 shadow-lg shadow-teal-950/20 transition hover:-translate-y-0.5 hover:bg-teal-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-100 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+                <i className="fa-solid fa-rotate-right" aria-hidden="true" /> Comprobar disponibilidad
+              </button>
+              <a href="mailto:patrimonio@unp.edu.py?subject=Consulta%20sobre%20mantenimiento%20del%20sistema" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[.06] px-5 text-sm font-semibold text-white transition hover:bg-white/[.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200">
+                <i className="fa-regular fa-envelope text-teal-200" aria-hidden="true" /> Contactar a Patrimonio
+              </a>
+            </div>
+            {onAccesoDesarrollador && <button onClick={onAccesoDesarrollador} className="mt-5 inline-flex items-center gap-2 rounded-lg px-1 py-2 text-xs font-semibold text-slate-400 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200" title="Acceso del desarrollador del sistema"><i className="fa-solid fa-key text-[10px]" aria-hidden="true" /> Acceso desarrollador</button>}
+          </section>
 
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href="mailto:patrimonio@unp.edu.py?subject=Consulta%20sobre%20mantenimiento%20del%20sistema" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-control border border-line bg-surface-1 px-4 text-sm font-semibold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-              <i className="fa-solid fa-envelope text-brand-text" aria-hidden="true" /> Contactar a Patrimonio
-            </a>
-            <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-control bg-brand px-4 text-sm font-bold text-content-inverse hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
-              <i className="fa-solid fa-rotate-right" aria-hidden="true" /> Volver a comprobar
-            </button>
-          </div>
-          <p className="mt-3 text-xs text-content-3">
-            ¿Necesitas ayuda? <a href="mailto:patrimonio@unp.edu.py" className="font-semibold text-brand-text underline underline-offset-2">patrimonio@unp.edu.py</a>
-          </p>
-          {onAccesoDesarrollador && (
-            <button
-              onClick={onAccesoDesarrollador}
-              className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-content-3 hover:text-slate-300 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-lg px-4 py-2.5"
-              title="Acceso del desarrollador del sistema"
-            >
-              <i className="fa-solid fa-key text-[10px]"></i>
-              Acceso desarrollador
-            </button>
-          )}
+          <aside className="maintenance-card rounded-3xl border border-white/10 bg-white/[.06] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-7 lg:p-8">
+            <div className="flex items-start gap-4 border-b border-white/10 pb-5 sm:pb-6">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-300/10 text-teal-200"><i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" /></span>
+              <div><h2 className="text-base font-bold text-white sm:text-lg">Una mejor experiencia está en camino</h2><p className="mt-1 text-sm leading-6 text-slate-300">Estamos actualizando el sistema para que trabajar con el patrimonio sea más sencillo.</p></div>
+            </div>
+            {(transcurrido || estimado) && <dl className="grid grid-cols-2 gap-3 border-b border-white/10 py-5 sm:py-6">
+              {transcurrido && <div className="rounded-xl bg-white/[.05] p-3"><dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiempo transcurrido</dt><dd className="mt-1.5 text-sm font-semibold text-white">{transcurrido}</dd></div>}
+              {estimado && <div className="rounded-xl bg-white/[.05] p-3"><dt className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tiempo estimado</dt><dd className="mt-1.5 text-sm font-semibold text-white">{estimado}</dd></div>}
+            </dl>}
+            <div className="pt-5 sm:pt-6">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-[.16em] text-teal-200">Qué estamos mejorando</p>
+              {mejoras.length > 0 ? <ul className="space-y-3">
+                {mejoras.map((m, i) => <li key={i} className="flex min-w-0 items-start gap-3 text-sm leading-6 text-slate-200">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal-300/10 text-teal-200"><i className="fa-solid fa-check text-[10px]" aria-hidden="true" /></span><span>{m}</span>
+                </li>)}
+              </ul> : <ul className="space-y-3 text-sm text-slate-200">
+                {['Interfaz más clara y consistente', 'Mejoras de uso y rendimiento', 'Nuevas animaciones sutiles'].map(item => <li key={item} className="flex items-center gap-3"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-300/10 text-teal-200"><i className="fa-solid fa-check text-[10px]" aria-hidden="true" /></span>{item}</li>)}
+              </ul>}
+            </div>
+            <p className="mt-6 rounded-xl border border-white/10 bg-slate-950/20 px-4 py-3 text-xs leading-5 text-slate-400">Gracias por tu paciencia. Tus datos permanecen protegidos durante la actualización.</p>
+          </aside>
         </div>
       </main>
 
-      <footer className="relative z-10 mt-8 flex flex-col items-center justify-between gap-2 border-t border-line/70 px-6 py-5 text-center sm:flex-row sm:text-left">
-        <p className="text-xs font-medium text-content-3">
-          Universidad Nacional de Pilar · Dpto. Bienes Patrimoniales
-        </p>
-        <p className="text-xs font-bold text-content-3">
-          Sistema de Gestión Patrimonial v{version}
-        </p>
+      <footer className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-2 border-t border-white/10 px-5 py-5 text-center text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:text-left">
+        <p>Universidad Nacional de Pilar · Departamento de Bienes Patrimoniales</p>
+        <a href="mailto:patrimonio@unp.edu.py" className="font-medium text-slate-300 hover:text-white">patrimonio@unp.edu.py</a>
       </footer>
     </div>
   );

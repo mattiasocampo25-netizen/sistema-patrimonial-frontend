@@ -57,10 +57,7 @@ const GRUPOS = [
 ];
 
 function LogoInstitucional({ className = '' }) {
-  return <>
-    <img src="/UNP-Site-Logo-negro.webp" alt="Universidad Nacional de Pilar" className={`block h-full w-full object-contain object-left dark:hidden ${className}`} onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = '/UNP-Site-Logo-negro.png'; }} />
-    <img src="/UNP-Site-Logo.webp" alt="Universidad Nacional de Pilar" className={`hidden h-full w-full object-contain object-left dark:block ${className}`} onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = '/UNP-Site-Logo.png'; }} />
-  </>;
+  return <img src="/UNP-Site-Logo.webp" alt="Universidad Nacional de Pilar" className={`block h-full w-full object-contain object-left ${className}`} onError={event => { event.currentTarget.onerror = null; event.currentTarget.src = '/UNP-Site-Logo.png'; }} />;
 }
 
 /**

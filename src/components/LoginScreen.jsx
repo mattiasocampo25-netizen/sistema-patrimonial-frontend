@@ -48,19 +48,17 @@ export default function LoginScreen({
 
   return (
     <div
-      className={`relative flex h-dvh min-h-dvh w-full items-start justify-center overflow-x-hidden overflow-y-auto bg-canvas px-4 py-8 font-sans antialiased text-content-1 selection:bg-brand/20 md:items-center sm:px-8 ${darkMode ? 'dark' : ''}`}
+      className={`relative flex h-dvh min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto bg-[#edf3f9] px-4 py-5 font-sans antialiased text-content-1 selection:bg-brand/20 dark:bg-[#0c1725] sm:px-8 md:py-8 ${darkMode ? 'dark' : ''}`}
     >
-      {/* Fondo decorativo sutil con tonos de marca */}
+      {/* Fondo limpio: el campus queda como acento dentro del panel institucional. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-35" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#071a29]/88 via-[#0d3445]/70 to-brand/45" />
-        <span className="absolute -left-32 -top-32 h-64 w-64 rounded-full bg-brand/20 blur-[100px]" />
-        <span className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-cyan-400/10 blur-[100px]" />
+        <span className="absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-brand/10 blur-[110px]" />
+        <span className="absolute -bottom-48 -right-40 h-[32rem] w-[32rem] rounded-full bg-blue-400/10 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 flex w-full items-center justify-center max-w-6xl">
-        <div className="login-card-in login-experience grid w-full overflow-hidden rounded-[28px] border border-white/40 bg-surface-1 shadow-pop md:grid-cols-[1fr_1fr]">
-            <aside className="relative hidden min-h-[620px] flex-col justify-between overflow-hidden bg-[#102b40] p-10 text-white md:flex lg:p-14">
+      <div className="relative z-10 flex w-full max-w-5xl items-center justify-center">
+        <div className="login-card-in login-experience grid w-full overflow-hidden rounded-3xl border border-white/70 bg-surface-1 shadow-pop md:grid-cols-[.88fr_1.12fr]">
+            <aside className="relative hidden min-h-[500px] flex-col justify-between overflow-hidden bg-[#153b68] p-8 text-white md:flex lg:p-10">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-65" />
               <div className="absolute inset-0 bg-gradient-to-b from-[#092033]/65 via-[#0b2b3e]/45 to-[#071a29]/95" />
@@ -69,7 +67,7 @@ export default function LoginScreen({
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:42px_42px]" />
             </div>
             <div className="relative z-10 flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-2 shadow-card">
+              <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-white/50 bg-white p-2 shadow-card">
                 {appLogo ? <img src={appLogo} alt="Logo institucional UNP" className="h-full w-full object-contain" /> : <i className="fa-solid fa-building-columns text-xl text-teal-100" aria-hidden="true" />}
               </span>
               <span>
@@ -78,7 +76,7 @@ export default function LoginScreen({
               </span>
             </div>
 
-            <div className="relative z-10 my-12">
+            <div className="relative z-10 my-8 lg:my-10">
               <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-teal-200/20 bg-teal-300/10 px-3 py-1.5 text-label font-semibold text-teal-100">
                 <i className="fa-solid fa-shield-halved" aria-hidden="true" /> Plataforma institucional
               </span>
@@ -108,8 +106,8 @@ export default function LoginScreen({
             </div>
           </div>
 
-          <div className="px-6 pb-7 pt-7 sm:px-10 sm:pb-9 md:px-12 md:pb-8 md:pt-12">
-            <div className="login-rise login-rise-2 mb-6">
+          <div className="px-6 pb-6 pt-6 sm:px-9 sm:pb-7 md:px-10 md:py-8">
+            <div className="login-rise login-rise-2 mb-5">
               <span className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-soft text-brand-text md:hidden" aria-hidden="true"><i className="fa-solid fa-right-to-bracket" /></span>
               <p className="text-label font-bold uppercase tracking-[0.16em] text-brand-text">Acceso institucional</p>
               <h2 className="mt-2 text-2xl font-bold tracking-tight text-content-1 sm:text-3xl">Iniciar sesión</h2>
@@ -118,7 +116,7 @@ export default function LoginScreen({
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="w-full space-y-5">
+            <form onSubmit={handleLogin} className="w-full space-y-4">
               {loginError && (
                 <div id="login-error" role="alert" className="rounded-xl bg-danger-soft p-3.5 text-sm text-danger font-medium flex items-center gap-3 border border-danger/25 animate-slide-up shadow-sm">
                   <i className="fa-solid fa-circle-exclamation text-base text-danger shrink-0" aria-hidden="true"></i>
@@ -216,7 +214,7 @@ export default function LoginScreen({
             </form>
           </div>
 
-          <div className="border-t border-line bg-surface-2/50 px-6 py-4 sm:px-10 md:px-12">
+          <div className="border-t border-line bg-surface-2/50 px-6 py-3 sm:px-9 md:px-10">
             <div className="flex items-center justify-between gap-4 text-center sm:text-left">
               <Button
                 variante="ghost"

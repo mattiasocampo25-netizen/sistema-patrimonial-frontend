@@ -39,6 +39,7 @@ export const normalizeStr = (str) =>
 // Colores institucionales estables por facultad. Se usan en marca y acciones
 // de la interfaz, no en estados semánticos como error, advertencia o éxito.
 const PALETAS_DEPENDENCIA = [
+  { clave: 'RECTORADO', claro: ['#2563eb', '#1d4ed8', '#eff6ff', '#1d4ed8'], oscuro: ['#60a5fa', '#93c5fd', '#172d4d', '#93c5fd'] },
   { clave: 'CIENCIAS APLICADAS', claro: ['#4338ca', '#3730a3', '#eef2ff', '#3730a3'], oscuro: ['#a5b4fc', '#c7d2fe', '#24214a', '#c7d2fe'] },
   { clave: 'HUMANIDADES', claro: ['#6d28d9', '#5b21b6', '#f5f3ff', '#5b21b6'], oscuro: ['#c4b5fd', '#ddd6fe', '#32204f', '#ddd6fe'] },
   { clave: 'CONTABLES', claro: ['#047857', '#065f46', '#ecfdf5', '#065f46'], oscuro: ['#6ee7b7', '#a7f3d0', '#123b32', '#a7f3d0'] },

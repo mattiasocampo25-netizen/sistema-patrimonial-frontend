@@ -469,7 +469,7 @@ export default function InventarioView({
     </div>
 
     <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-    <div className="grid min-h-[68px] grid-cols-1 items-center gap-3 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3 dark:bg-emerald-500/[0.06]">
+    <div className="inventory-free-filter grid min-h-[68px] grid-cols-1 items-center gap-3 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-3 dark:bg-emerald-500/[0.06]">
       <button
         type="button"
         aria-pressed={filtroPendiente === 'libresParaAsignar'}
@@ -490,7 +490,7 @@ export default function InventarioView({
       </div>
     </div>
 
-    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
+    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`inventory-observed-filter flex min-h-[68px] w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
       <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
       <span className="min-w-[68px] rounded-full border border-amber-600/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-amber-800 dark:bg-slate-900 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>

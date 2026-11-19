@@ -328,7 +328,7 @@ export default function DashboardView({
         </section>
       )}
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,.8fr)]">
+      <div className="dashboard-workspaces-grid grid items-start gap-5 xl:grid-cols-[minmax(0,1.5fr)_minmax(320px,.8fr)]">
         <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Trabajo pendiente" data-tour="dash-pendientes">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
             <div>
@@ -391,7 +391,7 @@ export default function DashboardView({
           </section>
 
           {widgets.metricas && tilesPorDependencia.length > 0 && (
-            <details className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
+            <details open className="group overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 text-xs font-extrabold text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
                 <span className="flex items-center gap-2"><i className="fa-solid fa-building-columns text-brand-text" aria-hidden="true" /> Dependencias</span>
                 <span className="flex items-center gap-2 text-[10px] font-semibold text-content-3">{tilesPorDependencia.length} áreas <i className="fa-solid fa-chevron-down transition-transform group-open:rotate-180" aria-hidden="true" /></span>

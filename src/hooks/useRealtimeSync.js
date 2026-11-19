@@ -97,6 +97,18 @@ export function useRealtimeSync({
     const consultas = [];
     if (currentUser?.username) consultas.push(consultaDestino(currentUser.username));
     consultas.push(consultaDestino('TODOS'));
+    // Las solicitudes de baja no son avisos de buzón: pertenecen al historial
+    // del solicitante y no llevan `usuarioDestino`. Sin esta consulta, quien
+    // las crea las ve solo hasta que se sincroniza la aplicación y pierde el
+    // estado/historial del trámite tras recargar. La RLS limita la lectura a
+    // su dependencia o a su propia identidad.
+    if (!isAdmin && currentUser?.username) {
+      consultas.push(supabase.from('notificaciones').select('id, data')
+        .eq('data->>solicitante', currentUser.username)
+        .in('data->>tipo', ['BAJA_BIEN', 'BAJA_FUNCIONARIO'])
+        .order('id', { ascending: false })
+        .limit(limite));
+    }
     // El historial de Anuncios es administrativo: además de los recibidos por
     // el propio administrador y los globales, debe recuperar los avisos
     // dirigidos a otros usuarios. Sin esta consulta el anuncio recién enviado

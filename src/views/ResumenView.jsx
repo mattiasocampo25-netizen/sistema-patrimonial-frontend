@@ -78,7 +78,7 @@ export default function ResumenView({
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[1.1fr_0.9fr]">
         <Card tamaño="sm" className="overflow-hidden p-0">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4 sm:px-6">
             <div>
@@ -133,17 +133,37 @@ export default function ResumenView({
           <span className="rounded-full border border-line bg-surface-2 px-3 py-1 text-xs font-semibold text-content-2">{misSolicitudesBaja.length} solicitudes</span>
         </div>
         {misSolicitudesBaja.length === 0 ? (
-          <p className="px-5 py-8 text-center text-xs text-content-3">Todavía no tienes solicitudes de baja registradas.</p>
+          <p className="px-5 py-5 text-center text-xs text-content-3">Todavía no tienes solicitudes de baja registradas.</p>
         ) : (
           <ul className="divide-y divide-line">
             {misSolicitudesBaja.map(solicitud => {
-              const historial = Array.isArray(solicitud.historial) && solicitud.historial.length
+              const estadoActual = String(solicitud.estado || 'PENDIENTE').toUpperCase();
+              const estadosFinales = ['APROBADO', 'RECHAZADO', 'RESUELTO'];
+              const historialBase = Array.isArray(solicitud.historial) && solicitud.historial.length
                 ? solicitud.historial
-                : [{ estado: solicitud.estado || 'PENDIENTE', usuario: solicitud.solicitante, fecha: solicitud.created_at || solicitud.fecha, motivo: solicitud.motivo }];
+                : [
+                    { estado: 'PENDIENTE', usuario: solicitud.solicitante, fecha: solicitud.created_at || solicitud.fecha, motivo: solicitud.motivo },
+                    ...(solicitud.revisionEn || estadoActual === 'EN_REVISION' ? [{ estado: 'EN_REVISION', usuario: solicitud.revisionPor, fecha: solicitud.revisionEn }] : []),
+                    ...(estadosFinales.includes(estadoActual) ? [{ estado: estadoActual, usuario: solicitud.resueltoPor, fecha: solicitud.resueltoEn || solicitud.resueltoFecha, motivo: solicitud.motivoResolucion }] : [])
+                  ];
+              const tieneEventoAsignacion = historialBase.some(evento => /Responsable asignado:/i.test(evento.motivo || ''));
+              const historial = [
+                ...historialBase,
+                ...(solicitud.responsable && solicitud.asignadoEn && !tieneEventoAsignacion
+                  ? [{ estado: 'PENDIENTE', usuario: solicitud.asignadoPor, fecha: solicitud.asignadoEn, motivo: `Responsable asignado: ${solicitud.responsable}` }]
+                  : [])
+              ].sort((a, b) => {
+                const fechaA = new Date(a.fecha || 0).getTime() || 0;
+                const fechaB = new Date(b.fecha || 0).getTime() || 0;
+                return fechaA - fechaB;
+              });
               const ultimo = historial[historial.length - 1] || {};
               const estado = String(solicitud.estado || ultimo.estado || 'PENDIENTE').toUpperCase();
               const estadoTexto = ({ PENDIENTE: 'Recibida', EN_REVISION: 'En revisión', APROBADO: 'Aprobada', RECHAZADO: 'Rechazada', RESUELTO: 'Resuelta' })[estado] || estado.replaceAll('_', ' ');
               const esFinal = ['APROBADO', 'RECHAZADO', 'RESUELTO'].includes(estado);
+              const procesoActual = estado === 'PENDIENTE'
+                ? (solicitud.responsable ? 'Responsable asignado · pendiente de revisión' : 'Pendiente de asignación y revisión')
+                : estadoTexto;
               return <li key={solicitud.id} className="px-5 py-5 sm:px-6">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -152,9 +172,14 @@ export default function ResumenView({
                   </div>
                   <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold ${estado === 'RECHAZADO' ? 'border-danger/20 bg-danger-soft text-danger' : esFinal ? 'border-ok/20 bg-ok-soft text-ok' : 'border-warn/20 bg-warn-soft text-warn'}`}>{estadoTexto}</span>
                 </div>
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 rounded-lg bg-surface-2/70 px-3 py-2 text-[11px]">
+                  <span className="font-semibold text-content-2"><i className="fa-solid fa-route mr-1.5 text-brand-text" aria-hidden="true" />Proceso actual: {procesoActual}</span>
+                  {solicitud.responsable && <span className="text-content-2"><i className="fa-solid fa-user-check mr-1.5 text-brand-text" aria-hidden="true" />Responsable: <strong className="font-semibold text-content-1">{solicitud.responsable}</strong></span>}
+                  {ultimo.fecha && <span className="text-content-3">Actualizado: {formatDateText(ultimo.fecha)}</span>}
+                </div>
                 <ol className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {historial.map((evento, indice) => <li key={`${solicitud.id}-${indice}`} className="rounded-xl border border-line bg-surface-2/70 p-3">
-                    <p className="text-xs font-bold text-content-1">{({ PENDIENTE: 'Solicitud enviada', EN_REVISION: 'En revisión', APROBADO: 'Aprobada', RECHAZADO: 'Rechazada', RESUELTO: 'Resuelta' })[String(evento.estado || '').toUpperCase()] || String(evento.estado || 'Actualización').replaceAll('_', ' ')}</p>
+                    <p className="text-xs font-bold text-content-1">{/Responsable asignado:/i.test(evento.motivo || '') ? 'Responsable asignado' : ({ PENDIENTE: 'Solicitud enviada', EN_REVISION: 'En revisión', APROBADO: 'Aprobada', RECHAZADO: 'Rechazada', RESUELTO: 'Resuelta' })[String(evento.estado || '').toUpperCase()] || String(evento.estado || 'Actualización').replaceAll('_', ' ')}</p>
                     <p className="mt-1 text-[10px] text-content-3">{evento.fecha ? formatDateText(evento.fecha) : 'Fecha no registrada'}{evento.usuario ? ` · ${evento.usuario}` : ''}</p>
                     {evento.motivo && <p className="mt-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-content-2">{evento.motivo}</p>}
                   </li>)}
@@ -166,7 +191,7 @@ export default function ResumenView({
         )}
       </Card>
 
-      <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+      <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
         <Card tamaño="sm" className="p-5 sm:p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div><h2 className="text-sm font-bold text-content-1"><i className="fa-solid fa-arrow-right-arrow-left mr-2 text-brand-text" aria-hidden="true" />Movimientos FC-10</h2><p className="mt-1 text-xs text-content-3">Compara las asignaciones del período.</p></div>

@@ -937,10 +937,12 @@ useEffect(() => {
       return notificaciones.filter(n => {
           if (n.tipo !== 'BAJA_BIEN' && n.tipo !== 'BAJA_FUNCIONARIO') return false;
           if (isAdmin) return true;
+          const usuario = normalizeStr(currentUser?.username || currentUser?.id || '');
+          if (usuario && normalizeStr(n.solicitante) === usuario) return true;
           if (!n.dependencia || !dependenciaActual) return true;
           return normalizeStr(n.dependencia) === normalizeStr(dependenciaActual);
       });
-  }, [notificaciones, dependenciaActual, isAdmin]);
+  }, [notificaciones, dependenciaActual, isAdmin, currentUser?.username, currentUser?.id]);
   // --- CAMBIO MANUAL DE ESTADO DE FIRMAS FC-10 (solo administrador) ---
   // Escribe directo en Supabase (tabla fc10, columna JSONB data). No usa backend.
   const actualizarEstadoFirma = async (id, { estadoFirma, registradoPor }) => {

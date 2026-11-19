@@ -1303,7 +1303,14 @@ html.font-lg { font-size: 18px; }
 .summary-hero .mt-6 { border-color: rgb(215 242 241 / .18); background: rgb(255 255 255 / .16); }
 .summary-hero .mt-6 button { background: rgb(255 255 255 / .08); color: #fff; }
 .summary-hero .mt-6 button:hover { background: rgb(255 255 255 / .16); }
-.summary-hero .mt-6 button :is(span, i) { color: inherit; }
+.summary-hero .mt-6 button > span:first-child { background-color: color-mix(in srgb, var(--brand) 12%, var(--surface-1)); }
+.summary-hero .mt-6 button > span:first-child i { color: var(--brand-text); }
+.summary-hero .mt-6 button > span:first-child.text-emerald-700 i { color: #047857; }
+.summary-hero .mt-6 button > span:first-child.text-amber-700 i { color: #b45309; }
+.summary-hero .mt-6 button > span:first-child.text-orange-700 i { color: #c2410c; }
+.dark .summary-hero .mt-6 button > span:first-child.text-emerald-700 i { color: #6ee7b7; }
+.dark .summary-hero .mt-6 button > span:first-child.text-amber-700 i { color: #fcd34d; }
+.dark .summary-hero .mt-6 button > span:first-child.text-orange-700 i { color: #fdba74; }
 .summary-hero .mt-6 button span span:first-child { color: #c2d9dc; }
 .summary-hero .mt-6 button span span:nth-child(2) { color: #fff; }
 
@@ -1379,7 +1386,10 @@ html.font-lg { font-size: 18px; }
 .inventory-view > .overflow-hidden:first-child p.text-brand-text { color: #a8eee5 !important; }
 .inventory-view > .overflow-hidden:first-child .module-page-header > div:first-child > span:first-child { color: #a8f0e6; background: rgb(255 255 255 / .12); }
 .inventory-view > .overflow-hidden:first-child .rounded-xl.border { color: #f5fbfb; background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .18); }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border :is(span, i) { color: #fff; }
+.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:first-child { color: #f5fbfb; }
+.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:first-child :is(span, i) { color: #fff; }
+.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:last-child { color: #fff; background: rgb(255 255 255 / .14); }
+.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:last-child i { color: inherit; }
 .inventory-view > .overflow-hidden:first-child .border-t { border-color: rgb(220 245 244 / .18); }
 .inventory-view > .overflow-hidden:first-child .border-t > div { color: #fff; }
 .inventory-view > .overflow-hidden:first-child .border-t span { color: #c6dbdd; }

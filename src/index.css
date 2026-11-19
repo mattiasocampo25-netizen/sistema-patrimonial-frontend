@@ -1385,20 +1385,28 @@ html.font-lg { font-size: 18px; }
 .inventory-view > .overflow-hidden:first-child .module-page-header p,
 .inventory-view > .overflow-hidden:first-child p.text-brand-text { color: #a8eee5 !important; }
 .inventory-view > .overflow-hidden:first-child .module-page-header > div:first-child > span:first-child { color: #a8f0e6; background: rgb(255 255 255 / .12); }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border { color: #f5fbfb; background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .18); }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:first-child { color: #f5fbfb; }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:first-child :is(span, i) { color: #fff; }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:last-child { color: #fff; background: rgb(255 255 255 / .14); }
-.inventory-view > .overflow-hidden:first-child .rounded-xl.border > span:last-child i { color: inherit; }
+.inventory-header-main { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1rem 1.5rem; }
+.inventory-header-content { min-width: 0; }
+.inventory-view-count { color: #f5fbfb; background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .2); }
+.inventory-view-count-icon { color: #a8eee5; background: #123744; }
+.inventory-view-count-label { color: #c6dbdd; background: transparent; }
+.inventory-view-count-value { color: #fff; background: transparent; }
 .inventory-view > .overflow-hidden:first-child .border-t { border-color: rgb(220 245 244 / .18); }
 .inventory-view > .overflow-hidden:first-child .border-t > div { color: #fff; }
 .inventory-view > .overflow-hidden:first-child .border-t span { color: #c6dbdd; }
+.inventory-view > .overflow-hidden:first-child .border-t > div > i { color: #a8eee5; }
+.inventory-view > .overflow-hidden:first-child .border-t > div > i.text-emerald-700 { color: #6ee7b7; }
+.inventory-view > .overflow-hidden:first-child .border-t > div > i.text-amber-700 { color: #fcd34d; }
+.inventory-view > .overflow-hidden:first-child .border-t > div > i.text-sky-700 { color: #7dd3fc; }
 .inventory-view > .overflow-hidden:first-child .border-t span span:last-child { color: #fff; }
 .inventory-view > .overflow-hidden:first-child > .border-t { background: rgb(8 35 46 / .22); }
 .inventory-view > .w-full.min-w-0.space-y-2 { padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 1.1rem; background: var(--surface-1); box-shadow: var(--shadow-card); }
 .inventory-view { min-width: 0; max-width: 100%; overflow-x: clip; }
 .inventory-view .toolbar { min-width: 0; flex-wrap: wrap; row-gap: .55rem; }
 .inventory-view .toolbar > * { min-width: 0; }
+.inventory-toolbar { width: 100%; min-width: 0; }
+.inventory-actions { display: flex; min-width: 0; flex: 1 1 auto; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.inventory-actions-scroll { min-width: 0; flex: 1 1 24rem; }
 .inventory-view :is(.overflow-x-auto, .overflow-auto) { max-width: 100%; }
 /* Las acciones de inventario están en una banda clara bajo la cabecera. */
 .inventory-view > .overflow-hidden:first-child > div:nth-child(2) { background: #edf2f2; }
@@ -1451,7 +1459,7 @@ html.font-lg { font-size: 18px; }
 .dark .inventory-free-filter { background: color-mix(in srgb, var(--brand) 8%, var(--surface-1)); }
 .dark .inventory-observed-filter:not([aria-pressed="true"]) { background: color-mix(in srgb, #f59e0b 7%, var(--surface-1)); }
 .inventory-view { row-gap: .8rem; }
-.inventory-view > .overflow-hidden:first-child > div:first-child { padding: .75rem 1rem; }
+.inventory-view > .overflow-hidden:first-child > div:first-child { padding: 1rem 1.1rem; }
 .inventory-view > .w-full.min-w-0.space-y-2 { padding: .6rem .7rem; }
 button:disabled {
   cursor: not-allowed;
@@ -1547,7 +1555,7 @@ button:disabled {
   .records-workspace > .records-hero > div:first-child,
   .announcement-workspace > .announcement-hero > div:first-child,
   .help-workspace > .help-hero > div:first-child,
-  .inventory-view > .overflow-hidden:first-child > div:first-child { padding: .75rem .9rem; }
+  .inventory-view > .overflow-hidden:first-child > div:first-child { padding: .9rem 1rem; }
   .inventory-view > .overflow-hidden:first-child .border-t { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
@@ -1556,6 +1564,9 @@ button:disabled {
   .module-screen { gap: .85rem; }
   .module-page-header h1 { font-size: 1.4rem; }
   .module-page-header { gap: .75rem; }
+  .inventory-header-main { grid-template-columns: minmax(0, 1fr); }
+  .inventory-view-count { justify-self: start; }
+  .inventory-actions-scroll { width: 100%; flex: 0 0 100%; }
   .dashboard-stagger { gap: 1rem; }
   .dashboard-stagger > header { gap: 1rem; }
   .mobile-nav { padding-top: .45rem; }

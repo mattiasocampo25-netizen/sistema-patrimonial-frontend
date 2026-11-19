@@ -278,9 +278,9 @@ export default function InventarioView({
 
   {/* 1. ENCABEZADO Y ACCIONES PRINCIPALES */}
   <Card className="overflow-hidden border-brand/15 p-0 shadow-panel">
-    <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 px-4 py-3 sm:px-5 sm:py-3.5 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0 flex-1">
+    <div className="inventory-header bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 px-4 py-4 sm:px-5 sm:py-4 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
+      <div className="inventory-header-main">
+        <div className="inventory-header-content min-w-0">
           <p className="mb-1 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-brand-text"><i className="fa-solid fa-layer-group" aria-hidden="true" /> Gestión patrimonial</p>
           <PageHeader
             titulo={'Inventario General'}
@@ -289,9 +289,9 @@ export default function InventarioView({
             className="!mb-0 !p-0"
           />
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-1/90 px-3 py-2 shadow-xs">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-soft text-brand-text"><i className="fa-solid fa-boxes-stacked text-xs" aria-hidden="true" /></span>
-          <span><span className="block text-[10px] font-semibold uppercase tracking-wide text-content-3">Bienes en esta vista</span><span className="block text-sm font-extrabold tabular-nums text-content-1">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
+        <div className="inventory-view-count flex items-center gap-2 rounded-xl border border-line px-3 py-2 shadow-xs">
+          <span className="inventory-view-count-icon flex h-8 w-8 items-center justify-center rounded-lg"><i className="fa-solid fa-boxes-stacked text-xs" aria-hidden="true" /></span>
+          <span className="inventory-view-count-copy"><span className="inventory-view-count-label block text-[10px] font-semibold uppercase tracking-wide">Bienes en esta vista</span><span className="inventory-view-count-value block text-sm font-extrabold tabular-nums">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
         </div>
       </div>
       <div className="mt-3 grid grid-cols-2 gap-1.5 border-t border-line/70 pt-2.5 sm:grid-cols-4">
@@ -312,11 +312,11 @@ export default function InventarioView({
           ("Mostrando X de Y"), así que la cabecera queda solo con la
           identidad del módulo. */}
       <div className="border-t border-line bg-surface-2/50 px-3 py-2 sm:px-4">
-      <Toolbar>
+      <Toolbar className="inventory-toolbar">
 
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
-      <div className="flex items-center gap-2 min-w-0">
-      <div className="flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
+      <div className="inventory-actions">
+      <div className="inventory-actions-scroll flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
         <Button variante="subtle" icono="fa-file-excel" onClick={handleDownloadTemplateCSV} title="Descargar Plantilla CSV">
           {t('inv.plantilla')}
         </Button>
@@ -417,7 +417,7 @@ export default function InventarioView({
       )}
     </div>
     {searchTerm && (
-      <p role="status" aria-live="polite" className="-mt-2 flex items-center gap-2 px-1 text-xs font-medium text-content-3">
+        <p role="status" aria-live="polite" className="mt-1 flex items-center gap-2 px-1 text-xs font-medium text-content-3">
         {searchTerm !== debouncedSearchTerm ? (
           <><i className="fa-solid fa-circle-notch fa-spin text-brand" aria-hidden="true" /> Buscando en el inventario…</>
         ) : (

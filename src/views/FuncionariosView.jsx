@@ -35,7 +35,7 @@ export default function FuncionariosView({
             <p className="mb-2 text-label font-extrabold uppercase tracking-[0.18em] text-brand-text">Directorio institucional</p>
             <PageHeader
               titulo={'Plantel de Funcionarios'}
-              descripcion={<>Padrón de personal de <strong className='text-content-1 dark:text-white font-semibold'>{dependenciaActual}</strong>. Busca por nombre, cédula o cargo; edita desde la fila.</>}
+              descripcion={<>Padrón de personal de <strong className="font-semibold text-white">{dependenciaActual}</strong>. Busca por nombre, cédula o cargo; edita los datos desde cada fila.</>}
               icono="fa-address-book"
               className="staff-page-header"
               contador={(

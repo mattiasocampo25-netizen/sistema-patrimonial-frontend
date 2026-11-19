@@ -1401,6 +1401,14 @@ html.font-lg { font-size: 18px; }
   box-shadow: none;
   opacity: 1;
 }
+button:disabled {
+  cursor: not-allowed;
+  color: var(--content-3);
+  background-color: var(--surface-3);
+  border-color: var(--line);
+  box-shadow: none;
+  opacity: 1;
+}
 .ui-button:disabled {
   color: var(--content-3);
   background-color: var(--surface-3);

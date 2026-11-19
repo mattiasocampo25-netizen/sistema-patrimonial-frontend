@@ -99,7 +99,7 @@ export function useAuditoria({
       if (hastaAud) q = q.lte('fecha', new Date(`${hastaAud}T23:59:59.999`).toISOString());
       if (searchAud.trim()) {
         const t = `%${limpiarBusquedaAud(searchAud).split(' ').filter(Boolean).join('%')}%`;
-        q = q.or(`titulo.ilike.${t},mensaje.ilike.${t}`);
+        q = q.or(`titulo.ilike.${t},mensaje.ilike.${t},usuario.ilike.${t},bienid.ilike.${t}`);
       }
       const from = (pag - 1) * PAGE_AUD;
       const { data, error, count } = await q.range(from, from + PAGE_AUD - 1);

@@ -3,7 +3,7 @@ import { normalizeStr } from '../utils/helpers';
 import FiltroCombo from '../components/FiltroCombo';
 import { Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
-import { etiquetaAccionAuditoria, leerMensajeAuditoria, obtenerCambiosAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import { etiquetaAccionAuditoria, leerMensajeAuditoria, obtenerCambiosAuditoria, resumenAccionAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 import { csvRowsSafe } from '../utils/csvSafe.js';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
@@ -21,7 +21,8 @@ export default function AuditoriaView({
   guardarActaMuestreo, descargarActaMuestreoPDF,
   totalAud, paginaAud, alcanceAud, setAlcanceAud, searchAud, setSearchAud,
   filtroAccionAud, setFiltroAccionAud, filtroUsuarioAud, setFiltroUsuarioAud, tipoEntidadAud, setTipoEntidadAud, campoAud, setCampoAud, usuariosAud, desdeAud, setDesdeAud, hastaAud, setHastaAud, accionesUnicasAud, auditoriaList,
-  actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral
+  actorAud, tonoAccionAud, detalleAudCorto, ultimoBackup, handleExportBackupGeneral,
+  usuariosList = []
 }) {
   const [eventoExpandido, setEventoExpandido] = useState(null);
   const [seccionAuditoria, setSeccionAuditoria] = useState('actividad');
@@ -33,7 +34,16 @@ export default function AuditoriaView({
   const aplicarFiltrosAuditoria = () => { if (!filtrosGuardados) return; setSearchAud(filtrosGuardados.searchAud || ''); setFiltroAccionAud(filtrosGuardados.filtroAccionAud || ''); setFiltroUsuarioAud(filtrosGuardados.filtroUsuarioAud || ''); setTipoEntidadAud(filtrosGuardados.tipoEntidadAud || ''); setCampoAud(filtrosGuardados.campoAud || ''); setDesdeAud(filtrosGuardados.desdeAud || ''); setHastaAud(filtrosGuardados.hastaAud || ''); };
   const exportarEventosCSV = () => {
     if (!auditoriaList.length) return;
-    const filas = [['Fecha', 'Usuario', 'Acción', 'Registro', 'Detalle', 'Identificador'], ...auditoriaList.map(row => [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : '', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), detalleAudCorto(row), row.id])];
+    const filas = [['Fecha', 'Usuario', 'Acción', 'Registro', 'Rótulo', 'Descripción', 'Campo modificado', 'Valor anterior', 'Valor nuevo', 'Detalle', 'Identificador']];
+    auditoriaList.forEach(row => {
+      const mensaje = leerMensajeAuditoria(row);
+      const cambios = obtenerCambiosAuditoria(row);
+      const rotulo = mensaje?.rotulo || mensaje?.cambios?.nuevo?.rotulo || mensaje?.cambios?.anterior?.rotulo || '';
+      const descripcion = mensaje?.descripcion || mensaje?.cambios?.nuevo?.descripcion || mensaje?.cambios?.anterior?.descripcion || '';
+      const base = [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : '', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), rotulo, descripcion];
+      if (cambios.length) cambios.forEach(cambio => filas.push([...base, cambio.etiqueta, valorAuditoriaLegible(cambio.antes, cambio.campoOriginal), valorAuditoriaLegible(cambio.despues, cambio.campoOriginal), detalleAudCorto(row), row.id]));
+      else filas.push([...base, '', '', '', detalleAudCorto(row), row.id]);
+    });
     const csv = csvRowsSafe(filas);
     const enlace = document.createElement('a'); enlace.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); enlace.download = `auditoria_pagina_${paginaAud}.csv`; enlace.click(); setTimeout(() => URL.revokeObjectURL(enlace.href), 1000);
   };
@@ -42,7 +52,17 @@ export default function AuditoriaView({
     const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
     doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('Historial de auditoría', 14, 15);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.text(`Dependencia: ${alcanceAud === 'todas' ? 'Todas' : 'Esta dependencia'} · Página ${paginaAud} · ${auditoriaList.length} eventos`, 14, 22);
-    doc.autoTable({ startY: 28, head: [['Fecha', 'Usuario', 'Acción', 'Registro', 'Detalle']], body: auditoriaList.map(row => [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : 'Sin fecha', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), detalleAudCorto(row)]), styles: { font: 'helvetica', fontSize: 7, cellPadding: 2.2, overflow: 'linebreak' }, headStyles: { fillColor: [30, 64, 75] }, columnStyles: { 0: { cellWidth: 34 }, 1: { cellWidth: 28 }, 2: { cellWidth: 24 }, 3: { cellWidth: 38 } } });
+    const filasPDF = auditoriaList.flatMap(row => {
+      const mensaje = leerMensajeAuditoria(row);
+      const cambios = obtenerCambiosAuditoria(row);
+      const rotulo = mensaje?.rotulo || mensaje?.cambios?.nuevo?.rotulo || mensaje?.cambios?.anterior?.rotulo || '';
+      const descripcion = mensaje?.descripcion || mensaje?.cambios?.nuevo?.descripcion || mensaje?.cambios?.anterior?.descripcion || '';
+      const base = [row.fecha ? new Date(row.fecha).toLocaleString('es-PY') : 'Sin fecha', actorAud(row), etiquetaAccionAuditoria(row.accion), tituloEventoAuditoria(row), rotulo, descripcion];
+      return cambios.length
+        ? cambios.map(cambio => [...base, cambio.etiqueta, valorAuditoriaLegible(cambio.antes, cambio.campoOriginal), valorAuditoriaLegible(cambio.despues, cambio.campoOriginal)])
+        : [[...base, '', '', detalleAudCorto(row)]];
+    });
+    doc.autoTable({ startY: 28, head: [['Fecha', 'Usuario', 'Acción', 'Registro', 'Rótulo', 'Descripción', 'Campo', 'Antes', 'Después']], body: filasPDF, styles: { font: 'helvetica', fontSize: 7, cellPadding: 2.2, overflow: 'linebreak' }, headStyles: { fillColor: [30, 64, 75] }, columnStyles: { 0: { cellWidth: 28 }, 1: { cellWidth: 25 }, 2: { cellWidth: 20 }, 3: { cellWidth: 32 }, 4: { cellWidth: 27 }, 5: { cellWidth: 42 }, 6: { cellWidth: 28 }, 7: { cellWidth: 38 }, 8: { cellWidth: 38 } } });
     doc.save(`auditoria_pagina_${paginaAud}.pdf`);
   };
   const aplicarRangoRapido = (dias) => {
@@ -452,6 +472,13 @@ export default function AuditoriaView({
             const rotuloEvento = mensajeEvento?.rotulo || mensajeEvento?.cambios?.nuevo?.rotulo || mensajeEvento?.cambios?.anterior?.rotulo || bienRelacionado?.rotulo;
             const descripcionEvento = mensajeEvento?.descripcion || mensajeEvento?.cambios?.nuevo?.descripcion || mensajeEvento?.cambios?.anterior?.descripcion || bienRelacionado?.descripcion;
             const fechaEvento = r.fecha ? new Date(r.fecha) : null;
+            const perfilActor = usuariosList.find(usuario => String(usuario.username || '').toLocaleLowerCase('es') === String(actorAud(r) || '').toLocaleLowerCase('es'));
+            const nombreActor = perfilActor?.nombre || actorAud(r);
+            const contextoEvento = [
+              mensajeEvento?.dependencia || bienRelacionado?.dependencia,
+              mensajeEvento?.ubicacion || mensajeEvento?.cambios?.nuevo?.ubicacion || bienRelacionado?.ubicacion,
+              mensajeEvento?.funcionario || mensajeEvento?.cambios?.nuevo?.funcionario || bienRelacionado?.funcionario,
+            ].filter(Boolean);
             return (
               <article key={r.id} className="relative ml-3 rounded-2xl border border-line bg-surface-1 p-4 shadow-[0_8px_28px_-22px_rgba(15,35,55,.55)] transition-all hover:-translate-y-px hover:border-brand/30 hover:shadow-md sm:ml-5 sm:p-5">
                 <span className="absolute -left-[22px] top-6 z-[1] h-3 w-3 rounded-full border-[3px] border-surface-2 bg-brand sm:-left-[30px]" aria-hidden="true" />
@@ -462,12 +489,16 @@ export default function AuditoriaView({
                 </div>
 
                 <div className="flex flex-wrap items-start justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-black leading-relaxed text-content-1">{tituloEventoAuditoria(r)}</h3>
-                    <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-content-2"><i className="fa-regular fa-user text-content-3" aria-hidden="true" />Realizado por {actorAud(r)}</p>
-                    {rotuloEvento && <p className="mt-1 text-xs font-semibold text-brand-text">Rótulo: {rotuloEvento}</p>}
-                    {descripcionEvento && <p className="mt-1 text-xs leading-relaxed text-content-2">{descripcionEvento}</p>}
-                    <p className="mt-1 text-xs leading-relaxed text-content-3">{campos.length ? `Se modificaron ${campos.length} ${campos.length === 1 ? 'dato' : 'datos'}; compara los valores abajo.` : detalleAudCorto(r)}</p>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-black leading-relaxed text-content-1">{resumenAccionAuditoria(r, nombreActor)}</h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-brand/20 bg-brand-soft/45 px-3 py-2.5">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-black text-white shadow-sm" aria-hidden="true">{String(nombreActor || '?').trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toLocaleUpperCase('es')}</span>
+                      <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Usuario que realizó la acción</span><span className="block truncate text-sm font-extrabold text-content-1">{nombreActor}</span><span className="block text-[11px] font-medium text-content-2">@{actorAud(r)}{perfilActor?.cargo ? ` · ${perfilActor.cargo}` : ''}</span></span>
+                    </div>
+                    {rotuloEvento && <p className="mt-3 text-xs font-bold text-brand-text">Rótulo patrimonial: <span className="font-mono">{rotuloEvento}</span></p>}
+                    {descripcionEvento && <p className="mt-1 max-w-4xl break-words text-sm leading-relaxed text-content-1">{descripcionEvento}</p>}
+                    {contextoEvento.length > 0 && <div className="mt-2 flex flex-wrap gap-1.5">{[...new Set(contextoEvento)].map((dato, indice) => <span key={`${dato}-${indice}`} className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-line bg-surface-2 px-2.5 py-1 text-[10px] font-semibold text-content-2"><i className={`fa-solid ${indice === 0 ? 'fa-building' : indice === 1 ? 'fa-location-dot' : 'fa-user'} text-content-3`} aria-hidden="true"/><span className="truncate">{dato}</span></span>)}</div>}
+                    <p className="mt-2 text-xs leading-relaxed text-content-2">{campos.length ? `${campos.length} ${campos.length === 1 ? 'cambio' : 'cambios'} registrados; los valores anteriores y nuevos aparecen abajo.` : detalleAudCorto(r)}</p>
                   </div>
                   {r.bienid && /BIEN/i.test(r.titulo || '') && (
                     <button type="button" onClick={() => {
@@ -502,6 +533,7 @@ export default function AuditoriaView({
                     {campos.length > 3 && <button type="button" onClick={() => setEventoExpandido(mostrarTodos ? null : r.id)} aria-expanded={mostrarTodos} className="mt-3 rounded-lg px-2 py-1 text-[11px] font-bold text-brand-text hover:bg-brand-soft">{mostrarTodos ? 'Mostrar menos' : `Ver los ${campos.length - 3} cambios restantes`}</button>}
                   </section>
                 )}
+                {!campos.length && /MODIFICACION/i.test(String(r.accion || '')) && <p className="mt-2 rounded-xl border border-info/20 bg-info-soft/40 px-3 py-2 text-xs font-medium text-content-2">Este registro no contiene diferencias de valores comparables; no se muestran campos vacíos como si hubieran cambiado.</p>}
               </article>
             );
           })}</div></section>)}

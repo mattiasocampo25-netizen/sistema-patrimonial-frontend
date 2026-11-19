@@ -1,4 +1,4 @@
-const CAMPOS_TECNICOS = new Set(['id', 'updated_at', 'created_at', 'updatedat', 'createdat', 'fechacarga', 'creadopor', 'modificadoen', 'modificadopor']);
+const CAMPOS_TECNICOS = new Set(['id', 'updated_at', 'created_at', 'updatedat', 'createdat', 'fechacarga', 'fechamodificacion', 'createdby', 'updatedby', 'creadopor', 'modificadoen', 'modificadopor', 'syncat', 'version']);
 
 const ETIQUETAS_CAMPO = {
   funcionario: 'Responsable',
@@ -47,15 +47,48 @@ export function etiquetaCampoAuditoria(campo) {
     .replace(/^./, letra => letra.toUpperCase());
 }
 
+const valorVacio = valor => valor == null
+  || (typeof valor === 'string' && !valor.trim())
+  || (Array.isArray(valor) && valor.length === 0)
+  || (typeof valor === 'object' && !Array.isArray(valor) && Object.keys(valor).length === 0);
+
+const normalizarValorComparacion = valor => {
+  if (valorVacio(valor)) return null;
+  if (Array.isArray(valor)) return valor.map(normalizarValorComparacion);
+  if (valor && typeof valor === 'object') return Object.fromEntries(Object.keys(valor).sort().map(k => [k, normalizarValorComparacion(valor[k])]));
+  return typeof valor === 'string' ? valor.trim() : valor;
+};
+
+const valoresEquivalentes = (a, b) => JSON.stringify(normalizarValorComparacion(a)) === JSON.stringify(normalizarValorComparacion(b));
+
 export function obtenerCambiosAuditoria(row) {
   const mensaje = leerMensajeAuditoria(row);
-  const anterior = mensaje?.cambios?.anterior;
-  const nuevo = mensaje?.cambios?.nuevo;
-  if (!anterior || !nuevo || typeof anterior !== 'object' || typeof nuevo !== 'object') return [];
-  return Object.keys(nuevo)
-    .filter(campo => !CAMPOS_TECNICOS.has(String(campo).toLowerCase()))
-    .filter(campo => JSON.stringify(nuevo[campo]) !== JSON.stringify(anterior[campo]))
-    .map(campo => ({ campo, etiqueta: etiquetaCampoAuditoria(campo), antes: anterior[campo], despues: nuevo[campo] }));
+  const entradas = Array.isArray(mensaje?.cambios)
+    ? mensaje.cambios
+    : [{ anterior: mensaje?.cambios?.anterior, nuevo: mensaje?.cambios?.nuevo, rotulo: mensaje?.rotulo }];
+  const cambios = [];
+  entradas.forEach((entrada, indice) => {
+    const anterior = entrada?.anterior;
+    const nuevo = entrada?.nuevo;
+    if (!anterior || !nuevo || typeof anterior !== 'object' || typeof nuevo !== 'object') return;
+    Object.keys(nuevo).forEach(campo => {
+      if (CAMPOS_TECNICOS.has(String(campo).toLowerCase()) || valoresEquivalentes(nuevo[campo], anterior[campo])) return;
+      const sujeto = entradas.length > 1 ? (entrada.rotulo || `Bien ${indice + 1}`) : '';
+      cambios.push({
+        campo: entradas.length > 1 ? `${entrada.bienId || indice}.${campo}` : campo,
+        etiqueta: sujeto ? `${sujeto} · ${etiquetaCampoAuditoria(campo)}` : etiquetaCampoAuditoria(campo),
+        campoOriginal: campo,
+        antes: anterior[campo],
+        despues: nuevo[campo]
+      });
+    });
+  });
+  const prioridad = ['funcionario', 'ubicacion', 'dependencia', 'estadoConservacion', 'observaciones', 'rotulo', 'descripcion', 'fotos', 'componentes'];
+  return cambios.sort((a, b) => {
+    const ai = prioridad.indexOf(a.campoOriginal);
+    const bi = prioridad.indexOf(b.campoOriginal);
+    return (ai < 0 ? prioridad.length : ai) - (bi < 0 ? prioridad.length : bi) || a.etiqueta.localeCompare(b.etiqueta, 'es');
+  });
 }
 
 function unirEtiquetas(etiquetas) {
@@ -178,8 +211,20 @@ export function valorAuditoriaLegible(valor, campo) {
   if (typeof valor === 'boolean') return valor ? 'Sí' : 'No';
   if (Array.isArray(valor)) {
     if (!valor.length) return 'Ninguno';
-    if (String(campo).toLowerCase() === 'fotos') return `${valor.length} ${valor.length === 1 ? 'fotografía' : 'fotografías'}`;
-    return valor.map(item => typeof item === 'object' ? item?.nombre || item?.label || '[Elemento]' : String(item)).join(', ');
+    if (String(campo).toLowerCase() === 'fotos') {
+      const nombres = valor.map(item => {
+        const ruta = typeof item === 'object' ? item?.nombre || item?.name || item?.ruta || item?.url || '' : String(item);
+        const ultimo = String(ruta).split(/[/?#]/).filter(Boolean).at(-1) || '';
+        try { return decodeURIComponent(ultimo); } catch { return ultimo; }
+      }).filter(Boolean);
+      return `${valor.length} ${valor.length === 1 ? 'fotografía' : 'fotografías'}${nombres.length ? `: ${nombres.join(', ')}` : ''}`;
+    }
+    return valor.map(item => {
+      if (typeof item !== 'object') return String(item);
+      const nombre = item?.nombre || item?.tipo || item?.descripcion || item?.label || 'Componente';
+      const cantidad = Number(item?.cantidad || 1);
+      return `${nombre}${cantidad > 1 ? ` × ${cantidad}` : ''}`;
+    }).join(', ');
   }
   if (typeof valor === 'object') return valor.nombre || valor.label || valor.descripcion || 'Dato actualizado';
   const texto = String(valor);

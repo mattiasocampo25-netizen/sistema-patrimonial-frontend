@@ -1640,7 +1640,8 @@ button:disabled {
 
 .audit-workspace .audit-tab[aria-selected="true"] :where(span, i) { color: #fff !important; }
 .audit-workspace .audit-tab[aria-selected="true"] { background: #155e75 !important; color: #fff !important; }
-.audit-workspace .audit-tab[aria-selected="true"] span:first-child { background: rgb(255 255 255 / .14) !important; }
+.audit-workspace .audit-tab[aria-selected="true"] > span:first-child { background: rgb(255 255 255 / .14) !important; }
+.audit-workspace .audit-tab[aria-selected="true"] > span:last-child span:first-child { background: transparent !important; }
 
 .announcement-hero :where(h1, h2, p, span, i),
 .help-hero :where(h1, h2, p, span, i),

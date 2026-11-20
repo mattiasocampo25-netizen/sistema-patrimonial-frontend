@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useLayoutEffect, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import AnimatedNumber from '../components/AnimatedNumber';
 import SimpleBar from '../components/SimpleBar';
@@ -8,6 +8,7 @@ import { getLogoPorDependencia } from '../utils/helpers';
 import { useResumenDependencias } from '../hooks/useResumenDependencias';
 import useScopedPreference from '../hooks/useScopedPreference';
 import { crearEventosAgenda, fechaAgenda } from '../utils/agenda';
+import { supabase } from '../supabaseClient';
 
 const WIDGETS_INICIALES = { metricas: true, pendientes: true, accesos: true, tendencias: true, agenda: true };
 const ACCESOS_INICIALES = ['nuevo', 'importar', 'exportar', 'qr', 'fc03'];
@@ -26,17 +27,26 @@ function inicioSemana(fecha = new Date()) {
   return copia;
 }
 
-function ResumenSemanal({ bienes = [], fc10List = [], solicitudesBaja = [], pendientes = [], dependenciaActual, onVerAuditoria }) {
+function ResumenSemanal({ dependenciaActual, onVerAuditoria }) {
+  const [eventos, setEventos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const periodo = useMemo(() => { const inicio = inicioSemana(); const fin = new Date(inicio); fin.setDate(fin.getDate() + 5); fin.setHours(23, 59, 59, 999); return { inicio, fin }; }, []);
+  useEffect(() => {
+    let activo = true;
+    const cargar = async () => {
+      setCargando(true);
+      let consulta = supabase.from('auditoria').select('accion, usuario, dependencia, fecha').gte('fecha', periodo.inicio.toISOString()).lte('fecha', periodo.fin.toISOString()).order('fecha', { ascending: false }).limit(500);
+      if (dependenciaActual) consulta = consulta.eq('dependencia', dependenciaActual);
+      const { data } = await consulta;
+      if (activo) { setEventos(data || []); setCargando(false); }
+    };
+    cargar();
+    return () => { activo = false; };
+  }, [dependenciaActual, periodo]);
   const resumen = useMemo(() => {
-    const inicio = inicioSemana();
-    const fin = new Date(inicio); fin.setDate(fin.getDate() + 5); fin.setHours(23, 59, 59, 999);
-    const dentro = valor => { const fecha = new Date(valor); return !Number.isNaN(fecha.valueOf()) && fecha >= inicio && fecha <= fin; };
-    const propios = item => !dependenciaActual || String(item?.dependencia || '').toLowerCase() === String(dependenciaActual || '').toLowerCase();
-    const bienesSemana = bienes.filter(item => propios(item) && (dentro(item.fechaCarga) || dentro(item.created_at) || dentro(item.modificadoEn) || dentro(item.updated_at)));
-    const actas = fc10List.filter(item => propios(item) && (dentro(item.fechaGeneracion) || dentro(item.entregadoFecha) || dentro(item.created_at)));
-    const bajas = solicitudesBaja.filter(item => propios(item) && (dentro(item.created_at) || dentro(item.fechaSolicitud) || dentro(item.fecha)));
-    return { bienes: bienesSemana.length, actas: actas.length, bajas: bajas.length, inicio, fin };
-  }, [bienes, fc10List, solicitudesBaja, dependenciaActual]);
+    const contar = patrones => eventos.filter(evento => patrones.some(patron => String(evento.accion || '').toUpperCase().includes(patron))).length;
+    return { creaciones: contar(['CREACION', 'ALTA']), modificaciones: contar(['MODIFICACION']), asignaciones: contar(['TRASLADO', 'ASIGNACION', 'FC10_']), bajas: contar(['BAJA', 'ELIMINACION']), aprobaciones: contar(['APROBACION', 'APROBAR']), usuarios: new Set(eventos.map(evento => evento.usuario).filter(Boolean)).size, inicio: periodo.inicio, fin: periodo.fin };
+  }, [eventos, periodo]);
   const rango = `${resumen.inicio.toLocaleDateString('es-PY', { day: '2-digit', month: 'short' })} – ${resumen.fin.toLocaleDateString('es-PY', { day: '2-digit', month: 'short' })}`;
   return <section className="weekly-summary-card rounded-2xl border border-brand/15 bg-surface-1 p-4 shadow-sm sm:p-5" aria-labelledby="resumen-semanal-titulo">
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -44,7 +54,7 @@ function ResumenSemanal({ bienes = [], fc10List = [], solicitudesBaja = [], pend
       <button type="button" onClick={onVerAuditoria} className="rounded-lg border border-line px-3 py-2 text-xs font-bold text-brand-text hover:bg-brand-soft">Ver actividad</button>
     </div>
     <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-      {[['Bienes activos', resumen.bienes, 'fa-boxes-stacked'], ['Actas FC-10', resumen.actas, 'fa-file-signature'], ['Solicitudes de baja', resumen.bajas, 'fa-file-circle-minus'], ['Pendientes', pendientes.length, 'fa-hourglass-half']].map(([label, valor, icono]) => <div key={label} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-content-3"><i className={`fa-solid ${icono} text-brand-text`} aria-hidden="true" />{label}</div><strong className="mt-1 block text-lg tabular-nums text-content-1">{valor}</strong></div>)}
+      {[['Creaciones', resumen.creaciones, 'fa-plus'], ['Modificaciones', resumen.modificaciones, 'fa-pen'], ['Asignaciones', resumen.asignaciones, 'fa-arrows-rotate'], ['Bajas', resumen.bajas, 'fa-file-circle-minus'], ['Aprobaciones', resumen.aprobaciones, 'fa-check'], ['Usuarios activos', resumen.usuarios, 'fa-users']].map(([label, valor, icono]) => <div key={label} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-content-3"><i className={`fa-solid ${icono} text-brand-text`} aria-hidden="true" />{label}</div><strong className="mt-1 block text-lg tabular-nums text-content-1">{cargando ? '…' : valor}</strong></div>)}
     </div>
   </section>;
 }
@@ -153,7 +163,6 @@ export default function DashboardView({
   setIsBulkQR, setQrTargetBien, setIsQRModalOpen, openFC03Modal,
   setFc10Year, setFc10Month,
   fc10List, bienes, requestDependenciaChange
-  , solicitudesBaja = []
 }) {
   const actasPorFirmar = useMemo(() => (fc10List || [])
     .filter(fc => !fc.devolucionFecha && pendienteDeFirma(fc))
@@ -333,7 +342,7 @@ export default function DashboardView({
         </div>
       </header>
 
-      <ResumenSemanal bienes={bienes} fc10List={fc10List} solicitudesBaja={solicitudesBaja} pendientes={pendientes} dependenciaActual={dependenciaActual} onVerAuditoria={() => setActiveTab('auditoria')} />
+      <ResumenSemanal dependenciaActual={dependenciaActual} onVerAuditoria={() => setActiveTab('auditoria')} />
       {widgets.metricas && (
         <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Indicadores del inventario" data-tour="dash-stats">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3.5">

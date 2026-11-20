@@ -1605,3 +1605,105 @@ button:disabled {
   .audit-hero :is(h1, h2, p, span),
   .approval-workspace section :is(h1, h2, p, span) { color: #111 !important; }
 }
+
+/* ---------------------------------------------------------------------------
+ * Capa visual transversal v2.19.42
+ * Corrige contraste, densidad y alineación en módulos que comparten clases
+ * pero antes heredaban colores locales difíciles de mantener.
+ * ------------------------------------------------------------------------ */
+:root {
+  --ui-page-gutter: clamp(1rem, 2.4vw, 2.5rem);
+  --ui-section-gap: clamp(.85rem, 1.5vw, 1.35rem);
+  --ui-control-height: 2.7rem;
+}
+
+.workspace-main {
+  background: var(--canvas);
+}
+
+.workspace-main > div {
+  padding-inline: var(--ui-page-gutter) !important;
+}
+
+.module-screen,
+.dashboard-stagger {
+  gap: var(--ui-section-gap) !important;
+}
+
+/* Nunca usar blanco tenue sobre superficies claras. */
+:where(.bg-white, .bg-surface-1, .surface-1, [class*="bg-surface-1"]) :where(.text-white\/60, .text-white\/70, .text-white\/80, .text-white\/90) {
+  color: var(--content-2) !important;
+}
+
+:where(.bg-white, .bg-surface-1, .surface-1) :where(.fa-solid, .fa-regular, .fa-brands) {
+  color: var(--brand) !important;
+}
+
+.inventory-view-count {
+  min-width: 10.5rem;
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface-1));
+  border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
+  color: var(--content-1);
+}
+
+.inventory-view-count-icon {
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface-1));
+  color: var(--brand) !important;
+}
+
+.inventory-view-count-label { color: var(--content-3) !important; }
+.inventory-view-count-value { color: var(--content-1) !important; }
+
+.dark .inventory-view-count {
+  background: color-mix(in srgb, var(--brand) 18%, var(--surface-1));
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+}
+
+.dark .inventory-view-count-icon { background: color-mix(in srgb, var(--brand) 28%, var(--surface-1)); }
+
+.workspace-main :where(input, select, textarea) {
+  min-height: var(--ui-control-height);
+  color: var(--content-1) !important;
+}
+
+.workspace-main :where(input, select, textarea)::placeholder { color: var(--content-3) !important; opacity: 1; }
+
+.workspace-main :where(button, .ui-button) { min-height: 2.55rem; }
+
+.dashboard-stagger > header,
+.summary-hero,
+.staff-hero,
+.users-hero,
+.records-hero,
+.announcement-hero,
+.help-hero,
+.audit-hero,
+.approval-workspace > section:first-child {
+  min-height: 0 !important;
+}
+
+.dashboard-stagger > header { padding-block: clamp(1.1rem, 2vw, 1.65rem) !important; }
+.summary-hero, .staff-hero, .users-hero { padding-block: clamp(1rem, 1.8vw, 1.45rem) !important; }
+
+.dashboard-workspaces-grid { align-items: start; }
+.dashboard-workspaces-grid > * { min-width: 0; }
+
+/* Acciones: una jerarquía clara y menos botones compitiendo. */
+.inventory-actions-scroll { gap: .5rem !important; }
+.inventory-actions-scroll .ui-button { min-height: 2.45rem; padding-inline: .8rem; }
+
+/* Filas de trabajo compactas, sin eliminar información. */
+.dashboard-workspaces-grid :where(.rounded-panel, .rounded-card) { box-shadow: 0 8px 24px rgb(15 48 68 / .06); }
+.dark .dashboard-workspaces-grid :where(.rounded-panel, .rounded-card) { box-shadow: none; }
+
+@media (max-width: 900px) {
+  .workspace-main > div { padding-inline: 1rem !important; }
+  .inventory-view-count { width: fit-content; }
+}
+
+@media (max-width: 640px) {
+  .workspace-main > div { padding-inline: .75rem !important; }
+  .inventory-view-count { min-width: 0; }
+  .inventory-actions-scroll { overflow-x: auto; padding-bottom: .2rem; }
+  .inventory-actions-scroll .ui-button { flex: 0 0 auto; }
+}

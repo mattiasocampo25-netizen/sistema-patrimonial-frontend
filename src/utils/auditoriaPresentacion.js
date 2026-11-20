@@ -111,6 +111,9 @@ export function detalleAuditoriaLegible(row) {
     const rotulo = rotuloBien ? `Bien ${rotuloBien}: ` : '';
     return `${rotulo}${unirEtiquetas(etiquetas)}${extra}`;
   }
+  if (String(row?.accion || '').toUpperCase() === 'MODIFICACION') {
+    return 'El registro se guardó, pero no se detectaron cambios en los campos editables. La diferencia correspondía a metadatos internos.';
+  }
   if (mensaje && typeof mensaje === 'object') {
     const partes = [];
     if (mensaje.rotulo) partes.push(`Bien ${mensaje.rotulo}`);
@@ -184,7 +187,10 @@ export function resumenAccionAuditoria(row, actor = row?.usuario) {
     [/FC10_/, 'actualizó el trámite del FC-10'], [/FC11_/, 'actualizó el trámite del FC-11'],
     [/CONCILIACION|MUESTREO/, 'realizó una verificación física del inventario'],
   ];
-  const accionHumana = verbos.find(([patron]) => patron.test(accion))?.[1]
+  const sinCambiosEditables = accion === 'MODIFICACION' && obtenerCambiosAuditoria(row).length === 0;
+  const accionHumana = sinCambiosEditables
+    ? `guardó ${entidad} sin cambios en los campos editables`
+    : verbos.find(([patron]) => patron.test(accion))?.[1]
     || `registró una acción sobre ${entidad}`;
   const mensaje = leerMensajeAuditoria(row);
   const sujeto = mensaje?.rotulo ? ` · Rótulo ${mensaje.rotulo}`

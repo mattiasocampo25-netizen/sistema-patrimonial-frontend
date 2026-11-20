@@ -5,6 +5,7 @@ import { Button, StatTile } from '../components/ui';
 import { LIMITE_DB, LIMITE_STORAGE } from '../services/supabaseFreeTier';
 import { etiquetaAccionAuditoria, leerMensajeAuditoria, obtenerCambiosAuditoria, resumenAccionAuditoria, tituloEventoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
 import { csvRowsSafe } from '../utils/csvSafe.js';
+import ComponentesAuditCompare from '../components/audit/ComponentesAuditCompare.jsx';
 
 // Vista de auditoría -solo admin- (extraída de App.jsx, Fase 5).
 export default function AuditoriaView({
@@ -522,12 +523,14 @@ export default function AuditoriaView({
                     </div>
                     <div className="space-y-2">
                       {camposVisibles.map(({ campo, etiqueta, antes, despues }) => (
-                        <div key={campo} className="grid gap-2 rounded-xl border border-line/70 bg-surface-1 p-3 sm:grid-cols-[minmax(130px,0.7fr)_minmax(0,1fr)_28px_minmax(0,1fr)] sm:items-center">
-                          <p className="text-xs font-bold text-content-1">{etiqueta}</p>
-                          <div className="min-w-0 rounded-lg border border-danger/10 bg-danger-soft/50 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-danger"><i className="fa-solid fa-minus mr-1" aria-hidden="true" />Antes</span><span className="block break-words text-xs text-content-2">{valorAuditoriaLegible(antes, campo)}</span></div>
-                          <i className="fa-solid fa-arrow-right hidden text-center text-xs text-content-3 sm:block" aria-hidden="true" />
-                          <div className="min-w-0 rounded-lg border border-ok/20 bg-ok-soft/70 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-ok"><i className="fa-solid fa-plus mr-1" aria-hidden="true" />Después</span><span className="block break-words text-xs font-bold text-content-1">{valorAuditoriaLegible(despues, campo)}</span></div>
-                        </div>
+                        campo === 'componentes'
+                          ? <div key={campo} className="rounded-xl border border-line/70 bg-surface-1 p-3 sm:p-4"><p className="text-xs font-bold text-content-1">{etiqueta}</p><ComponentesAuditCompare antes={antes} despues={despues} /></div>
+                          : <div key={campo} className="grid gap-2 rounded-xl border border-line/70 bg-surface-1 p-3 sm:grid-cols-[minmax(130px,0.7fr)_minmax(0,1fr)_28px_minmax(0,1fr)] sm:items-center">
+                            <p className="text-xs font-bold text-content-1">{etiqueta}</p>
+                            <div className="min-w-0 rounded-lg border border-danger/10 bg-danger-soft/50 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-danger"><i className="fa-solid fa-minus mr-1" aria-hidden="true" />Antes</span><span className="block break-words text-xs text-content-2">{valorAuditoriaLegible(antes, campo)}</span></div>
+                            <i className="fa-solid fa-arrow-right hidden text-center text-xs text-content-3 sm:block" aria-hidden="true" />
+                            <div className="min-w-0 rounded-lg border border-ok/20 bg-ok-soft/70 px-3 py-2.5"><span className="mb-1 block text-[9px] font-extrabold uppercase tracking-wider text-ok"><i className="fa-solid fa-plus mr-1" aria-hidden="true" />Después</span><span className="block break-words text-xs font-bold text-content-1">{valorAuditoriaLegible(despues, campo)}</span></div>
+                          </div>
                       ))}
                     </div>
                     {campos.length > 3 && <button type="button" onClick={() => setEventoExpandido(mostrarTodos ? null : r.id)} aria-expanded={mostrarTodos} className="mt-3 rounded-lg px-2 py-1 text-[11px] font-bold text-brand-text hover:bg-brand-soft">{mostrarTodos ? 'Mostrar menos' : `Ver los ${campos.length - 3} cambios restantes`}</button>}

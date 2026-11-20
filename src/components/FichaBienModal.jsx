@@ -5,6 +5,7 @@ import { camposIncompletos } from '../utils/dataCompleteness';
 import { supabase } from '../supabaseClient';
 import { crearExpedienteAuditoria } from '../utils/expedienteAuditoria';
 import { obtenerCambiosAuditoria, etiquetaCampoAuditoria, valorAuditoriaLegible } from '../utils/auditoriaPresentacion';
+import ComponentesAuditCompare from './audit/ComponentesAuditCompare.jsx';
 
 const TIPO_TONO = {
   alta: 'ok',
@@ -314,11 +315,13 @@ export default function FichaBienModal({ isOpen, onClose, bien, eventos, fc10Lis
                         {(ev.auditRow ? obtenerCambiosAuditoria(ev.auditRow) : []).length > 0 && <details className="mt-2 pl-[38px]">
                           <summary className="cursor-pointer text-[10px] font-bold text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Comparar antes y después</summary>
                           <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
-                            {obtenerCambiosAuditoria(ev.auditRow).map((cambio) => <div key={cambio.campo} className="rounded-control border border-line bg-surface-1 p-2.5">
-                              <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-content-3">{etiquetaCampoAuditoria(cambio.campo)}</p>
-                              <p className="break-words text-[10px] text-content-2"><span className="font-bold">Antes:</span> {valorAuditoriaLegible(cambio.antes, cambio.campo)}</p>
-                              <p className="break-words text-[10px] text-content-1"><span className="font-bold">Después:</span> {valorAuditoriaLegible(cambio.despues, cambio.campo)}</p>
-                            </div>)}
+                            {obtenerCambiosAuditoria(ev.auditRow).map((cambio) => cambio.campoOriginal === 'componentes'
+                              ? <div key={cambio.campo} className="sm:col-span-2"><ComponentesAuditCompare antes={cambio.antes} despues={cambio.despues} /></div>
+                              : <div key={cambio.campo} className="rounded-control border border-line bg-surface-1 p-2.5">
+                                <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-content-3">{etiquetaCampoAuditoria(cambio.campo)}</p>
+                                <p className="break-words text-[10px] text-content-2"><span className="font-bold">Antes:</span> {valorAuditoriaLegible(cambio.antes, cambio.campo)}</p>
+                                <p className="break-words text-[10px] text-content-1"><span className="font-bold">Después:</span> {valorAuditoriaLegible(cambio.despues, cambio.campo)}</p>
+                              </div>)}
                           </div>
                         </details>}
                       </div>

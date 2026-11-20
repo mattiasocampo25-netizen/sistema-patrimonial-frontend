@@ -43,16 +43,16 @@ function ComponentesInventario({ bien, compacto = false }) {
         <span>{componentes.length} {componentes.length === 1 ? 'tipo' : 'tipos'} · {piezas} {piezas === 1 ? 'pieza' : 'piezas'}</span>
         <i className="fa-solid fa-chevron-down ml-auto text-[9px]" aria-hidden="true" />
       </summary>
-      <div className="grid gap-1.5 border-t border-brand/15 p-2">
+      <div className="grid max-h-52 gap-1 overflow-y-auto border-t border-brand/15 p-1.5 custom-scrollbar">
         {componentes.map((componente, index) => (
-          <div key={componente?.id || `${componente?.nombre || 'componente'}-${index}`} className="rounded-md bg-surface-1 px-2.5 py-2 text-content-1">
+          <div key={componente?.id || `${componente?.nombre || 'componente'}-${index}`} className="rounded-md bg-surface-1 px-2 py-1.5 text-content-1">
             <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-              <span className="text-xs font-bold">{componente?.nombre || `Componente ${index + 1}`}</span>
-              <span className="text-[10px] font-semibold text-content-3">× {Number.parseInt(componente?.cantidad, 10) || 1}</span>
+              <span className="min-w-0 truncate text-[11px] font-bold" title={componente?.nombre || `Componente ${index + 1}`}>{componente?.nombre || `Componente ${index + 1}`}</span>
+              <span className="shrink-0 text-[10px] font-semibold text-content-3">× {Number.parseInt(componente?.cantidad, 10) || 1}</span>
             </div>
-            <div className="mt-1 grid gap-1 text-[10px] text-content-2 sm:grid-cols-2">
-              <span className="flex min-w-0 items-start gap-1.5"><i className="fa-solid fa-location-dot mt-0.5 w-3 shrink-0 text-danger" aria-hidden="true" /><span className="min-w-0"><b>Ubicación:</b> {componente?.ubicacion?.trim() || bien.ubicacion || 'Sin ubicación'}</span></span>
-              <span className="flex min-w-0 items-start gap-1.5"><i className="fa-solid fa-user-check mt-0.5 w-3 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0"><b>Funcionario:</b> {componente?.funcionario?.trim() || bien.funcionario || 'Sin funcionario'}</span></span>
+            <div className="mt-1 grid min-w-0 gap-x-2 text-[10px] text-content-2 sm:grid-cols-2">
+              <span className="flex min-w-0 items-center gap-1"><i className="fa-solid fa-location-dot w-3 shrink-0 text-danger" aria-hidden="true" /><span className="min-w-0 truncate" title={componente?.ubicacion?.trim() || bien.ubicacion || 'Sin ubicación'}><b>Ubicación:</b> {componente?.ubicacion?.trim() || bien.ubicacion || 'Sin ubicación'}</span></span>
+              <span className="flex min-w-0 items-center gap-1"><i className="fa-solid fa-user-check w-3 shrink-0 text-ok" aria-hidden="true" /><span className="min-w-0 truncate" title={componente?.funcionario?.trim() || bien.funcionario || 'Sin funcionario'}><b>Funcionario:</b> {componente?.funcionario?.trim() || bien.funcionario || 'Sin funcionario'}</span></span>
             </div>
           </div>
         ))}
@@ -1212,7 +1212,7 @@ export default function InventarioView({
               </div>
               <IconButton titulo="Cerrar" icono="fa-xmark" variante="ghost" tamano="sm" onClick={() => setObservacionAbierta(null)} />
             </header>
-            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] min-h-28 overflow-y-auto overscroll-contain bg-amber-50/40 px-5 py-5 text-sm leading-7 text-content-1 custom-scrollbar dark:bg-amber-400/[0.04] sm:px-6">
+            <div tabIndex={0} aria-label="Texto completo de la observación" className="max-h-[min(60dvh,32rem)] min-h-0 overflow-y-auto overscroll-contain bg-amber-50/40 px-5 py-4 text-sm leading-6 text-content-1 custom-scrollbar dark:bg-amber-400/[0.04] sm:px-6">
               <div className="whitespace-pre-wrap break-words">{observacionAbierta.texto}</div>
             </div>
             {(observacionAbierta.usuario || fechaHoraLegible(observacionAbierta.fecha)) && <p className="border-t border-line px-5 py-2.5 text-[10px] text-content-3 sm:px-6">{observacionAbierta.usuario ? `Último cambio del registro: ${observacionAbierta.usuario}` : ''}{fechaHoraLegible(observacionAbierta.fecha) ? `${observacionAbierta.usuario ? ' · ' : ''}${fechaHoraLegible(observacionAbierta.fecha)}` : ''}</p>}

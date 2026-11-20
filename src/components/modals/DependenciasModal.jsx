@@ -370,7 +370,7 @@ export default function DependenciasModal({
                       <i className="fa-solid fa-plus text-xs"></i>
                     </button>
                   </div>
-                  <div className="grid gap-3 xl:grid-cols-2">
+                  <div className="grid content-start items-start gap-2.5 xl:grid-cols-2">
                     {ubicsFiltradas.map(u => (
                       <TarjetaDepartamento
                         key={u.id}
@@ -470,7 +470,7 @@ const TarjetaDepartamento = React.memo(function TarjetaDepartamento({
   editando, editNombre, onEditNombre, onEmpezarEditar, onTerminarEditar
 }) {
   return (
-    <div className="rounded-card bg-surface-2 dark:bg-surface-1/[0.03] border border-line/70 dark:border-white/10 px-3.5 py-2.5">
+    <div className="h-fit rounded-card bg-surface-2 dark:bg-surface-1/[0.03] border border-line/70 dark:border-white/10 px-3 py-2">
       <div className="flex items-center gap-2">
         {editando ? (
           <>

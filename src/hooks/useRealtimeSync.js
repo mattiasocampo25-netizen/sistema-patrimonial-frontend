@@ -60,6 +60,11 @@ export function useRealtimeSync({
   // debe llegar a la pantalla.
   const depAnteriorRef = useRef(dependenciaActual);
   const secundariosCargadosRef = useRef({ dependencia: dependenciaActual, fc11: 0, fc04: 0 });
+  // Validar el tamaño remoto de la caché es útil, pero el `count: exact` sobre
+  // bens puede ser costoso. Se limita a una comprobación por dependencia cada
+  // cinco minutos; los eventos Realtime y las cargas normales siguen usando la
+  // caché/delta sin volver a contar toda la tabla.
+  const conteoBensRef = useRef(new Map());
   useEffect(() => {
     let vigente = true;
     setUltimoSyncBienes(null);
@@ -279,13 +284,23 @@ export function useRealtimeSync({
         // El conteo remoto comienza en paralelo con las consultas de apoyo,
         // pero se conserva como validación obligatoria antes de aceptar caché.
         const requiereDescargaTotal = debeResyncTotal(metaBienes) || !Array.isArray(cacheBienes);
-        const cantidadRemotaPromise = requiereDescargaTotal
+        const ahoraConteo = Date.now();
+        const ultimoConteo = conteoBensRef.current.get(dependenciaActual) || 0;
+        const puedeValidarConteo = ahoraConteo - ultimoConteo >= 5 * 60 * 1000;
+        const cantidadRemotaPromise = requiereDescargaTotal || !puedeValidarConteo
           ? Promise.resolve(null)
           : supabase.from('bens')
             .select('id', { count: 'exact', head: true })
             .eq('data->>dependencia', dependenciaActual)
-            .then(({ count, error }) => !error && Number.isInteger(count) ? count : null)
-            .catch(() => null);
+            .then(({ count, error }) => {
+              conteoBensRef.current.set(dependenciaActual, Date.now());
+              return !error && Number.isInteger(count) ? count : null;
+            })
+            .catch(() => {
+              // No bloquear la sincronización si esta comprobación falla.
+              conteoBensRef.current.set(dependenciaActual, Date.now());
+              return null;
+            });
 
         // Inicia las consultas de actas y catálogos junto con la descarga de
         // bienes. Antes empezaban después de bajar el inventario completo, lo

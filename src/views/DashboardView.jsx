@@ -19,6 +19,36 @@ function claveDia(fecha) {
   return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
 }
 
+function inicioSemana(fecha = new Date()) {
+  const copia = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+  const dia = (copia.getDay() + 6) % 7;
+  copia.setDate(copia.getDate() - dia);
+  return copia;
+}
+
+function ResumenSemanal({ bienes = [], fc10List = [], solicitudesBaja = [], pendientes = [], dependenciaActual, onVerAuditoria }) {
+  const resumen = useMemo(() => {
+    const inicio = inicioSemana();
+    const fin = new Date(inicio); fin.setDate(fin.getDate() + 5); fin.setHours(23, 59, 59, 999);
+    const dentro = valor => { const fecha = new Date(valor); return !Number.isNaN(fecha.valueOf()) && fecha >= inicio && fecha <= fin; };
+    const propios = item => !dependenciaActual || String(item?.dependencia || '').toLowerCase() === String(dependenciaActual || '').toLowerCase();
+    const bienesSemana = bienes.filter(item => propios(item) && (dentro(item.fechaCarga) || dentro(item.created_at) || dentro(item.modificadoEn) || dentro(item.updated_at)));
+    const actas = fc10List.filter(item => propios(item) && (dentro(item.fechaGeneracion) || dentro(item.entregadoFecha) || dentro(item.created_at)));
+    const bajas = solicitudesBaja.filter(item => propios(item) && (dentro(item.created_at) || dentro(item.fechaSolicitud) || dentro(item.fecha)));
+    return { bienes: bienesSemana.length, actas: actas.length, bajas: bajas.length, inicio, fin };
+  }, [bienes, fc10List, solicitudesBaja, dependenciaActual]);
+  const rango = `${resumen.inicio.toLocaleDateString('es-PY', { day: '2-digit', month: 'short' })} – ${resumen.fin.toLocaleDateString('es-PY', { day: '2-digit', month: 'short' })}`;
+  return <section className="weekly-summary-card rounded-2xl border border-brand/15 bg-surface-1 p-4 shadow-sm sm:p-5" aria-labelledby="resumen-semanal-titulo">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-soft text-brand-text"><i className="fa-solid fa-calendar-week" aria-hidden="true" /></span><div><h2 id="resumen-semanal-titulo" className="text-sm font-extrabold text-content-1">Resumen de la semana</h2><p className="text-xs text-content-3">Actividad registrada · {rango}</p></div></div>
+      <button type="button" onClick={onVerAuditoria} className="rounded-lg border border-line px-3 py-2 text-xs font-bold text-brand-text hover:bg-brand-soft">Ver actividad</button>
+    </div>
+    <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {[['Bienes activos', resumen.bienes, 'fa-boxes-stacked'], ['Actas FC-10', resumen.actas, 'fa-file-signature'], ['Solicitudes de baja', resumen.bajas, 'fa-file-circle-minus'], ['Pendientes', pendientes.length, 'fa-hourglass-half']].map(([label, valor, icono]) => <div key={label} className="rounded-xl border border-line bg-surface-2/60 px-3 py-2.5"><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-content-3"><i className={`fa-solid ${icono} text-brand-text`} aria-hidden="true" />{label}</div><strong className="mt-1 block text-lg tabular-nums text-content-1">{valor}</strong></div>)}
+    </div>
+  </section>;
+}
+
 function AgendaPatrimonial({ bienes, fc10List, dependenciaActual, onAbrirBien, onAbrirFC10 }) {
   const [mes, setMes] = useState(() => {
     const hoy = new Date();
@@ -123,6 +153,7 @@ export default function DashboardView({
   setIsBulkQR, setQrTargetBien, setIsQRModalOpen, openFC03Modal,
   setFc10Year, setFc10Month,
   fc10List, bienes, requestDependenciaChange
+  , solicitudesBaja = []
 }) {
   const actasPorFirmar = useMemo(() => (fc10List || [])
     .filter(fc => !fc.devolucionFecha && pendienteDeFirma(fc))
@@ -302,6 +333,7 @@ export default function DashboardView({
         </div>
       </header>
 
+      <ResumenSemanal bienes={bienes} fc10List={fc10List} solicitudesBaja={solicitudesBaja} pendientes={pendientes} dependenciaActual={dependenciaActual} onVerAuditoria={() => setActiveTab('auditoria')} />
       {widgets.metricas && (
         <section className="overflow-hidden rounded-panel border border-line bg-surface-1 shadow-card" aria-label="Indicadores del inventario" data-tour="dash-stats">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3.5">

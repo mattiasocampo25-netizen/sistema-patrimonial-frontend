@@ -1707,3 +1707,77 @@ button:disabled {
   .inventory-actions-scroll { overflow-x: auto; padding-bottom: .2rem; }
   .inventory-actions-scroll .ui-button { flex: 0 0 auto; }
 }
+
+/* Segunda fase visual: módulos densos, login y modales. */
+.login-experience {
+  max-width: 64rem;
+  margin-inline: auto;
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
+}
+.login-experience :where(input) {
+  min-height: 3rem;
+  color: var(--content-1) !important;
+  background: var(--surface-1) !important;
+  border-color: var(--line-strong) !important;
+}
+.login-experience :where(label) { color: var(--content-2); }
+.login-experience :where(button[type="submit"]) {
+  min-height: 3rem;
+  font-weight: 800;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+.login-experience :where(a) { color: var(--brand) !important; }
+
+.audit-workspace,
+.approval-workspace,
+.users-workspace,
+.records-workspace { min-width: 0; }
+.audit-nav { gap: .5rem !important; }
+.audit-tab { min-height: 3.5rem !important; }
+.audit-workspace .audit-hero,
+.approval-workspace > section:first-child,
+.records-workspace .records-hero,
+.users-workspace .users-hero {
+  box-shadow: 0 12px 28px rgb(15 48 68 / .08);
+}
+.dark .audit-workspace .audit-hero,
+.dark .approval-workspace > section:first-child,
+.dark .records-workspace .records-hero,
+.dark .users-workspace .users-hero { box-shadow: none; }
+
+.users-summary { gap: .75rem !important; }
+.users-summary-tile {
+  min-height: 5.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  box-shadow: 0 6px 18px rgb(15 48 68 / .05);
+}
+.users-summary-label { color: var(--content-3); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.users-summary-tile strong { color: var(--content-1); font-size: 1.45rem; line-height: 1.1; }
+.users-summary-icon { color: var(--brand) !important; background: color-mix(in srgb, var(--brand) 12%, var(--surface-2)) !important; }
+.dark .users-summary-tile { box-shadow: none; }
+
+.modal-overlay,
+[role="dialog"] { overscroll-behavior: contain; }
+.modal-content,
+.restore-dialog,
+.organization-dialog,
+.ficha-bien-dialog {
+  max-height: min(92dvh, 54rem);
+}
+.modal-content :where(input, select, textarea) { color: var(--content-1) !important; }
+.modal-content :where(label) { color: var(--content-2); }
+
+.workspace-main table { border-collapse: separate; border-spacing: 0; }
+.workspace-main table th { white-space: nowrap; }
+.workspace-main table td { vertical-align: middle; }
+.workspace-main table tbody tr:last-child td:first-child { border-bottom-left-radius: .75rem; }
+.workspace-main table tbody tr:last-child td:last-child { border-bottom-right-radius: .75rem; }
+
+@media (max-width: 720px) {
+  .login-experience { border-radius: 1.25rem; }
+  .audit-nav { grid-template-columns: 1fr !important; }
+  .users-summary { grid-template-columns: 1fr !important; }
+  .users-summary-tile { min-height: 4.5rem; }
+}

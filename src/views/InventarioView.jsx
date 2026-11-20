@@ -1136,10 +1136,10 @@ export default function InventarioView({
       )}
       {mostrarAsignacionMasiva && (
         <Dialogo className={STYLES.modalOverlay} onClick={() => setMostrarAsignacionMasiva(false)}>
-          <div className={STYLES.modalContent + ' max-w-lg !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line'} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Asignación masiva de bienes">
-            <div className="px-6 py-5 border-b border-line dark:border-white/10">
+          <div className={STYLES.modalContent + ' mass-assignment-dialog w-[min(32rem,calc(100vw-2rem))] max-w-none !p-0 overflow-hidden rounded-[24px] shadow-2xl border border-line/80 dark:border-line'} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Asignación masiva de bienes">
+            <div className="px-6 py-5 border-b border-line bg-surface-1 dark:border-white/10">
               <h2 className="text-lg font-bold text-content-1 dark:text-white">Asignar bienes seleccionados</h2>
-              <p className="mt-1 text-sm text-content-3">Se actualizarán {seleccionados.length} bienes. Deja un campo en “Mantener” para no modificarlo.</p>
+              <p className="mt-1 text-sm leading-relaxed text-content-3">Se actualizarán {seleccionados.length} bienes. Elige solo los campos que quieres cambiar.</p>
             </div>
             <div className="p-6 grid gap-4">
               <label className="grid gap-1.5 text-xs font-bold text-content-2">Responsable
@@ -1157,7 +1157,9 @@ export default function InventarioView({
                 </select>
               </label>
             </div>
-            <div className="flex justify-end gap-2 px-6 py-4 border-t border-line dark:border-white/10">
+            <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-t border-line bg-surface-2/60 dark:border-white/10">
+              <span className="text-xs text-content-3">{asignacionMasiva.funcionario === '__MANTENER__' && asignacionMasiva.ubicacion === '__MANTENER__' ? 'Selecciona al menos un cambio' : 'Los campos no elegidos se mantienen'}</span>
+              <div className="flex gap-2">
               <button onClick={() => setMostrarAsignacionMasiva(false)} className="h-10 px-4 rounded-control text-sm font-semibold hover:bg-surface-2">Cancelar</button>
               <button
                 disabled={asignacionMasiva.funcionario === '__MANTENER__' && asignacionMasiva.ubicacion === '__MANTENER__'}
@@ -1167,8 +1169,9 @@ export default function InventarioView({
                   onAsignarMasivo?.({ ids: seleccionados, funcionario, ubicacion });
                   setMostrarAsignacionMasiva(false);
                 }}
-                className="h-10 px-5 rounded-control bg-brand text-white text-sm font-bold disabled:opacity-45"
+                className="h-10 px-5 rounded-control bg-brand text-white text-sm font-bold disabled:cursor-not-allowed disabled:bg-surface-3 disabled:text-content-3"
               >Aplicar cambios</button>
+              </div>
             </div>
           </div>
         </Dialogo>

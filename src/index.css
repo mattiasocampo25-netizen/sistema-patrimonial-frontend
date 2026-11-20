@@ -1606,6 +1606,22 @@ button:disabled {
   .approval-workspace section :is(h1, h2, p, span) { color: #111 !important; }
 }
 
+/* Tipografía de interfaz: deliberadamente limitada a pantalla para no alterar
+ * reportes PDF ni impresiones. */
+@media screen {
+  body { font-size: 0.9375rem; }
+  :where(h1, h2, h3, h4, .font-display) { font-family: var(--font-display); }
+  :where(h1) { line-height: 1.08; }
+  :where(h2, h3) { line-height: 1.16; }
+  :where(p, label, button, input, select, textarea) { font-family: var(--font-sans); }
+  :where(.text-xs) { line-height: 1.35; }
+  :where(.text-\[10px\], .text-\[11px\]) { letter-spacing: .035em; }
+  :where(.font-mono, code, kbd, samp) {
+    font-family: var(--font-mono) !important;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Capa visual transversal v2.19.42
  * Corrige contraste, densidad y alineación en módulos que comparten clases

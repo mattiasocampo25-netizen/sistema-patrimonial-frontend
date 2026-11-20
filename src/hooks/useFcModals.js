@@ -663,6 +663,12 @@ export function useFcModals({
     
     // Duplicado: bienEditing sin id se trata como alta nueva.
     const esEdicion = Boolean(bienEditing?.id);
+    // El formulario puede normalizar componentes y responsables mientras se
+    // guarda. Conservamos una instantánea inmutable para que la auditoría
+    // compare contra lo que existía antes del clic en «Guardar».
+    const bienAnteriorAuditoria = esEdicion
+        ? JSON.parse(JSON.stringify(bienEditing))
+        : null;
     const ahoraRegistro = new Date().toISOString();
     const usuarioRegistro = currentUser?.username || 'Usuario';
     const bienData = { 
@@ -772,7 +778,7 @@ export function useFcModals({
                 detalles: {
                     rotulo: bienData.rotulo,
                     descripcion: bienData.descripcion,
-                    cambios: esEdicion ? { anterior: bienEditing, nuevo: bienGuardado } : bienGuardado
+                    cambios: esEdicion ? { anterior: bienAnteriorAuditoria, nuevo: bienGuardado } : bienGuardado
                 }
             });
 

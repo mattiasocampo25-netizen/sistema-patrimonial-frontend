@@ -75,7 +75,10 @@ export function obtenerCambiosAuditoria(row) {
     const anterior = entrada?.anterior;
     const nuevo = entrada?.nuevo;
     if (!anterior || !nuevo || typeof anterior !== 'object' || typeof nuevo !== 'object') return;
-    Object.keys(nuevo).forEach(campo => {
+    // Comparamos la unión de claves: si un valor se elimina del formulario,
+    // no existe en `nuevo`, pero sigue siendo un cambio real que debe quedar
+    // visible en la auditoría.
+    [...new Set([...Object.keys(anterior), ...Object.keys(nuevo)])].forEach(campo => {
       if (CAMPOS_TECNICOS.has(String(campo).toLowerCase()) || valoresEquivalentes(nuevo[campo], anterior[campo], campo)) return;
       const sujeto = entradas.length > 1 ? (entrada.rotulo || `Bien ${indice + 1}`) : '';
       cambios.push({

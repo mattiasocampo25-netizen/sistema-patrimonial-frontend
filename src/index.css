@@ -1868,3 +1868,21 @@ button:disabled {
   .users-summary { grid-template-columns: 1fr !important; }
   .users-summary-tile { min-height: 4.5rem; }
 }
+
+/* Contraste y densidad final para superficies de revisión. */
+.audit-workspace [class*="bg-danger-soft"] { background: #fff7f7 !important; border-color: #f4caca !important; }
+.audit-workspace [class*="bg-ok-soft"] { background: #effcf6 !important; border-color: #b8ead5 !important; }
+.audit-workspace [class*="bg-danger-soft"] :where(span, p) { color: #9f2535 !important; }
+.audit-workspace [class*="bg-ok-soft"] :where(span, p) { color: #126b50 !important; }
+.dark .audit-workspace [class*="bg-danger-soft"] { background: #351e26 !important; border-color: #713442 !important; }
+.dark .audit-workspace [class*="bg-ok-soft"] { background: #15362f !important; border-color: #286b59 !important; }
+.dark .audit-workspace [class*="bg-danger-soft"] :where(span, p) { color: #ffb4bf !important; }
+.dark .audit-workspace [class*="bg-ok-soft"] :where(span, p) { color: #9ce8cd !important; }
+.approval-workspace :where(input, select) { min-height: 2.75rem; }
+.approval-workspace [role="tablist"] { flex-wrap: wrap; gap: .45rem; }
+.approval-workspace [role="tab"] { min-height: 2.35rem; border-radius: .7rem; }
+.organization-dialog .organization-card { transition: border-color .18s ease, box-shadow .18s ease; }
+.organization-dialog .organization-card:hover { border-color: color-mix(in srgb, var(--brand) 38%, var(--line)); box-shadow: 0 5px 14px rgb(15 48 68 / .07); }
+.dark .organization-dialog .organization-card:hover { box-shadow: none; }
+.users-table-panel tbody td { padding-block: .7rem !important; }
+.users-table-panel tbody tr:hover td { background: color-mix(in srgb, var(--brand) 5%, var(--surface-1)); }

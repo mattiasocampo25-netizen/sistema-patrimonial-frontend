@@ -370,10 +370,10 @@ export default function BienModal({
 
     return (
         <Dialogo className={STYLES.modalOverlay} onCerrar={solicitarCierre}>
-          <div className={STYLES.modalContent + " max-w-5xl overflow-hidden !rounded-[24px] shadow-2xl"}>
+          <div className={STYLES.modalContent + " bien-modal-dialog max-w-5xl overflow-hidden !rounded-[24px] shadow-2xl"}>
 
             {/* Header */}
-            <div className="flex justify-between items-center px-6 py-5 border-b border-white/10 bg-[#145a75] text-white shrink-0 z-10">
+            <div className="bien-modal-header flex justify-between items-center px-6 py-5 border-b border-white/10 bg-[#145a75] text-white shrink-0 z-10">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white">
                    <i className={`fa-solid ${esNuevo ? 'fa-plus' : 'fa-pen-to-square'} text-base`}></i>
@@ -382,7 +382,7 @@ export default function BienModal({
                   <h2 className="text-lg font-extrabold text-white tracking-tight">
                     {esNuevo ? 'Registrar Nuevo Bien' : 'Editar Bien Patrimonial'}
                   </h2>
-                  <p className="text-xs text-white/80 mt-0.5">{esNuevo ? 'Sigue las secciones para registrar el bien.' : 'Edita los datos del bien por sección.'} · Dependencia: {dependenciaActual || 'No indicada'}</p>
+                  <p className="text-xs text-white/80 mt-0.5">{esNuevo ? 'Completa las secciones para registrar el bien.' : 'Actualiza únicamente la información necesaria.'} · Dependencia: {dependenciaActual || 'No indicada'}</p>
                 </div>
               </div>
 

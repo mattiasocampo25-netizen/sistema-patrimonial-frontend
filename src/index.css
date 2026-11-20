@@ -1664,6 +1664,35 @@ button:disabled {
   .organization-dialog > .grid { grid-template-columns: 280px minmax(0, 1fr) !important; }
 }
 
+/* Editor de bienes: una sola jerarquía visual, menos ruido y mejor lectura. */
+.bien-modal-dialog {
+  width: min(58rem, calc(100vw - 2rem));
+  max-height: min(94dvh, 56rem);
+}
+.bien-modal-header :where(h2, p, i) { color: #f7ffff !important; }
+.bien-modal-header p { color: #d9eef1 !important; }
+.bien-modal-dialog form > div:first-of-type { background: var(--surface-1); }
+.bien-modal-dialog form > div:first-of-type nav { max-width: 58rem; margin-inline: auto; }
+.bien-modal-dialog form > div:first-of-type nav button { min-height: 2.5rem; border-color: var(--line-strong); }
+.bien-modal-dialog form > div:first-of-type nav button:hover { border-color: var(--brand); }
+.bien-modal-dialog form > div:nth-child(2) { max-width: 58rem; width: 100%; margin-inline: auto; }
+.bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] {
+  border-radius: 1rem;
+  box-shadow: 0 5px 16px rgb(15 48 68 / .045);
+}
+.dark .bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] { box-shadow: none; }
+.bien-modal-dialog :where(label) { color: var(--content-2) !important; }
+.bien-modal-dialog :where(input, textarea, select) { min-height: 2.75rem; }
+.bien-modal-dialog textarea { min-height: 5.5rem; }
+.bien-modal-dialog .modal-footer,
+.bien-modal-dialog form > div:last-child { background: color-mix(in srgb, var(--surface-1) 94%, var(--brand)); }
+@media (max-width: 640px) {
+  .bien-modal-dialog { width: calc(100vw - 1rem); max-height: 96dvh; border-radius: 1rem !important; }
+  .bien-modal-header { padding: 1rem !important; }
+  .bien-modal-dialog form > div:nth-child(2) { padding: .75rem !important; }
+  .bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] { padding: 1rem !important; }
+}
+
 /* ---------------------------------------------------------------------------
  * Capa visual transversal v2.19.42
  * Corrige contraste, densidad y alineación en módulos que comparten clases

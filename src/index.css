@@ -1385,6 +1385,9 @@ html.font-lg { font-size: 18px; }
 .inventory-view > .overflow-hidden:first-child .module-page-header p,
 .inventory-view > .overflow-hidden:first-child p.text-brand-text { color: #a8eee5 !important; }
 .inventory-view > .overflow-hidden:first-child .module-page-header > div:first-child > span:first-child { color: #a8f0e6; background: rgb(255 255 255 / .12); }
+.inventory-view > .overflow-hidden:first-child .module-page-header h1 { color: #f7ffff !important; }
+.inventory-view > .overflow-hidden:first-child .module-page-header p { color: #cfe7e8 !important; }
+.inventory-view > .overflow-hidden:first-child .module-page-header > div:first-child > span:first-child { color: #c7fff7 !important; background: rgb(255 255 255 / .14) !important; }
 .inventory-header-main { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 1rem 1.5rem; }
 .inventory-header-content { min-width: 0; }
 .inventory-view-count { color: #f5fbfb; background: rgb(255 255 255 / .1); border-color: rgb(255 255 255 / .2); }
@@ -1398,6 +1401,12 @@ html.font-lg { font-size: 18px; }
 .inventory-view > .overflow-hidden:first-child .border-t > div > i.text-emerald-700 { color: #6ee7b7; }
 .inventory-view > .overflow-hidden:first-child .border-t > div > i.text-amber-700 { color: #fcd34d; }
 .inventory-view > .overflow-hidden:first-child .border-t > div > i.text-sky-700 { color: #7dd3fc; }
+@media (max-width: 640px) {
+  .inventory-header-main { grid-template-columns: minmax(0, 1fr); gap: .7rem; }
+  .inventory-view-count { justify-self: start; }
+  .inventory-toolbar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: .15rem; scrollbar-width: thin; }
+  .inventory-toolbar > * { flex: 0 0 auto; }
+}
 .inventory-view > .overflow-hidden:first-child .border-t span span:last-child { color: #fff; }
 .inventory-view > .overflow-hidden:first-child > .border-t { background: rgb(8 35 46 / .22); }
 .inventory-view > .w-full.min-w-0.space-y-2 { padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 1.1rem; background: var(--surface-1); box-shadow: var(--shadow-card); }

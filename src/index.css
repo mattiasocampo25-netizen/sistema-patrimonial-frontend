@@ -1622,6 +1622,39 @@ button:disabled {
   }
 }
 
+/* Correcciones de contraste en encabezados oscuros y estados seleccionados. */
+.organization-dialog-header :where(h2, p, span) { color: #f8fbff !important; }
+.organization-dialog-header p.text-cyan-100 { color: #bdebf0 !important; }
+.organization-dialog-header p.text-white\/80 { color: #dcecf2 !important; }
+.organization-dialog-header button { color: #dcecf2 !important; }
+.organization-dialog-header button:hover { color: #fff !important; }
+
+.audit-workspace .audit-tab[aria-selected="true"] :where(span, i) { color: #fff !important; }
+.audit-workspace .audit-tab[aria-selected="true"] { background: #155e75 !important; color: #fff !important; }
+.audit-workspace .audit-tab[aria-selected="true"] span:first-child { background: rgb(255 255 255 / .14) !important; }
+
+.announcement-hero :where(h1, h2, p, span, i),
+.help-hero :where(h1, h2, p, span, i),
+.records-hero :where(h1, h2, p, span, i) { text-shadow: 0 1px 1px rgb(0 0 0 / .14); }
+.announcement-hero .fa-solid,
+.help-hero .fa-solid,
+.records-hero .fa-solid { color: #c9f5f2; }
+
+.organization-dialog { --org-gap: .85rem; }
+.organization-dialog-sidebar { width: 100%; }
+.organization-dialog-sidebar > .custom-scrollbar { scrollbar-gutter: stable; }
+.organization-dialog .organization-card,
+.organization-dialog [class*="rounded-card"] { min-width: 0; }
+.organization-dialog .organization-card { padding: .85rem 1rem; }
+.organization-dialog .organization-card :where(h3, p) { overflow-wrap: anywhere; }
+.organization-dialog .organization-dialog-sidebar button { text-align: left; }
+.organization-dialog .organization-dialog-sidebar > div:last-child button { justify-content: center; text-align: center; }
+
+@media (min-width: 768px) {
+  .organization-dialog > .organization-dialog-header { min-height: 6.4rem; }
+  .organization-dialog > .grid { grid-template-columns: 280px minmax(0, 1fr) !important; }
+}
+
 /* ---------------------------------------------------------------------------
  * Capa visual transversal v2.19.42
  * Corrige contraste, densidad y alineación en módulos que comparten clases

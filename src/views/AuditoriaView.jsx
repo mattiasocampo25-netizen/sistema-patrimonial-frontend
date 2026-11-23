@@ -75,12 +75,35 @@ export default function AuditoriaView({
     setHastaAud(aFecha(fin));
   };
   const descargarInformeSalud = () => {
-    const filas = [['Tipo de revisión', 'Cantidad detectada', 'Identificador', 'Rótulo o nombre', 'Dependencia', 'Detalle']];
+    const plan = {
+      dup: ['Alta', 'Inventario > buscar el rótulo y abrir el bien', 'Rótulo, descripción, clasificación contable, año y ubicación', 'Comparar físicamente ambos bienes. Si es el mismo, conservar un registro y solicitar la baja/corrección del duplicado; si son distintos, documentar la diferencia.'],
+      dupfunc: ['Alta', 'Funcionarios > buscar por documento', 'Documento/C.I.', 'Verificar el documento original y corregir el registro duplicado o unificar la persona.'],
+      dupnombre: ['Media', 'Funcionarios > buscar por nombre', 'Nombre completo y C.I.', 'Confirmar si son personas distintas. Completar C.I. y diferenciar los nombres cuando corresponda.'],
+      fc10: ['Alta', 'Actas FC-10 > revisar el acta', 'Bien asociado al acta', 'Abrir el acta y vincularla al bien correcto o corregir/eliminar la referencia huérfana.'],
+      fc11: ['Alta', 'Traslados FC-11 > revisar el traslado', 'Bien asociado al traslado', 'Verificar el bien trasladado y asociar el identificador correcto.'],
+      sinrotulo: ['Alta', 'Inventario > editar bien', 'Rótulo patrimonial', 'Asignar el rótulo oficial según la documentación patrimonial.'],
+      sindep: ['Alta', 'Inventario > editar bien', 'Dependencia', 'Seleccionar la dependencia institucional correcta.'],
+      sinubicacion: ['Media', 'Inventario > editar bien', 'Ubicación operativa', 'Registrar la oficina, laboratorio o espacio físico actual.'],
+      sinfecha: ['Media', 'Inventario > editar bien', 'Fecha de adquisición', 'Completar la fecha usando factura, acta o documento de incorporación.'],
+      sinestado: ['Media', 'Inventario > editar bien', 'Estado de conservación', 'Seleccionar Bueno, Muy bueno, Regular, Malo o De Baja según verificación física.'],
+      sindescripcion: ['Media', 'Inventario > editar bien', 'Descripción', 'Escribir una descripción identificable del bien.'],
+      sinresponsable: ['Informativa', 'Inventario > editar bien', 'Responsable', 'Asignar custodio si el bien está entregado; si está libre, mantenerlo sin responsable y documentar el motivo.'],
+      responsablepadron: ['Alta', 'Inventario > editar bien y Funcionarios', 'Responsable y documento', 'Seleccionar el funcionario desde el padrón; no escribir manualmente un nombre que no exista.'],
+      componentes: ['Alta', 'Inventario > editar bien > Piezas y conjuntos', 'Nombre y cantidad de componentes', 'Completar nombre y cantidad de cada pieza o desactivar Piezas y conjuntos si no corresponde.'],
+      fechaInvalida: ['Alta', 'Inventario > editar bien', 'Fecha de adquisición', 'Corregir el formato o la fecha usando el documento fuente.'],
+      fechaFutura: ['Media', 'Inventario > editar bien', 'Fecha de adquisición', 'Confirmar la fecha; no debe ser posterior a la fecha actual.'],
+      montoInvalido: ['Alta', 'Inventario > editar bien', 'Valor de adquisición', 'Corregir el monto a un valor numérico no negativo.'],
+      funcionariosSinCI: ['Alta', 'Funcionarios > editar funcionario', 'C.I./Documento', 'Completar el documento oficial del funcionario.'],
+      funcionariosSinDependencia: ['Media', 'Funcionarios > editar funcionario', 'Dependencia', 'Asignar la dependencia institucional correspondiente.'],
+      alternativoPadron: ['Media', 'Inventario > editar bien', 'Responsable alternativo', 'Seleccionar el funcionario desde el padrón o retirar el responsable alternativo inválido.'],
+    };
+    const filas = [['Prioridad', 'Tipo de revisión', 'Cantidad del grupo', 'Identificador', 'Rótulo o nombre', 'Dependencia', 'Campo a revisar', 'Dónde corregir', 'Acción recomendada', 'Detalle']];
     saludDatos.forEach((grupo) => {
-      if (!grupo.detalle.length) filas.push([grupo.label, grupo.count, '', '', '', 'Sin ejemplos disponibles']);
+      const [prioridad, donde, campo, accion] = plan[grupo.id] || ['Revisar', 'Módulo correspondiente', 'Dato señalado', 'Verificar y corregir el registro según la documentación fuente.'];
+      if (!grupo.detalle.length) filas.push(['—', grupo.label, grupo.count, '', '', '', campo, donde, accion, 'Sin ejemplos disponibles']);
       grupo.detalle.forEach((item) => filas.push([
-        grupo.label, grupo.count, item.id || '', item.rotulo || item.nombre || item.descripcion || '',
-        item.dependencia || '', item.cedula ? `Documento ${item.cedula}` : item.funcionario || item.motivo || '',
+        prioridad, grupo.label, grupo.count, item.id || '', item.rotulo || item.nombre || item.descripcion || '', item.dependencia || '', campo, donde, accion,
+        item.cedula ? `Documento/C.I.: ${item.cedula}` : item.funcionario || item.motivo || 'Revisar el registro indicado.',
       ]));
     });
     const csv = csvRowsSafe(filas);

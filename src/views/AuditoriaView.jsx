@@ -124,7 +124,7 @@ export default function AuditoriaView({
       if (!grupo.detalle.length) filas.push(['—', grupo.label, grupo.count, '', '', '', campo, donde, accion, 'Sin ejemplos disponibles']);
       grupo.detalle.forEach((item) => filas.push([
         prioridad, grupo.label, grupo.count, item.id || '', item.rotulo || item.nombre || item.descripcion || '', item.dependencia || '', campo, donde, accion,
-        item.cedula ? `Documento/C.I.: ${item.cedula}` : item.funcionario || item.motivo || 'Revisar el registro indicado.',
+        [item.motivo, item.funcionario ? `Responsable actual: ${item.funcionario}` : '', item.cedula ? `Documento/C.I.: ${item.cedula}` : ''].filter(Boolean).join(' · ') || 'Revisar el registro indicado.',
       ]));
     });
     const csv = csvRowsSafe(filas);

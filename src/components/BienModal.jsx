@@ -115,6 +115,22 @@ export default function BienModal({
         const maxHeight = Math.max(120, Math.min(alto, (abrirArriba ? arriba : abajo) - 6));
         setStyle({ position: 'fixed', left: rect.left, width: rect.width, maxHeight, top: abrirArriba ? undefined : rect.bottom + 6, bottom: abrirArriba ? window.innerHeight - rect.top + 6 : undefined });
     };
+    useEffect(() => {
+        if (!showCustodioDropdown) return undefined;
+        const actualizar = () => posicionarDropdown(custodioDropdownRef, setCustodioDropdownStyle);
+        actualizar();
+        window.addEventListener('resize', actualizar);
+        window.addEventListener('scroll', actualizar, true);
+        return () => { window.removeEventListener('resize', actualizar); window.removeEventListener('scroll', actualizar, true); };
+    }, [showCustodioDropdown]);
+    useEffect(() => {
+        if (!showUbicacionDropdown) return undefined;
+        const actualizar = () => posicionarDropdown(ubicacionDropdownRef, setUbicacionDropdownStyle, 208);
+        actualizar();
+        window.addEventListener('resize', actualizar);
+        window.addEventListener('scroll', actualizar, true);
+        return () => { window.removeEventListener('resize', actualizar); window.removeEventListener('scroll', actualizar, true); };
+    }, [showUbicacionDropdown]);
     const guardarBorradorDespuesDeCambio = () => setTimeout(() => guardarBorrador(serializarForm(bienFormRef.current)), 0);
     const actualizarComponente = (indice, cambios) => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.map((item, index) => index === indice ? { ...item, ...cambios } : item)); };
     const validarRotulo = (valor) => {

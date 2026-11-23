@@ -1239,7 +1239,7 @@ export default function InventarioView({
               onFocus={() => setBuscadorRapidoFijado(true)}
               onChange={event => { setSearchTerm(event.target.value); setSearchInput(event.target.value); setCurrentPage(1); }}
               onKeyDown={event => { if (event.key === 'Enter' && event.currentTarget.value.trim()) guardarReciente(event.currentTarget.value); }}
-              className="min-w-0 flex-1 border-0 bg-transparent px-1 py-2 text-sm font-medium text-content-1 outline-none placeholder:font-medium placeholder:text-content-3 focus:ring-0"
+              className="inventory-floating-search-input min-w-0 flex-1 border-0 bg-transparent px-1 py-2 text-sm font-medium text-content-1 outline-none placeholder:font-medium placeholder:text-content-3 focus:ring-0"
             />
             {searchTerm && <button type="button" onClick={() => { setSearchTerm(''); setSearchInput(''); setCurrentPage(1); }} title="Limpiar búsqueda" aria-label="Limpiar búsqueda rápida" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-content-3 hover:bg-surface-2 hover:text-content-1"><i className="fa-solid fa-xmark text-xs" /></button>}
             <span className="hidden h-6 w-px bg-line sm:block" aria-hidden="true" />

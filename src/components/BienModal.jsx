@@ -74,6 +74,10 @@ export default function BienModal({
     const [componentes, setComponentes] = useState(() => normalizarComponentes(bienEditing?.componentes));
     const [tieneComponentes, setTieneComponentes] = useState(() => normalizarComponentes(bienEditing?.componentes).length > 0);
     const [observacionesTexto, setObservacionesTexto] = useState(() => String(bienEditing?.observaciones || ''));
+    // El combo de estado es controlado para que la selección se refleje
+    // inmediatamente y FormData reciba el valor elegido al editar.
+    const [estadoConservacionTexto, setEstadoConservacionTexto] = useState(() => String(bienEditing?.estadoConservacion || 'Bueno'));
+    useEffect(() => { setEstadoConservacionTexto(String(bienEditing?.estadoConservacion || 'Bueno')); }, [bienEditing?.id, bienEditing?.estadoConservacion]);
     useEffect(() => { setObservacionesTexto(String(bienEditing?.observaciones || '')); }, [bienEditing?.id, bienEditing?.observaciones]);
     const [errorComponentes, setErrorComponentes] = useState('');
     const [fechaAviso, setFechaAviso] = useState('');
@@ -518,7 +522,8 @@ export default function BienModal({
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3 mb-2">Estado de Conservación</label>
                     <FiltroCombo
                       name="estadoConservacion"
-                      valor={defecto('estadoConservacion', bienEditing?.estadoConservacion || 'Bueno')}
+                      valor={estadoConservacionTexto}
+                      onElegir={setEstadoConservacionTexto}
                       opciones={ESTADOS_CONSERVACION}
                       etiquetaTodos="Estado"
                       titulo="Estado de conservación"

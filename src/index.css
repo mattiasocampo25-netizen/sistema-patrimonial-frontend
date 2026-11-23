@@ -1685,6 +1685,13 @@ button:disabled {
 .bien-modal-dialog :where(label) { color: var(--content-2) !important; }
 .bien-modal-dialog :where(input, textarea, select) { min-height: 2.75rem; }
 .bien-modal-dialog textarea { min-height: 5.5rem; }
+.bien-modal-dialog form > div:nth-child(2) { gap: .75rem !important; }
+.bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] { padding: 1rem 1.15rem !important; }
+.bien-modal-dialog form > div:nth-child(2) .grid { gap: .7rem; }
+.bien-modal-dialog form > div:nth-child(2) label { margin-bottom: 0; }
+.inventory-floating-search-input::-webkit-search-cancel-button,
+.inventory-floating-search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
+.inventory-floating-search-input { appearance: none; }
 .bien-modal-dialog .modal-footer,
 .bien-modal-dialog form > div:last-child { background: color-mix(in srgb, var(--surface-1) 94%, var(--brand)); }
 @media (max-width: 640px) {

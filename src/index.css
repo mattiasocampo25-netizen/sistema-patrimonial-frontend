@@ -1693,6 +1693,22 @@ button:disabled {
 .inventory-floating-search-input::-webkit-search-cancel-button,
 .inventory-floating-search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 .inventory-floating-search-input { appearance: none; }
+
+/* Panel principal: jerarquía más compacta y equilibrada. */
+.weekly-summary-card { padding: 1rem !important; }
+.weekly-summary-card > div:last-child { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; margin-top: .75rem; }
+.weekly-summary-card > div:last-child > div { min-height: 4.1rem; padding: .65rem .75rem; border-radius: .75rem; }
+.weekly-summary-card > div:last-child strong { margin-top: .25rem; font-size: 1.15rem; }
+.dashboard-workspaces-grid { gap: 1rem !important; }
+.dashboard-workspaces-grid > section,
+.dashboard-workspaces-grid > aside > section { border-radius: 1rem !important; }
+.dashboard-workspaces-grid > aside > section[aria-label="Avance de asignación"] { padding: 1rem !important; background: linear-gradient(145deg, #123b52, #0e2a3a) !important; }
+@media (min-width: 900px) {
+  .weekly-summary-card > div:last-child { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .weekly-summary-card > div:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .bien-modal-dialog .modal-footer,
 .bien-modal-dialog form > div:last-child { background: color-mix(in srgb, var(--surface-1) 94%, var(--brand)); }
 @media (max-width: 640px) {

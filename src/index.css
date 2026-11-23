@@ -1689,6 +1689,7 @@ button:disabled {
 .bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] { padding: 1rem 1.15rem !important; }
 .bien-modal-dialog form > div:nth-child(2) .grid { gap: .7rem; }
 .bien-modal-dialog form > div:nth-child(2) label { margin-bottom: 0; }
+.bien-modal-dialog form > div:nth-child(2) { padding-bottom: 8rem !important; }
 .inventory-floating-search-input::-webkit-search-cancel-button,
 .inventory-floating-search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 .inventory-floating-search-input { appearance: none; }

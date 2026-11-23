@@ -53,7 +53,6 @@ export default function BienModal({
     // Estado para custodio
     const [custodioTexto, setCustodioTexto] = useState(bienEditing?.funcionario || '');
     const [showCustodioDropdown, setShowCustodioDropdown] = useState(false);
-    const [custodioDropdownStyle, setCustodioDropdownStyle] = useState(null);
     const custodioDropdownRef = useRef(null);
     const [custodioAlternativoTexto, setCustodioAlternativoTexto] = useState(bienEditing?.funcionarioAlternativo || '');
     const [showAlternativoDropdown, setShowAlternativoDropdown] = useState(false);
@@ -63,7 +62,6 @@ export default function BienModal({
     // Estado para ubicación operativa
     const [ubicacionTexto, setUbicacionTexto] = useState(bienEditing?.ubicacion || '');
     const [showUbicacionDropdown, setShowUbicacionDropdown] = useState(false);
-    const [ubicacionDropdownStyle, setUbicacionDropdownStyle] = useState(null);
     const ubicacionDropdownRef = useRef(null);
 
     // Estado para autocompletado de descripción (aprende de bienes existentes)
@@ -105,32 +103,6 @@ export default function BienModal({
         setIsBienModalOpen(false);
     };
     const defecto = (campo, fb) => (restaurado && restaurado[campo] !== undefined && restaurado[campo] !== null ? restaurado[campo] : fb);
-    const posicionarDropdown = (ref, setStyle, alto = 280) => {
-        const rect = ref.current?.getBoundingClientRect();
-        if (!rect) return;
-        const margen = 8;
-        const abajo = window.innerHeight - rect.bottom - margen;
-        const arriba = rect.top - margen;
-        const abrirArriba = abajo < Math.min(alto, 220) && arriba > abajo;
-        const maxHeight = Math.max(120, Math.min(alto, (abrirArriba ? arriba : abajo) - 6));
-        setStyle({ position: 'fixed', left: rect.left, width: rect.width, maxHeight, top: abrirArriba ? undefined : rect.bottom + 6, bottom: abrirArriba ? window.innerHeight - rect.top + 6 : undefined });
-    };
-    useEffect(() => {
-        if (!showCustodioDropdown) return undefined;
-        const actualizar = () => posicionarDropdown(custodioDropdownRef, setCustodioDropdownStyle);
-        actualizar();
-        window.addEventListener('resize', actualizar);
-        window.addEventListener('scroll', actualizar, true);
-        return () => { window.removeEventListener('resize', actualizar); window.removeEventListener('scroll', actualizar, true); };
-    }, [showCustodioDropdown]);
-    useEffect(() => {
-        if (!showUbicacionDropdown) return undefined;
-        const actualizar = () => posicionarDropdown(ubicacionDropdownRef, setUbicacionDropdownStyle, 208);
-        actualizar();
-        window.addEventListener('resize', actualizar);
-        window.addEventListener('scroll', actualizar, true);
-        return () => { window.removeEventListener('resize', actualizar); window.removeEventListener('scroll', actualizar, true); };
-    }, [showUbicacionDropdown]);
     const guardarBorradorDespuesDeCambio = () => setTimeout(() => guardarBorrador(serializarForm(bienFormRef.current)), 0);
     const actualizarComponente = (indice, cambios) => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.map((item, index) => index === indice ? { ...item, ...cambios } : item)); };
     const validarRotulo = (valor) => {
@@ -662,7 +634,7 @@ export default function BienModal({
                             name="funcionario"
                             value={custodioTexto}
                             onChange={handleCustodioChange}
-                            onFocus={() => { setShowCustodioDropdown(true); posicionarDropdown(custodioDropdownRef, setCustodioDropdownStyle); }}
+                            onFocus={() => setShowCustodioDropdown(true)}
                             className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                             placeholder="Escribe un nombre o número de cédula..."
                             autoComplete="off"
@@ -680,7 +652,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && (
-                            <div style={custodioDropdownStyle || undefined} className="fixed z-[120] overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
+                            <div className="absolute left-0 right-0 top-full mt-2 z-[80] max-h-52 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-xl py-1 custom-scrollbar">
                                 <p className="sticky top-0 z-10 border-b border-line bg-surface-1 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-content-3">{custodioTexto.trim() ? `${filteredCustodios.length} coincidencia${filteredCustodios.length === 1 ? '' : 's'}` : 'Funcionarios de la dependencia'}</p>
                                 {filteredCustodios.map((f) => (
                                     <button
@@ -753,7 +725,7 @@ export default function BienModal({
                                 setUbicacionTexto(e.target.value);
                                 setShowUbicacionDropdown(true);
                             }}
-                            onFocus={() => { setShowUbicacionDropdown(true); posicionarDropdown(ubicacionDropdownRef, setUbicacionDropdownStyle, 208); }}
+                            onFocus={() => setShowUbicacionDropdown(true)}
                             className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                             placeholder="Oficina / Laboratorio..."
                             autoComplete="off"
@@ -761,7 +733,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Ubicaciones */}
                         {showUbicacionDropdown && filteredUbicaciones.length > 0 && (
-                            <div style={ubicacionDropdownStyle || undefined} className="fixed z-[120] overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="absolute left-0 right-0 top-full mt-2 z-[80] max-h-44 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
                                 {filteredUbicaciones.map((ub) => (
                                     <button
                                         type="button"

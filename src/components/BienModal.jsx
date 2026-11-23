@@ -53,6 +53,7 @@ export default function BienModal({
     // Estado para custodio
     const [custodioTexto, setCustodioTexto] = useState(bienEditing?.funcionario || '');
     const [showCustodioDropdown, setShowCustodioDropdown] = useState(false);
+    const [custodioDropdownStyle, setCustodioDropdownStyle] = useState(null);
     const custodioDropdownRef = useRef(null);
     const [custodioAlternativoTexto, setCustodioAlternativoTexto] = useState(bienEditing?.funcionarioAlternativo || '');
     const [showAlternativoDropdown, setShowAlternativoDropdown] = useState(false);
@@ -62,6 +63,7 @@ export default function BienModal({
     // Estado para ubicación operativa
     const [ubicacionTexto, setUbicacionTexto] = useState(bienEditing?.ubicacion || '');
     const [showUbicacionDropdown, setShowUbicacionDropdown] = useState(false);
+    const [ubicacionDropdownStyle, setUbicacionDropdownStyle] = useState(null);
     const ubicacionDropdownRef = useRef(null);
 
     // Estado para autocompletado de descripción (aprende de bienes existentes)
@@ -103,6 +105,16 @@ export default function BienModal({
         setIsBienModalOpen(false);
     };
     const defecto = (campo, fb) => (restaurado && restaurado[campo] !== undefined && restaurado[campo] !== null ? restaurado[campo] : fb);
+    const posicionarDropdown = (ref, setStyle, alto = 280) => {
+        const rect = ref.current?.getBoundingClientRect();
+        if (!rect) return;
+        const margen = 8;
+        const abajo = window.innerHeight - rect.bottom - margen;
+        const arriba = rect.top - margen;
+        const abrirArriba = abajo < Math.min(alto, 220) && arriba > abajo;
+        const maxHeight = Math.max(120, Math.min(alto, (abrirArriba ? arriba : abajo) - 6));
+        setStyle({ position: 'fixed', left: rect.left, width: rect.width, maxHeight, top: abrirArriba ? undefined : rect.bottom + 6, bottom: abrirArriba ? window.innerHeight - rect.top + 6 : undefined });
+    };
     const guardarBorradorDespuesDeCambio = () => setTimeout(() => guardarBorrador(serializarForm(bienFormRef.current)), 0);
     const actualizarComponente = (indice, cambios) => { setHayCambiosSinGuardar(true); setComponentes(prev => prev.map((item, index) => index === indice ? { ...item, ...cambios } : item)); };
     const validarRotulo = (valor) => {
@@ -634,7 +646,7 @@ export default function BienModal({
                             name="funcionario"
                             value={custodioTexto}
                             onChange={handleCustodioChange}
-                            onFocus={() => setShowCustodioDropdown(true)}
+                            onFocus={() => { setShowCustodioDropdown(true); posicionarDropdown(custodioDropdownRef, setCustodioDropdownStyle); }}
                             className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                             placeholder="Escribe un nombre o número de cédula..."
                             autoComplete="off"
@@ -652,7 +664,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && (
-                            <div className="absolute left-0 right-0 bottom-full mb-1.5 z-[70] max-h-72 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
+                            <div style={custodioDropdownStyle || undefined} className="fixed z-[120] overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
                                 <p className="sticky top-0 z-10 border-b border-line bg-surface-1 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-content-3">{custodioTexto.trim() ? `${filteredCustodios.length} coincidencia${filteredCustodios.length === 1 ? '' : 's'}` : 'Funcionarios de la dependencia'}</p>
                                 {filteredCustodios.map((f) => (
                                     <button
@@ -725,7 +737,7 @@ export default function BienModal({
                                 setUbicacionTexto(e.target.value);
                                 setShowUbicacionDropdown(true);
                             }}
-                            onFocus={() => setShowUbicacionDropdown(true)}
+                            onFocus={() => { setShowUbicacionDropdown(true); posicionarDropdown(ubicacionDropdownRef, setUbicacionDropdownStyle, 208); }}
                             className={`${STYLES.input} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`}
                             placeholder="Oficina / Laboratorio..."
                             autoComplete="off"
@@ -733,7 +745,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Ubicaciones */}
                         {showUbicacionDropdown && filteredUbicaciones.length > 0 && (
-                            <div className="absolute left-0 right-0 bottom-full mb-1.5 z-[70] max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div style={ubicacionDropdownStyle || undefined} className="fixed z-[120] overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
                                 {filteredUbicaciones.map((ub) => (
                                     <button
                                         type="button"

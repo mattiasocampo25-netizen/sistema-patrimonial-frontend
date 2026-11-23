@@ -1689,7 +1689,6 @@ button:disabled {
 .bien-modal-dialog form > div:nth-child(2) > div[id^="bien-seccion-"] { padding: 1rem 1.15rem !important; }
 .bien-modal-dialog form > div:nth-child(2) .grid { gap: .7rem; }
 .bien-modal-dialog form > div:nth-child(2) label { margin-bottom: 0; }
-.bien-modal-dialog form > div:nth-child(2) .relative:has(> [class*="z-[70]"]) { z-index: 60; }
 .inventory-floating-search-input::-webkit-search-cancel-button,
 .inventory-floating-search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 .inventory-floating-search-input { appearance: none; }

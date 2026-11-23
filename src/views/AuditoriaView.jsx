@@ -30,6 +30,27 @@ export default function AuditoriaView({
   const [mostrarResumenActividad, setMostrarResumenActividad] = useState(false);
   const [filtrosAvanzadosAbiertos, setFiltrosAvanzadosAbiertos] = useState(false);
   const [hallazgoActivo, setHallazgoActivo] = useState('');
+  const instruccionesCalidad = (id, entidad = 'bien') => {
+    const base = {
+      dup: ['Alta', 'Inventario > editar bien', 'Rótulo, clasificación y ubicación', 'Comparar físicamente; conservar el registro correcto y corregir o solicitar baja del duplicado.'],
+      sinrotulo: ['Alta', 'Inventario > editar bien', 'Rótulo patrimonial', 'Asignar el rótulo oficial según el documento fuente.'],
+      sindep: ['Alta', 'Inventario > editar bien', 'Dependencia', 'Seleccionar la dependencia institucional correcta.'],
+      sinubicacion: ['Media', 'Inventario > editar bien', 'Ubicación operativa', 'Registrar oficina, laboratorio o espacio físico.'],
+      sinfecha: ['Media', 'Inventario > editar bien', 'Fecha de adquisición', 'Completar con factura, acta o documento de incorporación.'],
+      sinestado: ['Media', 'Inventario > editar bien', 'Estado de conservación', 'Seleccionar el estado verificado físicamente.'],
+      sinresponsable: ['Informativa', 'Inventario > editar bien', 'Responsable', 'Asignar custodio si corresponde; si está libre, documentar el motivo.'],
+      responsablepadron: ['Alta', 'Inventario > editar bien', 'Responsable y C.I.', 'Seleccionar el funcionario desde el padrón.'],
+      componentes: ['Alta', 'Inventario > editar bien > Piezas y conjuntos', 'Nombre y cantidad', 'Completar cada pieza o desactivar la opción si no corresponde.'],
+      fechaInvalida: ['Alta', 'Inventario > editar bien', 'Fecha de adquisición', 'Corregir formato o fecha con el documento fuente.'],
+      fechaFutura: ['Media', 'Inventario > editar bien', 'Fecha de adquisición', 'Confirmar que no sea posterior a hoy.'],
+      montoInvalido: ['Alta', 'Inventario > editar bien', 'Valor de adquisición', 'Corregir a un monto numérico no negativo.'],
+      dupfunc: ['Alta', 'Funcionarios > editar funcionario', 'C.I./Documento', 'Verificar y unificar el documento duplicado.'],
+      dupnombre: ['Media', 'Funcionarios > editar funcionario', 'Nombre y C.I.', 'Confirmar si son personas distintas y completar C.I.'],
+      funcionariosSinCI: ['Alta', 'Funcionarios > editar funcionario', 'C.I./Documento', 'Completar el documento oficial.'],
+      funcionariosSinDependencia: ['Media', 'Funcionarios > editar funcionario', 'Dependencia', 'Asignar la dependencia institucional.'],
+    };
+    return base[id] || ['Revisar', entidad === 'funcionario' ? 'Funcionarios' : 'Módulo correspondiente', 'Dato señalado', 'Verificar y corregir con la documentación fuente.'];
+  };
   const [filtrosGuardados, setFiltrosGuardados] = useState(() => { try { return JSON.parse(localStorage.getItem('auditoria_filtros_guardados') || 'null'); } catch { return null; } });
   const guardarFiltrosAuditoria = () => { const filtros = { searchAud, filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud }; try { localStorage.setItem('auditoria_filtros_guardados', JSON.stringify(filtros)); setFiltrosGuardados(filtros); } catch {} };
   const aplicarFiltrosAuditoria = () => { if (!filtrosGuardados) return; setSearchAud(filtrosGuardados.searchAud || ''); setFiltroAccionAud(filtrosGuardados.filtroAccionAud || ''); setFiltroUsuarioAud(filtrosGuardados.filtroUsuarioAud || ''); setTipoEntidadAud(filtrosGuardados.tipoEntidadAud || ''); setCampoAud(filtrosGuardados.campoAud || ''); setDesdeAud(filtrosGuardados.desdeAud || ''); setHastaAud(filtrosGuardados.hastaAud || ''); };
@@ -272,7 +293,7 @@ export default function AuditoriaView({
             const grupo = saludDatos.find((s) => s.id === hallazgoActivo);
             if (!grupo) return null;
             return <section className="mt-4 overflow-hidden rounded-card border border-line/70" aria-live="polite">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-surface-2/50 px-3.5 py-3"><div><h3 className="text-xs font-bold text-content-1">{grupo.label}</h3><p className="mt-0.5 text-[10px] text-content-3">{grupo.count.toLocaleString('es-PY')} registros detectados · se muestran hasta {grupo.detalle.length}</p></div><button type="button" onClick={() => setHallazgoActivo('')} className="rounded-control px-2.5 py-1.5 text-xs font-semibold text-content-3 hover:bg-surface-2">Cerrar</button></div>
+              <div className="border-b border-line bg-surface-2/50 px-3.5 py-3"><div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="text-xs font-bold text-content-1">{grupo.label}</h3><p className="mt-0.5 text-[10px] text-content-3">{grupo.count.toLocaleString('es-PY')} registros detectados · se muestran hasta {grupo.detalle.length}</p></div><button type="button" onClick={() => setHallazgoActivo('')} className="rounded-control px-2.5 py-1.5 text-xs font-semibold text-content-3 hover:bg-surface-2">Cerrar</button></div><div className="mt-3 grid gap-2 sm:grid-cols-3">{(() => { const [prioridad, donde, campo, accion] = instruccionesCalidad(grupo.id, grupo.entidad); return <><div className="rounded-lg border border-line bg-surface-1 px-2.5 py-2"><p className="text-[9px] font-bold uppercase text-content-3">Prioridad</p><p className="mt-1 text-[11px] font-bold text-content-1">{prioridad}</p></div><div className="rounded-lg border border-line bg-surface-1 px-2.5 py-2"><p className="text-[9px] font-bold uppercase text-content-3">Campo y ubicación</p><p className="mt-1 text-[11px] font-semibold text-content-1">{campo}</p><p className="text-[10px] text-brand-text">{donde}</p></div><div className="rounded-lg border border-line bg-surface-1 px-2.5 py-2 sm:col-span-1"><p className="text-[9px] font-bold uppercase text-content-3">Acción</p><p className="mt-1 text-[10px] leading-relaxed text-content-2">{accion}</p></div></>; })()}</div></div>
               {grupo.detalle.length ? <div className="max-h-72 divide-y divide-line/60 overflow-y-auto custom-scrollbar">{grupo.detalle.map((item, idx) => {
                 const nombre = item.rotulo || item.nombre || item.descripcion || `Registro ${item.id || idx + 1}`;
                 const descripcion = [item.dependencia, item.funcionario, item.cedula ? `CI ${item.cedula}` : '', item.motivo].filter(Boolean).join(' · ');

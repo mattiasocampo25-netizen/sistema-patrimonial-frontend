@@ -652,7 +652,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Custodios */}
                         {showCustodioDropdown && (
-                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-72 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
+                            <div className="absolute left-0 right-0 bottom-full mb-1.5 z-[70] max-h-72 overflow-y-auto rounded-2xl bg-surface-1 border border-line shadow-2xl py-1 custom-scrollbar">
                                 <p className="sticky top-0 z-10 border-b border-line bg-surface-1 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-content-3">{custodioTexto.trim() ? `${filteredCustodios.length} coincidencia${filteredCustodios.length === 1 ? '' : 's'}` : 'Funcionarios de la dependencia'}</p>
                                 {filteredCustodios.map((f) => (
                                     <button
@@ -733,7 +733,7 @@ export default function BienModal({
 
                         {/* Custom Dropdown Ubicaciones */}
                         {showUbicacionDropdown && filteredUbicaciones.length > 0 && (
-                            <div className="absolute left-0 right-0 top-full mt-1.5 z-50 max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
+                            <div className="absolute left-0 right-0 bottom-full mb-1.5 z-[70] max-h-52 overflow-y-auto rounded-card bg-surface-1 dark:bg-surface-1 border border-line dark:border-zinc-800 shadow-2xl py-1 divide-y divide-zinc-100 dark:divide-zinc-800/50">
                                 {filteredUbicaciones.map((ub) => (
                                     <button
                                         type="button"

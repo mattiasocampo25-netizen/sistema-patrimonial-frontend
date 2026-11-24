@@ -1815,6 +1815,77 @@ button:disabled {
   .inventory-view-count { width: fit-content; }
 }
 
+/* Rediseño transversal v2.21: jerarquía editorial y módulos respirables. */
+:root {
+  --ui-radius: 1.15rem;
+  --ui-radius-sm: .8rem;
+  --ui-gap: 1.35rem;
+  --ui-brand-deep: #123a52;
+}
+
+.workspace-main { padding-bottom: 2rem !important; }
+.workspace-main .module-screen { max-width: 90rem; margin-inline: auto; }
+.workspace-main .module-screen > * { min-width: 0; }
+
+/* Todos los encabezados de módulo comparten una misma lectura. */
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) {
+  padding: clamp(1.35rem, 2.5vw, 2.25rem) !important;
+  border-radius: var(--ui-radius) !important;
+  background: linear-gradient(125deg, #12384e 0%, #176b76 58%, #2a91a0 100%) !important;
+  box-shadow: 0 16px 38px rgb(12 47 65 / .14) !important;
+}
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) :where(h1, h2, h3, p, span) { color: #f7fbfc !important; }
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) :where(.text-content-3, .text-content-2) { color: #c8e0e5 !important; }
+
+/* Dashboard: una cuadrícula clara, sin columnas que compitan. */
+.dashboard-stagger { gap: var(--ui-gap) !important; }
+.dashboard-stagger > header { margin-bottom: 0 !important; }
+.dashboard-stagger .weekly-summary-card { padding: 1.25rem !important; }
+.dashboard-stagger .weekly-summary-card > div:last-child { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; gap: .7rem !important; }
+.dashboard-stagger .weekly-summary-card > div:last-child > div { min-height: 4.5rem; padding: .85rem 1rem !important; }
+.dashboard-workspaces-grid { grid-template-columns: minmax(0, 1.45fr) minmax(18rem, .75fr) !important; gap: var(--ui-gap) !important; }
+.dashboard-workspaces-grid > section, .dashboard-workspaces-grid > aside > * { border-radius: var(--ui-radius) !important; overflow: hidden; }
+.dashboard-workspaces-grid > section > :first-child, .dashboard-workspaces-grid > aside > * > :first-child { padding: 1.15rem 1.35rem !important; }
+.dashboard-workspaces-grid > section > :last-child > button { min-height: 3.65rem !important; padding-inline: 1.25rem !important; }
+
+/* Inventario: acciones y filtros en dos niveles, no una pared de controles. */
+.inventory-actions-scroll { display: grid !important; grid-template-columns: repeat(7, minmax(0, max-content)); align-items: center; gap: .55rem !important; padding: .35rem 0 .6rem !important; }
+.inventory-actions-scroll .ui-button { min-height: 2.7rem !important; border-radius: .75rem !important; }
+.inventory-actions-scroll .ui-button:last-child { margin-left: .35rem; }
+.inventory-filters-panel { padding: 1.25rem !important; border-radius: var(--ui-radius) !important; }
+.inventory-filters-panel > :first-child { margin-bottom: .8rem !important; }
+.inventory-filters-panel .grid { gap: .7rem !important; }
+.inventory-filters-panel .inventory-filter-alerts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.inventory-filters-panel .inventory-filter-alerts > * { min-height: 4.3rem; }
+.inventory-table-toolbar { padding-block: .75rem !important; }
+.inventory-table-toolbar + * { border-radius: var(--ui-radius) !important; overflow: hidden; }
+.workspace-main table th { height: 3.2rem; font-size: .68rem; letter-spacing: .08em; }
+.workspace-main table td { padding-block: .95rem !important; }
+
+/* Formularios y modales: secciones con aire, labels visibles y acciones fijas. */
+.modal-content { width: min(58rem, calc(100vw - 2rem)) !important; }
+.modal-content > form { display: flex; flex-direction: column; min-height: 0; }
+.modal-content > form > :first-child { padding: 1.25rem 1.5rem !important; }
+.modal-content > form > :last-child { padding: 1rem 1.5rem !important; background: color-mix(in srgb, var(--surface-2) 88%, transparent); border-top: 1px solid var(--line); }
+.modal-content > form > div > section, .modal-content > form > div > div { padding: 1.25rem !important; }
+.modal-content :where(label) { font-size: .7rem; letter-spacing: .035em; }
+
+/* Iconografía: nunca usar colores claros sobre superficies claras. */
+.workspace-main :where(.text-brand, .text-brand-text, .text-info, .text-success, .text-warn, .text-danger) { color: color-mix(in srgb, currentColor 88%, var(--content-1)) !important; }
+.workspace-main :where(.bg-brand-soft, .bg-info-soft, .bg-success-soft, .bg-warn-soft, .bg-danger-soft) { border: 1px solid color-mix(in srgb, currentColor 20%, var(--line)); }
+.dark .workspace-main :where(.text-brand, .text-brand-text, .text-info, .text-success, .text-warn, .text-danger) { filter: brightness(1.25); }
+
+@media (max-width: 1100px) {
+  .dashboard-stagger .weekly-summary-card > div:last-child { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .dashboard-workspaces-grid { grid-template-columns: 1fr !important; }
+  .inventory-actions-scroll { grid-template-columns: repeat(4, max-content); overflow-x: auto; }
+}
+@media (max-width: 680px) {
+  .dashboard-stagger .weekly-summary-card > div:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .inventory-filters-panel .inventory-filter-alerts { grid-template-columns: 1fr; }
+  .modal-content { width: calc(100vw - 1rem) !important; }
+}
+
 @media (max-width: 640px) {
   .workspace-main > div { padding-inline: .75rem !important; }
   .inventory-view-count { min-width: 0; }

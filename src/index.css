@@ -2288,6 +2288,8 @@ button:disabled {
 .inventory-view .inventory-filter-pills { min-width: 0; }
 .inventory-view .inventory-actions-scroll { display: flex !important; overflow: visible !important; flex-wrap: wrap; }
 .inventory-view .inventory-toolbar { min-width: 0; overflow: visible !important; flex-wrap: wrap; }
+.dark .inventory-view > .overflow-hidden:first-child > .border-t,
+.inventory-view > .overflow-hidden:first-child > .border-t { background: #1E1A16 !important; border-color: rgb(255 255 255 / .10) !important; }
 .inventory-view .inventory-export-menu[open] > summary { background: var(--surface-2); border-color: var(--line-strong); }
 .inventory-view .inventory-selection-bar {
   position: fixed !important;

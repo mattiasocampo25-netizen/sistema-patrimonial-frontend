@@ -156,7 +156,7 @@ export default function DependenciasModal({
   return (
     <Dialogo className={STYLES.modalOverlay} onCerrar={onClose}>
       <div className={STYLES.modalContent + " organization-dialog max-w-7xl !max-h-[94dvh] overflow-hidden !rounded-[28px] shadow-2xl"} onClick={(e) => e.stopPropagation()}>
-        <div className="organization-dialog-header relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-white/10 bg-[#145a75] px-5 py-5 text-white sm:px-7">
+        <div className="organization-dialog-header relative flex flex-wrap items-center justify-between gap-4 overflow-visible border-b border-white/10 bg-[#302920] px-5 py-5 text-white sm:px-7">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white shadow-inner">
               <i className="fa-solid fa-sitemap text-lg" aria-hidden="true"></i>
@@ -340,10 +340,10 @@ export default function DependenciasModal({
 
                 <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-content-2"><i className="fa-solid fa-arrow-turn-down text-brand-text" aria-hidden="true"/>¿Qué quieres gestionar en esta dependencia?</div>
                 <div className="grid grid-cols-2 gap-2 rounded-2xl border border-line bg-surface-1 p-1.5 dark:bg-surface-1/80" role="tablist" aria-label="Contenido de la dependencia">
-                  <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-[#145a75] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'departamentos'} onClick={() => setVistaDetalle('departamentos')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'departamentos' ? 'bg-[#423222] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
                     <i className="fa-solid fa-diagram-project" aria-hidden="true" /> Departamentos <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{ubicsDeSel.length}</span>
                   </button>
-                  <button type="button" role="tab" aria-selected={vistaDetalle === 'funcionarios'} onClick={() => setVistaDetalle('funcionarios')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'funcionarios' ? 'bg-[#145a75] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
+                  <button type="button" role="tab" aria-selected={vistaDetalle === 'funcionarios'} onClick={() => setVistaDetalle('funcionarios')} className={`flex min-h-12 items-center justify-center gap-2 rounded-xl px-3 text-xs font-bold transition sm:text-sm ${vistaDetalle === 'funcionarios' ? 'bg-[#423222] text-white shadow-sm' : 'text-content-3 hover:bg-surface-2 hover:text-content-1'}`}>
                     <i className="fa-solid fa-users" aria-hidden="true" /> Funcionarios <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] tabular-nums dark:bg-white/10">{funcsDeSel.length}</span>
                   </button>
                 </div>

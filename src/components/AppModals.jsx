@@ -813,7 +813,7 @@ export default function AppModals({
           {showChangelog && (
             <Dialogo className={STYLES.modalOverlay}>
                 <div className={STYLES.modalContent + " max-w-md overflow-hidden"}>
-                    <div className="px-6 py-8 sm:px-8 text-center relative overflow-hidden bg-[#0a1c38]">
+                    <div className="px-6 py-8 sm:px-8 text-center relative overflow-hidden bg-[#211e1a]">
                         <div className="absolute -top-20 left-1/2 -translate-x-1/2 h-48 w-[22rem] rounded-full bg-violet-500/20 blur-3xl pointer-events-none"></div>
                         <div className="relative z-10">
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/25 px-3 py-1 text-[11px] font-bold text-emerald-300 uppercase tracking-[0.18em] mb-4">

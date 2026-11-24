@@ -163,15 +163,15 @@ describe('smoke por modulo', () => {
     await app.escribir('password', 'malaclave');
     await app.clickSiExiste('Acceder');
     await app.esperar('incorrect', 3000);
-    assert.ok(!app.tiene('Accesos directos'), 'no debe entrar con credenciales invalidas');
+    assert.ok(!app.tiene('Acciones rápidas'), 'no debe entrar con credenciales invalidas');
   });
 
   // ── 2. Panel ────────────────────────────────────────────────────────────
   test('modulo Panel: renderiza y abre el generador FC-03', async () => {
     await entrar();
     await app.clickTour('nav-dashboard');
-    await app.esperar('Accesos directos', 3000);
-    assert.ok(app.tiene('Accesos directos'), 'el panel debe mostrar los accesos directos');
+    await app.esperar('Acciones rápidas', 3000);
+    assert.ok(app.tiene('Acciones rápidas'), 'el panel debe mostrar los accesos directos');
 
     await app.clickSiExiste('FC-03');
     assert.ok(await app.hayDialogo(), 'el boton FC-03 debe abrir un dialogo');
@@ -212,7 +212,7 @@ describe('smoke por modulo', () => {
     await entrar();
     await app.clickSiExiste('Restaurar respaldo');
     assert.ok(await app.hayDialogo(), 'Restaurar respaldo debe abrir el cuadro aunque la aplicación use un contenedor con scroll');
-    assert.ok(app.tiene('El archivo contiene datos de hasta 9 tablas'), 'debe anticipar qué cubre el respaldo');
+    assert.ok(app.tiene('Copia de datos de 11 tablas'), 'debe anticipar qué cubre el respaldo');
     assert.ok(app.tiene('No incluye contraseñas de Auth'), 'debe aclarar qué datos no restaura');
     assert.ok(app.tiene('Archivo de respaldo'), 'debe permitir seleccionar el JSON');
   });
@@ -296,12 +296,12 @@ describe('smoke por modulo', () => {
   test('modulo Auditoría: lista la traza', async () => {
     await entrar();
     await app.clickTour('nav-auditoria');
-    await app.esperar('MODIFICACION', 4000);
+    await app.esperar('Modificación', 4000);
     assert.ok(app.tiene('Auditoría'), 'debe mostrar el libro de auditoria');
 
     // La lista tiene que traer el evento del mock: prueba que el modulo
     // lee datos de verdad, no que solo pinta la cabecera.
-    assert.ok(app.tiene('MODIFICACION'), 'debe listar los eventos de la traza');
+    assert.ok(app.tiene('Modificación'), 'debe listar los eventos de la traza');
 
   });
 
@@ -309,8 +309,8 @@ describe('smoke por modulo', () => {
   test('modulo Usuarios: lista usuarios y abre el alta', async () => {
     await entrar();
     await app.clickTour('nav-usuarios');
-    await app.esperar('Usuarios', 3000);
-    assert.ok(app.tiene('Usuarios'), 'debe mostrar la gestion de usuarios');
+    await app.esperar('Gestión de cuentas y roles de acceso al sistema', 4000);
+    assert.ok(app.tiene('Gestión de cuentas y roles de acceso al sistema'), 'debe mostrar la gestion de usuarios');
 
     await app.clickSiExiste('Nuevo Usuario');
     assert.ok(await app.hayDialogo(), 'debe abrir el formulario de alta');

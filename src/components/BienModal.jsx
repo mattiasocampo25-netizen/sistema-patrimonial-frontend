@@ -377,7 +377,7 @@ export default function BienModal({
           <div className={STYLES.modalContent + " bien-modal-dialog max-w-5xl overflow-hidden !rounded-[24px] shadow-2xl"}>
 
             {/* Header */}
-            <div className="bien-modal-header flex justify-between items-center px-6 py-5 border-b border-white/10 bg-[#145a75] text-white shrink-0 z-10">
+            <div className="bien-modal-header flex justify-between items-center px-6 py-5 border-b border-white/10 bg-[#302920] text-white shrink-0 z-10">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 text-white">
                    <i className={`fa-solid ${esNuevo ? 'fa-plus' : 'fa-pen-to-square'} text-base`}></i>

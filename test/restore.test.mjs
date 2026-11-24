@@ -221,7 +221,7 @@ test('toda tabla restaurable declara su tabla real y su clave primaria', () => {
   for (const t of TABLAS_RESTORABLES) {
     assert.ok(t.tabla, `${t.clave} sin tabla`);
     assert.ok(t.pk, `${t.clave} sin clave primaria`);
-    assert.ok(['data', 'plana'].includes(t.envoltura), `${t.clave} con envoltura desconocida`);
+    assert.ok(['data', 'plana', 'fila'].includes(t.envoltura), `${t.clave} con envoltura desconocida`);
   }
   // Coherencia con el formato real del respaldo: bienes vive en 'bens'.
   assert.equal(TABLAS_RESTORABLES.find(t => t.clave === 'bienes').tabla, 'bens');

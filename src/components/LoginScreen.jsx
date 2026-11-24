@@ -48,22 +48,22 @@ export default function LoginScreen({
 
   return (
     <div
-      className={`relative flex h-dvh min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto bg-[#edf3f9] px-4 py-5 font-sans antialiased text-content-1 selection:bg-brand/20 dark:bg-[#0c1725] sm:px-8 md:py-8 ${darkMode ? 'dark' : ''}`}
+      className={`relative flex h-dvh min-h-dvh w-full items-center justify-center overflow-x-hidden overflow-y-auto bg-canvas px-4 py-5 font-sans antialiased text-content-1 selection:bg-brand/20 sm:px-8 md:py-8 ${darkMode ? 'dark' : ''}`}
     >
       {/* Fondo limpio: el campus queda como acento dentro del panel institucional. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
         <span className="absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-brand/10 blur-[110px]" />
-        <span className="absolute -bottom-48 -right-40 h-[32rem] w-[32rem] rounded-full bg-blue-400/10 blur-[120px]" />
+        <span className="absolute -bottom-48 -right-40 h-[32rem] w-[32rem] rounded-full bg-brand/10 blur-[120px]" />
       </div>
 
       <div className="relative z-10 flex w-full max-w-5xl items-center justify-center">
         <div className="login-card-in login-experience grid w-full overflow-hidden rounded-3xl border border-white/70 bg-surface-1 shadow-pop md:grid-cols-[.88fr_1.12fr]">
-            <aside className="relative hidden min-h-[500px] flex-col justify-between overflow-hidden bg-[#153b68] p-8 text-white md:flex lg:p-10">
+            <aside className="relative hidden min-h-[500px] flex-col justify-between overflow-hidden bg-[#25211c] p-8 text-white md:flex lg:p-10">
             <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
               <img src={rectoradoPilar} alt="" className="absolute inset-0 h-full w-full object-cover object-[58%_center] opacity-65" />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#092033]/65 via-[#0b2b3e]/45 to-[#071a29]/95" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#1b1814]/75 via-[#27221b]/60 to-[#151311]/95" />
               <div className="absolute -right-32 -top-28 h-96 w-96 rounded-full bg-brand/25 blur-3xl" />
-              <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-teal-300/15 blur-3xl" />
+              <div className="absolute -bottom-36 -left-32 h-96 w-96 rounded-full bg-brand/15 blur-3xl" />
               <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.35)_1px,transparent_1px)] [background-size:42px_42px]" />
             </div>
             <div className="relative z-10 flex items-center gap-3">

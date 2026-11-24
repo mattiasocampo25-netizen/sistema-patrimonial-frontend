@@ -123,7 +123,7 @@ export default function AprobacionesView({
     <div className="module-screen approvals-workspace flex flex-col flex-1 space-y-4 pb-12">
       <Card className="p-0">
           <div className="p-5 sm:p-6">
-          <section className="relative isolate overflow-hidden rounded-[26px] bg-gradient-to-br from-slate-950 via-[#123a60] to-[#176475] p-5 text-white shadow-[0_22px_60px_-38px_rgba(15,45,75,.75)] sm:p-7">
+          <section className="relative isolate overflow-hidden rounded-[26px] bg-gradient-to-br from-[#211f1c] via-[#302a23] to-[#443522] p-5 text-white shadow-panel sm:p-7">
             <div aria-hidden="true" className="pointer-events-none absolute -right-14 -top-24 h-64 w-64 rounded-full border border-white/10 bg-white/[0.035]" />
             <div className="relative flex flex-wrap items-start justify-between gap-4">
               <div className="max-w-3xl">

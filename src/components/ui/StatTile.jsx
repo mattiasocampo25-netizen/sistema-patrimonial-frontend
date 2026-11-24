@@ -19,6 +19,8 @@ const TONOS = {
   info: { valor: 'text-info', fondo: 'bg-info-soft', icono: 'text-info' }
 };
 
+const BARRAS = { brand: 'bg-brand', ok: 'bg-ok', warn: 'bg-warn', info: 'bg-info', danger: 'bg-danger' };
+
 export default function StatTile({
   etiqueta,
   valor,
@@ -39,11 +41,11 @@ export default function StatTile({
     <Contenedor
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`flex min-h-[142px] flex-col gap-2.5 rounded-2xl border border-line/80 bg-surface-1 p-4 text-left shadow-card w-full ${ onClick ? 'group ui-stat-interactive hover:border-brand/30 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
+      className={`flex min-h-[150px] min-w-0 flex-col gap-3 rounded-card border border-line bg-surface-1 p-5 text-left shadow-card w-full ${ onClick ? 'group ui-stat-interactive hover:border-brand/60 hover:shadow-panel motion cursor-pointer focus-visible:ring-2 focus-visible:ring-brand' : '' } ${className}`}
     >
       <div className="flex items-center justify-between gap-3">
         {icono ? (
-          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${t.fondo} ${t.icono}`} aria-hidden="true">
+          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-control border border-line/50 ${t.fondo} ${t.icono}`} aria-hidden="true">
             <i className={`fa-solid ${icono}`} />
           </span>
         ) : null}
@@ -51,14 +53,14 @@ export default function StatTile({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-label font-semibold text-content-2 uppercase tracking-wide truncate">{etiqueta}</p>
-        <p className={`text-display font-black tabular-nums leading-tight mt-0.5 ${t.valor}`}>
+        <p className="text-label font-bold text-content-2 uppercase tracking-[0.09em] leading-snug">{etiqueta}</p>
+        <p className={`text-[clamp(1.55rem,2vw,2.15rem)] font-black tabular-nums leading-tight mt-1 ${t.valor}`}>
           {animado && typeof valor === 'number' ? <AnimatedNumber value={valor} /> : valor}
         </p>
-        {sub ? <p className="text-label text-content-3 truncate">{sub}</p> : null}
+        {sub ? <p className="text-label leading-snug text-content-3">{sub}</p> : null}
         {pct > 0 ? (
           <div className="mt-1.5 h-1.5 w-full bg-surface-3 dark:bg-surface-1/5 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full motion duration-[var(--dur-slow)] ${ progressColor ? 'bg-' + progressColor : 'bg-brand' } shadow-xs shadow-${ progressColor ? progressColor + '/40' : 'brand/30' }`} style={{ width: pct + '%' }}></div>
+            <div className={`h-full rounded-full motion duration-[var(--dur-slow)] ${BARRAS[progressColor] || BARRAS.brand}`} style={{ width: pct + '%' }}></div>
           </div>
         ) : null}
       </div>

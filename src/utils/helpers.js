@@ -52,14 +52,14 @@ const PALETAS_DEPENDENCIA = [
 export const coloresPorDependencia = (dependencia, darkMode = false) => {
   const nombre = normalizeStr(dependencia);
   const paleta = PALETAS_DEPENDENCIA.find(item => nombre.includes(item.clave));
-  const [accent, hover, soft, text] = (darkMode ? paleta?.oscuro : paleta?.claro)
-    || (darkMode ? ['#5bb8c0', '#79cbd0', '#123944', '#8cdae0'] : ['#14728a', '#105d72', '#e6f3f5', '#11596e']);
+  const [accent, hover, soft, text] = darkMode
+    ? ['#e8b979', '#f1c993', '#3a2d1d', '#f1c993']
+    : (paleta?.claro || ['#80532e', '#684122', '#f5e9d9', '#704524']);
   return {
     '--dep-accent': accent,
-    '--brand': accent,
-    '--brand-hover': hover,
-    '--brand-soft': soft,
-    '--brand-text': text
+    '--dep-accent-hover': hover,
+    '--dep-accent-soft': soft,
+    '--dep-accent-text': text
   };
 };
 

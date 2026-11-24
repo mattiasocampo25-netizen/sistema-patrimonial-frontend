@@ -104,34 +104,34 @@
   color-scheme: light;
 
   /* Fondo institucional neutro, superficies con separación clara */
-  --canvas: #f3f6f6;
+  --canvas: #f5f3ef;
   --surface-1: #ffffff;
-  --surface-2: #f6f9f9;
-  --surface-3: #e8efef;
+  --surface-2: #faf8f4;
+  --surface-3: #eeeae3;
   --surface-glass: rgb(255 255 255 / 0.82);
 
   /* Texto con excelente contraste */
-  --content-1: #183247;
-  --content-2: #496273;
-  --content-3: #5f7482;
+  --content-1: #292521;
+  --content-2: #625a52;
+  --content-3: #756c63;
   --content-inverse: #ffffff;
 
   /* Bordes sutiles */
-  --line: #dce5e9;
-  --line-strong: #c3d1d8;
+  --line: #e3ded6;
+  --line-strong: #c9c0b5;
 
   /* El sidebar comparte superficie, contraste y bordes con la barra superior. */
-  --sidebar: #102d38;
-  --sidebar-content: #f3f8f8;
-  --sidebar-content-2: #bad0d3;
-  --sidebar-content-3: #8daab0;
-  --sidebar-line: #2b4a54;
+  --sidebar: #211f1d;
+  --sidebar-content: #f8f5f0;
+  --sidebar-content-2: #d6ccc0;
+  --sidebar-content-3: #aa9f93;
+  --sidebar-line: #3a3632;
 
   /* Marca azul profesional */
-  --brand: #087f83;
-  --brand-hover: #06686d;
-  --brand-soft: #e0f3f1;
-  --brand-text: #08666a;
+  --brand: #80532e;
+  --brand-hover: #684122;
+  --brand-soft: #f5e9d9;
+  --brand-text: #704524;
 
   /* Estados */
   --danger: #dc2626;
@@ -140,8 +140,8 @@
   --warn-soft: #fffbeb;
   --ok: #059669;
   --ok-soft: #ecfdf5;
-  --info: #0284c7;
-  --info-soft: #f0f9ff;
+  --info: #766042;
+  --info-soft: #f4eee4;
 
   /* Paleta pastel */
   --pastel-1: #d1fae5;
@@ -163,30 +163,30 @@
   color-scheme: dark;
 
   /* Tono oscuro pizarra: menos negro puro, con separación clara entre capas. */
-  --canvas: #101c29;
-  --surface-1: #172838;
-  --surface-2: #1d3445;
-  --surface-3: #294354;
-  --surface-glass: rgb(23 40 56 / 0.94);
+  --canvas: #111110;
+  --surface-1: #1c1b19;
+  --surface-2: #252320;
+  --surface-3: #302d29;
+  --surface-glass: rgb(28 27 25 / 0.94);
 
-  --content-1: #f4f8fa;
-  --content-2: #c4d2da;
-  --content-3: #a4b6c1;
-  --content-inverse: #0f172a;
+  --content-1: #f6f3ed;
+  --content-2: #d1c9bd;
+  --content-3: #b0a69a;
+  --content-inverse: #21180e;
 
-  --line: #2b4556;
-  --line-strong: #3b5b6d;
+  --line: #3a3631;
+  --line-strong: #554e46;
 
-  --sidebar: #172838;
-  --sidebar-content: #f2f7f9;
-  --sidebar-content-2: #b5c7d1;
-  --sidebar-content-3: #829daa;
-  --sidebar-line: #20384b;
+  --sidebar: #171614;
+  --sidebar-content: #f6f2eb;
+  --sidebar-content-2: #d1c7b9;
+  --sidebar-content-3: #aaa093;
+  --sidebar-line: #36322e;
 
-  --brand: #55c7bb;
-  --brand-hover: #78d8ce;
-  --brand-soft: #153b40;
-  --brand-text: #82e2d6;
+  --brand: #e8b979;
+  --brand-hover: #f1c993;
+  --brand-soft: #3a2d1d;
+  --brand-text: #f1c993;
 
   --danger: #f87171;
   --danger-soft: #450a0a;
@@ -194,15 +194,15 @@
   --warn-soft: #451a03;
   --ok: #34d399;
   --ok-soft: #022c22;
-  --info: #38bdf8;
-  --info-soft: #082f49;
+  --info: #d8bb90;
+  --info-soft: #30291f;
 
   --pastel-1: #16342a;
   --pastel-2: #3a2617;
-  --pastel-3: #152c47;
+  --pastel-3: #302b23;
   --pastel-4: #36301a;
   --pastel-5: #271f3d;
-  --pastel-6: #142e3d;
+  --pastel-6: #2d2a24;
   --pastel-7: #1d3319;
   --pastel-8: #3a1f2b;
 

@@ -4,6 +4,11 @@ import { createPortal } from 'react-dom';
 const ContextMenuContext = createContext(null);
 const INTERACTIVE = 'button, a, input, textarea, select, [contenteditable="true"], [role="button"]';
 
+export function ContextMenuButton({ actions, label = 'Más acciones', title = 'Más acciones', className = '' }) {
+  const openMenu = useContext(ContextMenuContext);
+  return <button type="button" title={title} aria-label={title} aria-haspopup="menu" onClick={event => { const rect = event.currentTarget.getBoundingClientRect(); openMenu?.(actions, rect.left, rect.bottom + 4, label); }} className={className}><i className="fa-solid fa-ellipsis" aria-hidden="true" /></button>;
+}
+
 export function ContextualMenuProvider({ children }) {
   const [menu, setMenu] = useState(null);
   const menuRef = useRef(null);

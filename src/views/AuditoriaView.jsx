@@ -490,7 +490,9 @@ export default function AuditoriaView({
               {Boolean(filtroAccionAud || filtroUsuarioAud || tipoEntidadAud || campoAud || desdeAud || hastaAud) && <span className="ml-1.5 rounded-full bg-brand-soft px-1.5 py-0.5 text-brand-text">{[filtroAccionAud, filtroUsuarioAud, tipoEntidadAud, campoAud, desdeAud, hastaAud].filter(Boolean).length}</span>}
             </button>
             <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-content-3">Período rápido</span>
-            {[7, 30, 90].map(dias => <button key={dias} type="button" onClick={() => aplicarRangoRapido(dias)} className="min-h-8 rounded-lg border border-line bg-surface-1 px-3 text-[11px] font-bold text-content-2 hover:border-brand/40 hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Últimos {dias} días</button>)}
+            <div className="inline-flex overflow-hidden rounded-control border border-line bg-surface-1 p-0.5" role="group" aria-label="Período rápido">
+              {[7, 30, 90].map(dias => <button key={dias} type="button" aria-pressed={Boolean(desdeAud && hastaAud && Math.round((new Date(hastaAud + 'T12:00:00') - new Date(desdeAud + 'T12:00:00')) / 86400000) + 1 === dias)} onClick={() => aplicarRangoRapido(dias)} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand aria-pressed:bg-surface-3 aria-pressed:text-content-1">{dias} días</button>)}
+            </div>
             <div className="ml-auto flex flex-wrap gap-2">
               <button type="button" onClick={guardarFiltrosAuditoria} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-brand-text hover:bg-brand-soft">Guardar búsqueda</button>
               {filtrosGuardados && <button type="button" onClick={aplicarFiltrosAuditoria} className="min-h-8 rounded-lg px-3 text-[11px] font-bold text-brand-text hover:bg-brand-soft">Aplicar guardada</button>}
@@ -517,8 +519,7 @@ export default function AuditoriaView({
             const rotuloEvento = mensajeEvento?.rotulo || mensajeEvento?.cambios?.nuevo?.rotulo || mensajeEvento?.cambios?.anterior?.rotulo || bienRelacionado?.rotulo;
             const descripcionEvento = mensajeEvento?.descripcion || mensajeEvento?.cambios?.nuevo?.descripcion || mensajeEvento?.cambios?.anterior?.descripcion || bienRelacionado?.descripcion;
             const fechaEvento = r.fecha ? new Date(r.fecha) : null;
-            const perfilActor = usuariosList.find(usuario => String(usuario.username || '').toLocaleLowerCase('es') === String(actorAud(r) || '').toLocaleLowerCase('es'));
-            const nombreActor = perfilActor?.nombre || actorAud(r);
+            const nombreActor = usuariosList.find(usuario => String(usuario.username || '').toLocaleLowerCase('es') === String(actorAud(r) || '').toLocaleLowerCase('es'))?.nombre || actorAud(r);
             const contextoEvento = [
               mensajeEvento?.dependencia || bienRelacionado?.dependencia,
               mensajeEvento?.ubicacion || mensajeEvento?.cambios?.nuevo?.ubicacion || bienRelacionado?.ubicacion,
@@ -535,15 +536,14 @@ export default function AuditoriaView({
 
                 <div className="flex flex-wrap items-start justify-between gap-3 py-3">
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-black leading-relaxed text-content-1">{resumenAccionAuditoria(r, nombreActor)}</h3>
-                    <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-brand/20 bg-brand-soft/45 px-3 py-2.5">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-black text-white shadow-sm" aria-hidden="true">{String(nombreActor || '?').trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toLocaleUpperCase('es')}</span>
-                      <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold uppercase tracking-wider text-content-3">Usuario que realizó la acción</span><span className="block truncate text-sm font-extrabold text-content-1">{nombreActor}</span><span className="block text-[11px] font-medium text-content-2">@{actorAud(r)}{perfilActor?.cargo ? ` · ${perfilActor.cargo}` : ''}</span></span>
+                    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-3 text-xs font-black text-content-1" aria-hidden="true">{String(nombreActor || '?').trim().split(/\s+/).slice(0, 2).map(parte => parte[0]).join('').toLocaleUpperCase('es')}</span>
+                      <h3 className="min-w-0 text-sm font-bold leading-snug text-content-1">{resumenAccionAuditoria(r, nombreActor)}</h3>
+                      {rotuloEvento && <span className="font-mono text-xs font-semibold tabular-nums text-content-2">· Rótulo {rotuloEvento}</span>}
+                      {descripcionEvento && <span className="max-w-72 truncate text-xs text-content-2" title={descripcionEvento}>({descripcionEvento})</span>}
+                      {contextoEvento[0] && <span className="text-xs text-content-2">· {contextoEvento[0]}</span>}
                     </div>
-                    {rotuloEvento && <p className="mt-3 text-xs font-bold text-brand-text">Rótulo patrimonial: <span className="font-mono">{rotuloEvento}</span></p>}
-                    {descripcionEvento && <p className="mt-1 max-w-4xl break-words text-sm leading-relaxed text-content-1">{descripcionEvento}</p>}
-                    {contextoEvento.length > 0 && <div className="mt-2 flex flex-wrap gap-1.5">{[...new Set(contextoEvento)].map((dato, indice) => <span key={`${dato}-${indice}`} className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-line bg-surface-2 px-2.5 py-1 text-[10px] font-semibold text-content-2"><i className={`fa-solid ${indice === 0 ? 'fa-building' : indice === 1 ? 'fa-location-dot' : 'fa-user'} text-content-3`} aria-hidden="true"/><span className="truncate">{dato}</span></span>)}</div>}
-                    <p className="mt-2 text-xs leading-relaxed text-content-2">{campos.length ? `${campos.length} ${campos.length === 1 ? 'cambio' : 'cambios'} registrados; los valores anteriores y nuevos aparecen abajo.` : detalleAudCorto(r)}</p>
+                    {!campos.length && <p className="mt-1.5 text-xs text-content-2">{detalleAudCorto(r)}</p>}
                   </div>
                   {r.bienid && /BIEN/i.test(r.titulo || '') && (
                     <button type="button" onClick={() => {
@@ -560,7 +560,9 @@ export default function AuditoriaView({
                 </div>
 
                 {campos.length > 0 && (
-                  <section aria-label={`Cambios realizados: ${campos.length}`} className="rounded-xl bg-surface-2/60 p-3 sm:p-4">
+                  <details className="rounded-control bg-surface-2/60 px-3 py-2">
+                    <summary className="cursor-pointer text-xs font-semibold text-content-2 hover:text-content-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Ver {campos.length} {campos.length === 1 ? 'cambio registrado' : 'cambios registrados'} <i className="fa-solid fa-chevron-down ml-1 text-[10px]" aria-hidden="true" /></summary>
+                  <section aria-label={`Cambios realizados: ${campos.length}`} className="mt-2 rounded-xl bg-surface-2/60 p-3 sm:p-4">
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                       <h4 className="flex items-center gap-2 text-xs font-black text-content-1"><i className="fa-solid fa-code-compare text-brand-text" aria-hidden="true" />Qué cambió</h4>
                       <span className="text-[10px] font-semibold text-content-3">{campos.length} {campos.length === 1 ? 'dato modificado' : 'datos modificados'}</span>
@@ -579,6 +581,7 @@ export default function AuditoriaView({
                     </div>
                     {campos.length > 3 && <button type="button" onClick={() => setEventoExpandido(mostrarTodos ? null : r.id)} aria-expanded={mostrarTodos} className="mt-3 rounded-lg px-2 py-1 text-[11px] font-bold text-brand-text hover:bg-brand-soft">{mostrarTodos ? 'Mostrar menos' : `Ver los ${campos.length - 3} cambios restantes`}</button>}
                   </section>
+                  </details>
                 )}
                 {!campos.length && /MODIFICACION/i.test(String(r.accion || '')) && <p className="mt-2 rounded-xl border border-info/20 bg-info-soft/40 px-3 py-2 text-xs font-medium text-content-2">Este registro no contiene diferencias de valores comparables; no se muestran campos vacíos como si hubieran cambiado.</p>}
               </article>

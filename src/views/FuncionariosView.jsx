@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { formatCI } from '../utils/helpers';
+import React, { useMemo, useState } from 'react';
+import { formatCI, normalizeStr } from '../utils/helpers';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button } from '../components/ui';
 import FiltroCombo from '../components/FiltroCombo';
@@ -15,9 +15,18 @@ export default function FuncionariosView({
   filtroCargo = '', setFiltroCargo = () => {}, cargosFuncionarios = [],
   setCurrentPaginaFuncionarios, funcionariosPaginados,
   handleEditFuncionario, handleDeleteFuncionario, renderPaginationFuncionarios,
-  isLoading, bienesDependenciaCount = 0
+  isLoading, bienesDependenciaCount = 0, bienesDependencia = []
 }) {
   const [mostrarCedulas, setMostrarCedulas] = useState(false);
+  const [cedulasReveladas, setCedulasReveladas] = useState(() => new Set());
+  const [cedulaEnHover, setCedulaEnHover] = useState(null);
+  const bienesPorFuncionario = useMemo(() => {
+    const conteos = new Map();
+    for (const bien of bienesDependencia) {
+      for (const nombre of new Set([normalizeStr(bien.funcionario), normalizeStr(bien.funcionarioAlternativo)].filter(Boolean))) conteos.set(nombre, (conteos.get(nombre) || 0) + 1);
+    }
+    return conteos;
+  }, [bienesDependencia]);
   const [actualizandoResponsables, setActualizandoResponsables] = useState(false);
   const ejecutarActualizacion = async () => {
     if (actualizandoResponsables) return;
@@ -113,7 +122,7 @@ export default function FuncionariosView({
               {mostrarCedulas ? 'Ocultar cédulas' : 'Mostrar cédulas'}
             </button>
           </div>
-          <p className="mt-2 text-[11px] text-content-3">Las cédulas permanecen ocultas hasta que elijas «Mostrar cédulas».</p>
+          <p className="mt-2 text-[11px] text-content-3">Las cédulas permanecen ocultas. Puedes revelar una sola al pasar el cursor o pulsar su número.</p>
         </Card>
 
       </div>
@@ -166,14 +175,16 @@ export default function FuncionariosView({
                       className="hover:bg-surface-2/80 dark:hover:bg-surface-1/[0.03] transition-colors group"
                     >
                         <TD className="py-4 pl-8 pr-4 align-middle tabular-nums font-semibold text-content-1 dark:text-content-3 text-sm">
-                            {mostrarCedulas ? formatCI(f.cedula) : `••••${String(f.cedula || '').replace(/\D/g, '').slice(-2) || '••'}`}
+                            <button type="button" onClick={() => setCedulasReveladas(actual => { const siguiente = new Set(actual); if (siguiente.has(f.id)) siguiente.delete(f.id); else siguiente.add(f.id); return siguiente; })} onMouseEnter={() => setCedulaEnHover(f.id)} onMouseLeave={() => setCedulaEnHover(null)} aria-pressed={mostrarCedulas || cedulasReveladas.has(f.id)} aria-label={`${mostrarCedulas || cedulasReveladas.has(f.id) ? 'Ocultar' : 'Revelar'} cédula de ${f.nombre}`} title="Revelar u ocultar esta cédula" className="rounded-control px-2 py-1 text-left tabular-nums hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">
+                              {mostrarCedulas || cedulasReveladas.has(f.id) || cedulaEnHover === f.id ? formatCI(f.cedula) : `••••${String(f.cedula || '').replace(/\D/g, '').slice(-2) || '••'}`}
+                            </button>
                         </TD>
                         <TD className="px-4 py-4 align-middle">
                             <div className="flex items-center gap-3">
                                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-surface-3 dark:bg-surface-1/10 text-content-1 dark:text-zinc-200 font-bold text-xs">
                                     {inicial}
                                 </div>
-                                <span className="font-bold text-content-1 dark:text-white text-sm">{f.nombre}</span>
+                                <span className="min-w-0"><span className="block font-bold text-content-1 dark:text-white text-sm">{f.nombre}</span><span className="block text-[11px] font-medium tabular-nums text-content-2">{(bienesPorFuncionario.get(normalizeStr(f.nombre)) || 0).toLocaleString('es-PY')} bienes a cargo</span></span>
                             </div>
                         </TD>
                         <TD className="px-4 py-4 align-middle">

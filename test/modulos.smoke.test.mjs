@@ -193,6 +193,21 @@ describe('smoke por modulo', () => {
     await app.esperar('2803-01-02-0001', 4000);
     assert.ok(app.tiene('2803-01-02-0001'), 'debe listar los bienes cargados');
 
+    const libres = [...app.contenedor.querySelectorAll('[aria-label="Filtros rápidos del inventario"] button')]
+      .find(boton => boton.textContent.includes('Libres para asignar'));
+    assert.ok(libres, 'debe ofrecer el filtro rápido de bienes libres');
+    libres.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    assert.equal(app.contenedor.querySelector('[aria-label="Filtros rápidos del inventario"] button[aria-pressed="true"]')?.textContent.includes('Libres para asignar'), true);
+
+    app.contenedor.querySelector('[aria-label="Filtros rápidos del inventario"] button')?.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const masAcciones = app.contenedor.querySelector('button[title="Más acciones de 2803-01-02-0001"]');
+    assert.ok(masAcciones, 'cada fila debe ofrecer el resto de acciones en un menú');
+    masAcciones.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    assert.ok(document.querySelector('[role="menu"][aria-label^="Bien"]'), 'el menú contextual debe abrirse');
+
     await app.clickSiExiste('FC-03');
     assert.ok(await app.hayDialogo(), 'el boton FC-03 debe abrir un dialogo');
   });
@@ -203,6 +218,12 @@ describe('smoke por modulo', () => {
     await app.clickTour('nav-funcionarios');
     await app.esperar('Plantel de Funcionarios', 3000);
     assert.ok(app.tiene('Plantel de Funcionarios'), 'debe mostrar el titulo del padron');
+    assert.ok(app.tiene('bienes a cargo'), 'debe mostrar el contexto patrimonial por funcionario');
+    const cedula = app.contenedor.querySelector('button[aria-label="Revelar cédula de Alguien"]');
+    assert.ok(cedula, 'la cédula debe estar oculta inicialmente y poder revelarse');
+    cedula.click();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    assert.ok(app.tiene('1.234.567'), 'debe revelar solo la cédula elegida');
 
     await app.clickSiExiste('Nuevo Funcionario');
     assert.ok(await app.hayDialogo(), 'debe abrir el formulario de alta');

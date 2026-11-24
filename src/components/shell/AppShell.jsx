@@ -75,7 +75,7 @@ export default function AppShell({
   }, [isSidebarOpen, setIsSidebarOpen]);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-canvas text-content-1">
+    <div className="app-layout flex h-dvh overflow-hidden bg-canvas text-content-1">
       <AppSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -96,7 +96,7 @@ export default function AppShell({
         currentUser={currentUser}
       />
 
-      <div className="flex flex-1 flex-col min-w-0 gap-0">
+      <div className="app-layout-content flex flex-1 flex-col min-w-0 gap-0">
         {errorBanner ? errorBanner : null}
 
         <AppTopbar
@@ -129,7 +129,7 @@ export default function AppShell({
         />
 
         <ContextualMenuProvider>
-          <main id="contenido" tabIndex={-1} className="workspace-main mt-2 min-w-0 flex-1 overflow-y-auto bg-canvas custom-scrollbar sm:mt-3 lg:mt-4">
+          <main id="contenido" tabIndex={-1} aria-label="Contenido principal" className="workspace-main mt-2 min-w-0 flex-1 overflow-y-auto bg-canvas custom-scrollbar sm:mt-3 lg:mt-4">
             {children}
           </main>
         </ContextualMenuProvider>

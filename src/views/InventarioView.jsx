@@ -16,7 +16,7 @@ import Dialogo from '../components/ui/Dialogo';
 import InlineInventoryField from '../components/InlineInventoryField';
 import { Card, EmptyState, PageHeader, Toolbar, Table, THead, TBody, TRow, TH, TD, Button, IconButton } from '../components/ui';
 import useScopedPreference from '../hooks/useScopedPreference';
-import { ContextMenuTarget } from '../components/ui/ContextualMenu';
+import { ContextMenuTarget, ContextMenuButton } from '../components/ui/ContextualMenu';
 
 const COLUMNAS_INICIALES = { fecha: true, cuenta: true, qr: true };
 const VISTAS_RECIENTES_INICIALES = [];
@@ -76,6 +76,7 @@ function ResumenObservacion({ bien, onClick }) {
 export default function InventarioView({
   hasFilters,
   filteredBienes,
+  bienes = filteredBienes,
   bienesLibresParaAsignar = [],
   stats = {},
   handleDownloadTemplateCSV,
@@ -120,6 +121,8 @@ export default function InventarioView({
   analiticos2Unicos,
   filtroFC10,
   setFiltroFC10,
+  filtroQR,
+  setFiltroQR,
   filtroEstado,
   setFiltroEstado,
   vistasGuardadas,
@@ -187,6 +190,8 @@ export default function InventarioView({
   const [menuCols, setMenuCols] = useState(false);
   const [showHistorial, setShowHistorial] = useState(false);
   const [mostrarFiltrosAvanzados, setMostrarFiltrosAvanzados] = useState(false);
+  const [estadoMasivo, setEstadoMasivo] = useState('');
+  const [cambiandoEstadoMasivo, setCambiandoEstadoMasivo] = useState(false);
   const filtrosAvanzadosActivos = [filtroSubcuenta, filtroAnalitico1, filtroAnalitico2].filter(Boolean).length + (filtroEstado !== 'ALL' ? 1 : 0);
   const accionesContextualesBien = (item) => [
     { label: 'Ver ficha y trazabilidad', icon: 'fa-arrow-up-right-from-square', onSelect: () => openFichaBien(item) },
@@ -195,6 +200,7 @@ export default function InventarioView({
     { label: 'Exportar este bien a Excel', icon: 'fa-file-excel', onSelect: () => handleExportInventarioExcel?.([item]) },
     ...(isAdmin && openFC10Modal ? [{ label: 'Crear o gestionar acta FC-10', icon: 'fa-file-signature', onSelect: () => openFC10Modal(item) }] : []),
     ...(isAdmin && openFC11Modal ? [{ label: 'Registrar traslado FC-11', icon: 'fa-truck-fast', onSelect: () => openFC11Modal(item) }] : []),
+    ...(isAdmin ? [{ label: 'Descargar informe administrativo de baja', icon: 'fa-file-pdf', onSelect: () => imprimirInformeBajaBien(item) }] : []),
     ...(!isInventoryViewer ? [
       { label: 'Editar bien', icon: 'fa-pen-to-square', onSelect: () => { setBienEditing(item); setIsBienModalOpen(true); } },
       { label: isAdmin ? 'Dar de baja el bien' : 'Solicitar baja del bien', icon: 'fa-trash-can', danger: true, onSelect: () => setItemToDelete({ type: isAdmin ? 'bien' : 'requestBaja', id: item.id, item }) }
@@ -309,16 +315,16 @@ export default function InventarioView({
           <span className="inventory-view-count-copy"><span className="inventory-view-count-label block text-[10px] font-semibold uppercase tracking-wide">Bienes en esta vista</span><span className="inventory-view-count-value block text-sm font-extrabold tabular-nums">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-1.5 border-t border-line/70 pt-2.5 sm:grid-cols-4">
+      <div className="inventory-filter-pills mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3" role="group" aria-label="Filtros rápidos del inventario">
         {[
-          { label: 'Bienes registrados', value: stats.totalItems, icon: 'fa-boxes-stacked', tone: 'text-brand-text' },
-          { label: 'Libres para asignar', value: stats.libresParaAsignar, icon: 'fa-box-open', tone: 'text-emerald-700 dark:text-emerald-300' },
-          { label: 'Con observación', value: stats.observados, icon: 'fa-triangle-exclamation', tone: 'text-amber-700 dark:text-amber-300' },
-          { label: 'Pendientes de QR', value: stats.withoutQR, icon: 'fa-qrcode', tone: 'text-sky-700 dark:text-sky-300' }
-        ].map(item => <div key={item.label} className="flex min-w-0 items-center gap-2.5 px-1 py-1.5">
-          <i className={`fa-solid ${item.icon} ${item.tone} text-xs`} aria-hidden="true" />
-          <span className="min-w-0"><span className="block truncate text-[10px] font-medium text-content-3">{item.label}</span><span className="block text-sm font-bold tabular-nums text-content-1">{Number(item.value || 0).toLocaleString('es-PY')}</span></span>
-        </div>)}
+          { id: '', label: 'Todos', value: stats.totalItems, icon: 'fa-boxes-stacked' },
+          { id: 'libresParaAsignar', label: 'Libres para asignar', value: stats.libresParaAsignar, icon: 'fa-box-open' },
+          { id: 'observados', label: 'Con observación', value: stats.observados, icon: 'fa-triangle-exclamation' },
+          { id: 'sinQR', label: 'Pendientes de QR', value: stats.withoutQR, icon: 'fa-qrcode' }
+        ].map(item => <button key={item.label} type="button" aria-pressed={item.id === 'sinQR' ? filtroQR === 'NO' : filtroPendiente === item.id && filtroQR !== 'NO'} onClick={() => { if (item.id === 'sinQR') { setFiltroQR(filtroQR === 'NO' ? 'ALL' : 'NO'); setFiltroPendiente(''); } else { setFiltroQR('ALL'); setFiltroPendiente(item.id); } setCurrentPage(1); }} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 text-xs font-semibold text-white/85 transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white aria-pressed:border-white/60 aria-pressed:bg-white/20 aria-pressed:text-white">
+          <i className={`fa-solid ${item.icon} text-[11px]`} aria-hidden="true" />
+          <span>{item.label}</span><strong className="tabular-nums text-white">{Number(item.value || 0).toLocaleString('es-PY')}</strong>
+        </button>)}
       </div>
     </div>
       {/* Antes el `contador` de la cabecera mostraba "Añadir Registro", que
@@ -347,6 +353,15 @@ export default function InventarioView({
         <Button variante="subtle" icono="fa-file-excel" onClick={handleExportInventarioExcel} title="Exportar Excel real (.xlsx)">
           {t('inv.excel')}
         </Button>
+
+        <details className="inventory-export-menu relative shrink-0">
+          <summary className="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Exportar libres <i className="fa-solid fa-chevron-down text-[10px]" aria-hidden="true" /></summary>
+          <div className="absolute left-0 top-full z-40 mt-2 grid min-w-48 gap-1 rounded-card border border-line bg-surface-1 p-2 shadow-pop">
+            <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">CSV de bienes libres</button>
+            <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">Excel de bienes libres</button>
+            <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">PDF de bienes libres</button>
+          </div>
+        </details>
 
         {ultimaExportacion && (
           <Button variante="subtle" icono="fa-rotate-right" onClick={onRepetirExport} title={`Repetir última exportación (${ultimaExportacion.formato.toUpperCase()}) con los filtros actuales`}>
@@ -443,7 +458,7 @@ export default function InventarioView({
     </div>
 
     {/* Filtros frecuentes primero; los contables quedan agrupados para reducir ruido. */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 pt-0.5">
+    <div className="grid grid-cols-1 gap-2 pt-0.5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 
       {/* Responsables */}
       <FiltroCombo
@@ -481,35 +496,14 @@ export default function InventarioView({
         titulo="Filtrar por FC-10"
       />
 
-    </div>
+      <label className="flex h-10 min-w-0 items-center gap-2 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-2">
+        <i className="fa-solid fa-arrow-down-wide-short text-content-3" aria-hidden="true" />
+        <span className="sr-only">Ordenar inventario</span>
+        <select value={ordenActual} onChange={event => cambiarOrden(event.target.value)} aria-label="Ordenar inventario" className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-content-1 outline-none">
+          {ORDENES.map(opcion => <option key={opcion.id} value={opcion.id}>{opcion.label}</option>)}
+        </select>
+      </label>
 
-    <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
-    <div className="inventory-free-filter grid min-h-[58px] grid-cols-1 items-center gap-2 rounded-xl border border-emerald-700/15 bg-emerald-50/70 p-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:px-2 dark:bg-emerald-500/[0.06]">
-      <button
-        type="button"
-        aria-pressed={filtroPendiente === 'libresParaAsignar'}
-        onClick={() => { setFiltroPendiente(filtroPendiente === 'libresParaAsignar' ? '' : 'libresParaAsignar'); setCurrentPage(1); }}
-        className={`flex min-w-0 items-center gap-2 rounded-xl px-1.5 py-1 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${filtroPendiente === 'libresParaAsignar' ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/10'}`}
-      >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"><i className="fa-solid fa-box-open" aria-hidden="true" /></span>
-        <span className="min-w-0">
-          <span className="block text-sm font-extrabold text-content-1">Libres para asignar</span>
-          <span className="block text-xs text-content-3">Sin funcionario ni ubicación, o marcados expresamente para asignación</span>
-        </span>
-        <span className="ml-auto min-w-[68px] rounded-full border border-emerald-700/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-emerald-800 dark:bg-slate-900 dark:text-emerald-300">{Number(stats.libresParaAsignar || 0).toLocaleString('es-PY')}</span>
-      </button>
-      <div className="flex flex-wrap items-center justify-end gap-1.5 border-t border-emerald-700/10 pt-1.5 sm:border-0 sm:pt-0">
-        <Button variante="subtle" tamano="sm" icono="fa-file-csv" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en CSV">Descargar CSV</Button>
-        <Button variante="subtle" tamano="sm" icono="fa-file-excel" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} title="Descargar la lista de bienes libres para asignar en Excel">Excel</Button>
-        <Button variante="secondary" tamano="sm" icono="fa-file-pdf" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} title="Descargar informe PDF de bienes libres para asignar">PDF</Button>
-      </div>
-    </div>
-
-    <button type="button" aria-pressed={filtroPendiente === 'observados'} onClick={() => { setFiltroPendiente(filtroPendiente === 'observados' ? '' : 'observados'); setCurrentPage(1); }} className={`inventory-observed-filter flex min-h-[58px] w-full items-center gap-2 rounded-xl border px-2 py-1.5 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${filtroPendiente === 'observados' ? 'border-amber-500/40 bg-amber-500/10' : 'border-amber-500/15 bg-amber-50/70 hover:bg-amber-500/[0.08] dark:bg-amber-500/[0.05]'}`}>
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400"><i className="fa-solid fa-eye" aria-hidden="true" /></span>
-      <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-content-1">Bienes con observaciones</span><span className="block text-xs text-content-3">Abre el filtro para revisar las notas registradas en el inventario</span></span>
-      <span className="min-w-[68px] rounded-full border border-amber-600/20 bg-white px-3 py-1.5 text-center text-xs font-black tabular-nums text-amber-800 dark:bg-slate-900 dark:text-amber-300">{Number(stats.observados || 0).toLocaleString('es-PY')}</span>
-    </button>
     </div>
 
     <div>
@@ -739,6 +733,10 @@ export default function InventarioView({
                         {isAdmin && <button onClick={() => setMostrarAsignacionMasiva(true)} title="Asignar responsable o ubicación a los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-user-gear text-[11px]"></i> Asignar
                         </button>}
+                        {isAdmin && onMoverEstado && <span className="inline-flex items-center gap-1 rounded-control bg-white/10 px-2">
+                          <select value={estadoMasivo} onChange={event => setEstadoMasivo(event.target.value)} aria-label="Nuevo estado de los bienes seleccionados" className="h-9 max-w-32 bg-transparent text-xs font-semibold text-white outline-none [&>option]:text-zinc-900"><option value="">Estado…</option>{ESTADOS_CONSERVACION.filter(estado => estado !== 'De Baja').map(estado => <option key={estado} value={estado}>{estado}</option>)}</select>
+                          <button type="button" disabled={!estadoMasivo || cambiandoEstadoMasivo} onClick={async () => { setCambiandoEstadoMasivo(true); try { for (const item of bienes.filter(bien => seleccionados.includes(bien.id))) await onMoverEstado(item, estadoMasivo); setEstadoMasivo(''); limpiarSeleccion(); } finally { setCambiandoEstadoMasivo(false); } }} className="rounded px-2 py-1 text-xs font-bold hover:bg-white/15 disabled:opacity-40">{cambiandoEstadoMasivo ? 'Guardando…' : 'Aplicar'}</button>
+                        </span>}
                         {isAdmin && openFC11Modal && <button onClick={() => openFC11Modal(filteredBienes.filter(item => seleccionados.includes(item.id)))} title="Crear un FC-11 único para todos los bienes seleccionados" className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-control text-xs font-bold bg-surface-1/15 dark:bg-surface-1/10 hover:bg-surface-1/25 dark:hover:bg-surface-2/20 transition-all cursor-pointer">
                           <i className="fa-solid fa-truck-fast text-[11px]"></i> FC-11 ({seleccionados.length})
                         </button>}
@@ -1027,73 +1025,24 @@ export default function InventarioView({
                                   </div>
                                 </TD>
 
-                                {/* Columna 4: Matriz Completa de Acciones Restaurada */}
+                                {/* Acciones frecuentes y acceso visible al menú contextual completo. */}
                                 <TD className={`pl-4 pr-6 sm:pr-8 align-top text-right ${compacto ? 'py-2' : 'py-4'}`} >
                                   <div className="flex items-center justify-end gap-1.5">
-
-                                    {/* Ficha 360 y trazabilidad */}
                                     <IconButton
-                                      titulo="Ficha 360 y trazabilidad"
+                                      titulo="Ver ficha y trazabilidad"
                                       icono="fa-timeline"
                                       variante="ghost"
                                       tamano="sm"
                                       onClick={() => openFichaBien(item)}
-                                      className="focus-visible:ring-emerald-500"
                                     />
-
-                                    {/* Generar QR */}
-                                    <IconButton
-                                      titulo="Generar Código QR"
-                                      icono="fa-qrcode"
-                                      variante="ghost"
-                                      tamano="sm"
-                                      onClick={() => { setQrTargetBien(item); setIsBulkQR(false); setIsQRModalOpen(true); }}
-                                    />
-
-                                    {/* Asignar FC-10 */}
-                                    {isAdmin && <IconButton
-                                      titulo="Asignación FC-10"
-                                      icono="fa-file-signature"
-                                      variante="ghost"
-                                      tamano="sm"
-                                      onClick={() => openFC10Modal(item)}
-                                    />}
-
-                                    {/* Traslado FC-11 */}
-                                    {isAdmin && <IconButton
-                                      titulo="Traslado FC-11"
-                                      icono="fa-truck-fast"
-                                      variante="ghost"
-                                      tamano="sm"
-                                      onClick={() => openFC11Modal(item)}
-                                    />}
-
-                                    {/* Editar Bien */}
                                     {!isInventoryViewer && <IconButton
-                                      titulo="Editar Bien"
+                                      titulo="Editar bien"
                                       icono="fa-pen-to-square"
                                       variante="ghost"
                                       tamano="sm"
                                       onClick={() => { setBienEditing(item); setIsBienModalOpen(true); }}
                                     />}
-
-                                    {isAdmin && <IconButton titulo="Descargar informe administrativo de baja (no modifica el inventario)" icono="fa-file-pdf" variante="ghost" tamano="sm" onClick={() => imprimirInformeBajaBien(item)} />}
-
-                                    {/* Eliminar o Solicitar Baja */}
-                                    {!isInventoryViewer && <IconButton
-                                      titulo="Eliminar o Solicitar Baja"
-                                      icono="fa-trash-can"
-                                      variante="danger"
-                                      tamano="sm"
-                                      onClick={() => {
-                                        if (isAdmin) {
-                                          setItemToDelete({ type: 'bien', id: item.id, item });
-                                        } else {
-                                          setItemToDelete({ type: 'requestBaja', id: item.id, item });
-                                        }
-                                      }}
-                                    />}
-
+                                    <ContextMenuButton actions={accionesContextualesBien(item)} label={`Bien ${item.rotulo || ''}`} title={`Más acciones de ${item.rotulo || item.descripcion}`} className="flex h-8 w-8 items-center justify-center rounded-control text-content-2 hover:bg-surface-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand" />
                                   </div>
                                 </TD>
 

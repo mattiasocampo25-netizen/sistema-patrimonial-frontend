@@ -2114,15 +2114,15 @@ button:disabled {
 
 /* Identidad visual unificada: carbón, piedra y acento ámbar. */
 :root {
-  --canvas: #f5f3ef;
-  --surface-1: #fffefa;
-  --surface-2: #f8f5f0;
+  --canvas: #f6f4f0;
+  --surface-1: #ffffff;
+  --surface-2: #faf8f5;
   --surface-3: #eee9e1;
-  --line: #e3ded6;
+  --line: rgb(43 33 24 / .08);
   --line-strong: #c9c0b5;
-  --content-1: #292521;
-  --content-2: #625a52;
-  --content-3: #756c63;
+  --content-1: #2b2118;
+  --content-2: #57534e;
+  --content-3: #57534e;
   --shadow-card: 0 1px 2px rgb(43 34 24 / .04), 0 12px 30px rgb(43 34 24 / .045);
   --shadow-panel: 0 16px 42px rgb(35 28 21 / .12);
   --ui-brand-deep: #29231d;
@@ -2251,3 +2251,61 @@ button:disabled {
 .dark .records-hero .toolbar [role="group"] .text-content-1 { color: var(--content-1); }
 .dark .records-hero .toolbar [role="group"] .ui-button:not(.bg-brand) { color: var(--content-1); background: var(--surface-1); border-color: var(--line-strong); }
 .dark .records-hero .toolbar [role="group"] .ui-button:not(.bg-brand):hover { color: var(--content-1); background: var(--surface-3); }
+
+/* Sistema de diseño operativo: superficies livianas y números escaneables. */
+:root {
+  --radius-control: .625rem;
+  --radius-card: 1rem;
+  --radius-panel: 1rem;
+  --shadow-card: 0 1px 2px rgb(43 33 24 / .035), 0 7px 22px rgb(43 33 24 / .04);
+  --shadow-panel: 0 14px 36px rgb(43 33 24 / .075);
+  --brand: #7c5332;
+  --brand-hover: #684122;
+  --brand-text: #57534e;
+}
+.dark { --brand-text: #e9c99e; }
+.workspace-main :where(.module-screen, .inventory-view, .staff-workspace, .audit-workspace) { min-width: 0; }
+.workspace-main :where(.rounded-panel, .rounded-card) { border-color: var(--line); }
+.workspace-main :where(table) { font-variant-numeric: tabular-nums; }
+.workspace-main :where(time, .font-mono, .tabular-nums) { font-variant-numeric: tabular-nums; }
+.workspace-main :where(.shadow-card) { box-shadow: var(--shadow-card) !important; }
+.workspace-main :where(.bg-brand-soft) { background-color: var(--brand-soft); }
+.workspace-main :where(button:not(.bg-brand):not(.text-white)):hover { border-color: var(--line-strong); }
+.inventory-view > .overflow-hidden:first-child > div:first-child,
+.staff-hero { border-radius: 1rem !important; }
+.staff-hero { padding-top: 1.5rem !important; }
+.inventory-view .inventory-header { padding-block: 1rem !important; }
+.inventory-view > .overflow-hidden:first-child { overflow: visible !important; }
+.inventory-view .inventory-filter-pills { min-width: 0; }
+.inventory-view .inventory-actions-scroll { display: flex !important; overflow: visible !important; flex-wrap: wrap; }
+.inventory-view .inventory-toolbar { min-width: 0; overflow: visible !important; flex-wrap: wrap; }
+.inventory-view .inventory-export-menu[open] > summary { background: var(--surface-2); border-color: var(--line-strong); }
+.inventory-view .inventory-selection-bar {
+  position: fixed !important;
+  z-index: 180;
+  left: 50%;
+  bottom: 1.25rem;
+  width: min(1060px, calc(100vw - 2rem));
+  max-height: min(45vh, 19rem);
+  overflow-y: auto;
+  transform: translateX(-50%);
+  background: #2b2118;
+  border: 1px solid rgb(255 255 255 / .17);
+  box-shadow: 0 20px 50px rgb(0 0 0 / .24);
+}
+.dashboard-stagger > header { padding: 1rem 1.35rem !important; gap: .75rem !important; }
+.dashboard-stagger > header h1 { font-size: clamp(1.45rem, 2.2vw, 2rem); }
+.dashboard-stagger > header p { margin-top: .35rem; }
+.dashboard-stagger section[aria-label="Indicadores del inventario"] > div:last-child > button { min-height: 7.5rem; }
+.audit-workspace section[aria-label^="Eventos del"] article { padding: .75rem 1rem !important; border-radius: .75rem !important; }
+.audit-workspace section[aria-label^="Eventos del"] article > div:first-of-type { padding-bottom: .4rem; }
+.audit-workspace section[aria-label^="Eventos del"] article > div:nth-of-type(2) { padding-block: .45rem; }
+.audit-workspace section[aria-label^="Eventos del"] article details[open] > summary i { transform: rotate(180deg); }
+.login-experience input[aria-invalid="true"] { border-color: var(--danger) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 20%, transparent); }
+.login-experience :where(input, button):focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.login-experience p.text-content-3 { color: var(--content-2); }
+@media (max-width: 760px) {
+  .inventory-view .inventory-selection-bar { bottom: 4.75rem; width: calc(100vw - 1rem); padding: .75rem !important; gap: .35rem; }
+  .inventory-view .inventory-selection-bar > span.flex-1 { display: none; }
+  .dashboard-stagger > header { padding: 1rem !important; }
+}

@@ -231,7 +231,7 @@ export default function DashboardView({
       id: 'qr',
       label: 'Bienes con QR',
       valor: stats.withQR,
-      sub: stats.withQR + ' de ' + Number(stats.totalItems || 0).toLocaleString('es-PY') + ' con código',
+      sub: `${Math.round(Number(stats.percQR) || 0)}% del inventario con código`,
       icono: 'fa-qrcode',
       tono: 'brand',
       progress: stats.percQR || 0,
@@ -252,7 +252,7 @@ export default function DashboardView({
       id: 'pendiente-qr',
       label: 'Pendiente QR',
       valor: stats.withoutQR,
-      sub: 'Sin etiqueta generada',
+      sub: `${stats.totalItems ? Math.round((Number(stats.withoutQR || 0) / Number(stats.totalItems)) * 100) : 0}% del inventario sin etiqueta`,
       icono: 'fa-triangle-exclamation',
       tono: 'warn',
       onClick: () => irInventario(() => setFiltroQR('NO')),
@@ -420,15 +420,22 @@ export default function DashboardView({
         <aside className="space-y-4">
           <section className="rounded-panel border border-line bg-[#102d40] p-5 text-white shadow-card dark:bg-[#0f2635]" aria-label="Avance de asignación">
             <div className="flex items-start justify-between gap-4">
-              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-teal-200">Responsables registrados</p><h2 className="mt-1 text-sm font-bold text-white">Avance de asignación</h2></div>
-              <span className="font-display text-4xl font-black leading-none tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.round(porcentajeVinculadoFuncionario) + '%'}</span>
+              <div><p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#e9c99e]">Responsables registrados</p><h2 className="mt-1 text-sm font-bold text-white">Avance de asignación</h2></div>
+              {resumenActual?.asignados != null && totalBienesDashboard > 0 && <span className="font-display text-4xl font-black leading-none tabular-nums text-white">{Math.round(porcentajeVinculadoFuncionario)}%</span>}
             </div>
+            {resumenActual?.asignados == null || !totalBienesDashboard ? (
+              <div className="mt-5 rounded-xl bg-white/10 p-4">
+                <p className="text-xs leading-relaxed text-white/85">Aún no hay datos de asignación para mostrar. Revisa los bienes sin responsable o inicia una asignación.</p>
+                <button type="button" onClick={() => irInventario(() => setFiltroPendiente('libresParaAsignar'))} className="mt-3 inline-flex h-9 items-center gap-2 rounded-control bg-white px-3 text-xs font-bold text-[#2b2118] hover:bg-[#f1e9dc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">Ver bienes por asignar <i className="fa-solid fa-arrow-right" aria-hidden="true" /></button>
+              </div>
+            ) : <>
             <div className="mt-5 grid grid-cols-2 gap-2">
               <div className="rounded-xl border border-white/10 bg-white/5 p-3"><span className="block text-[9px] font-bold uppercase tracking-wide text-white/60">Con responsable</span><span className="mt-1 block text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : bienesVinculadosFuncionario.toLocaleString('es-PY')}</span></div>
               <div className="rounded-xl border border-white/10 bg-white/5 p-3"><span className="block text-[9px] font-bold uppercase tracking-wide text-white/60">Sin responsable</span><span className="mt-1 block text-lg font-black tabular-nums text-white">{resumenActual?.asignados == null ? '—' : Math.max(0, totalBienesDashboard - bienesVinculadosFuncionario).toLocaleString('es-PY')}</span></div>
             </div>
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/15" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300 transition-[width] duration-700" style={{ width: Math.min(100, Math.max(0, porcentajeVinculadoFuncionario)) + '%' }} /></div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/15" role={totalBienesDashboard ? 'progressbar' : undefined} aria-label="Avance de bienes con responsable" aria-valuemin={totalBienesDashboard ? 0 : undefined} aria-valuemax={totalBienesDashboard ? 100 : undefined} aria-valuenow={totalBienesDashboard ? Math.round(porcentajeVinculadoFuncionario) : undefined}><span className="block h-full rounded-full bg-[#e9c99e] transition-[width] duration-700" style={{ width: Math.min(100, Math.max(0, porcentajeVinculadoFuncionario)) + '%' }} /></div>
             <p className="mt-3 text-[10px] leading-relaxed text-white/60">Según el responsable guardado en inventario; independiente de las firmas FC-10.</p>
+            </>}
           </section>
 
           {widgets.metricas && tilesPorDependencia.length > 0 && (

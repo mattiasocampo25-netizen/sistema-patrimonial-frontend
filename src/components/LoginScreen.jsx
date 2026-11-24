@@ -142,7 +142,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-4 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-4 focus:ring-brand/10 motion disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-4 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus-visible:ring-2 focus-visible:ring-brand/40 motion disabled:opacity-60 outline-none"
                     placeholder="Escribe tu usuario"
                   />
                 </div>
@@ -159,7 +159,7 @@ export default function LoginScreen({
                   <button
                     type="button"
                     onClick={() => setShowRecoveryModal(true)}
-                    className="text-xs font-semibold text-brand-text dark:text-brand hover:underline cursor-pointer"
+                    className="text-xs font-bold text-content-1 underline underline-offset-2 hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -179,7 +179,7 @@ export default function LoginScreen({
                     disabled={isProcessing}
                     aria-invalid={loginError || undefined}
                     aria-describedby={loginError ? 'login-error' : undefined}
-                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-11 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus:ring-4 focus:ring-brand/10 motion disabled:opacity-60 outline-none"
+                    className="block w-full rounded-control border border-line bg-surface-2/70 pl-11 pr-11 py-3.5 text-sm font-medium text-content-1 caret-brand placeholder:text-content-3 focus:border-brand focus:bg-surface-1 focus-visible:ring-2 focus-visible:ring-brand/40 motion disabled:opacity-60 outline-none"
                     placeholder="••••••••"
                   />
                   <button

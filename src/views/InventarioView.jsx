@@ -316,7 +316,7 @@ export default function InventarioView({
           un contador. El total de bienes ya se ve en la paginación
           ("Mostrando X de Y"), así que la cabecera queda solo con la
           identidad del módulo. */}
-      <div className="border-t border-line bg-surface-2/50 px-3 py-2 sm:px-4">
+      <div className="inventory-command-surface rounded-panel border border-line overflow-hidden px-3 py-2 sm:px-4">
       <Toolbar className="inventory-toolbar">
 
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}

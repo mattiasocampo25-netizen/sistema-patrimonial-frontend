@@ -2290,6 +2290,9 @@ button:disabled {
 .inventory-view .inventory-toolbar { min-width: 0; overflow: visible !important; flex-wrap: wrap; }
 .dark .inventory-view > .overflow-hidden:first-child > .border-t,
 .inventory-view > .overflow-hidden:first-child > .border-t { background: #1E1A16 !important; border-color: rgb(255 255 255 / .10) !important; }
+.inventory-view > .overflow-hidden:first-child > div:nth-child(2),
+.inventory-command-surface { background: #1E1A16 !important; border-radius: 16px !important; border-color: rgb(255 255 255 / .10) !important; }
+.inventory-command-surface .inventory-toolbar { border-radius: 12px; }
 .inventory-view .inventory-export-menu[open] > summary { background: var(--surface-2); border-color: var(--line-strong); }
 .inventory-view .inventory-selection-bar {
   position: fixed !important;

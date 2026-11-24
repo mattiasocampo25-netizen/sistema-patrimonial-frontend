@@ -1838,6 +1838,7 @@ if (publicBienId) {
         solicitud={solicitudNombreArchivo}
         onAceptar={(nombre) => { solicitudNombreArchivo?.aceptar(nombre); setSolicitudesNombreArchivo(actuales => actuales.slice(1)); }}
         onUsarSugerido={() => resolverNombreArchivo('usarSugerido')}
+        onCancelar={() => setSolicitudesNombreArchivo(actuales => actuales.slice(1))}
       />
       {anuncioPendienteLectura && (
         <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-black/65 p-4" role="presentation">

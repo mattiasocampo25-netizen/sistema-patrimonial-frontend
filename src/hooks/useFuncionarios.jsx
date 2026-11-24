@@ -296,13 +296,16 @@ export function useFuncionarios({
             nombre: f.get('nombre').trim(),  
             cargo: f.get('cargo').trim(),  
             ubicacion: String(f.get('ubicacion') || '').trim(),  
-            dependencia: dependenciaActual  
+            // Usar la dependencia elegida en el formulario. Antes se ignoraba
+            // la selección y siempre se guardaba la dependencia activa.
+            dependencia: String(f.get('dependencia') || dependenciaActual || '').trim()
+  
         };  
     
         if (!nuevoFunc.cedula || !nuevoFunc.nombre) return notify("Cédula y Nombre son obligatorios.", "warning");
         const cedulaNormalizada = nuevoFunc.cedula.replace(/\D/g, '');
         if (funcionariosPadron.some(f =>
-          normalizeStr(f.dependencia) === normalizeStr(dependenciaActual) &&
+          normalizeStr(f.dependencia) === normalizeStr(nuevoFunc.dependencia) &&
           String(f.cedula || '').replace(/\D/g, '') === cedulaNormalizada
         )) return notify('Ya existe un funcionario con esa cédula en esta dependencia.', 'warning');
   

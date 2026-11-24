@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Input, Modal } from './ui';
 
-export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerido }) {
+export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerido, onCancelar }) {
   const [nombre, setNombre] = useState(solicitud?.nombreSugerido || '');
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
   return (
     <Modal
       abierto
-      onCerrar={onUsarSugerido}
+      onCerrar={onCancelar}
       titulo="Nombre del archivo"
       descripcion="Puedes ajustar el nombre antes de descargar."
       icono="fa-file-arrow-down"

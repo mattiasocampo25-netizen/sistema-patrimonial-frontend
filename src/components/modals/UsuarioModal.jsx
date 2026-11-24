@@ -113,7 +113,7 @@ return (
                       valor={dependenciaSeleccionada}
                       opciones={todasDependencias}
                       onElegir={setDependenciaSeleccionada}
-                      etiquetaTodos="Elegí dependencia"
+                      etiquetaTodos="Selecciona una dependencia"
                       titulo="Dependencia asignada"
                     />
                   </div>

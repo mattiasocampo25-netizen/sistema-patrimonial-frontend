@@ -128,7 +128,7 @@ export default function AppTopbar({
                     setDependenciaActual(v);
                     if (clearAllFilters) clearAllFilters();
                   }}
-                  etiquetaTodos="Elegí dependencia"
+                  etiquetaTodos="Selecciona una dependencia"
                   titulo={isAdmin ? 'Cambiar entorno de trabajo' : 'Consultar inventario de otra dependencia'}
                   ancho="w-full"
                   className="!h-9 !rounded-full !border-transparent !bg-surface-2/70 font-semibold hover:!border-line hover:!bg-surface-2"

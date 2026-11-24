@@ -759,11 +759,14 @@ select:focus {
 .dark .sync-banner-offline .sync-banner-icon { color: #fbbf24; background: rgb(251 191 36 / .12); }
 .sync-progress-track { height: 3px; overflow: hidden; margin-left: 2.9rem; border-radius: 999px; background: var(--surface-3); }
 .sync-progress-track span { display: block; width: 36%; height: 100%; border-radius: inherit; background: var(--info); animation: app-proc-slide 1.6s ease-in-out infinite; }
-.ui-toast { border-left: 3px solid var(--brand); }
+.ui-toast { border-left: 3px solid var(--brand); border-radius: 12px !important; }
 .ui-toast-success { border-left-color: var(--ok); }
 .ui-toast-warning { border-left-color: var(--warn); }
 .ui-toast-error { border-left-color: var(--danger); }
 .ui-toast-info { border-left-color: var(--info); }
+.fc10-hero .text-content-1, .fc10-hero .text-content-2, .fc10-hero .text-content-3 { color: rgb(255 255 255 / .82) !important; }
+.fc10-hero h1, .fc10-hero h2, .fc10-hero label, .fc10-hero span { color: white; }
+.fc10-hero select, .fc10-hero input { background: #fff; color: #2B2118; }
 .toast-dismiss { opacity: .72; }
 .toast-dismiss:hover { opacity: 1; }
 

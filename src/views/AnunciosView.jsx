@@ -79,17 +79,17 @@ export default function AnunciosView({
           <Toolbar className="mt-4 w-full">
   
           <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalEnviados > 0 ? 'bg-ok-soft dark:bg-emerald-900/10 border-ok/25 dark:border-emerald-900/30 shadow-emerald-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Total enviados</div>
-              <div className="text-xl font-black text-content-1 dark:text-white">{totalEnviados}</div>
+            <div className="rounded-card border border-white/15 bg-white/10 p-3 text-left text-white backdrop-blur-sm">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/70">Total enviados</div>
+              <div className="text-xl font-black tabular-nums">{totalEnviados}</div>
             </div>
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalDestinatarios > 0 ? 'bg-brand/5 dark:bg-brand/10 border-brand/20 text-brand-text shadow-brand/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Destinatarios</div>
-              <div className="text-xl font-black text-content-1 dark:text-white">{totalDestinatarios}</div>
+            <div className="rounded-card border border-white/15 bg-white/10 p-3 text-left text-white backdrop-blur-sm">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/70">Destinatarios</div>
+              <div className="text-xl font-black tabular-nums">{totalDestinatarios}</div>
             </div>
-            <div className={`rounded-card p-3 text-left border border-line dark:border-line shadow-sm ${ totalLeidos > 0 ? 'bg-info-soft dark:bg-sky-900/10 border-info/25 dark:border-sky-900/30 shadow-sky-500/20' : 'bg-surface-2 dark:bg-surface-2 border-line dark:border-line shadow-sm' }`}>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-content-3 dark:text-content-3">Leídos</div>
-              <div className="text-xl font-black text-content-1 dark:text-white">{totalLeidos}</div>
+            <div className="rounded-card border border-white/15 bg-white/10 p-3 text-left text-white backdrop-blur-sm">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-white/70">Leídos</div>
+              <div className="text-xl font-black tabular-nums">{totalLeidos}</div>
             </div>
           </div>
           </Toolbar>
@@ -118,14 +118,14 @@ export default function AnunciosView({
             <button
               type="button" onClick={() => setDestino('TODOS')}
               aria-pressed={destino === 'TODOS'}
-              className={`flex-1 h-11 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino === 'TODOS' ? 'bg-brand text-content-inverse border-brand hover:bg-brand-hover' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
+              className={`flex-1 h-10 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino === 'TODOS' ? 'bg-brand-soft text-brand-text border-brand/30' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
             >
               <i className="fa-solid fa-users mr-2 text-xs"></i>Todos ({usuariosList.length})
             </button>
             <button
               type="button" onClick={() => setDestino(usuariosOrdenados.find(u => u.username !== currentUser?.username)?.username || '')}
               aria-pressed={destino !== 'TODOS'}
-              className={`flex-1 h-11 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino !== 'TODOS' ? 'bg-brand text-content-inverse border-brand hover:bg-brand-hover' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
+              className={`flex-1 h-10 rounded-control text-body font-bold border transition-[color,background-color,border-color,transform] duration-[var(--dur-fast)] cursor-pointer active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${destino !== 'TODOS' ? 'bg-brand-soft text-brand-text border-brand/30' : 'bg-surface-1 text-content-2 border-line hover:bg-surface-2 hover:border-line-strong'}`}
             >
               <i className="fa-solid fa-user mr-2 text-xs"></i>Específico
             </button>

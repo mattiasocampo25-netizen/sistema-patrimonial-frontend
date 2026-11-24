@@ -240,7 +240,7 @@ export default function FiltroCombo({
                 title={o.label}
                 className={`w-full px-3.5 py-2 text-left text-[13px] transition-colors cursor-pointer ${activeIndex === index + 1 ? 'bg-brand/10 dark:bg-brand/20' : 'hover:bg-brand/10 dark:hover:bg-brand/20'} ${String(o.value) === String(valorActual) ? 'font-black text-brand-text dark:text-brand' : 'font-semibold text-content-1 dark:text-zinc-200'}`}
               >
-                <span className="block whitespace-normal break-words leading-snug" title={o.label}>{o.label}</span>
+                <span className="flex items-center justify-between gap-3 whitespace-normal break-words leading-snug" title={o.label}><span>{o.label}</span>{String(o.value) === String(valorActual) && <i className="fa-solid fa-check shrink-0 text-brand-text" aria-hidden="true" />}</span>
               </button>
             ))}
             {lista.length === 0 && (

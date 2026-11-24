@@ -50,10 +50,10 @@ export default function NuevoFuncionarioModal({ isOpen, onClose, onSave, depende
                                 <label className="block text-[11px] font-bold uppercase tracking-[0.05em] text-content-3 dark:text-content-3 mb-2 whitespace-normal">Cédula de Identidad</label>
                                 <div className="relative">
                                     <i className="fa-solid fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-content-3 text-sm"></i>
-                                    <input type="text" name="cedula" required inputMode="numeric" onInput={(e) => { e.target.value = formatearMiles(e.target.value); validarCI(e.target.value); }} onBlur={(e) => validarCI(e.target.value)} className={`${STYLES.input} pl-11 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej. 1.234.567" />
+                                    <input autoFocus type="text" name="cedula" required inputMode="numeric" autoComplete="off" onInput={(e) => { e.target.value = formatearMiles(e.target.value); validarCI(e.target.value); }} onBlur={(e) => validarCI(e.target.value)} className={`${STYLES.input} pl-11 tabular-nums focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand`} placeholder="Ej. 1.234.567" aria-describedby={ciAviso ? 'nuevo-funcionario-ci-ayuda' : undefined} />
                                 </div>
                                 {ciAviso && (
-                                  <p className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-warn dark:text-amber-400">
+                                  <p id="nuevo-funcionario-ci-ayuda" role="status" className="mt-1.5 flex items-center gap-1.5 text-[11px] font-bold text-warn dark:text-amber-400">
                                     <i className="fa-solid fa-triangle-exclamation text-[10px]"></i>{ciAviso}
                                   </p>
                                 )}

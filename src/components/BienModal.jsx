@@ -761,7 +761,7 @@ export default function BienModal({
                   Cancelar
                 </Button>
 
-                {!esNuevo && (
+                {esNuevo && (
                   <Button variante="subtle" tamano="md" disabled={isSaving || (!isOnline && !offlineConfirmado)} onClick={(e) => guardarConRevision(e, true)}>
                     + Guardar y Añadir Otro
                   </Button>

@@ -136,7 +136,7 @@ export default function Fc10View({
   return (
     <div className="module-screen records-workspace flex flex-col flex-1 space-y-4 pb-12">
       <Card className="records-hero overflow-hidden border-brand/15 p-0 shadow-panel">
-        <div className="bg-gradient-to-r from-brand-soft/70 via-surface-1 to-surface-1 p-5 sm:p-6 dark:from-brand/10 dark:via-surface-1 dark:to-surface-1">
+        <div className="fc10-hero bg-[#2B2118] p-5 text-white sm:p-6">
           {/* Cabecera: identidad a la izquierda, acciones a la derecha.
               Los filtros (etapas + periodo) van en una Toolbar aparte: antes
               todo estaba en una sola fila con `sm:flex-row`, `justify-between`

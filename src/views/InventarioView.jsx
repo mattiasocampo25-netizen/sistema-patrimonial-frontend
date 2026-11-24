@@ -215,22 +215,6 @@ export default function InventarioView({
       return [v, ...prev.filter(x => x !== v)].slice(0, 6);
     });
   };
-  const ORDENES = [
-    { id: 'natural', label: 'Orden natural' },
-    { id: 'rotulo-asc', label: 'Rótulo A–Z' },
-    { id: 'rotulo-desc', label: 'Rótulo Z–A' },
-    { id: 'valor-desc', label: 'Mayor valor' },
-    { id: 'valor-asc', label: 'Menor valor' },
-    { id: 'fecha-desc', label: 'Más recientes' },
-    { id: 'fecha-asc', label: 'Más antiguos' }
-  ];
-  const ordenActual = !orden ? 'natural' : (orden.campo + '-' + orden.dir);
-  const cambiarOrden = (id) => {
-    if (id === 'natural') { setOrden(null); setCurrentPage(1); return; }
-    const [campo, dir] = id.split('-');
-    setOrden({ campo, dir });
-    setCurrentPage(1);
-  };
   // Orden rápido por campo (clic en encabezado o aquí): asc -> desc -> natural
   const ciclarOrden = (campo) => {
     if (!orden || orden.campo !== campo) { setOrden({ campo, dir: campo === 'valor' ? 'desc' : 'asc' }); }

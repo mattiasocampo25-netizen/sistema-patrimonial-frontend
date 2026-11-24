@@ -293,8 +293,7 @@ export default function InventarioView({
   if (filtroFC10 !== 'ALL') chips.push({ id: 'fc10', label: 'FC-10: ' + (filtroFC10 === 'YES' ? 'Con acta' : 'Sin acta'), limpiar: limpiarPag(() => setFiltroFC10('ALL')) });
   if (filtroEstado !== 'ALL') chips.push({ id: 'est', label: filtroEstado, limpiar: limpiarPag(() => setFiltroEstado('ALL')) });
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
-  if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
-  const hayFiltroActivo = chips.some(chip => chip.id !== 'ord');
+  const hayFiltroActivo = chips.length > 0;
   return (
 <div className="inventory-view inventory-stagger min-w-0 space-y-4 pb-12 font-sans text-content-1 dark:text-content-1">
 

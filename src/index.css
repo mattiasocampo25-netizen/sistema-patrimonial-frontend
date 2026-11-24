@@ -2293,6 +2293,13 @@ button:disabled {
 .inventory-view > .overflow-hidden:first-child > div:nth-child(2),
 .inventory-command-surface { background: #1E1A16 !important; border-radius: 16px !important; border-color: rgb(255 255 255 / .10) !important; }
 .inventory-command-surface .inventory-toolbar { border-radius: 12px; }
+.inventory-command-surface .ui-button:not(.bg-brand),
+.inventory-command-surface summary,
+.inventory-command-surface .ui-button:not(.bg-brand) i { color: rgb(255 255 255 / .88) !important; }
+.inventory-command-surface .ui-button:not(.bg-brand) { background: #2A241E !important; border-color: rgb(255 255 255 / .18) !important; }
+.inventory-command-surface .ui-button:not(.bg-brand):hover { background: #3A3027 !important; color: #fff !important; }
+.inventory-command-surface .ui-button.bg-brand,
+.inventory-command-surface .ui-button.bg-brand i { color: #1C1611 !important; }
 .inventory-view .inventory-export-menu[open] > summary { background: var(--surface-2); border-color: var(--line-strong); }
 .inventory-view .inventory-selection-bar {
   position: fixed !important;

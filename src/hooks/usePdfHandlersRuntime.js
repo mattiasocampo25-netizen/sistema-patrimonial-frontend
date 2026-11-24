@@ -18,6 +18,32 @@ const resumenComponentes = (bien) => Array.isArray(bien?.componentes)
   ? bien.componentes.map(c => `${c.nombre || 'Componente'} x${Number.parseInt(c.cantidad, 10) || 1} | Ubicación: ${c.ubicacion || bien.ubicacion || 'la del bien'} | Encargado: ${c.funcionario || bien.funcionario || 'el del bien'}${c.observaciones ? ` | ${c.observaciones}` : ''}`).join(' ; ')
   : '';
 
+// Orden patrimonial estable para todos los formatos de salida. No muta el
+// array de la tabla y evita depender del orden no garantizado de Supabase.
+const ordenarBienesExport = (registros = []) => [...registros].sort((a, b) => {
+  const texto = (valor) => String(valor ?? '').trim();
+  const numero = (valor) => texto(valor).replace(/\D/g, '').padStart(12, '0');
+  const anio = (valor) => {
+    const match = texto(valor).match(/(?:19|20)\d{2}/);
+    return match ? match[0] : '9999';
+  };
+  const criterios = [
+    [texto(a.cuenta), texto(b.cuenta)],
+    [texto(a.subcuenta), texto(b.subcuenta)],
+    [texto(a.analitico1), texto(b.analitico1)],
+    [texto(a.analitico2), texto(b.analitico2)],
+    [anio(a.fechaAdquisicion), anio(b.fechaAdquisicion)],
+    [numero(a.rotulo), numero(b.rotulo)],
+    [texto(a.rotulo), texto(b.rotulo)],
+    [texto(a.id), texto(b.id)]
+  ];
+  for (const [izq, der] of criterios) {
+    const comparacion = izq.localeCompare(der, 'es', { numeric: true, sensitivity: 'base' });
+    if (comparacion !== 0) return comparacion;
+  }
+  return 0;
+});
+
 // Handlers de PDFs, QR, CSV, Excel y backup (extraídos de App.jsx, Fase 6).
 // Funciones de presentación: reciben todo por parámetros, sin estado propio.
 //
@@ -669,6 +695,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
   const handleExportInventarioCSV = (registros = filteredBienes) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
+      registros = ordenarBienesExport(registros);
       setIsProcessing({ active: true, text: 'Preparando el CSV…', pct: 0 });
       setTimeout(async () => {
           try {
@@ -715,6 +742,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
   const handleExportInventarioExcel = (registros = filteredBienes) => {
       if (!registros.length) return notify("No hay bienes para exportar", "warning");
+      registros = ordenarBienesExport(registros);
       if (!window.XLSX) return notify("Cargando librería Excel, intenta de nuevo...", "warning");
       setIsProcessing({ active: true, text: 'Preparando Excel…', pct: 0 });
       setTimeout(async () => {
@@ -774,6 +802,7 @@ const handleDownloadSimpleQR = async (bien, returnOnly = false) => {
 
   const handleExportInventarioPDF = (registros = filteredBienes) => {
       if (!registros?.length) return notify('No hay bienes para incluir en el informe.', 'warning');
+      registros = ordenarBienesExport(registros);
       if (!window.jspdf || typeof window.jspdf.jsPDF.API.autoTable !== 'function') return notify('Cargando librerías PDF, intenta de nuevo.', 'warning');
       setIsProcessing({ active: true, text: 'Generando informe de bienes sin asignar...' });
       setTimeout(async () => {

@@ -1693,6 +1693,8 @@ button:disabled {
 .inventory-floating-search-input::-webkit-search-cancel-button,
 .inventory-floating-search-input::-webkit-search-decoration { -webkit-appearance: none; appearance: none; display: none; }
 .inventory-floating-search-input { appearance: none; }
+.file-name-modal { width: min(32rem, calc(100vw - 2rem)); }
+.file-name-modal [data-modal-footer] { background: color-mix(in srgb, var(--surface-2) 82%, var(--brand)); }
 
 /* Panel principal: jerarquía más compacta y equilibrada. */
 .weekly-summary-card { padding: 1rem !important; }

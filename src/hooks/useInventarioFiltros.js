@@ -527,7 +527,11 @@ useEffect(() => {
           return orden.dir === 'desc' ? fb.localeCompare(fa) : fa.localeCompare(fb);
         }
         if (orden?.campo === 'rotulo') {
-          const c = String(a.rotulo || '').localeCompare(String(b.rotulo || ''), 'es', { numeric: true, sensitivity: 'base' });
+          const sufijo = (rotulo) => {
+            const digitos = String(rotulo || '').replace(/\D/g, '');
+            return digitos ? Number(digitos.slice(-4).padStart(4, '0')) : Number.POSITIVE_INFINITY;
+          };
+          const c = sufijo(a.rotulo) - sufijo(b.rotulo) || String(a.rotulo || '').localeCompare(String(b.rotulo || ''), 'es', { numeric: true, sensitivity: 'base' });
           return orden.dir === 'desc' ? -c : c;
         }
         const getSuffixNum = (rot) => { const str = String(rot || '').trim(); const match = str.match(/\d+$/); return match ? parseInt(match[0], 10) : 0; };

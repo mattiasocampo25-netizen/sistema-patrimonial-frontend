@@ -17,7 +17,8 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
       titulo="Nombre del archivo"
       descripcion="Puedes ajustar el nombre antes de descargar."
       icono="fa-file-arrow-down"
-      tamano="sm"
+      tamano="md"
+      className="file-name-modal"
       pie={(
         <div className="grid w-full grid-cols-1 gap-2 sm:flex sm:justify-end">
           <Button variante="secondary" className="w-full sm:w-auto" onClick={onUsarSugerido}>Usar nombre sugerido</Button>
@@ -26,7 +27,7 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
       )}
     >
       <form className="space-y-4 p-5 sm:p-6" onSubmit={(event) => { event.preventDefault(); onAceptar(nombre); }}>
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2.5">
           <label htmlFor="nombre-archivo" className="block text-label font-semibold text-content-2 uppercase tracking-wide">Nombre del archivo</label>
           <div className="flex min-w-0 items-stretch gap-2">
             <Input
@@ -35,7 +36,7 @@ export default function NombreArchivoModal({ solicitud, onAceptar, onUsarSugerid
               autoComplete="off"
               value={nombre}
               onChange={(event) => setNombre(event.target.value)}
-              className="min-w-0 flex-1"
+              className="min-w-0 flex-1 font-medium"
               maxLength={64}
             />
             <span className="inline-flex shrink-0 items-center rounded-control border border-line bg-surface-2 px-3 text-sm font-bold text-content-3">.{solicitud.extension}</span>

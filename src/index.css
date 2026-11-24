@@ -1913,3 +1913,61 @@ button:disabled {
 .dark .organization-dialog .organization-card:hover { box-shadow: none; }
 .users-table-panel tbody td { padding-block: .7rem !important; }
 .users-table-panel tbody tr:hover td { background: color-mix(in srgb, var(--brand) 5%, var(--surface-1)); }
+
+/* Sistema visual transversal v2.20: menos apilamiento, más jerarquía y lectura. */
+:root {
+  --canvas: #f4f7f8;
+  --surface-1: #ffffff;
+  --surface-2: #f8fafb;
+  --surface-3: #edf3f5;
+  --line: #d7e2e6;
+  --line-strong: #bdcfd5;
+  --content-1: #173449;
+  --content-2: #456274;
+  --content-3: #718796;
+}
+.workspace-main { background: var(--canvas) !important; }
+.workspace-main .module-screen { gap: 1.25rem !important; }
+.workspace-main .rounded-panel,
+.workspace-main .rounded-card,
+.workspace-main .rounded-2xl { border-radius: 1rem !important; }
+.workspace-main .shadow-card { box-shadow: 0 8px 24px rgb(24 62 77 / .06) !important; }
+.workspace-main :where(h1) { letter-spacing: -.035em; }
+.workspace-main :where(h2) { letter-spacing: -.02em; }
+.workspace-main :where(button, a) { transition-duration: 160ms; }
+.workspace-main :where(input, select, textarea) { border-color: var(--line-strong); background: var(--surface-1); }
+.workspace-main :where(input, select, textarea):focus { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 14%, transparent); }
+.workspace-main .page-hero,
+.workspace-main .audit-hero,
+.workspace-main .records-hero,
+.workspace-main .users-hero { border-radius: 1.25rem !important; }
+.workspace-main .dashboard-workspaces-grid { margin-top: .25rem; }
+.workspace-main .dashboard-workspaces-grid > aside { gap: 1rem !important; }
+.workspace-main .dashboard-workspaces-grid > section { background: var(--surface-1); }
+.workspace-main .dashboard-workspaces-grid > section > :where(div:first-child) { padding-block: 1rem; }
+.workspace-main .dashboard-workspaces-grid > section > :where(div:last-child) > button { min-height: 4rem; }
+.workspace-main .weekly-summary-card { background: var(--surface-1) !important; border-color: var(--line) !important; }
+.workspace-main .weekly-summary-card > div:last-child > div { background: var(--surface-2); border-color: var(--line); }
+.workspace-main .weekly-summary-card > div:last-child > div:hover { background: var(--surface-3); }
+.workspace-main .inventory-floating-search { width: min(34rem, calc(100vw - 2rem)) !important; }
+.workspace-main .inventory-floating-search > div { min-height: 3.25rem; }
+.workspace-main .modal-content { border-radius: 1.25rem !important; }
+.workspace-main .modal-content > form > div { gap: 1.1rem; }
+.workspace-main .modal-content > form > div > section,
+.workspace-main .modal-content > form > div > div { border-radius: 1rem !important; }
+.workspace-main .users-summary-tile { border-radius: 1rem !important; }
+.workspace-main .audit-nav { border-radius: 1rem !important; }
+.workspace-main .audit-tab { min-height: 3rem !important; }
+.workspace-main table th { background: var(--surface-2); color: var(--content-2); }
+.workspace-main table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 52%, transparent); }
+.dark .workspace-main { background: #102534 !important; }
+.dark .workspace-main :where(input, select, textarea) { background: #162f40; border-color: #365466; }
+.dark .workspace-main .weekly-summary-card,
+.dark .workspace-main .dashboard-workspaces-grid > section { background: #142d3d !important; border-color: #365466 !important; }
+.dark .workspace-main .weekly-summary-card > div:last-child > div { background: #193548; border-color: #365466; }
+.dark .workspace-main table th { background: #193548; color: #c8dbe3; }
+.dark .workspace-main table tbody tr:nth-child(even) td { background: #132c3b; }
+@media (max-width: 900px) {
+  .workspace-main .module-screen { gap: 1rem !important; }
+  .workspace-main .rounded-panel { border-radius: .9rem !important; }
+}

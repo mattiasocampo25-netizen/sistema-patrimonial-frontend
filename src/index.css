@@ -2042,3 +2042,72 @@ button:disabled {
   .workspace-main .module-screen { gap: 1rem !important; }
   .workspace-main .rounded-panel { border-radius: .9rem !important; }
 }
+
+/* Sistema visual v3: una base más editorial para que cada módulo respire. */
+.workspace-main {
+  --module-max: 94rem;
+  --module-gap: clamp(1rem, 1.8vw, 1.6rem);
+}
+.workspace-main .module-screen {
+  width: min(100%, var(--module-max));
+  margin-inline: auto;
+  padding-inline: clamp(.75rem, 2vw, 1.75rem);
+}
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) {
+  min-height: 0 !important;
+  padding: clamp(1.15rem, 2vw, 1.75rem) !important;
+  background: linear-gradient(115deg, #12364c 0%, #155b70 62%, #187f85 100%) !important;
+}
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) :where(h1) {
+  font-size: clamp(1.55rem, 2.35vw, 2.45rem) !important;
+  line-height: 1.08 !important;
+}
+.workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero, .approval-workspace > section:first-child) :where(p) {
+  max-width: 68ch;
+  line-height: 1.5 !important;
+}
+
+/* Reduce the “wall of controls”: action bars are grouped, not stretched. */
+.workspace-main :where(.staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero) > :last-child {
+  gap: .55rem !important;
+}
+.workspace-main :where(.staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero) :where(button) {
+  min-height: 2.55rem;
+  border-radius: .7rem;
+}
+.workspace-main :where(.staff-hero, .users-hero) :where(button:not(.bg-brand):not(.bg-primary)) {
+  color: #d9eef1 !important;
+  border-color: rgb(220 244 246 / .22) !important;
+  background: rgb(255 255 255 / .08) !important;
+}
+.workspace-main :where(.staff-hero, .users-hero) :where(button:not(.bg-brand):not(.bg-primary)):hover {
+  background: rgb(255 255 255 / .16) !important;
+}
+
+/* Dashboard: summary is a single compact band, work and context share a row. */
+.dashboard-stagger { gap: clamp(1rem, 1.8vw, 1.5rem) !important; }
+.dashboard-stagger .weekly-summary-card { padding: clamp(1rem, 1.8vw, 1.35rem) !important; }
+.dashboard-stagger .weekly-summary-card > div:last-child > div { min-height: 4rem !important; }
+.dashboard-workspaces-grid { grid-template-columns: minmax(0, 1.6fr) minmax(19rem, .9fr) !important; }
+.dashboard-workspaces-grid > section > :last-child > button { min-height: 3.4rem !important; }
+.dashboard-workspaces-grid > aside > section[aria-label="Avance de asignación"] { min-height: 0 !important; }
+.dashboard-workspaces-grid > aside details > div { max-height: 22rem !important; }
+.dashboard-stagger section[aria-label="Acciones rápidas"] { margin-top: -.15rem; }
+.dashboard-stagger section[aria-label="Acciones rápidas"] > div:last-child > button { min-height: 4.25rem !important; }
+.quick-action-icon--primary { box-shadow: 0 5px 12px rgb(20 97 126 / .22); }
+
+/* Tables and review modules: preserve function, improve scan rhythm. */
+.workspace-main :where(.table-responsive, .overflow-x-auto) table { min-width: 44rem; }
+.workspace-main :where(.table-responsive, .overflow-x-auto) tbody tr { height: 3.8rem; }
+.workspace-main :where(.table-responsive, .overflow-x-auto) tbody tr:hover td { background: color-mix(in srgb, var(--brand) 5%, var(--surface-1)); }
+.workspace-main :where([role="dialog"], .modal-content) :where(.overflow-y-auto) { scrollbar-gutter: stable; }
+
+@media (max-width: 1180px) {
+  .dashboard-workspaces-grid { grid-template-columns: 1fr !important; }
+  .dashboard-workspaces-grid > aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+}
+@media (max-width: 760px) {
+  .dashboard-stagger .weekly-summary-card > div:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .dashboard-workspaces-grid > aside { display: block; }
+  .workspace-main :where(.page-hero, .summary-hero, .staff-hero, .users-hero, .records-hero, .announcement-hero, .help-hero, .audit-hero) { padding: 1rem !important; }
+}

@@ -166,9 +166,9 @@ export default function AuditoriaView({
           { id: 'calidad', titulo: 'Calidad de datos', descripcion: 'Alertas y recursos', icono: 'fa-shield-halved' },
           { id: 'conteo', titulo: 'Verificación física', descripcion: 'Conteo y muestreo', icono: 'fa-clipboard-check' },
         ].map(tab => (
-          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`audit-tab flex min-h-[66px] items-center gap-2 rounded-control px-3 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-slate-900 text-white shadow-md dark:bg-white dark:text-slate-950' : 'border border-transparent text-content-2 hover:border-line hover:bg-surface-2'}`}>
-            <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:flex ${seccionAuditoria === tab.id ? 'bg-white/15 dark:bg-slate-900/10' : 'bg-brand-soft text-brand-text'}`}><i className={`fa-solid ${tab.icono}`} aria-hidden="true" /></span>
-            <span className="min-w-0"><span className="block truncate text-xs font-bold sm:text-sm">{tab.titulo}</span><span className={`mt-0.5 hidden truncate text-[10px] sm:block ${seccionAuditoria === tab.id ? 'text-white/70 dark:text-slate-600' : 'text-content-3'}`}>{tab.descripcion}</span></span>
+          <button key={tab.id} type="button" role="tab" aria-selected={seccionAuditoria === tab.id} onClick={() => setSeccionAuditoria(tab.id)} className={`audit-tab flex min-h-[66px] items-center gap-2 rounded-control px-3 text-left transition sm:gap-3 sm:px-4 ${seccionAuditoria === tab.id ? 'bg-brand-soft text-[#1C1611] shadow-md' : 'border border-transparent text-content-2 hover:border-line hover:bg-surface-2'}`}>
+            <span className={`hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:flex ${seccionAuditoria === tab.id ? 'bg-black/10 text-[#1C1611]' : 'bg-brand-soft text-brand-text'}`}><i className={`fa-solid ${tab.icono}`} aria-hidden="true" /></span>
+            <span className="min-w-0"><span className="block truncate text-xs font-bold sm:text-sm">{tab.titulo}</span><span className={`mt-0.5 hidden truncate text-[10px] sm:block ${seccionAuditoria === tab.id ? 'text-[#1C1611]/75' : 'text-content-3'}`}>{tab.descripcion}</span></span>
           </button>
         ))}
       </nav>

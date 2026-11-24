@@ -767,6 +767,8 @@ select:focus {
 .fc10-hero .text-content-1, .fc10-hero .text-content-2, .fc10-hero .text-content-3 { color: rgb(255 255 255 / .82) !important; }
 .fc10-hero h1, .fc10-hero h2, .fc10-hero label, .fc10-hero span { color: white; }
 .fc10-hero select, .fc10-hero input { background: #fff; color: #2B2118; }
+.inventory-toolbar { background: #1E1A16 !important; border-color: rgb(255 255 255 / .10) !important; }
+.inventory-toolbar .text-content-3 { color: rgb(255 255 255 / .72); }
 .toast-dismiss { opacity: .72; }
 .toast-dismiss:hover { opacity: 1; }
 

@@ -294,6 +294,7 @@ export default function InventarioView({
   if (filtroEstado !== 'ALL') chips.push({ id: 'est', label: filtroEstado, limpiar: limpiarPag(() => setFiltroEstado('ALL')) });
   if (filtroPendiente) chips.push({ id: 'pend', label: PENDIENTE_LABELS[filtroPendiente] || filtroPendiente, limpiar: limpiarPag(() => setFiltroPendiente('')) });
   if (orden) chips.push({ id: 'ord', label: 'Orden: ' + (ORDENES.find(o => o.id === ordenActual)?.label || ordenActual), limpiar: () => cambiarOrden('natural') });
+  const hayFiltroActivo = chips.some(chip => chip.id !== 'ord');
   return (
 <div className="inventory-view inventory-stagger min-w-0 space-y-4 pb-12 font-sans text-content-1 dark:text-content-1">
 
@@ -312,7 +313,7 @@ export default function InventarioView({
         </div>
         <div className="inventory-view-count flex items-center gap-2 rounded-xl border border-line px-3 py-2 shadow-xs">
           <span className="inventory-view-count-icon flex h-8 w-8 items-center justify-center rounded-lg"><i className="fa-solid fa-boxes-stacked text-xs" aria-hidden="true" /></span>
-          <span className="inventory-view-count-copy"><span className="inventory-view-count-label block text-[10px] font-semibold uppercase tracking-wide">Bienes en esta vista</span><span className="inventory-view-count-value block text-sm font-extrabold tabular-nums">{filteredBienes.length.toLocaleString('es-PY')}</span></span>
+          <span className="inventory-view-count-copy"><span className="inventory-view-count-label block text-[10px] font-semibold uppercase tracking-wide">{hayFiltroActivo ? 'Bienes en esta vista' : 'Bienes registrados'}</span><span className="inventory-view-count-value block text-sm font-extrabold tabular-nums">{(hayFiltroActivo ? filteredBienes.length : stats.totalItems).toLocaleString('es-PY')}</span></span>
         </div>
       </div>
       <div className="inventory-filter-pills mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3" role="group" aria-label="Filtros rápidos del inventario">
@@ -338,25 +339,13 @@ export default function InventarioView({
       {/* Barra de Acciones Rápidas: secundarias con scroll, CTA primario siempre visible */}
       <div className="inventory-actions">
       <div className="inventory-actions-scroll flex items-center gap-2 min-w-0 overflow-x-auto hide-scrollbar py-0.5 -my-0.5">
-        <Button variante="subtle" icono="fa-file-excel" onClick={handleDownloadTemplateCSV} title="Descargar Plantilla CSV">
-          {t('inv.plantilla')}
-        </Button>
-
-        {isAdmin && <Button variante="subtle" icono="fa-file-import" onClick={() => fileInputRef.current?.click()} title="Importar archivo CSV">
-          {t('inv.importar')}
-        </Button>}
-
-        <Button variante="subtle" icono="fa-file-export" onClick={handleExportInventarioCSV} title="Exportar archivo CSV">
-          {t('inv.exportar')}
-        </Button>
-
-        <Button variante="subtle" icono="fa-file-excel" onClick={handleExportInventarioExcel} title="Exportar Excel real (.xlsx)">
-          {t('inv.excel')}
-        </Button>
-
         <details className="inventory-export-menu relative shrink-0">
-          <summary className="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-2 hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Exportar libres <i className="fa-solid fa-chevron-down text-[10px]" aria-hidden="true" /></summary>
+          <summary className="inline-flex h-10 cursor-pointer list-none items-center gap-2 rounded-control border border-white/10 bg-[#1E1A16] px-3 text-xs font-semibold text-white/85 hover:bg-[#2A241E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand">Importar / Exportar <i className="fa-solid fa-chevron-down text-[10px]" aria-hidden="true" /></summary>
           <div className="absolute left-0 top-full z-40 mt-2 grid min-w-48 gap-1 rounded-card border border-line bg-surface-1 p-2 shadow-pop">
+            <button type="button" onClick={handleDownloadTemplateCSV} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2">Plantilla CSV</button>
+            {isAdmin && <button type="button" onClick={() => fileInputRef.current?.click()} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2">Importar CSV</button>}
+            <button type="button" onClick={() => handleExportInventarioExcel()} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2">Exportar Excel</button>
+            <button type="button" onClick={() => handleExportInventarioCSV()} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2">Exportar CSV</button>
             <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioCSV(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">CSV de bienes libres</button>
             <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioExcel(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">Excel de bienes libres</button>
             <button type="button" disabled={!bienesLibresParaAsignar.length} onClick={() => handleExportInventarioPDF(bienesLibresParaAsignar)} className="rounded-control px-3 py-2 text-left text-xs text-content-2 hover:bg-surface-2 disabled:opacity-40">PDF de bienes libres</button>
@@ -495,14 +484,6 @@ export default function InventarioView({
         etiquetaTodos="FC-10: Todos"
         titulo="Filtrar por FC-10"
       />
-
-      <label className="flex h-10 min-w-0 items-center gap-2 rounded-control border border-line bg-surface-1 px-3 text-xs font-semibold text-content-2">
-        <i className="fa-solid fa-arrow-down-wide-short text-content-3" aria-hidden="true" />
-        <span className="sr-only">Ordenar inventario</span>
-        <select value={ordenActual} onChange={event => cambiarOrden(event.target.value)} aria-label="Ordenar inventario" className="min-w-0 flex-1 bg-transparent text-xs font-semibold text-content-1 outline-none">
-          {ORDENES.map(opcion => <option key={opcion.id} value={opcion.id}>{opcion.label}</option>)}
-        </select>
-      </label>
 
     </div>
 
@@ -675,14 +656,6 @@ export default function InventarioView({
               </button>
             ))}
           </div>
-          <FiltroCombo
-            valor={ORDENES.find(o => o.id === ordenActual)?.label || ''}
-            opciones={ORDENES.map(o => o.label)}
-            onElegir={(v) => cambiarOrden(ORDENES.find(o => o.label === v)?.id || 'natural')}
-            etiquetaTodos="Orden"
-            titulo="Orden de la tabla"
-            ancho="w-[190px]"
-          />
           <button
             onClick={cambiarDensidad}
             title={compacto ? 'Vista cómoda' : 'Vista compacta'}
